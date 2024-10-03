@@ -1,0 +1,56 @@
+name: Oculab
+settings:
+  MARKETING_VERSION: "1.0"
+  CURRENT_PROJECT_VERSION: 1
+  DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM_ID}
+options:
+  bundleIdPrefix: com.Oculab
+  resolvePackagesAutomatically: true
+targets:
+  Oculab:
+    type: application
+    platform: iOS
+    supportedDestinations: [iOS]
+    deploymentTarget: "17.0"
+    sources: [Oculab]
+    info:
+        path: Oculab/Info.plist
+        properties:
+          UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.Oculab.Oculab
+      TARGETED_DEVICE_FAMILY: 1
+      DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM_ID}
+    dependencies: [] # Add dependencies here if needed
+  OculabTests:
+    type: bundle.unit-test
+    supportedDestinations: [iOS]
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources: [OculabTests]
+    dependencies:
+      - target: Oculab
+    info:
+        path: OculabTests/Info.plist
+        properties:
+          UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+    settings:
+      TARGETED_DEVICE_FAMILY: 1
+      PRODUCT_BUNDLE_IDENTIFIER: com.Oculab.OculabTests
+      DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM_ID}
+
+#  MyFramework:
+#    type: framework
+#    platform: iOS
+#    sources: [MyFramework]
+    
+schemes:
+  Oculab:
+    build:
+      targets:
+        Oculab: all
+        OculabTests: all
+    test:
+      targets:
+        OculabTests: all
+      gatherCoverageData: true
