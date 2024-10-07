@@ -2,7 +2,7 @@ name: Oculab
 settings:
   MARKETING_VERSION: "1.0"
   CURRENT_PROJECT_VERSION: 1
-  DEVELOPMENT_TEAM: XSHZNN2ULY
+  DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM_ID}
 options:
   bundleIdPrefix: com.Oculab
   resolvePackagesAutomatically: true
@@ -20,7 +20,7 @@ targets:
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.Oculab.Oculab
       TARGETED_DEVICE_FAMILY: 1
-      DEVELOPMENT_TEAM: XSHZNN2ULY
+      DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM_ID}
     dependencies: [] # Add dependencies here if needed
   OculabTests:
     type: bundle.unit-test
@@ -37,7 +37,7 @@ targets:
     settings:
       TARGETED_DEVICE_FAMILY: 1
       PRODUCT_BUNDLE_IDENTIFIER: com.Oculab.OculabTests
-      DEVELOPMENT_TEAM: XSHZNN2ULY
+      DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM_ID}
       ENABLE_TESTABILITY: YES
 
 #  MyFramework:
