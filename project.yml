@@ -21,6 +21,7 @@ targets:
       PRODUCT_BUNDLE_IDENTIFIER: com.Oculab.Oculab
       TARGETED_DEVICE_FAMILY: 1
       DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM_ID}
+      ENABLE_TESTABILITY: YES
     dependencies: [] # Add dependencies here if needed
   OculabTests:
     type: bundle.unit-test
