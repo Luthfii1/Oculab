@@ -53,5 +53,5 @@ schemes:
         OculabTests: all
     test:
       targets:
-        OculabTests: all
+      - name: OculabTests
       gatherCoverageData: true
