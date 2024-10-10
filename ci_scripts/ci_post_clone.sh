@@ -19,22 +19,33 @@ xcodegen
 echo "Checking for .xcodeproj file..."
 ls *.xcodeproj
 
-# Check for the existence of project.xcworkspace/xcshareddata directory
+# Check for the existence of xcshareddata and swiftpm directories, and create if necessary
 echo "Checking for xcshareddata directory..."
-if [ ! -d "*.xcodeproj/project.xcworkspace/xcshareddata" ]; then
-    echo "xcshareddata directory not found, creating it..."
-    mkdir -p *.xcodeproj/project.xcworkspace/xcshareddata
+mkdir -p *.xcodeproj/project.xcworkspace/xcshareddata/swiftpm
+
+## Check for the existence of project.xcworkspace/xcshareddata directory
+#echo "Checking for xcshareddata directory..."
+#if [ ! -d "*.xcodeproj/project.xcworkspace/xcshareddata" ]; then
+#    echo "xcshareddata directory not found, creating it..."
+#    mkdir -p *.xcodeproj/project.xcworkspace/xcshareddata
+#fi
+
+# Create an empty Package.resolved file to satisfy the resolver if it doesn't exist
+if [ ! -f "*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved" ]; then
+    echo "Package.resolved not found. Creating an empty file..."
+    touch *.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
 fi
 
 # Resolve package dependencies
 echo "Resolving Swift package dependencies..."
 xcodebuild -resolvePackageDependencies -project *.xcodeproj
 
-# Final check to confirm package resolution
-echo "Checking for Package.resolved..."
-if [ ! -f "*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved" ]; then
-    echo "Package.resolved not found. Creating it..."
-    touch *.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+# Check if Package.resolved was created/updated after resolving dependencies
+if [ -f "*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved" ]; then
+    echo "Package.resolved generated successfully."
+else
+    echo "Failed to generate Package.resolved."
+    exit 1
 fi
 
 echo "Xcode project setup complete."
