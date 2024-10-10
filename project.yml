@@ -22,7 +22,27 @@ targets:
       TARGETED_DEVICE_FAMILY: 1
       DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM_ID}
       ENABLE_TESTABILITY: YES
-    dependencies: [] # Add dependencies here if needed
+    dependencies:
+      - package: Alamofire  # Add Alamofire as a package dependency
+    postCompileScripts:
+      - script: |
+          export PATH="$PATH:/opt/homebrew/bin"
+          if which swiftformat >/dev/null; then
+            swiftformat .
+          else
+            echo "warning: Swiftformat not installed"
+          fi
+        name: SwiftFormat
+        showEnvVars: true
+#    buildPhases:
+#      - name: SwiftFormat
+#        script: |
+#          export PATH="$PATH:/opt/homebrew/bin"
+#          if which swiftformat >/dev/null; then
+#            swiftformat .
+#          else
+#            echo "warning: Swiftformat not installed"
+#          fi
   OculabTests:
     type: bundle.unit-test
     supportedDestinations: [iOS]
@@ -40,11 +60,6 @@ targets:
       PRODUCT_BUNDLE_IDENTIFIER: com.Oculab.OculabTests
       DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM_ID}
       ENABLE_TESTABILITY: YES
-
-#  MyFramework:
-#    type: framework
-#    platform: iOS
-#    sources: [MyFramework]
     
 schemes:
   Oculab:
@@ -56,3 +71,8 @@ schemes:
       targets:
       - name: OculabTests
       gatherCoverageData: true
+
+packages:  # Add the Swift packages section to define Alamofire
+  Alamofire:
+    url: https://github.com/Alamofire/Alamofire
+    from: 5.9.1
