@@ -8,7 +8,7 @@
 import Foundation
 
 class Examination: Decodable, Identifiable {
-    var id: UUID = UUID()
+    var id: UUID = .init()
     var goal: ExamGoalType
     var preparationType: ExamPreparationType
     var slideID: String
@@ -17,8 +17,18 @@ class Examination: Decodable, Identifiable {
     var timestamp: Date
     var FOV: [FOVData]?
     var result: ExamResult
-    
-    init(id: UUID, goal: ExamGoalType, preparationType: ExamPreparationType, slideID: String, recordVideo: Data, WSI: String? = nil, timestamp: Date, FOV: [FOVData]? = nil, result: ExamResult) {
+
+    init(
+        id: UUID,
+        goal: ExamGoalType,
+        preparationType: ExamPreparationType,
+        slideID: String,
+        recordVideo: Data,
+        WSI: String? = nil,
+        timestamp: Date,
+        FOV: [FOVData]? = nil,
+        result: ExamResult
+    ) {
         self.id = id
         self.goal = goal
         self.preparationType = preparationType

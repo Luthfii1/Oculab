@@ -24,8 +24,25 @@ targets:
       ENABLE_TESTABILITY: YES
     dependencies:
       - package: Alamofire  # Add Alamofire as a package dependency
-        requirement:
-          branch: main      # You can change this to a version or exact tag if needed
+    postCompileScripts:
+      - script: |
+          export PATH="$PATH:/opt/homebrew/bin"
+          if which swiftformat >/dev/null; then
+            swiftformat .
+          else
+            echo "warning: Swiftformat not installed"
+          fi
+        name: SwiftFormat
+        showEnvVars: true
+#    buildPhases:
+#      - name: SwiftFormat
+#        script: |
+#          export PATH="$PATH:/opt/homebrew/bin"
+#          if which swiftformat >/dev/null; then
+#            swiftformat .
+#          else
+#            echo "warning: Swiftformat not installed"
+#          fi
   OculabTests:
     type: bundle.unit-test
     supportedDestinations: [iOS]
@@ -58,5 +75,4 @@ schemes:
 packages:  # Add the Swift packages section to define Alamofire
   Alamofire:
     url: https://github.com/Alamofire/Alamofire
-    requirement:
-      branch: main  # Or specify a version requirement, e.g., version: "5.4.0"
+    from: 5.9.1

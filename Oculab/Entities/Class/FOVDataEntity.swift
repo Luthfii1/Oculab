@@ -8,13 +8,13 @@
 import Foundation
 
 class FOVData: Decodable, Identifiable {
-    var id: UUID = UUID()
+    var id: UUID = .init()
     var link: String
     var type: FOVType
     var order: Int
     var comment: [String]?
     var count: Int
-    
+
     init(id: UUID, link: String, type: FOVType, order: Int, comment: [String]? = nil, count: Int) {
         self.id = id
         self.link = link
