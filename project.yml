@@ -22,7 +22,10 @@ targets:
       TARGETED_DEVICE_FAMILY: 1
       DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM_ID}
       ENABLE_TESTABILITY: YES
-    dependencies: [] # Add dependencies here if needed
+    dependencies:
+      - package: Alamofire  # Add Alamofire as a package dependency
+        requirement:
+          branch: main      # You can change this to a version or exact tag if needed
   OculabTests:
     type: bundle.unit-test
     supportedDestinations: [iOS]
@@ -40,11 +43,6 @@ targets:
       PRODUCT_BUNDLE_IDENTIFIER: com.Oculab.OculabTests
       DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM_ID}
       ENABLE_TESTABILITY: YES
-
-#  MyFramework:
-#    type: framework
-#    platform: iOS
-#    sources: [MyFramework]
     
 schemes:
   Oculab:
@@ -56,3 +54,9 @@ schemes:
       targets:
       - name: OculabTests
       gatherCoverageData: true
+
+packages:  # Add the Swift packages section to define Alamofire
+  Alamofire:
+    url: https://github.com/Alamofire/Alamofire
+    requirement:
+      branch: main  # Or specify a version requirement, e.g., version: "5.4.0"

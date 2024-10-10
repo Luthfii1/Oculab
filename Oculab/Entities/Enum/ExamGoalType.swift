@@ -1,0 +1,13 @@
+//
+//  ExamGoalType.swift
+//  Oculab
+//
+//  Created by Luthfi Misbachul Munir on 10/10/24.
+//
+
+import Foundation
+
+enum ExamGoalType: String, Decodable {
+    case SCREENING
+    case TREATMENT
+}
