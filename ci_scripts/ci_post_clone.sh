@@ -65,19 +65,18 @@ cd ..
 echo "Generating Xcode project..."
 xcodegen
 echo "Check file on .xcodeproj"
-ls *.xcodeproj
+ls Oculab.xcodeproj
 echo "Check file on project.xcworkspace"
 echo "Check file on xcshareddata"
-ls *.xcodeproj/project.xcworkspace/xcshareddata
+ls Oculab.xcodeproj/project.xcworkspace/xcshareddata
 # BASED ON MY EXPERIENCE xcshareddata DIRECTORY IS NOT EXIST, YOU NEED TO CREATE THE DIRECTORY
-mkdir *.xcodeproj/project.xcworkspace/xcshareddata
+mkdir Oculab.xcodeproj/project.xcworkspace/xcshareddata
 # BASED ON MY EXPERIENCE swiftpm DIRECTORY IS NOT EXIST, YOU NEED TO CREATE THE DIRECTORY
-mkdir *.xcodeproj/project.xcworkspace/xcshareddata/swiftpm
+mkdir Oculab.xcodeproj/project.xcworkspace/xcshareddata/swiftpm
 # BASED ON MY EXPERIENCE Package.resolved DIRECTORY IS NOT EXIST, YOU NEED TO CREATE THE DIRECTORY
-touch *.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+touch Oculab.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
 echo "Creating Package.resolved..."
-cat <<EOL > *.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
-
+cat <<EOL > Oculab.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
 {
   "originHash" : "",
   "pins" : [
@@ -96,9 +95,9 @@ cat <<EOL > *.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolve
 EOL
 # Resolve package dependencies to generate Package.resolved
 echo "Resolving package dependencies..."
-xcodebuild -resolvePackageDependencies -project *.xcodeproj -scheme Oculab
+xcodebuild -resolvePackageDependencies -project Oculab.xcodeproj -scheme Oculab
 # Check if Package.resolved was created
-if [ -f "*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved" ]; then
+if [ -f "Oculab.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved" ]; then
     echo "Package.resolved generated successfully."
 else
     echo "Failed to generate Package.resolved."
