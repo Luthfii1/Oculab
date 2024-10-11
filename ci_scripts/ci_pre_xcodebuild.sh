@@ -4,7 +4,7 @@ bash
 cd ..
 # Resolve Swift package dependencies
 echo "Resolving Swift package dependencies..."
-if [ -f "*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved" ]; then
+if [ -f "Oculab.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved" ]; then
     echo "Package.resolved already exists."
 else
     echo "Resolving packages..."
