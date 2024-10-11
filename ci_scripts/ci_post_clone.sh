@@ -67,8 +67,19 @@ xcodegen
 echo "Check file on .xcodeproj"
 ls Oculab.xcodeproj
 echo "Check file on project.xcworkspace"
+# Check if necessary directories exist
 echo "Check file on xcshareddata"
-ls Oculab.xcodeproj/project.xcworkspace/xcshareddata
+if [ ! -d "Oculab.xcodeproj/project.xcworkspace/xcshareddata" ]; then
+    mkdir Oculab.xcodeproj/project.xcworkspace/xcshareddata
+fi
+
+# Remove any existing Package.resolved to avoid conflicts
+echo "Removing old Package.resolved..."
+rm -f Oculab.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+
+# Resolve package dependencies
+echo "Resolving package dependencies..."
+xcodebuild -resolvePackageDependencies -project Oculab.xcodeproj -scheme Oculab
 ## BASED ON MY EXPERIENCE xcshareddata DIRECTORY IS NOT EXIST, YOU NEED TO CREATE THE DIRECTORY
 #mkdir Oculab.xcodeproj/project.xcworkspace/xcshareddata
 ## BASED ON MY EXPERIENCE swiftpm DIRECTORY IS NOT EXIST, YOU NEED TO CREATE THE DIRECTORY
@@ -104,12 +115,13 @@ ls Oculab.xcodeproj/project.xcworkspace/xcshareddata
 #    exit 1
 #fi
 
-# Ensure directories exist, but don't create Package.resolved manually
-mkdir -p Oculab.xcodeproj/project.xcworkspace/xcshareddata/swiftpm
-
-# Resolve package dependencies
-echo "Resolving package dependencies..."
-xcodebuild -resolvePackageDependencies -project Oculab.xcodeproj -scheme Oculab
+# Check if Package.resolved was successfully generated
+if [ -f "Oculab.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved" ]; then
+    echo "Package.resolved generated successfully."
+else
+    echo "Failed to generate Package.resolved."
+    exit 1
+fi
 
 if [ $? -eq 0 ]; then
     echo "Package dependencies resolved successfully."
