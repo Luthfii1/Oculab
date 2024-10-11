@@ -50,7 +50,7 @@
 #
 #echo "Xcode project setup complete."
 
-bash
+#bash
 #!/bin/bash
 # Install XcodeGen if it's not already installed
 if ! command -v xcodegen &> /dev/null; then
@@ -69,37 +69,51 @@ ls Oculab.xcodeproj
 echo "Check file on project.xcworkspace"
 echo "Check file on xcshareddata"
 ls Oculab.xcodeproj/project.xcworkspace/xcshareddata
-# BASED ON MY EXPERIENCE xcshareddata DIRECTORY IS NOT EXIST, YOU NEED TO CREATE THE DIRECTORY
-mkdir Oculab.xcodeproj/project.xcworkspace/xcshareddata
-# BASED ON MY EXPERIENCE swiftpm DIRECTORY IS NOT EXIST, YOU NEED TO CREATE THE DIRECTORY
-mkdir Oculab.xcodeproj/project.xcworkspace/xcshareddata/swiftpm
-# BASED ON MY EXPERIENCE Package.resolved DIRECTORY IS NOT EXIST, YOU NEED TO CREATE THE DIRECTORY
-touch Oculab.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
-echo "Creating Package.resolved..."
-cat <<EOL > Oculab.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
-{
-  "originHash" : "",
-  "pins" : [
-    {
-      "identity" : "",
-      "kind" : "",
-      "location" : "",
-      "state" : {
-        "revision" : "",
-        "version" : ""
-      }
-    }
-  ],
-  "version" : 3
-}
-EOL
-# Resolve package dependencies to generate Package.resolved
+## BASED ON MY EXPERIENCE xcshareddata DIRECTORY IS NOT EXIST, YOU NEED TO CREATE THE DIRECTORY
+#mkdir Oculab.xcodeproj/project.xcworkspace/xcshareddata
+## BASED ON MY EXPERIENCE swiftpm DIRECTORY IS NOT EXIST, YOU NEED TO CREATE THE DIRECTORY
+#mkdir Oculab.xcodeproj/project.xcworkspace/xcshareddata/swiftpm
+## BASED ON MY EXPERIENCE Package.resolved DIRECTORY IS NOT EXIST, YOU NEED TO CREATE THE DIRECTORY
+#touch Oculab.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+#echo "Creating Package.resolved..."
+#cat <<EOL > Oculab.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+#{
+#  "originHash" : "",
+#  "pins" : [
+#    {
+#      "identity" : "",
+#      "kind" : "",
+#      "location" : "",
+#      "state" : {
+#        "revision" : "",
+#        "version" : ""
+#      }
+#    }
+#  ],
+#  "version" : 3
+#}
+#EOL
+## Resolve package dependencies to generate Package.resolved
+#echo "Resolving package dependencies..."
+#xcodebuild -resolvePackageDependencies -project Oculab.xcodeproj -scheme Oculab
+## Check if Package.resolved was created
+#if [ -f "Oculab.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved" ]; then
+#    echo "Package.resolved generated successfully."
+#else
+#    echo "Failed to generate Package.resolved."
+#    exit 1
+#fi
+
+# Ensure directories exist, but don't create Package.resolved manually
+mkdir -p Oculab.xcodeproj/project.xcworkspace/xcshareddata/swiftpm
+
+# Resolve package dependencies
 echo "Resolving package dependencies..."
 xcodebuild -resolvePackageDependencies -project Oculab.xcodeproj -scheme Oculab
-# Check if Package.resolved was created
-if [ -f "Oculab.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved" ]; then
-    echo "Package.resolved generated successfully."
+
+if [ $? -eq 0 ]; then
+    echo "Package dependencies resolved successfully."
 else
-    echo "Failed to generate Package.resolved."
+    echo "Failed to resolve package dependencies."
     exit 1
 fi
