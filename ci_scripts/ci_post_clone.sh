@@ -127,5 +127,5 @@ if [ $? -eq 0 ]; then
     echo "Package dependencies resolved successfully."
 else
     echo "Failed to resolve package dependencies."
-    exit 1
+    exit 2
 fi
