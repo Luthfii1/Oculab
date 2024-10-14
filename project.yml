@@ -46,6 +46,7 @@ targets:
           fi
         name: SwiftFormat
         showEnvVars: true
+        basedOnDependencyAnalysis: false
   OculabTests:
     type: bundle.unit-test
     supportedDestinations: [iOS]

@@ -19,7 +19,10 @@ struct CameraView: View {
                 .environmentObject(videoRecordPresenter)
         }
         .onAppear {
-            videoRecordPresenter.checkPermission()
+            Task {
+                videoRecordPresenter.checkPermission()
+//                videoRecordPresenter.previewSetup()
+            }
         }
         .alert(isPresented: $videoRecordPresenter.alert) {
             Alert(
