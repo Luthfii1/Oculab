@@ -80,9 +80,8 @@ struct AppTextBox: View {
                         .foregroundColor(AppColors.slate900)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 14)
-                   
                 }
-                
+
                 // Placeholder Text
                 if internalText.isEmpty {
                     Text(placeholder)
@@ -92,7 +91,7 @@ struct AppTextBox: View {
                         .allowsHitTesting(false) // Allow typing when placeholder is visible
                 }
             }
-            
+
             .frame(height: 100) // Adjustable height for TextBox
 
             Spacer().frame(height: 8)

@@ -8,23 +8,40 @@
 import SwiftUI
 
 struct Status: View {
-    var title: String
+    var type: StatusType
 
     var body: some View {
-        VStack(alignment: .leading) {
-            Text(title)
-                .foregroundStyle(AppColors.orange500)
+        switch type {
+        case .draft:
+            VStack(alignment: .leading) {
+                Text("Belum disimpulkan")
+                    .foregroundStyle(AppColors.orange500)
+            }
+            .font(AppTypography.s6)
+            .padding(.horizontal, Decimal.d8)
+            .padding(.vertical, Decimal.d6)
+            .background(AppColors.orange50)
+            .cornerRadius(Decimal.d4)
+
+        case .done:
+            VStack(alignment: .leading) {
+                Text("Selesai")
+                    .foregroundStyle(AppColors.blue500)
+            }
+            .font(AppTypography.s6)
+            .padding(.horizontal, Decimal.d8)
+            .padding(.vertical, Decimal.d6)
+            .background(AppColors.blue50)
+            .cornerRadius(Decimal.d4)
+
+        case .none:
+            EmptyView()
         }
-        .font(AppTypography.s6)
-        .padding(.horizontal, Decimal.d8)
-        .padding(.vertical, Decimal.d6)
-        .background(AppColors.orange50)
-        .cornerRadius(Decimal.d4)
     }
 }
 
 #Preview {
     Status(
-        title: "Belum disimpulkan"
+        type: .done
     )
 }
