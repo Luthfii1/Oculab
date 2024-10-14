@@ -85,6 +85,7 @@ struct AppTextBox: View {
                 // Placeholder Text
                 if internalText.isEmpty {
                     Text(placeholder)
+                        .font(AppTypography.p2)
                         .foregroundColor(AppColors.slate400)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 14)
