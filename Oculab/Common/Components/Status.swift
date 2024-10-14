@@ -1,46 +1,30 @@
 //
-//  Card 2.swift
+//  Status.swift
 //  Oculab
 //
-//  Created by Alifiyah Ariandri on 14/10/24.
+//  Created by Risa on 14/10/24.
 //
 
 import SwiftUI
 
-struct Card: View {
-    var icon: String
+struct Status: View {
     var title: String
-//    var status:
-    var titleSize: Font
 
     var body: some View {
         VStack(alignment: .leading) {
-            HStack {
-                Image(systemName: icon)
-                    .foregroundColor(AppColors.purple500)
-                Text(title)
-                    .padding(.leading, Decimal.d8)
-                Spacer()
-            }
+            Text(title)
+                .foregroundStyle(AppColors.orange500)
         }
-        .font(AppTypography.s4_1)
-        .padding(.horizontal, Decimal.d12)
-        .padding(.vertical, Decimal.d16)
-        .frame(maxWidth: .infinity, alignment: .topLeading)
-        .background(.white)
-        .cornerRadius(Decimal.d12)
-        .overlay(
-            RoundedRectangle(cornerRadius: Decimal.d12)
-                .stroke(AppColors.slate100)
-        )
-        .padding(.horizontal, Decimal.d20)
+        .font(AppTypography.s6)
+        .padding(.horizontal, Decimal.d8)
+        .padding(.vertical, Decimal.d6)
+        .background(AppColors.orange50)
+        .cornerRadius(Decimal.d4)
     }
 }
 
 #Preview {
-    Card(
-        icon: "person.fill",
-        title: "Data Pasien",
-        titleSize: AppTypography.s5
+    Status(
+        title: "Belum disimpulkan"
     )
 }
