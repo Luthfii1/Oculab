@@ -1,5 +1,5 @@
 //
-//  Button.swift
+//  AppButton.swift
 //  Oculab
 //
 //  Created by Alifiyah Ariandri on 14/10/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CustomButton: View {
+struct AppButton: View {
     enum ButtonSize {
         case large, small
     }
@@ -15,6 +15,8 @@ struct CustomButton: View {
     enum ButtonColorType {
         case primary, secondary, tertiary
     }
+
+    @State private var isPressed: Bool = false
 
     var title: String
     var leftIcon: String? = nil
@@ -25,15 +27,26 @@ struct CustomButton: View {
     var isEnabled: Bool = true
     var action: () -> Void
 
-    // Button background and foreground color based on color type and enabled state
+    // Button background and foreground color based on color type, enabled state, and pressed state
     private var backgroundColor: Color {
-        switch colorType {
-        case .primary:
-            return isEnabled ? AppColors.purple500 : AppColors.slate50
-        case .secondary:
-            return isEnabled ? AppColors.purple50 : .clear // Background clear when disabled
-        case .tertiary:
-            return isEnabled ? AppColors.slate0 : AppColors.slate0
+        if isPressed {
+            switch colorType {
+            case .primary:
+                return AppColors.purple700
+            case .secondary:
+                return AppColors.purple100
+            case .tertiary:
+                return AppColors.slate0
+            }
+        } else {
+            switch colorType {
+            case .primary:
+                return isEnabled ? AppColors.purple500 : AppColors.slate50
+            case .secondary:
+                return isEnabled ? AppColors.purple50 : .clear
+            case .tertiary:
+                return .clear
+            }
         }
     }
 
@@ -51,7 +64,7 @@ struct CustomButton: View {
     private var borderColor: Color {
         switch colorType {
         case .secondary:
-            return isEnabled ? .clear : AppColors.slate200 // Border slate200 when disabled
+            return isEnabled ? .clear : AppColors.slate200
         default:
             return .clear
         }
@@ -113,8 +126,21 @@ struct CustomButton: View {
             .opacity(isEnabled ? 1 : 0.5) // Dims the button when disabled
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius)
-                    .stroke(borderColor, lineWidth: 2) // Adds a border when disabled
+                    .stroke(borderColor, lineWidth: 1) // Adds a border when disabled
             )
+            .onTapGesture {
+                if isEnabled {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        isPressed = true
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            isPressed = false
+                        }
+                        action()
+                    }
+                }
+            }
         }
         .disabled(!isEnabled) // Disables button interaction when false
     }
@@ -122,7 +148,7 @@ struct CustomButton: View {
 
 #Preview {
     VStack(spacing: 20) {
-        CustomButton(
+        AppButton(
             title: "Primary Enabled",
             leftIcon: "person.fill", // Optional left icon
             rightIcon: "chevron.right", // Optional right icon
@@ -133,7 +159,7 @@ struct CustomButton: View {
             print("Primary Button Tapped")
         }
 
-        CustomButton(
+        AppButton(
             title: "Primary Disabled",
             leftIcon: "person.fill",
             rightIcon: "chevron.right",
@@ -144,7 +170,7 @@ struct CustomButton: View {
             print("Should not be tapped")
         }
 
-        CustomButton(
+        AppButton(
             title: "Secondary Enabled",
             colorType: .secondary,
             size: .small,
@@ -153,7 +179,7 @@ struct CustomButton: View {
             print("Secondary Button Tapped")
         }
 
-        CustomButton(
+        AppButton(
             title: "Secondary Disabled",
             colorType: .secondary,
             size: .small,
@@ -162,7 +188,7 @@ struct CustomButton: View {
             print("Should not be tapped")
         }
 
-        CustomButton(
+        AppButton(
             title: "Tertiary Enabled",
             colorType: .tertiary,
             size: .large,
@@ -171,7 +197,7 @@ struct CustomButton: View {
             print("Tertiary Button Tapped")
         }
 
-        CustomButton(
+        AppButton(
             title: "Tertiary Disabled",
             colorType: .tertiary,
             size: .large,
