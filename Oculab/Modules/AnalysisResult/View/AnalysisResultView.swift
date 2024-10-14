@@ -9,7 +9,20 @@ import SwiftUI
 
 struct AnalysisResultView: View {
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack {
+            FolderCard(
+                title: "0 BTA",
+                images: "9 Gambar"
+            )
+            FolderCard(
+                title: "1-9 BTA",
+                images: "9 Gambar"
+            )
+            FolderCard(
+                title: "≥ 10 BTA",
+                images: "9 Gambar"
+            )
+        }
     }
 }
 
