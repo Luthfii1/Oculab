@@ -24,7 +24,11 @@ targets:
     info:
         path: Oculab/Info.plist
         properties:
+          CFBundleDisplayName: Oculab
+          LSApplicationCategoryType: public.app-category.medical
           UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+          UILaunchScreen:
+            UIImageName: ""
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.Oculab.Oculab
       TARGETED_DEVICE_FAMILY: 1
@@ -42,15 +46,6 @@ targets:
           fi
         name: SwiftFormat
         showEnvVars: true
-#    buildPhases:
-#      - name: SwiftFormat
-#        script: |
-#          export PATH="$PATH:/opt/homebrew/bin"
-#          if which swiftformat >/dev/null; then
-#            swiftformat .
-#          else
-#            echo "warning: Swiftformat not installed"
-#          fi
   OculabTests:
     type: bundle.unit-test
     supportedDestinations: [iOS]
