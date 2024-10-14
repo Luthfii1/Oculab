@@ -1,11 +1,19 @@
 name: Oculab
+
+options:
+  bundleIdPrefix: com.Oculab
+#  resolvePackagesAutomatically: YES
+  
 settings:
   MARKETING_VERSION: "1.0"
   CURRENT_PROJECT_VERSION: 1
   DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM_ID}
-options:
-  bundleIdPrefix: com.Oculab
-  resolvePackagesAutomatically: true
+  
+packages:
+  Alamofire:
+    url: https://github.com/Alamofire/Alamofire
+    from: 5.9.1
+  
 targets:
   Oculab:
     type: application
@@ -23,7 +31,7 @@ targets:
       DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM_ID}
       ENABLE_TESTABILITY: YES
     dependencies:
-      - package: Alamofire  # Add Alamofire as a package dependency
+      - package: Alamofire
     postCompileScripts:
       - script: |
           export PATH="$PATH:/opt/homebrew/bin"
@@ -71,8 +79,3 @@ schemes:
       targets:
       - name: OculabTests
       gatherCoverageData: true
-
-packages:  # Add the Swift packages section to define Alamofire
-  Alamofire:
-    url: https://github.com/Alamofire/Alamofire
-    from: 5.9.1
