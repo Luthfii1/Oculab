@@ -1,5 +1,5 @@
 //
-//  Status.swift
+//  StatusTag.swift
 //  Oculab
 //
 //  Created by Risa on 14/10/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct Status: View {
+struct StatusTag: View {
     var type: StatusType
 
     var body: some View {
@@ -41,7 +41,7 @@ struct Status: View {
 }
 
 #Preview {
-    Status(
+    StatusTag(
         type: .done
     )
 }

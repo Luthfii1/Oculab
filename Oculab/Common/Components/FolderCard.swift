@@ -24,8 +24,8 @@ struct FolderCard: View {
             }
         }
         .font(AppTypography.s4_1)
-        .padding(.horizontal, Decimal.d12)
-        .padding(.vertical, Decimal.d16)
+        .padding(.horizontal, Decimal.d16)
+        .padding(.vertical, Decimal.d12)
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .background(.white)
         .cornerRadius(Decimal.d12)
@@ -33,7 +33,6 @@ struct FolderCard: View {
             RoundedRectangle(cornerRadius: Decimal.d12)
                 .stroke(AppColors.slate100)
         )
-        .padding(.horizontal, Decimal.d20)
     }
 }
 
