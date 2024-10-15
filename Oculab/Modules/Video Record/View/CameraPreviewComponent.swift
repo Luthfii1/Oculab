@@ -13,20 +13,30 @@ struct CameraPreviewComponent: UIViewRepresentable {
     var size: CGSize
 
     func makeUIView(context: Context) -> UIView {
-        let view = UIView()
+        let view = UIView(frame: CGRect(origin: .zero, size: size))
 
-        videoRecordPresenter.preview = AVCaptureVideoPreviewLayer(session: videoRecordPresenter.session)
-        videoRecordPresenter.preview.frame.size = size
+        let previewLayer = AVCaptureVideoPreviewLayer(session: videoRecordPresenter.session)
+        previewLayer.frame = view.bounds
+        previewLayer.videoGravity = .resizeAspectFill
+        view.layer.addSublayer(previewLayer)
 
-        videoRecordPresenter.preview.videoGravity = .resizeAspectFill
-        view.layer.addSublayer(videoRecordPresenter.preview)
-
-        // starting session
-        DispatchQueue.global(qos: .background).async {
-            videoRecordPresenter.session.startRunning()
+        // Store the preview layer in the presenter
+        DispatchQueue.main.async {
+            self.videoRecordPresenter.preview = previewLayer
         }
+
+        // Starting session
+        DispatchQueue.global(qos: .background).async {
+            self.videoRecordPresenter.session.startRunning()
+        }
+
         return view
     }
 
-    func updateUIView(_ uiView: UIView, context: Context) {}
+    func updateUIView(_ uiView: UIView, context: Context) {
+        // Update the preview layer's frame if needed
+        if let previewLayer = uiView.layer.sublayers?.first as? AVCaptureVideoPreviewLayer {
+            previewLayer.frame = uiView.bounds
+        }
+    }
 }
