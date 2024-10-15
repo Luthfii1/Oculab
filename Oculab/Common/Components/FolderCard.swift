@@ -17,13 +17,14 @@ struct FolderCard: View {
                 Image(systemName: "rectangle.stack.fill")
                     .foregroundColor(AppColors.purple500)
                 Text(title)
+                    .font(AppTypography.p2)
                     .padding(.leading, Decimal.d8)
                 Spacer()
                 Text(images)
                 Image(systemName: "chevron.right")
             }
         }
-        .font(AppTypography.s4_1)
+        .font(AppTypography.p3)
         .padding(.horizontal, Decimal.d16)
         .padding(.vertical, Decimal.d12)
         .frame(maxWidth: .infinity, alignment: .topLeading)
