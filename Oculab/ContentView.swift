@@ -43,7 +43,9 @@ struct ContentView: View {
                 titleSize: AppTypography.s5
             )
         }
-        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .ignoresSafeArea()
+        .background(.red)
     }
 }
 

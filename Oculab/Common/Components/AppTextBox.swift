@@ -5,13 +5,6 @@
 //  Created by Alifiyah Ariandri on 14/10/24.
 //
 
-//
-//  AppTextBox.swift
-//  Oculab
-//
-//  Created by Alifiyah Ariandri on 14/10/24.
-//
-
 import SwiftUI
 
 struct AppTextBox: View {
@@ -85,6 +78,7 @@ struct AppTextBox: View {
                 // Placeholder Text
                 if internalText.isEmpty {
                     Text(placeholder)
+                        .font(AppTypography.p2)
                         .foregroundColor(AppColors.slate400)
                         .padding(.horizontal, 24)
                         .padding(.vertical, 20)
