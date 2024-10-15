@@ -62,7 +62,6 @@ struct AppDropdown: View {
                     if let leftIcon = leftIcon {
                         Image(systemName: leftIcon)
                             .foregroundColor(AppColors.purple700)
-                            
                     }
 
                     // Placeholder or selected choice
@@ -105,9 +104,7 @@ struct AppDropdown: View {
                 .frame(maxHeight: isExtended ? .infinity : 150) // Adjustable height based on isExtended
                 .padding(.bottom, 12)
                 .padding(.top, 4)
-
                 .padding(.horizontal, 16)
-
                 .cornerRadius(12)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
@@ -161,7 +158,14 @@ struct AppDropdown: View {
             leftIcon: "arrow.down.to.line.alt",
             rightIcon: "chevron.up",
             isDisabled: false,
-            choices: ["Extended Option 1", "Extended Option 2", "Extended Option 3", "Extended Option 4", "Extended Option 5", "Extended Option 6"],
+            choices: [
+                "Extended Option 1",
+                "Extended Option 2",
+                "Extended Option 3",
+                "Extended Option 4",
+                "Extended Option 5",
+                "Extended Option 6"
+            ],
             isExtended: true,
             description: "This dropdown allows more options to be visible."
         )
