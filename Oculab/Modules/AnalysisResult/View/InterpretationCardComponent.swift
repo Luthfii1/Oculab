@@ -1,5 +1,5 @@
 //
-//  InterpretationCard.swift
+//  InterpretationCardComponent.swift
 //  Oculab
 //
 //  Created by Alifiyah Ariandri on 14/10/24.

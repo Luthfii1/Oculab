@@ -23,7 +23,8 @@ struct VideoPreview: View {
             VStack {
                 HStack {
                     Button(action: {
-                        videoRecordPresenter.previewURL = nil
+//                        videoRecordPresenter.previewURL = nil
+                        print("back button pressed")
                     }) {
                         Image(systemName: "chevron.left.circle")
                             .foregroundColor(.white)
@@ -58,7 +59,7 @@ struct VideoPreview: View {
             HStack {
                 // Button to retake video
                 Button {
-                    print("Ambil Ulang")
+                    videoRecordPresenter.previewURL = nil
                 } label: {
                     HStack(alignment: .center, spacing: 4) {
                         Image(systemName: "arrow.counterclockwise")

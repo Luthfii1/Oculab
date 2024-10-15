@@ -1,5 +1,5 @@
 //
-//  FolderCard.swift
+//  FolderCardComponent.swift
 //  Oculab
 //
 //  Created by Risa on 14/10/24.
