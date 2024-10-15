@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct InterpretationCard: View {
+struct InterpretationCardComponent: View {
     var type: String
     var confidenceLevel: String
     var notes: String
@@ -45,7 +45,7 @@ struct InterpretationCard: View {
 }
 
 #Preview {
-    InterpretationCard(
+    InterpretationCardComponent(
         type: "Normal",
         confidenceLevel: "Medium",
         notes: "Tidak ditemukan BTA dari 100 gambar lapangan pandang"
