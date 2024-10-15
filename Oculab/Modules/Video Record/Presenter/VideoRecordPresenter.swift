@@ -7,13 +7,19 @@
 
 import AVFoundation
 import Foundation
+import SwiftUI
 
-class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
+class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate,
+AVCaptureFileOutputRecordingDelegate {
     @Published var session = AVCaptureSession()
     @Published var alert = false
     @Published var output = AVCaptureMovieFileOutput()
     @Published var preview: AVCaptureVideoPreviewLayer!
     @Published var hasTaken: Bool = false
+    @Published var isRecording: Bool = false
+    @Published var recordedURLs: [URL] = []
+    @Published var previewURL: URL?
+    @Published var showPreview: Bool = false
 
     func checkPermission() {
         // check camera got permission
@@ -59,5 +65,47 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
         } catch {
             print(error.localizedDescription)
         }
+    }
+
+    func startRecording() {
+        let tempURL = NSTemporaryDirectory() + "\(Date()).mov"
+        output.startRecording(to: URL(filePath: tempURL), recordingDelegate: self)
+        isRecording = true
+    }
+
+    func stopRecording() {
+        output.stopRecording()
+        isRecording = false
+    }
+
+    func fileOutput(
+        _ output: AVCaptureFileOutput,
+        didFinishRecordingTo outputFileURL: URL,
+        from connections: [AVCaptureConnection],
+        error: Error?
+    ) {
+        if let error = error {
+            print(error.localizedDescription)
+            return
+        }
+
+        print(outputFileURL)
+        previewURL = outputFileURL
+    }
+
+    func handleButtonRecording() {
+        if isRecording {
+            stopRecording()
+        } else {
+            startRecording()
+        }
+    }
+
+    func getIconButtonRecording() -> String {
+        return isRecording ? "circle.fill" : "button.programmable"
+    }
+
+    func getColorButtonRecording() -> Color {
+        return isRecording ? .red : .white
     }
 }

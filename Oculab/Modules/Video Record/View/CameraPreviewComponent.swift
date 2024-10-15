@@ -22,7 +22,9 @@ struct CameraPreviewComponent: UIViewRepresentable {
         view.layer.addSublayer(videoRecordPresenter.preview)
 
         // starting session
-        videoRecordPresenter.session.startRunning()
+        DispatchQueue.global(qos: .background).async {
+            videoRecordPresenter.session.startRunning()
+        }
         return view
     }
 

@@ -15,8 +15,23 @@ struct CameraView: View {
         GeometryReader { proxy in
             let size = proxy.size
 
-            CameraPreviewComponent(size: size)
-                .environmentObject(videoRecordPresenter)
+            ZStack {
+                CameraPreviewComponent(size: size)
+                    .environmentObject(videoRecordPresenter)
+
+                Button {
+                    videoRecordPresenter.handleButtonRecording()
+                } label: {
+                    Image(systemName: videoRecordPresenter.getIconButtonRecording())
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .foregroundColor(videoRecordPresenter.getColorButtonRecording())
+                        .frame(width: 60, height: 60)
+                }
+                .frame(maxHeight: .infinity, alignment: .bottom)
+                .padding(.bottom, 32)
+                .padding(.horizontal, 20)
+            }
         }
         .onAppear {
             Task {
