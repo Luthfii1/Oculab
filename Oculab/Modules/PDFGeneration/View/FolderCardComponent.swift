@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct FolderCard: View {
+struct FolderCardComponent: View {
     var title: String
     var images: String
 
@@ -37,7 +37,7 @@ struct FolderCard: View {
 }
 
 #Preview {
-    FolderCard(
+    FolderCardComponent(
         title: "0 BTA",
         images: "9 Gambar"
     )

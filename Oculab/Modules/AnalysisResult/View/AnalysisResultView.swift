@@ -27,15 +27,15 @@ struct AnalysisResultView: View {
                         .foregroundStyle(AppColors.slate50)
                         .frame(height: 200)
 
-                    FolderCard(
+                    FolderCardComponent(
                         title: "0 BTA",
                         images: "9 Gambar"
                     )
-                    FolderCard(
+                    FolderCardComponent(
                         title: "1-9 BTA",
                         images: "9 Gambar"
                     )
-                    FolderCard(
+                    FolderCardComponent(
                         title: "≥ 10 BTA",
                         images: "9 Gambar"
                     )
@@ -59,7 +59,7 @@ struct AnalysisResultView: View {
                     Text("Hasil Interpretasi")
                         .padding(.leading, Decimal.d8)
                     Spacer()
-                    StatusTag(type: .done)
+                    StatusTagComponent(type: .done)
                 }
 
                 VStack(alignment: .leading, spacing: Decimal.d16) {
@@ -77,7 +77,7 @@ struct AnalysisResultView: View {
                             .foregroundColor(AppColors.orange500)
                         Text("Interpretasi sistem bukan merupakan hasil akhir untuk pasien")
                     }
-                    InterpretationCard(
+                    InterpretationCardComponent(
                         type: "Normal",
                         confidenceLevel: "Medium",
                         notes: "Tidak ditemukan BTA dari 100 gambar lapangan pandang"

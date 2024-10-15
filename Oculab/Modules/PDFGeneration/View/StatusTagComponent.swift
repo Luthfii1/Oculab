@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct StatusTag: View {
+struct StatusTagComponent: View {
     var type: StatusType
 
     var body: some View {
@@ -41,7 +41,7 @@ struct StatusTag: View {
 }
 
 #Preview {
-    StatusTag(
+    StatusTagComponent(
         type: .done
     )
 }

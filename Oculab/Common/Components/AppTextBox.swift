@@ -5,13 +5,6 @@
 //  Created by Alifiyah Ariandri on 14/10/24.
 //
 
-//
-//  AppTextBox.swift
-//  Oculab
-//
-//  Created by Alifiyah Ariandri on 14/10/24.
-//
-
 import SwiftUI
 
 struct AppTextBox: View {
