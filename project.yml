@@ -2,7 +2,7 @@ name: Oculab
 
 options:
   bundleIdPrefix: com.Oculab
-#  resolvePackagesAutomatically: YES
+  findCarthageFrameworks: TRUE
   
 settings:
   MARKETING_VERSION: "1.0"
@@ -10,6 +10,9 @@ settings:
   DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM_ID}
   
 packages:
+#  SwiftPM:
+#    url: https://github.com/apple/swift-package-manager
+#    branch: swift-5.10.1-RELEASE
   Alamofire:
     url: https://github.com/Alamofire/Alamofire
     from: 5.9.1
@@ -24,7 +27,11 @@ targets:
     info:
         path: Oculab/Info.plist
         properties:
+          CFBundleDisplayName: Oculab
+          LSApplicationCategoryType: public.app-category.medical
           UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+          UILaunchScreen:
+            UIImageName: ""
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.Oculab.Oculab
       TARGETED_DEVICE_FAMILY: 1
@@ -32,6 +39,7 @@ targets:
       ENABLE_TESTABILITY: YES
     dependencies:
       - package: Alamofire
+#      - package: SwiftPM
     postCompileScripts:
       - script: |
           export PATH="$PATH:/opt/homebrew/bin"
@@ -42,15 +50,7 @@ targets:
           fi
         name: SwiftFormat
         showEnvVars: true
-#    buildPhases:
-#      - name: SwiftFormat
-#        script: |
-#          export PATH="$PATH:/opt/homebrew/bin"
-#          if which swiftformat >/dev/null; then
-#            swiftformat .
-#          else
-#            echo "warning: Swiftformat not installed"
-#          fi
+        basedOnDependencyAnalysis: false
   OculabTests:
     type: bundle.unit-test
     supportedDestinations: [iOS]
