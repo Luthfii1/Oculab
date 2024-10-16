@@ -14,9 +14,7 @@ struct ContentView: View {
         ZStack {
             ScrollView {
                 Button("Show Popup") {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        showPopup = true
-                    }
+                    showPopup = true
                 }
 
                 AppTextBox(
@@ -76,9 +74,7 @@ struct ContentView: View {
                             colorType: .tertiary,
                             isEnabled: true
                         ) {
-                            withAnimation(.easeInOut(duration: 0.3)) {
-                                showPopup = false
-                            }
+                            showPopup = false
                         }
                     ],
                     isVisible: $showPopup
