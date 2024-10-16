@@ -16,6 +16,7 @@ struct AppTextField: View {
     var rightIcon: String? = nil
     var isError: Bool = false
     var isDisabled: Bool = false
+    var isNumberOnly: Bool = false
     @Binding var text: String
 
     // Colors based on the state (error, disabled, normal)
@@ -72,9 +73,16 @@ struct AppTextField: View {
                 }
 
                 TextField(placeholder, text: $text)
+                    .keyboardType(isNumberOnly ? .numberPad : .default) // Conditionally set the keyboard type
                     .disabled(isDisabled)
                     .foregroundColor(textColor)
-                    .padding(.horizontal, 8)
+                    .padding(.horizontal, 16)
+                    .onChange(of: text) { newValue in
+                        if isNumberOnly {
+                            // Only allow numbers if isNumberOnly is true
+                            text = newValue.filter { $0.isNumber }
+                        }
+                    }
 
                 if let rightIcon = rightIcon {
                     Image(systemName: rightIcon)
