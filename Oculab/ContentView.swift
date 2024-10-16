@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var showPopup = false
+
     var body: some View {
         TabView {
             HomeView()
