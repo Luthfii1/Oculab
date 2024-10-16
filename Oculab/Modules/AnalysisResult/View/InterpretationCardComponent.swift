@@ -8,20 +8,19 @@
 import SwiftUI
 
 struct InterpretationCardComponent: View {
-    var type: String
-    var confidenceLevel: String
-    var notes: String
+    var type: TBGrade
+    var confidenceLevel: ConfidenceLevel
 
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text(TBGrade.negatif.rawValue).font(AppTypography.h4)
-                    .foregroundColor(type == TBGrade.negatif.rawValue ? AppColors.blue500 : AppColors.red500)
+                Text(type.rawValue).font(AppTypography.h4)
+                    .foregroundColor(type == TBGrade.negatif ? AppColors.blue500 : AppColors.red500)
 
                 HStack {
                     Image("robot")
                     Spacer().frame(width: 4)
-                    Text("\(confidenceLevel) confidence level")
+                    Text("\(confidenceLevel.rawValue) confidence level")
                         .foregroundColor(AppColors.slate300)
                 }.font(AppTypography.p4)
                     .foregroundColor(AppColors.slate300)
@@ -30,8 +29,7 @@ struct InterpretationCardComponent: View {
 
                 Image(systemName: "info.circle").foregroundColor(AppColors.purple500)
             }
-
-            Text(notes).font(AppTypography.p3)
+            Text(gradeDesc[type]!).font(AppTypography.p3)
         }
         .padding(Decimal.d12)
         .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -46,9 +44,7 @@ struct InterpretationCardComponent: View {
 
 #Preview {
     InterpretationCardComponent(
-        type: TBGrade.negatif.rawValue,
-        confidenceLevel: "Medium",
-        notes: "Tidak ditemukan BTA dari 100 gambar lapangan pandang"
-        // test
+        type: .negatif,
+        confidenceLevel: .medium
     )
 }
