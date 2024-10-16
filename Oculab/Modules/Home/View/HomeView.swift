@@ -36,7 +36,7 @@ struct HomeView: View {
                                 )
                             }
                         }
-                        
+
                         // TODO: Create component for Sample Preview
                     }
                 }
