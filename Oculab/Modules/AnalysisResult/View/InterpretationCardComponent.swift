@@ -24,8 +24,9 @@ struct InterpretationCardComponent: View {
                         .foregroundColor(AppColors.slate300)
 
                     Spacer()
-
-                    Image(systemName: "info.circle").foregroundColor(AppColors.purple500)
+                    Button(action: {}) {
+                        Image(systemName: "info.circle").foregroundColor(AppColors.purple500)
+                    }
                 }
             }
             Text(gradeResultDesc[type]!).font(AppTypography.p3)
