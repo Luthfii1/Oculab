@@ -95,6 +95,16 @@ struct AnalysisResultView: View {
                     notes: "Tidak ditemukan BTA dari 100 gambar lapangan pandang"
                 )
 
+                AppDropdown(
+                    title: "Interpretasi Petugas",
+                    placeholder: "Pilih kategori",
+                    isRequired: true,
+                    rightIcon: "chevron.down",
+                    isDisabled: false,
+                    choices: TBGrade.allCases.map { $0.rawValue },
+                    isExtended: true
+                )
+
                 AppTextBox(
                     title: "Catatan Petugas",
                     placeholder: "Contoh: Hanya terdapat 20 bakteri dari 60 lapangan pandang yang terkumpul",

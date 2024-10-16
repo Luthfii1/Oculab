@@ -2,85 +2,173 @@
 //  AppDropdown.swift
 //  Oculab
 //
-//  Created by Risa on 15/10/24.
+//  Created by Alifiyah Ariandri on 14/10/24.
 //
 
 import SwiftUI
 
 struct AppDropdown: View {
     var title: String
-    @State private var isExtended = true
-    var data: [(key: String, value: String)]
-    var titleSize: Font
+    var placeholder: String
+    var isRequired: Bool = false
+    var leftIcon: String? = nil // SF Symbol or custom icon name
+    var rightIcon: String? = "chevron.down" // Default right icon
+    var isDisabled: Bool = false
+    var choices: [String] // List of dropdown choices
+    var isExtended: Bool = false // If true, allows multi-line choices display
+    var description: String? = nil // Description or additional info
 
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text(title)
-                .font(AppTypography.s4_1)
-            VStack(alignment: .leading) {
-                HStack {
-                    Text(title)
-                        .padding(.leading, Decimal.d8)
-                    Spacer()
+    @State private var selectedChoice: String? = nil
+    @State private var isDropdownOpen: Bool = false
 
-                    Image(systemName: isExtended ? "chevron.up" : "chevron.down")
-                }
-
-                if isExtended {
-                    ExtendedAppDropdown(data: data, titleSize: titleSize)
-                }
-            }
-            .font(AppTypography.s4_1)
-            .padding(.horizontal, Decimal.d12)
-            .padding(.vertical, Decimal.d16)
-            .frame(maxWidth: .infinity, alignment: .topLeading)
-            .background(.white)
-            .cornerRadius(Decimal.d12)
-            .overlay(
-                RoundedRectangle(cornerRadius: Decimal.d12)
-                    .stroke(AppColors.slate100)
-            )
-            .padding(.horizontal, Decimal.d20)
-            .onTapGesture {
-                withAnimation {
-                    isExtended.toggle()
-                }
-            }
-        }
+    // Colors based on the state (disabled or normal)
+    private var textColor: Color {
+        isDisabled ? AppColors.slate400 : AppColors.slate900
     }
-}
 
-struct ExtendedAppDropdown: View {
-    var data: [(key: String, value: String)]
-    var titleSize: Font
+    private var backgroundColor: Color {
+        isDisabled ? AppColors.slate50 : AppColors.slate0
+    }
+
+    private var borderColor: Color {
+        isDisabled ? AppColors.slate100 : AppColors.slate200
+    }
 
     var body: some View {
         VStack(alignment: .leading) {
-            ForEach(data, id: \.key) { item in
-                VStack(alignment: .leading) {
-                    Text(item.key)
-                        .font(titleSize)
-                        .foregroundColor(AppColors.slate300)
-                    Spacer().frame(height: Decimal.d4)
-                    Text(item.value)
-                        .font(AppTypography.p2)
+            // Title and required indicator
+            HStack {
+                Text(title)
+                    .font(AppTypography.s4_1)
+                    .foregroundColor(textColor)
+                if isRequired {
+                    Text("*")
+                        .foregroundColor(AppColors.red500)
                 }
-                .padding(.top, Decimal.d8)
+            }
+
+            Spacer().frame(height: 8)
+
+            // Dropdown button
+            Button(action: {
+                if !isDisabled {
+                    withAnimation {
+                        isDropdownOpen.toggle()
+                    }
+                }
+            }) {
+                HStack {
+                    // Left icon
+                    if let leftIcon = leftIcon {
+                        Image(systemName: leftIcon)
+                            .foregroundColor(AppColors.purple700)
+                    }
+
+                    // Placeholder or selected choice
+                    Text(selectedChoice ?? placeholder)
+                        .foregroundColor(selectedChoice == nil ? AppColors.slate400 : textColor)
+                        .padding(.horizontal, 8)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    // Right icon
+                    if let rightIcon = rightIcon {
+                        Image(systemName: rightIcon)
+                            .foregroundColor(textColor)
+                    }
+                }
+                .padding()
+                .background(backgroundColor)
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(borderColor, lineWidth: 1)
+                )
+            }
+            .disabled(isDisabled)
+
+            // Dropdown choices (visible when the dropdown is open)
+            if isDropdownOpen {
+                VStack(alignment: .leading) {
+                    ForEach(choices, id: \.self) { choice in
+                        Button(action: {
+                            selectedChoice = choice
+                            isDropdownOpen = false
+                        }) {
+                            Text(choice)
+                                .foregroundColor(textColor)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.top, 8)
+                        }
+                    }
+                }
+                .frame(maxHeight: isExtended ? .infinity : 150) // Adjustable height based on isExtended
+                .padding(.bottom, 12)
+                .padding(.top, 4)
+                .padding(.horizontal, 16)
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(borderColor, lineWidth: 1)
+                )
+            }
+
+            Spacer().frame(height: 8)
+
+            // Description or additional info
+            if let description = description {
+                Text(description)
+                    .font(AppTypography.p3)
+                    .foregroundColor(AppColors.slate600)
             }
         }
+        .padding(.vertical, 4)
     }
 }
 
 #Preview {
-    AppDropdown(
-        title: "Data Pasien",
-        data: [
-            (key: "Nama Pasien", value: "Alya Annisa Kirana"),
-            (key: "NIK Pasien", value: "167012039484700"),
-            (key: "Umur Pasien", value: "23 Tahun"),
-            (key: "Jenis Kelamin", value: "Perempuan"),
-            (key: "Nomor BPJS", value: "06L30077675")
-        ],
-        titleSize: AppTypography.s5
-    )
+    ScrollView {
+        AppDropdown(
+            title: "Select Option",
+            placeholder: "Choose an option...",
+            isRequired: true,
+            leftIcon: "list.bullet",
+            rightIcon: "chevron.down",
+            isDisabled: false,
+            choices: ["Option 1", "Option 2", "Option 3", "Option 4"],
+            isExtended: false,
+            description: "Please select an option from the dropdown"
+        )
+
+        AppDropdown(
+            title: "Disabled Dropdown",
+            placeholder: "Disabled",
+            isRequired: false,
+            leftIcon: "lock.fill",
+            rightIcon: "chevron.down",
+            isDisabled: true,
+            choices: ["Option A", "Option B"],
+            isExtended: false,
+            description: "This dropdown is disabled"
+        )
+
+        AppDropdown(
+            title: "Extended Dropdown",
+            placeholder: "Choose something...",
+            isRequired: true,
+            leftIcon: "arrow.down.to.line.alt",
+            rightIcon: "chevron.up",
+            isDisabled: false,
+            choices: [
+                "Extended Option 1",
+                "Extended Option 2",
+                "Extended Option 3",
+                "Extended Option 4",
+                "Extended Option 5",
+                "Extended Option 6"
+            ],
+            isExtended: true,
+            description: "This dropdown allows more options to be visible."
+        )
+    }
+    .padding()
 }

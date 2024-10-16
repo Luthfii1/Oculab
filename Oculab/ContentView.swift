@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack {
+        ScrollView {
             AppTextBox(
                 title: "Description",
                 placeholder: "Enter your description here...",
@@ -18,13 +18,34 @@ struct ContentView: View {
                 isDisabled: false,
                 text: .constant("")
             )
-
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+            ExtendableCard(
+                icon: "person.fill",
+                title: "Data Pasien",
+                data: [
+                    (key: "Nama Pasien", value: "Alya Annisa Kirana"),
+                    (key: "NIK Pasien", value: "167012039484700"),
+                    (key: "Umur Pasien", value: "23 Tahun"),
+                    (key: "Jenis Kelamin", value: "Perempuan"),
+                    (key: "Nomor BPJS", value: "06L30077675")
+                ],
+                titleSize: AppTypography.s5
+            )
+            ExtendableCard(
+                icon: "person.fill",
+                title: "Data Pasien",
+                data: [
+                    (key: "Nama Pasien", value: "Alya Annisa Kirana"),
+                    (key: "NIK Pasien", value: "167012039484700"),
+                    (key: "Umur Pasien", value: "23 Tahun"),
+                    (key: "Jenis Kelamin", value: "Perempuan"),
+                    (key: "Nomor BPJS", value: "06L30077675")
+                ],
+                titleSize: AppTypography.s5
+            )
         }
-        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .ignoresSafeArea()
+        .background(.red)
     }
 }
 

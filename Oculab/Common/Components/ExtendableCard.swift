@@ -10,11 +10,12 @@ import SwiftUI
 struct ExtendableCard: View {
     var icon: String
     var title: String
-    @State private var isExtended = true
+    @State private var isExtended = false
     var data: [(key: String, value: String)]
     var titleSize: Font
 
     var body: some View {
+//        VStack {
         VStack(alignment: .leading) {
             HStack {
                 Image(systemName: icon)
@@ -40,12 +41,14 @@ struct ExtendableCard: View {
             RoundedRectangle(cornerRadius: Decimal.d12)
                 .stroke(AppColors.slate100)
         )
-        .padding(.horizontal, Decimal.d20)
         .onTapGesture {
             withAnimation {
                 isExtended.toggle()
             }
         }
+
+//            Spacer()
+//        }
     }
 }
 

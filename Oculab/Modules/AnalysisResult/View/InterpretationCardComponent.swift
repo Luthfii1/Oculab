@@ -49,5 +49,6 @@ struct InterpretationCardComponent: View {
         type: "Normal",
         confidenceLevel: "Medium",
         notes: "Tidak ditemukan BTA dari 100 gambar lapangan pandang"
+        // test
     )
 }
