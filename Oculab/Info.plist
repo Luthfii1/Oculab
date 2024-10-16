@@ -22,6 +22,10 @@
 	<string>1</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.medical</string>
+	<key>NSCameraUsageDescription</key>
+	<string>We would like to access your camera to record video</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We would like to access your microphone to record video</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Inter-Bold.ttf</string>

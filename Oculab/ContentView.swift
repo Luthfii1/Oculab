@@ -8,44 +8,30 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var showPopup = false
+
     var body: some View {
-        ScrollView {
-            AppTextBox(
-                title: "Description",
-                placeholder: "Enter your description here...",
-                isRequired: true,
-                description: "This is a required field",
-                isDisabled: false,
-                text: .constant("")
-            )
-            ExtendableCard(
-                icon: "person.fill",
-                title: "Data Pasien",
-                data: [
-                    (key: "Nama Pasien", value: "Alya Annisa Kirana"),
-                    (key: "NIK Pasien", value: "167012039484700"),
-                    (key: "Umur Pasien", value: "23 Tahun"),
-                    (key: "Jenis Kelamin", value: "Perempuan"),
-                    (key: "Nomor BPJS", value: "06L30077675")
-                ],
-                titleSize: AppTypography.s5
-            )
-            ExtendableCard(
-                icon: "person.fill",
-                title: "Data Pasien",
-                data: [
-                    (key: "Nama Pasien", value: "Alya Annisa Kirana"),
-                    (key: "NIK Pasien", value: "167012039484700"),
-                    (key: "Umur Pasien", value: "23 Tahun"),
-                    (key: "Jenis Kelamin", value: "Perempuan"),
-                    (key: "Nomor BPJS", value: "06L30077675")
-                ],
-                titleSize: AppTypography.s5
-            )
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .ignoresSafeArea()
-        .background(.red)
+        VideoRecordView()
+//        TabView {
+//            HomeView()
+//                .tabItem {
+//                    Image(systemName: "rectangle.split.2x2.fill")
+//                    Text("Ringkasan")
+//                }
+//
+//            PDFPageView()
+//                .tabItem {
+//                    Image(systemName: "folder.fill.badge.person.crop")
+//                    Text("PDF")
+//                }
+//
+//            AnalysisResultView()
+//                .tabItem {
+//                    Image(systemName: "person.crop.circle.fill")
+//                    Text("Analyze")
+//                }
+//        }
+//        .tint(AppColors.purple500)
     }
 }
 

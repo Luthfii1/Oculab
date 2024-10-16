@@ -25,6 +25,7 @@ struct FolderCardComponent: View {
                 Text(title.rawValue)
                     .font(AppTypography.s4_1)
                     .padding(.leading, Decimal.d8)
+                    .font(AppTypography.s4_1)
                 Spacer()
                 Text("\(numOfImage) Gambar")
                 Image(systemName: "chevron.right")
@@ -37,7 +38,7 @@ struct FolderCardComponent: View {
         .background(.white)
         .cornerRadius(Decimal.d12)
         .overlay(
-            RoundedRectangle(cornerRadius: Decimal.d12)
+            RoundedRectangle(cornerRadius: Decimal.d8)
                 .stroke(AppColors.slate100)
         )
     }

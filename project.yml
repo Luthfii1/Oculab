@@ -33,6 +33,8 @@ targets:
           UILaunchScreen:
             UIImageName: ""
           UIAppFonts: [Inter-Bold.ttf, Inter-Regular.ttf, Inter-SemiBold.ttf]
+          NSCameraUsageDescription: We would like to access your camera to record video
+          NSMicrophoneUsageDescription: We would like to access your microphone to record video
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.Oculab.Oculab
       TARGETED_DEVICE_FAMILY: 1

@@ -12,7 +12,7 @@ struct InterpretationCardComponent: View {
     var confidenceLevel: ConfidenceLevel
 
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: Decimal.d8) {
             HStack {
                 Text(type.rawValue).font(AppTypography.h4)
                     .foregroundColor(type == TBGrade.negatif ? AppColors.blue500 : AppColors.red500)
@@ -22,12 +22,11 @@ struct InterpretationCardComponent: View {
                     Spacer().frame(width: 4)
                     Text("\(confidenceLevel.rawValue) confidence level")
                         .foregroundColor(AppColors.slate300)
-                }.font(AppTypography.p4)
-                    .foregroundColor(AppColors.slate300)
 
-                Spacer()
+                    Spacer()
 
-                Image(systemName: "info.circle").foregroundColor(AppColors.purple500)
+                    Image(systemName: "info.circle").foregroundColor(AppColors.purple500)
+                }
             }
             Text(gradeDesc[type]!).font(AppTypography.p3)
         }
