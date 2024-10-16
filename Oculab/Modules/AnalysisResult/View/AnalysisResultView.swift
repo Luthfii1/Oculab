@@ -77,7 +77,7 @@ struct AnalysisResultView: View {
 
                         InterpretationCardComponent(
                             type: .scanty,
-                            confidenceLevel: .medium
+                            confidenceLevel: .lowConfidence
                         )
 
                     }.font(AppTypography.p4)

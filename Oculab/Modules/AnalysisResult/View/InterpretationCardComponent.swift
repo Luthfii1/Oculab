@@ -45,6 +45,6 @@ struct InterpretationCardComponent: View {
 #Preview {
     InterpretationCardComponent(
         type: .negatif,
-        confidenceLevel: .medium
+        confidenceLevel: .mediumConfidence
     )
 }
