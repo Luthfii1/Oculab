@@ -35,6 +35,7 @@ targets:
           UIAppFonts: [Inter-Bold.ttf, Inter-Regular.ttf, Inter-SemiBold.ttf]
           NSCameraUsageDescription: We would like to access your camera to record video
           NSMicrophoneUsageDescription: We would like to access your microphone to record video
+          NSPhotoLibraryUsageDescription: We need access to save videos to your photo library.
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.Oculab.Oculab
       TARGETED_DEVICE_FAMILY: 1
