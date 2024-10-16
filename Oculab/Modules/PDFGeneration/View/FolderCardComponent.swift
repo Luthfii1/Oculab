@@ -18,19 +18,21 @@ struct FolderCardComponent: View {
                     .foregroundColor(AppColors.purple500)
                 Text(title)
                     .padding(.leading, Decimal.d8)
+                    .font(AppTypography.s4_1)
                 Spacer()
                 Text(images)
+                    .font(AppTypography.p3)
                 Image(systemName: "chevron.right")
             }
         }
-        .font(AppTypography.s4_1)
+
         .padding(.horizontal, Decimal.d16)
         .padding(.vertical, Decimal.d12)
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .background(.white)
         .cornerRadius(Decimal.d12)
         .overlay(
-            RoundedRectangle(cornerRadius: Decimal.d12)
+            RoundedRectangle(cornerRadius: Decimal.d8)
                 .stroke(AppColors.slate100)
         )
     }

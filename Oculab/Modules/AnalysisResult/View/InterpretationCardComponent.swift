@@ -13,22 +13,24 @@ struct InterpretationCardComponent: View {
     var notes: String
 
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: Decimal.d8) {
             HStack {
                 Text(type).font(AppTypography.h4)
-                    .foregroundColor(type == "Normal" ? AppColors.blue500 : AppColors.red500)
+                    .foregroundColor(type == "Negatif" ? AppColors.blue500 : AppColors.red500)
 
-                HStack {
-                    Image("robot")
-                    Spacer().frame(width: 4)
-                    Text("\(confidenceLevel) confidence level")
+                if confidenceLevel != "" {
+                    HStack {
+                        Image("robot")
+                        Spacer().frame(width: 4)
+                        Text("\(confidenceLevel) confidence level")
+                            .foregroundColor(AppColors.slate300)
+                    }.font(AppTypography.p4)
                         .foregroundColor(AppColors.slate300)
-                }.font(AppTypography.p4)
-                    .foregroundColor(AppColors.slate300)
 
-                Spacer()
+                    Spacer()
 
-                Image(systemName: "info.circle").foregroundColor(AppColors.purple500)
+                    Image(systemName: "info.circle").foregroundColor(AppColors.purple500)
+                }
             }
 
             Text(notes).font(AppTypography.p3)
@@ -46,9 +48,14 @@ struct InterpretationCardComponent: View {
 
 #Preview {
     InterpretationCardComponent(
-        type: "Normal",
+        type: "Negatif",
         confidenceLevel: "Medium",
         notes: "Tidak ditemukan BTA dari 100 gambar lapangan pandang"
-        // test
+    )
+
+    InterpretationCardComponent(
+        type: "Negatif",
+        confidenceLevel: "",
+        notes: "Tidak ditemukan BTA dari 100 gambar lapangan pandang"
     )
 }
