@@ -23,7 +23,6 @@ struct CameraView: View {
                     videoRecordPresenter.handleButtonRecording()
                 } label: {
                     Image(systemName: videoRecordPresenter.getIconButtonRecording())
-                        
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .foregroundColor(videoRecordPresenter.getColorButtonRecording())

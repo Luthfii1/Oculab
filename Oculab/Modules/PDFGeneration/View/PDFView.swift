@@ -16,7 +16,7 @@ struct PDFPageView: View {
     var preparatTitle = ["ID Pemeriksaan", "Diambil di", "Petugas"]
 
     var body: some View {
-        Text("test").foregroundColor(AppColors.purple300).font(AppTypography.h1)
+//        Text("test").foregroundColor(AppColors.purple300).font(AppTypography.h1)
         PDFKitView(pdfData: PDFDocument(data: generatePDF())!)
     }
 
