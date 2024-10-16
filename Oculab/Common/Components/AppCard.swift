@@ -1,5 +1,5 @@
 //
-//  AppProfileDataCard.swift
+//  AppCard.swift
 //  Oculab
 //
 //  Created by Alifiyah Ariandri on 16/10/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct AppProfileDataCard<Content: View>: View {
+struct AppCard<Content: View>: View {
     var icon: String
     var title: String
     var spacing: CGFloat
@@ -47,7 +47,7 @@ struct AppProfileDataCard<Content: View>: View {
 }
 
 #Preview {
-    AppProfileDataCard(icon: "person.fill", title: "Profile", spacing: Decimal.d16) {
+    AppCard(icon: "person.fill", title: "Profile", spacing: Decimal.d16) {
         VStack(alignment: .leading) {
             Text("Name: Alya Annisa Kirana")
             Text("Age: 23 Years")

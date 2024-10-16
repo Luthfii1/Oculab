@@ -11,7 +11,7 @@ struct InformationPage: View {
     var body: some View {
         ScrollView {
             VStack(spacing: Decimal.d24) {
-                AppProfileDataCard(icon: "info.circle", title: "Standar Penilaian", spacing: Decimal.d16) {
+                AppCard(icon: "info.circle", title: "Standar Penilaian", spacing: Decimal.d16) {
                     VStack(alignment: .leading, spacing: Decimal.d16) {
                         Text("Sistem ini menghitung bakteri sesuai rekomendasi WHO dan standar IUALTD")
 
@@ -46,7 +46,7 @@ struct InformationPage: View {
                     .font(AppTypography.p3)
                 }
 
-                AppProfileDataCard(icon: "info.circle", title: "Confidence Level", spacing: Decimal.d16) {
+                AppCard(icon: "info.circle", title: "Confidence Level", spacing: Decimal.d16) {
                     VStack(alignment: .leading, spacing: Decimal.d16) {
                         HStack(alignment: .top) {
                             Text("•")
