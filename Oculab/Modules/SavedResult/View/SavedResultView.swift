@@ -36,7 +36,7 @@ struct SavedResultView: View {
                     titleSize: AppTypography.s6
                 )
 
-                AppCard(icon: "photo", title: "Hasil Gambar", spacing: Decimal.d16) {
+                AppProfileDataCard(icon: "photo", title: "Hasil Gambar", spacing: Decimal.d16) {
                     VStack(alignment: .leading, spacing: Decimal.d16) {
                         Text("Ketuk untuk lihat detail gambar")
                             .font(AppTypography.p3)
@@ -61,7 +61,7 @@ struct SavedResultView: View {
                     }
                 }
 
-                AppCard(icon: "text.badge.checkmark", title: "Hasil Interpretasi", spacing: Decimal.d24) {
+                AppProfileDataCard(icon: "text.badge.checkmark", title: "Hasil Interpretasi", spacing: Decimal.d24) {
                     VStack(alignment: .leading, spacing: Decimal.d8) {
                         Text("Interpretasi Petugas")
                             .font(AppTypography.s5)

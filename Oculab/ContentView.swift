@@ -11,26 +11,27 @@ struct ContentView: View {
     @State private var showPopup = false
 
     var body: some View {
-        TabView {
-            HomeView()
-                .tabItem {
-                    Image(systemName: "rectangle.split.2x2.fill")
-                    Text("Ringkasan")
-                }
-
-            PDFPageView()
-                .tabItem {
-                    Image(systemName: "folder.fill.badge.person.crop")
-                    Text("PDF")
-                }
-
-            AnalysisResultView()
-                .tabItem {
-                    Image(systemName: "person.crop.circle.fill")
-                    Text("Analyze")
-                }
-        }
-        .tint(AppColors.purple500)
+        VideoRecordView()
+//        TabView {
+//            HomeView()
+//                .tabItem {
+//                    Image(systemName: "rectangle.split.2x2.fill")
+//                    Text("Ringkasan")
+//                }
+//
+//            PDFPageView()
+//                .tabItem {
+//                    Image(systemName: "folder.fill.badge.person.crop")
+//                    Text("PDF")
+//                }
+//
+//            AnalysisResultView()
+//                .tabItem {
+//                    Image(systemName: "person.crop.circle.fill")
+//                    Text("Analyze")
+//                }
+//        }
+//        .tint(AppColors.purple500)
     }
 }
 
