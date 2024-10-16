@@ -27,15 +27,15 @@ struct AnalysisResultView: View {
                         .font(AppTypography.p3)
                         .foregroundStyle(AppColors.slate300)
 
-                    //TODO: Hasil gambar slides
-                    
-                    // TODO: Bikin IF sesuai API nanti
+                    // TODO: Hasil gambar slides
+
+                    // TODO: Bikin IF sesuai data API nanti, numOfImage jadi len(arrayGambar)
                     FolderCardComponent(
                         title: .zero,
                         numOfImage: 9
                     )
                     FolderCardComponent(
-                        title: .middle,
+                        title: .low,
                         numOfImage: 9
                     )
                     FolderCardComponent(
@@ -76,9 +76,8 @@ struct AnalysisResultView: View {
                         }
 
                         InterpretationCardComponent(
-                            type: "Normal",
-                            confidenceLevel: "Medium",
-                            notes: "Tidak ditemukan BTA dari 100 gambar lapangan pandang"
+                            type: .scanty,
+                            confidenceLevel: .medium
                         )
 
                     }.font(AppTypography.p4)
@@ -102,6 +101,7 @@ struct AnalysisResultView: View {
                                 placeholder: "Contoh: 8",
                                 isError: false,
                                 isDisabled: false,
+                                isNumberOnly: true,
                                 text: $numOfBTA
                             )
                         }
@@ -119,7 +119,13 @@ struct AnalysisResultView: View {
                             rightIcon: "checkmark",
                             colorType: .primary,
                             size: .large,
-                            isEnabled: true
+                            isEnabled: {
+                                if selectedTBGrade == TBGrade.scanty.rawValue {
+                                    return !numOfBTA.isEmpty && Int(numOfBTA) != nil
+                                } else {
+                                    return selectedTBGrade != nil
+                                }
+                            }()
                         ) {
                             print("Primary Button Tapped")
                         }
