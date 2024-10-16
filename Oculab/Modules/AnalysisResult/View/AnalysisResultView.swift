@@ -18,9 +18,15 @@ struct AnalysisResultView: View {
             VStack {
                 HStack {
                     Button(action: {}) {
-                        Image(systemName: "xmark")
-                            .foregroundColor(AppColors.slate900)
-                            .padding()
+                        ZStack {
+                            Circle()
+                                .stroke(AppColors.slate100, lineWidth: 1)
+                                .frame(width: 36, height: 36)
+                            
+                            Image(systemName: "xmark")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(AppColors.slate900)
+                        }
                     }
 
                     Spacer()
@@ -35,13 +41,12 @@ struct AnalysisResultView: View {
                 .padding(.horizontal)
                 .frame(height: 24)
 
-                    AppStepper(
-                        stepTitles: ["Data Pasien", "Data Sediaan", "Hasil"],
-                        currentStep: 2
-                    )
-                    .padding(.horizontal, Decimal.d20)
-                    .padding(.vertical, Decimal.d16)
-                
+                AppStepper(
+                    stepTitles: ["Data Pasien", "Data Sediaan", "Hasil"],
+                    currentStep: 2
+                )
+                .padding(.horizontal, Decimal.d20)
+                .padding(.vertical, Decimal.d16)
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: Decimal.d24) {
