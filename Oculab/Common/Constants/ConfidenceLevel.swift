@@ -1,14 +1,32 @@
 //
-//  TBGrade.swift
+//  ConfidenceLevel.swift
 //  Oculab
 //
 //  Created by Risa on 16/10/24.
 //
 
-enum TBGrade: String, CaseIterable {
-    case negatif = "Negatif"
-    case scanty = "Scanty"
-    case positif1 = "Positif (1+)"
-    case positif2 = "Positif (2+)"
-    case positif3 = "Positif (3+)"
+enum ConfidenceLevel: String, CaseIterable {
+    case fullConfidence = "100% Confidence"
+    case highConfidence = "High Confidence"
+    case mediumConfidence = "Medium Confidence"
+    case lowConfidence = "Low Confidence"
+    case veryLowConfidence = "Very Low Confidence"
+    case unpredicted = "Unpredicted"
+
+    var confidenceRange: String {
+        switch self {
+        case .fullConfidence:
+            return "Tidak ada keraguan dari sistem"
+        case .highConfidence:
+            return "90% - 99%"
+        case .mediumConfidence:
+            return "70% - 89%"
+        case .lowConfidence:
+            return "50% - 69%"
+        case .veryLowConfidence:
+            return "10% - 50%"
+        case .unpredicted:
+            return "0% - 9%"
+        }
+    }
 }
