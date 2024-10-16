@@ -14,7 +14,7 @@ struct StatusTagComponent: View {
         switch type {
         case .draft:
             VStack(alignment: .leading) {
-                Text("Belum disimpulkan")
+                Text(StatusType.draft.rawValue)
                     .foregroundStyle(AppColors.orange500)
             }
             .font(AppTypography.s6)
@@ -25,7 +25,7 @@ struct StatusTagComponent: View {
 
         case .done:
             VStack(alignment: .leading) {
-                Text("Selesai")
+                Text(StatusType.done.rawValue)
                     .foregroundStyle(AppColors.blue500)
             }
             .font(AppTypography.s6)

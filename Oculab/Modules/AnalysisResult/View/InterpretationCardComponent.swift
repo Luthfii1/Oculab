@@ -8,32 +8,28 @@
 import SwiftUI
 
 struct InterpretationCardComponent: View {
-    var type: String
-    var confidenceLevel: String
-    var notes: String
+    var type: TBGrade
+    var confidenceLevel: ConfidenceLevel
 
     var body: some View {
         VStack(alignment: .leading, spacing: Decimal.d8) {
             HStack {
-                Text(type).font(AppTypography.h4)
-                    .foregroundColor(type == "Negatif" ? AppColors.blue500 : AppColors.red500)
+                Text(type.rawValue).font(AppTypography.h4)
+                    .foregroundColor(type == TBGrade.negative ? AppColors.blue500 : AppColors.red500)
 
-                if confidenceLevel != "" {
-                    HStack {
-                        Image("robot")
-                        Spacer().frame(width: 4)
-                        Text("\(confidenceLevel) confidence level")
-                            .foregroundColor(AppColors.slate300)
-                    }.font(AppTypography.p4)
+                HStack {
+                    Image("robot")
+                    Spacer().frame(width: 4)
+                    Text("\(confidenceLevel.rawValue) confidence level")
                         .foregroundColor(AppColors.slate300)
 
                     Spacer()
-
-                    Image(systemName: "info.circle").foregroundColor(AppColors.purple500)
+                    Button(action: {}) {
+                        Image(systemName: "info.circle").foregroundColor(AppColors.purple500)
+                    }
                 }
             }
-
-            Text(notes).font(AppTypography.p3)
+            Text(gradeResultDesc[type]!).font(AppTypography.p3)
         }
         .padding(Decimal.d12)
         .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -48,14 +44,7 @@ struct InterpretationCardComponent: View {
 
 #Preview {
     InterpretationCardComponent(
-        type: "Negatif",
-        confidenceLevel: "Medium",
-        notes: "Tidak ditemukan BTA dari 100 gambar lapangan pandang"
-    )
-
-    InterpretationCardComponent(
-        type: "Negatif",
-        confidenceLevel: "",
-        notes: "Tidak ditemukan BTA dari 100 gambar lapangan pandang"
+        type: .negative,
+        confidenceLevel: .mediumConfidence
     )
 }
