@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct AppButton: View {
+struct AppButton: View, Identifiable {
     enum ButtonSize {
         case large, small
     }
@@ -18,6 +18,7 @@ struct AppButton: View {
 
     @State private var isPressed: Bool = false
 
+    var id = UUID()
     var title: String
     var leftIcon: String? = nil
     var rightIcon: String? = nil
@@ -72,11 +73,16 @@ struct AppButton: View {
 
     // Adjust button size based on the provided size (large or small)
     private var buttonHeight: CGFloat {
-        switch size {
-        case .large:
-            return 50
-        case .small:
-            return 40
+        switch colorType {
+        case .tertiary:
+            return 0 // No padding for tertiary buttons
+        default:
+            switch size {
+            case .large:
+                return 50
+            case .small:
+                return 40
+            }
         }
     }
 
@@ -89,12 +95,18 @@ struct AppButton: View {
         }
     }
 
+    // Only apply vertical padding for non-tertiary buttons
     private var vPadding: CGFloat {
-        switch size {
-        case .large:
-            return Decimal.d16
-        case .small:
-            return Decimal.d12
+        switch colorType {
+        case .tertiary:
+            return 0 // No padding for tertiary buttons
+        default:
+            switch size {
+            case .large:
+                return Decimal.d16
+            case .small:
+                return Decimal.d12
+            }
         }
     }
 
@@ -119,7 +131,7 @@ struct AppButton: View {
                         .foregroundColor(foregroundColor)
                 }
             }
-            .padding(.vertical, vPadding)
+            .padding(.vertical, vPadding) // Use dynamic vertical padding
             .frame(maxWidth: .infinity, minHeight: buttonHeight)
             .background(backgroundColor)
             .cornerRadius(cornerRadius)

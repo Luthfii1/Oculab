@@ -36,15 +36,7 @@ struct SavedResultView: View {
                     titleSize: AppTypography.s6
                 )
 
-                VStack(alignment: .leading, spacing: Decimal.d16) {
-                    HStack {
-                        Image(systemName: "photo")
-                            .foregroundColor(AppColors.purple500)
-                        Text("Hasil Gambar")
-                            .padding(.leading, Decimal.d8)
-                            .font(AppTypography.s4_1)
-                    }
-
+                AppCard(icon: "photo", title: "Hasil Gambar", spacing: Decimal.d16) {
                     VStack(alignment: .leading, spacing: Decimal.d16) {
                         Text("Ketuk untuk lihat detail gambar")
                             .font(AppTypography.p3)
@@ -68,27 +60,8 @@ struct SavedResultView: View {
                         )
                     }
                 }
-                .padding(.horizontal, Decimal.d16)
-                .padding(.vertical, Decimal.d16)
-                .frame(maxWidth: .infinity, alignment: .topLeading)
-                .background(.white)
-                .cornerRadius(Decimal.d12)
-                .overlay(
-                    RoundedRectangle(cornerRadius: Decimal.d12)
-                        .stroke(AppColors.slate100)
-                )
 
-                VStack(alignment: .leading, spacing: Decimal.d24) {
-                    HStack {
-                        Image(systemName: "text.badge.checkmark")
-                            .foregroundColor(AppColors.purple500)
-                        Text("Hasil Interpretasi")
-                            .padding(.leading, Decimal.d8)
-                            .font(AppTypography.s4_1)
-                        Spacer()
-                        StatusTagComponent(type: .done)
-                    }
-
+                AppCard(icon: "text.badge.checkmark", title: "Hasil Interpretasi", spacing: Decimal.d24) {
                     VStack(alignment: .leading, spacing: Decimal.d8) {
                         Text("Interpretasi Petugas")
                             .font(AppTypography.s5)
@@ -139,15 +112,6 @@ struct SavedResultView: View {
                         }
                     }
                 }
-                .padding(.horizontal, Decimal.d16)
-                .padding(.vertical, Decimal.d16)
-                .frame(maxWidth: .infinity, alignment: .topLeading)
-                .background(.white)
-                .cornerRadius(Decimal.d12)
-                .overlay(
-                    RoundedRectangle(cornerRadius: Decimal.d12)
-                        .stroke(AppColors.slate100)
-                )
             }
         }
         .padding(.horizontal, Decimal.d16)
