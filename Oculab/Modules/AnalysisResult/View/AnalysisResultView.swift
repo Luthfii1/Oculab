@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AnalysisResultView: View {
     @State var selectedTBGrade: String? = nil
-    @State var numberOfBTA: String = ""
+    @State var numOfBTA: String = ""
     @State var inspectorNotes: String = ""
 
     var body: some View {
@@ -27,21 +27,20 @@ struct AnalysisResultView: View {
                         .font(AppTypography.p3)
                         .foregroundStyle(AppColors.slate300)
 
-                    RoundedRectangle(cornerRadius: Decimal.d8)
-                        .foregroundStyle(AppColors.slate50)
-                        .frame(height: 200)
-
+                    //TODO: Hasil gambar slides
+                    
+                    // TODO: Bikin IF sesuai API nanti
                     FolderCardComponent(
-                        title: "0 BTA",
-                        images: "9 Gambar"
+                        title: .zero,
+                        numOfImage: 9
                     )
                     FolderCardComponent(
-                        title: "1-9 BTA",
-                        images: "9 Gambar"
+                        title: .middle,
+                        numOfImage: 9
                     )
                     FolderCardComponent(
-                        title: "≥ 10 BTA",
-                        images: "9 Gambar"
+                        title: .high,
+                        numOfImage: 9
                     )
                 }
                 .padding(.horizontal, Decimal.d16)
@@ -103,7 +102,7 @@ struct AnalysisResultView: View {
                                 placeholder: "Contoh: 8",
                                 isError: false,
                                 isDisabled: false,
-                                text: $numberOfBTA
+                                text: $numOfBTA
                             )
                         }
 

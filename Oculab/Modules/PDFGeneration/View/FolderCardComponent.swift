@@ -8,19 +8,25 @@
 import SwiftUI
 
 struct FolderCardComponent: View {
-    var title: String
-    var images: String
+    enum BTAfolder: String, CaseIterable {
+        case zero = "0 BTA"
+        case middle = "1-9 BTA"
+        case high = "≥ 10 BTA"
+    }
+
+    var title: BTAfolder
+    var numOfImage: Int = 0
 
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
                 Image(systemName: "rectangle.stack.fill")
                     .foregroundColor(AppColors.purple500)
-                Text(title)
-                    .font(AppTypography.p2)
+                Text(title.rawValue)
+                    .font(AppTypography.s4_1)
                     .padding(.leading, Decimal.d8)
                 Spacer()
-                Text(images)
+                Text("\(numOfImage) Gambar")
                 Image(systemName: "chevron.right")
             }
         }
@@ -39,7 +45,7 @@ struct FolderCardComponent: View {
 
 #Preview {
     FolderCardComponent(
-        title: "0 BTA",
-        images: "9 Gambar"
+        title: .zero,
+        numOfImage: 9
     )
 }
