@@ -32,7 +32,7 @@ struct ExtendableCard: View {
             }
         }
         .font(AppTypography.s4_1)
-        .padding(.horizontal, Decimal.d12)
+        .padding(.horizontal, Decimal.d16)
         .padding(.vertical, Decimal.d16)
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .background(.white)
