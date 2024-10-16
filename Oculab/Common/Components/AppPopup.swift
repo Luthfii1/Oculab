@@ -60,7 +60,7 @@ struct AppPopup: View {
 
                 Spacer()
             }
-            .background(Color.black.opacity(0.4))
+            .background(Color.black.opacity(0.7))
             .edgesIgnoringSafeArea(.all)
             .transition(.opacity.combined(with: .move(edge: .bottom)))
             .zIndex(2)
