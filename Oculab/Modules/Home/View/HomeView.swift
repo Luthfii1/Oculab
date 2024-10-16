@@ -41,7 +41,7 @@ struct HomeView: View {
                     }
                 }
             }
-            .padding(.vertical, 24)
+            .padding(.bottom, 24)
             .padding(.horizontal, 20)
             .navigationTitle("Ringkasan")
             .foregroundStyle(AppColors.slate900)
