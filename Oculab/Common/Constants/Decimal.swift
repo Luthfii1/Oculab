@@ -9,7 +9,7 @@ import Foundation
 
 enum Decimal {
     static let zeros = 0.0
-
+    static let d2 = 2.0
     static let d4 = 4.0
     static let d6 = 6.0
     static let d8 = 8.0
