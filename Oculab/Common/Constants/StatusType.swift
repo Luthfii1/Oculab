@@ -6,7 +6,7 @@
 //
 
 enum StatusType: String, CaseIterable {
-    case draft
-    case done
-    case none
+    case draft = "Belum disimpulkan"
+    case done = "Selesai"
+    case none = ""
 }

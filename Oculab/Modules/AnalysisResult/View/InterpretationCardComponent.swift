@@ -15,8 +15,8 @@ struct InterpretationCardComponent: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text(type).font(AppTypography.h4)
-                    .foregroundColor(type == "Normal" ? AppColors.blue500 : AppColors.red500)
+                Text(TBGrade.negatif.rawValue).font(AppTypography.h4)
+                    .foregroundColor(type == TBGrade.negatif.rawValue ? AppColors.blue500 : AppColors.red500)
 
                 HStack {
                     Image("robot")
@@ -46,7 +46,7 @@ struct InterpretationCardComponent: View {
 
 #Preview {
     InterpretationCardComponent(
-        type: "Normal",
+        type: TBGrade.negatif.rawValue,
         confidenceLevel: "Medium",
         notes: "Tidak ditemukan BTA dari 100 gambar lapangan pandang"
         // test
