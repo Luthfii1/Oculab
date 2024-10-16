@@ -6,11 +6,11 @@
 //
 
 enum ConfidenceLevel: String, CaseIterable {
-    case fullConfidence = "100% Confidence"
-    case highConfidence = "High Confidence"
-    case mediumConfidence = "Medium Confidence"
-    case lowConfidence = "Low Confidence"
-    case veryLowConfidence = "Very Low Confidence"
+    case fullConfidence = "100%"
+    case highConfidence = "High"
+    case mediumConfidence = "Medium"
+    case lowConfidence = "Low"
+    case veryLowConfidence = "Very Low"
     case unpredicted = "Unpredicted"
 
     var confidenceRange: String {
