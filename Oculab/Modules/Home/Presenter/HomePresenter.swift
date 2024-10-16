@@ -19,6 +19,7 @@ class HomePresenter: ObservableObject {
 
     func newInputPatient() {
         print("goes to video record page")
+        Router.shared.navigateTo(.videoRecord)
     }
 
     func filterLatestActivity(typeActivity: LatestActivityType) {

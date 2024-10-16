@@ -24,7 +24,6 @@ struct VideoRecordView: View {
                     .ignoresSafeArea()
             }
         }
-        .preferredColorScheme(.dark)
     }
 }
 
