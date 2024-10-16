@@ -9,9 +9,9 @@ import SwiftUI
 
 struct FolderCardComponent: View {
     enum BTAfolder: String, CaseIterable {
-        case zero = "0 BTA"
-        case low = "1-9 BTA"
-        case high = "≥ 10 BTA"
+        case zeroBTA = "0 BTA"
+        case lowBTA = "1-9 BTA"
+        case highBTA = "≥ 10 BTA"
     }
 
     var title: BTAfolder
@@ -46,7 +46,7 @@ struct FolderCardComponent: View {
 
 #Preview {
     FolderCardComponent(
-        title: .zero,
+        title: .zeroBTA,
         numOfImage: 9
     )
 }

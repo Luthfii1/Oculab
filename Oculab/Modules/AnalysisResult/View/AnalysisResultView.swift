@@ -31,15 +31,15 @@ struct AnalysisResultView: View {
 
                     // TODO: Bikin IF sesuai data API nanti, numOfImage jadi len(arrayGambar)
                     FolderCardComponent(
-                        title: .zero,
+                        title: .zeroBTA,
                         numOfImage: 9
                     )
                     FolderCardComponent(
-                        title: .low,
+                        title: .lowBTA,
                         numOfImage: 9
                     )
                     FolderCardComponent(
-                        title: .high,
+                        title: .highBTA,
                         numOfImage: 9
                     )
                 }

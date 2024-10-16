@@ -47,15 +47,15 @@ struct SavedResultView: View {
                             .frame(height: 200)
 
                         FolderCardComponent(
-                            title: .zero,
+                            title: .zeroBTA,
                             numOfImage: 9
                         )
                         FolderCardComponent(
-                            title: .low,
+                            title: .lowBTA,
                             numOfImage: 9
                         )
                         FolderCardComponent(
-                            title: .high,
+                            title: .highBTA,
                             numOfImage: 9
                         )
                     }
