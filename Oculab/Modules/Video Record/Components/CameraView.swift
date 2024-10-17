@@ -36,7 +36,6 @@ struct CameraView: View {
         .onAppear {
             Task {
                 videoRecordPresenter.checkPermission()
-//                videoRecordPresenter.previewSetup()
             }
         }
         .alert(isPresented: $videoRecordPresenter.alert) {

@@ -102,7 +102,6 @@ struct AnalysisResultView: View {
                         stepTitles: ["Data Pasien", "Data Sediaan", "Hasil"],
                         currentStep: 2
                     )
-                    .padding(.horizontal, Decimal.d20)
                     .padding(.vertical, Decimal.d16)
 
                     ScrollView {
