@@ -17,6 +17,7 @@ class Router: ObservableObject {
         case videoRecord
         case pdf
         case analysisResult
+        case instructionRecord
     }
 
     @Published var path: NavigationPath = .init()
@@ -32,6 +33,8 @@ class Router: ObservableObject {
             PDFPageView()
         case .analysisResult:
             AnalysisResultView()
+        case .instructionRecord:
+            InstructionRecordView()
         }
     }
 
@@ -44,6 +47,8 @@ class Router: ObservableObject {
     }
 
     func popToRoot() {
-        path.removeLast(path.count)
+        DispatchQueue.main.async {
+            self.path.removeLast(self.path.count)
+        }
     }
 }

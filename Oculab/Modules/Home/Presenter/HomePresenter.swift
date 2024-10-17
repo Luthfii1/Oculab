@@ -17,9 +17,8 @@ class HomePresenter: ObservableObject {
         negatifCount = 2
     }
 
-    func newInputPatient() {
-        print("goes to video record page")
-        Router.shared.navigateTo(.videoRecord)
+    func newInputRecord() {
+        Router.shared.navigateTo(.instructionRecord)
     }
 
     func filterLatestActivity(typeActivity: LatestActivityType) {

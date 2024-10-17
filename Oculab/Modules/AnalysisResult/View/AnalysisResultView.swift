@@ -8,120 +8,207 @@
 import SwiftUI
 
 struct AnalysisResultView: View {
+    @State var selectedTBGrade: String? = nil
+    @State var numOfBTA: String = ""
+    @State var inspectorNotes: String = ""
+    @State private var currentStep: Int = 3
+    @State var isPopUpVisible = false
+
     var body: some View {
-        VStack(alignment: .leading, spacing: Decimal.d24) {
-            VStack(alignment: .leading, spacing: Decimal.d16) {
-                HStack {
-                    Image(systemName: "photo")
-                        .foregroundColor(AppColors.purple500)
-                    Text("Hasil Gambar")
-                        .padding(.leading, Decimal.d8)
-                }
+        ZStack {
+            AppPopup(
+                image: "Confirm",
+                title: "Simpan Hasil Pemeriksaan",
+                description: "Hasil pemeriksaan yang sudah disimpan tidak dapat diubah kembali",
+                buttons: [
+                    AppButton(
+                        title: "Simpan",
+                        colorType: .primary,
+                        size: .large,
+                        isEnabled: true
+                    ) {
+                        print("Simpan Tapped")
+                    },
 
-                VStack(alignment: .leading, spacing: Decimal.d16) {
-                    Text("Ketuk untuk lihat detail gambar")
-                        .font(AppTypography.p3)
-                        .foregroundStyle(AppColors.slate300)
-
-                    RoundedRectangle(cornerRadius: Decimal.d8)
-                        .foregroundStyle(AppColors.slate50)
-                        .frame(height: 200)
-
-                    FolderCardComponent(
-                        title: "0 BTA",
-                        images: "9 Gambar"
-                    )
-                    FolderCardComponent(
-                        title: "1-9 BTA",
-                        images: "9 Gambar"
-                    )
-                    FolderCardComponent(
-                        title: "≥ 10 BTA",
-                        images: "9 Gambar"
-                    )
-                }
-            }
-            .padding(.horizontal, Decimal.d16)
-            .padding(.vertical, Decimal.d16)
-            .frame(maxWidth: .infinity, alignment: .topLeading)
-            .background(.white)
-            .cornerRadius(Decimal.d12)
-            .overlay(
-                RoundedRectangle(cornerRadius: Decimal.d12)
-                    .stroke(AppColors.slate100)
+                    AppButton(
+                        title: "Periksa Kembali",
+                        colorType: .tertiary,
+                        isEnabled: true
+                    ) {
+                        isPopUpVisible = false
+                        print("Periksa Kembali Tapped")
+                    }
+                ],
+                isVisible: $isPopUpVisible
             )
-            .padding(.horizontal, Decimal.d20)
+            NavigationView {
+                VStack {
+                    HStack {
+                        Button(action: {}) {
+                            ZStack {
+                                Circle()
+                                    .stroke(AppColors.slate100, lineWidth: 1)
+                                    .frame(width: 36, height: 36)
 
-            VStack(alignment: .leading, spacing: Decimal.d16) {
-                HStack {
-                    Image(systemName: "photo")
-                        .foregroundColor(AppColors.purple500)
-                    Text("Hasil Interpretasi")
-                        .padding(.leading, Decimal.d8)
+                                Image(systemName: "xmark")
+                                    .font(.system(size: 18, weight: .medium))
+                                    .foregroundColor(AppColors.slate900)
+                            }
+                        }
+
+                        Spacer()
+
+                        Text("Pemeriksaan Baru")
+                            .font(AppTypography.s4_1)
+                            .foregroundColor(AppColors.slate900)
+
+                        Spacer()
+                        Spacer().frame(width: 44)
+                    }
+                    .padding(.horizontal)
+                    .frame(height: 24)
+
+                    AppStepper(
+                        stepTitles: ["Data Pasien", "Data Sediaan", "Hasil"],
+                        currentStep: 2
+                    )
+                    .padding(.horizontal, Decimal.d20)
+                    .padding(.vertical, Decimal.d16)
+
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: Decimal.d24) {
+                            VStack(alignment: .leading, spacing: Decimal.d16) {
+                                HStack {
+                                    Image(systemName: "photo")
+                                        .foregroundColor(AppColors.purple500)
+                                    Text("Hasil Gambar")
+                                        .font(AppTypography.s4_1)
+                                        .padding(.leading, Decimal.d8)
+                                }
+                                Text("Ketuk untuk lihat detail gambar")
+                                    .font(AppTypography.p3)
+                                    .foregroundStyle(AppColors.slate300)
+
+                                // Example placeholder for image results
+                                FolderCardComponent(
+                                    title: .zeroBTA,
+                                    numOfImage: 9
+                                )
+                                FolderCardComponent(
+                                    title: .lowBTA,
+                                    numOfImage: 9
+                                )
+                                FolderCardComponent(
+                                    title: .highBTA,
+                                    numOfImage: 9
+                                )
+                            }
+                            .padding(.horizontal, Decimal.d16)
+                            .padding(.vertical, Decimal.d16)
+                            .frame(maxWidth: .infinity, alignment: .topLeading)
+                            .background(.white)
+                            .cornerRadius(Decimal.d12)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: Decimal.d12)
+                                    .stroke(AppColors.slate100)
+                            )
+                            .padding(.horizontal, Decimal.d20)
+
+                            VStack(alignment: .leading, spacing: Decimal.d24) {
+                                HStack {
+                                    Image(systemName: "photo")
+                                        .foregroundColor(AppColors.purple500)
+                                    Text("Hasil Interpretasi")
+                                        .font(AppTypography.s4_1)
+                                        .padding(.leading, Decimal.d8)
+                                    Spacer()
+                                    StatusTagComponent(type: .draft)
+                                }
+
+                                VStack(alignment: .leading, spacing: Decimal.d16) {
+                                    Text("Interpretasi Sistem")
+                                        .font(AppTypography.s4_1)
+
+                                    HStack(alignment: .top) {
+                                        Image(systemName: "exclamationmark.triangle.fill")
+                                            .foregroundColor(AppColors.orange500)
+                                        Text("Interpretasi sistem bukan merupakan hasil akhir untuk pasien")
+                                    }
+
+                                    InterpretationCardComponent(
+                                        type: .scanty,
+                                        confidenceLevel: .lowConfidence
+                                    )
+
+                                }.font(AppTypography.p4)
+
+                                VStack(alignment: .leading, spacing: Decimal.d16) {
+                                    AppDropdown(
+                                        title: "Interpretasi Petugas",
+                                        placeholder: "Pilih kategori",
+                                        isRequired: false,
+                                        rightIcon: "chevron.down",
+                                        isDisabled: false,
+                                        choices: TBGrade.allCases.map { $0.rawValue },
+                                        isExtended: true,
+                                        selectedChoice: $selectedTBGrade
+                                    )
+
+                                    if selectedTBGrade == TBGrade.scanty.rawValue {
+                                        AppTextField(
+                                            title: "Jumlah BTA",
+                                            isRequired: false,
+                                            placeholder: "Contoh: 8",
+                                            isError: false,
+                                            isDisabled: false,
+                                            isNumberOnly: true,
+                                            text: $numOfBTA
+                                        )
+                                    }
+
+                                    AppTextBox(
+                                        title: "Catatan Petugas",
+                                        placeholder: "Contoh: Hanya terdapat 20 bakteri dari 60 lapangan pandang yang terkumpul",
+                                        isRequired: false,
+                                        isDisabled: false,
+                                        text: $inspectorNotes
+                                    )
+
+                                    AppButton(
+                                        title: "Simpan Hasil Pemeriksaan",
+                                        rightIcon: "checkmark",
+                                        colorType: .primary,
+                                        size: .large,
+                                        isEnabled: {
+                                            if selectedTBGrade == TBGrade.scanty.rawValue {
+                                                return !numOfBTA.isEmpty && Int(numOfBTA) != nil
+                                            } else {
+                                                return selectedTBGrade != nil
+                                            }
+                                        }()
+                                    ) {
+                                        isPopUpVisible = true
+                                        print("Primary Button Tapped")
+                                    }
+                                }
+                            }
+                            .padding(.horizontal, Decimal.d16)
+                            .padding(.vertical, Decimal.d16)
+                            .frame(maxWidth: .infinity, alignment: .topLeading)
+                            .background(.white)
+                            .cornerRadius(Decimal.d12)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: Decimal.d12)
+                                    .stroke(AppColors.slate100)
+                            )
+                            .padding(.horizontal, Decimal.d20)
+                        }
+                    }
+
                     Spacer()
-                    StatusTagComponent(type: .done)
                 }
-
-                VStack(alignment: .leading, spacing: Decimal.d16) {
-                    Text("Interpretasi Sistem")
-                        .font(AppTypography.s4_1)
-
-                    HStack(alignment: .top) {
-                        Image(systemName: "info.circle.fill")
-                            .foregroundColor(AppColors.blue400)
-                        Text("Sistem ini menghitung bakteri sesuai standar IUALTD")
-                    }
-
-                    HStack(alignment: .top) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundColor(AppColors.orange500)
-                        Text("Interpretasi sistem bukan merupakan hasil akhir untuk pasien")
-                    }
-                    InterpretationCardComponent(
-                        type: "Normal",
-                        confidenceLevel: "Medium",
-                        notes: "Tidak ditemukan BTA dari 100 gambar lapangan pandang"
-                    )
-
-                }.font(AppTypography.p4)
-
-                AppTextField(
-                    title: "Jumlah BTA",
-                    isRequired: true,
-                    placeholder: "Contoh: 8",
-                    isError: false,
-                    isDisabled: false,
-                    text: .constant("")
-                )
-
-                AppTextBox(
-                    title: "Catatan Petugas",
-                    placeholder: "Contoh: Hanya terdapat 20 bakteri dari 60 lapangan pandang yang terkumpul",
-                    isRequired: false,
-                    isDisabled: false,
-                    text: .constant("")
-                )
-
-                AppButton(
-                    title: "Simpan Hasil Pemeriksaan",
-                    rightIcon: "checkmark", // Optional right icon
-                    colorType: .primary, // Primary button type
-                    size: .large,
-                    isEnabled: true
-                ) {
-                    print("Primary Button Tapped")
-                }
+                .navigationBarHidden(true)
             }
-            .padding(.horizontal, Decimal.d16)
-            .padding(.vertical, Decimal.d16)
-            .frame(maxWidth: .infinity, alignment: .topLeading)
-            .background(.white)
-            .cornerRadius(Decimal.d12)
-            .overlay(
-                RoundedRectangle(cornerRadius: Decimal.d12)
-                    .stroke(AppColors.slate100)
-            )
-            .padding(.horizontal, Decimal.d20)
         }
     }
 }

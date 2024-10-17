@@ -26,6 +26,8 @@
 	<string>We would like to access your camera to record video</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>We would like to access your microphone to record video</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need access to save videos to your photo library.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Inter-Bold.ttf</string>
@@ -40,6 +42,12 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Inter-Bold.ttf</string>
+		<string>Inter-Regular.ttf</string>
+		<string>Inter-SemiBold.ttf</string>
 	</array>
 </dict>
 </plist>

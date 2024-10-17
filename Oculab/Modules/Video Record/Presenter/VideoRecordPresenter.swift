@@ -7,11 +7,13 @@
 
 import AVFoundation
 import Foundation
+import Photos
 import SwiftUI
 
 class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate,
 AVCaptureFileOutputRecordingDelegate {
     @Published var session = AVCaptureSession()
+    @Published var videoRecordingTitle: String = "Sediaan: -"
     @Published var alert = false
     @Published var output = AVCaptureMovieFileOutput()
     @Published var preview: AVCaptureVideoPreviewLayer!
@@ -20,6 +22,18 @@ AVCaptureFileOutputRecordingDelegate {
     @Published var recordedURLs: [URL] = []
     @Published var previewURL: URL?
     @Published var showPreview: Bool = false
+
+    let preRecordingInstructions: [String] = [
+        "Gunakan lensa objektif 10x untuk menentukan fokus, kemudian teteskan minyak imersi",
+        "Pastikan lensa objektif telah diatur ke perbesaran 100x setelah fokus ditemukan",
+        "Pasang perangkat Anda dengan lensa kamera menempel pada lensa okuler",
+        "Pastikan Anda berada di lokasi dengan jaringan yang lancar"
+    ]
+    let duringRecordingInstructions: [String] = [
+        "Pastikan sediaan tetap terlihat di layar dan selalu dalam fokus optimal",
+        "Baca sediaan mulai dari ujung kiri ke ujung kanan mengikuti skema pemindaian untuk pemeriksaan apusan",
+        "Progress pengambilan gambar keseluruhan akan terlihat di kanan atas"
+    ]
 
     func checkPermission() {
         // check camera got permission
@@ -107,5 +121,50 @@ AVCaptureFileOutputRecordingDelegate {
 
     func getColorButtonRecording() -> Color {
         return isRecording ? .red : .white
+    }
+
+    func navigateToVideo() {
+        Router.shared.navigateTo(.videoRecord)
+    }
+
+    func navigateBack() {
+        Router.shared.navigateBack()
+    }
+
+    func isBackButtonActive() -> Bool {
+        return previewURL == nil && !isRecording
+    }
+
+    func saveVideoToPhotos() {
+        guard let videoURL = previewURL else {
+            print("No video URL to save")
+            return
+        }
+
+        // Request authorization to save to Photos library
+        PHPhotoLibrary.requestAuthorization { status in
+            switch status {
+            case .authorized:
+                // Perform the changes to save the video
+                PHPhotoLibrary.shared().performChanges({
+                    PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: videoURL)
+                }) { success, error in
+                    if success {
+                        Router.shared.popToRoot()
+                        print("Video saved successfully!")
+                    } else if let error = error {
+                        print("Error saving video: \(error.localizedDescription)")
+                    }
+                }
+            case .denied, .restricted:
+                print("Access to Photos library denied or restricted.")
+            case .notDetermined:
+                print("Photo library access has not been determined.")
+            case .limited:
+                print("Photo library just limited to some photos")
+            @unknown default:
+                break
+            }
+        }
     }
 }

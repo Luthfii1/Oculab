@@ -79,9 +79,9 @@ struct AppTextBox: View {
                 if internalText.isEmpty {
                     Text(placeholder)
                         .font(AppTypography.p2)
-                        .foregroundColor(AppColors.slate400)
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 20)
+                        .foregroundColor(AppColors.slate100)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 14)
                         .allowsHitTesting(false) // Allow typing when placeholder is visible
                 }
             }

@@ -1,0 +1,55 @@
+//
+//  VideoPreview.swift
+//  Oculab
+//
+//  Created by Luthfi Misbachul Munir on 15/10/24.
+//
+
+import AVKit
+import SwiftUI
+
+struct VideoPreview: View {
+    @EnvironmentObject private var videoRecordPresenter: VideoRecordPresenter
+
+    var body: some View {
+        ZStack {
+            if let url = videoRecordPresenter.previewURL {
+                VideoPlayer(player: AVPlayer(url: url))
+                    .ignoresSafeArea()
+            }
+
+            // Control buttons (Retake & Save) at the bottom
+            VStack(alignment: .center, spacing: 32) {
+                // Button to save video
+                AppButton(
+                    title: "Simpan Video",
+                    rightIcon: "checkmark",
+                    colorType: .primary,
+                    size: .large,
+                    cornerRadius: 8
+                ) {
+                    videoRecordPresenter.saveVideoToPhotos()
+                }
+
+                // Button to retake video
+                AppButton(
+                    title: "Ambil Ulang",
+                    leftIcon: "arrow.counterclockwise",
+                    colorType: .tertiary,
+                    size: .large
+                ) {
+                    videoRecordPresenter.previewURL = nil
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 52)
+            .frame(maxHeight: .infinity, alignment: .bottom)
+        }
+        .ignoresSafeArea()
+    }
+}
+
+#Preview {
+    VideoPreview()
+        .environmentObject(VideoRecordPresenter())
+}

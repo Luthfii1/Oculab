@@ -47,16 +47,16 @@ struct SavedResultView: View {
                             .frame(height: 200)
 
                         FolderCardComponent(
-                            title: "0 BTA",
-                            images: "9 Gambar"
+                            title: .zeroBTA,
+                            numOfImage: 9
                         )
                         FolderCardComponent(
-                            title: "1-9 BTA",
-                            images: "9 Gambar"
+                            title: .lowBTA,
+                            numOfImage: 9
                         )
                         FolderCardComponent(
-                            title: "≥ 10 BTA",
-                            images: "9 Gambar"
+                            title: .highBTA,
+                            numOfImage: 9
                         )
                     }
                 }
@@ -67,9 +67,8 @@ struct SavedResultView: View {
                             .font(AppTypography.s5)
                             .foregroundColor(AppColors.slate300)
                         InterpretationCardComponent(
-                            type: "Negatif",
-                            confidenceLevel: "",
-                            notes: "Tidak ditemukan BTA dari 100 gambar lapangan pandang"
+                            type: .scanty,
+                            confidenceLevel: .lowConfidence
                         )
                     }
 
@@ -85,9 +84,8 @@ struct SavedResultView: View {
                                 .font(AppTypography.p4)
                         }
                         InterpretationCardComponent(
-                            type: "Positif 2+",
-                            confidenceLevel: "Low",
-                            notes: "Ditemukan 1-9 BTA dari 70 gambar lapangan pandang"
+                            type: .scanty,
+                            confidenceLevel: .lowConfidence
                         )
                     }
 
