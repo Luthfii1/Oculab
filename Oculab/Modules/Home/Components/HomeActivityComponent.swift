@@ -20,7 +20,7 @@ struct HomeActivityComponent: View {
                 ZStack(alignment: .topTrailing) {
                     Image(fileName)
                         .resizable()
-                        .frame(maxHeight: 114)
+                        .frame(height: 114)
 
                     StatusTagComponent(type: status)
                         .padding(Decimal.d6) // Padding for the status tag
@@ -41,7 +41,7 @@ struct HomeActivityComponent: View {
             }
             .padding(.horizontal, Decimal.d12)
             .padding(.vertical, Decimal.d12)
-            .frame(maxWidth: (geometry.size.width / 2.0) - 28, alignment: .topLeading)
+            .frame(maxWidth: geometry.size.width, alignment: .topLeading)
             .cornerRadius(Decimal.d12)
             .overlay(
                 RoundedRectangle(cornerRadius: Decimal.d12)

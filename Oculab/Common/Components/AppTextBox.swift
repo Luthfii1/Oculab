@@ -80,8 +80,8 @@ struct AppTextBox: View {
                     Text(placeholder)
                         .font(AppTypography.p2)
                         .foregroundColor(AppColors.slate100)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 14)
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 22)
                         .allowsHitTesting(false) // Allow typing when placeholder is visible
                 }
             }

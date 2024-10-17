@@ -39,6 +39,23 @@ struct HomeView: View {
                         }
 
                         // TODO: Create component for Sample Preview
+
+                        HStack(spacing: Decimal.d16) {
+                            HomeActivityComponent(
+                                fileName: "image 41",
+                                slideId: "24/11/1/0123A",
+                                status: .draft,
+                                date: "18 September 2024",
+                                time: "14.39"
+                            )
+                            HomeActivityComponent(
+                                fileName: "Instruction",
+                                slideId: "24/11/1/0123A",
+                                status: .draft,
+                                date: "18 September 2024",
+                                time: "14.39"
+                            )
+                        }
                     }
                 }
             }
