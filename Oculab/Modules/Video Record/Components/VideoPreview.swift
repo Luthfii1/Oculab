@@ -10,6 +10,7 @@ import SwiftUI
 
 struct VideoPreview: View {
     @EnvironmentObject private var videoRecordPresenter: VideoRecordPresenter
+    @EnvironmentObject private var examPresenter: ExamDataPresenter
 
     var body: some View {
         ZStack {
@@ -28,7 +29,7 @@ struct VideoPreview: View {
                     size: .large,
                     cornerRadius: 8
                 ) {
-                    videoRecordPresenter.saveVideoToPhotos()
+                    videoRecordPresenter.navigateBack()
                 }
 
                 // Button to retake video
