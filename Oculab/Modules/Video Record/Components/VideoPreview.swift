@@ -19,12 +19,12 @@ struct VideoPreview: View {
             }
 
             // Control buttons (Retake & Save) at the bottom
-            VStack(alignment: .center, spacing: 32) {
+            VStack(alignment: .center, spacing: Decimal.d16) {
                 // Button to save video
                 AppButton(
                     title: "Simpan Video",
                     rightIcon: "checkmark",
-                    colorType: .primary,
+                    colorType: .neutral(.primary),
                     size: .large,
                     cornerRadius: 8
                 ) {
@@ -35,7 +35,7 @@ struct VideoPreview: View {
                 AppButton(
                     title: "Ambil Ulang",
                     leftIcon: "arrow.counterclockwise",
-                    colorType: .tertiary,
+                    colorType: .neutral(.secondary),
                     size: .large
                 ) {
                     videoRecordPresenter.previewURL = nil

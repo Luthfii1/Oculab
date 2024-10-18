@@ -68,6 +68,7 @@ struct HomeView: View {
             homePresenter.getStatisticData()
             homePresenter.fetchData()
         }
+        .navigationBarBackButtonHidden(true)
     }
 }
 
