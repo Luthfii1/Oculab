@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HomeActivityComponent: View {
-    var fileName: String
+    var fileName: String // URL as a String
     var slideId: String
     var status: StatusType
     var date: String
@@ -17,9 +17,29 @@ struct HomeActivityComponent: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Decimal.d12) {
             ZStack(alignment: .topTrailing) {
-                Image(fileName)
-                    .resizable()
-                    .frame(height: 114)
+
+                AsyncImage(url: URL(string: fileName)) { phase in
+                    switch phase {
+                    case .empty:
+                        ProgressView()
+                            .frame(height: 114)
+                    case let .success(image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                            .frame(height: 114)
+                            .clipped()
+                    case .failure:
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 114)
+                            .foregroundColor(.red)
+                    @unknown default:
+                        EmptyView()
+                    }
+                }
+                .cornerRadius(Decimal.d8)
 
                 StatusTagComponent(type: status)
                     .padding(Decimal.d6) // Padding for the status tag
@@ -40,7 +60,6 @@ struct HomeActivityComponent: View {
         }
         .padding(.horizontal, Decimal.d12)
         .padding(.vertical, Decimal.d12)
-//            .frame(maxWidth: geometry.size.width, minHeight: 190, alignment: .topLeading)
         .cornerRadius(Decimal.d12)
         .overlay(
             RoundedRectangle(cornerRadius: Decimal.d12)
@@ -49,11 +68,10 @@ struct HomeActivityComponent: View {
     }
 }
 
-// }
 
 #Preview {
     HomeActivityComponent(
-        fileName: "Instruction",
+        fileName: "https://is3.cloudhost.id/oculab-fov/oculab-fov/eead8004-2fd7-4f40-be1f-1d02cb886af4.png",
         slideId: "24/11/1/0123A",
         status: .draft,
         date: "18 September 2024",
