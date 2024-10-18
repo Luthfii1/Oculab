@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HomeView: View {
-    @StateObject private var homePresenter = HomePresenter()
+    @ObservedObject private var homePresenter = HomePresenter()
 
     let columns = [
         GridItem(.flexible(), spacing: 16),
@@ -43,44 +43,16 @@ struct HomeView: View {
                             .padding(.horizontal, 1)
                         }
 
-                        // TODO: Create component for Sample Preview
-
                         LazyVGrid(columns: columns, spacing: 16) {
-                            HomeActivityComponent(
-                                fileName: "image 41",
-                                slideId: "24/11/1/0123A",
-                                status: .draft,
-                                date: "18 September 2024",
-                                time: "14.39"
-                            )
-                            HomeActivityComponent(
-                                fileName: "image 41",
-                                slideId: "24/11/1/0123A",
-                                status: .draft,
-                                date: "18 September 2024",
-                                time: "14.39"
-                            )
-                            HomeActivityComponent(
-                                fileName: "image 41",
-                                slideId: "24/11/1/0123A",
-                                status: .draft,
-                                date: "18 September 2024",
-                                time: "14.39"
-                            )
-                            HomeActivityComponent(
-                                fileName: "image 41",
-                                slideId: "24/11/1/0123A",
-                                status: .draft,
-                                date: "18 September 2024",
-                                time: "14.39"
-                            )
-                            HomeActivityComponent(
-                                fileName: "image 41",
-                                slideId: "24/11/1/0123A",
-                                status: .draft,
-                                date: "18 September 2024",
-                                time: "14.39"
-                            )
+                            ForEach(homePresenter.filteredExamination) { exam in
+                                HomeActivityComponent(
+                                    fileName: exam.imagePreview,
+                                    slideId: exam.slideId,
+                                    status: exam.statusExamination,
+                                    date: exam.date,
+                                    time: exam.time
+                                )
+                            }
                         }
                     }
                 }
@@ -94,6 +66,7 @@ struct HomeView: View {
         .ignoresSafeArea()
         .onAppear {
             homePresenter.getStatisticData()
+            homePresenter.fetchData()
         }
     }
 }
