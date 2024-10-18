@@ -16,8 +16,7 @@ struct HomeActivityComponent: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Decimal.d12) {
-            ZStack(alignment: .topTrailing) {
-
+            ZStack(alignment: .top) {
                 AsyncImage(url: URL(string: fileName)) { phase in
                     switch phase {
                     case .empty:
@@ -41,8 +40,11 @@ struct HomeActivityComponent: View {
                 }
                 .cornerRadius(Decimal.d8)
 
-                StatusTagComponent(type: status)
-                    .padding(Decimal.d6) // Padding for the status tag
+                HStack {
+                    Spacer()
+                    StatusTagComponent(type: status)
+                        .padding(Decimal.d6)
+                }
             }
             .cornerRadius(Decimal.d8)
 
@@ -68,12 +70,19 @@ struct HomeActivityComponent: View {
     }
 }
 
-
 #Preview {
     HomeActivityComponent(
         fileName: "https://is3.cloudhost.id/oculab-fov/oculab-fov/eead8004-2fd7-4f40-be1f-1d02cb886af4.png",
         slideId: "24/11/1/0123A",
         status: .draft,
+        date: "18 September 2024",
+        time: "14.39"
+    )
+
+    HomeActivityComponent(
+        fileName: "https://is3.cloudhost.id/oculab-fov/oculab-fov/eead8004-2fd7-4f40-be1f-1d02cb886af4.png",
+        slideId: "24/11/1/0123A",
+        status: .done,
         date: "18 September 2024",
         time: "14.39"
     )

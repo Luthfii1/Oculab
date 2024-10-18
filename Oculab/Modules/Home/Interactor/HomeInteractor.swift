@@ -23,7 +23,7 @@ class HomeInteractor {
             },
             {
                 "examinationId": "sampleId2",
-                "statusExamination": "pending",
+                "statusExamination": "completed",
                 "imagePreview": "https://is3.cloudhost.id/oculab-fov/oculab-fov/eead8004-2fd7-4f40-be1f-1d02cb886af4.png",
                 "timestamp": "2022-01-02T12:00:00Z",
                 "slideId": "slide2"
