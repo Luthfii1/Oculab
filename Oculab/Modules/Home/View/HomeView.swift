@@ -10,6 +10,11 @@ import SwiftUI
 struct HomeView: View {
     @StateObject private var homePresenter = HomePresenter()
 
+    let columns = [
+        GridItem(.flexible(), spacing: 16),
+        GridItem(.flexible(), spacing: 16)
+    ]
+
     var body: some View {
         NavigationView {
             ScrollView {
@@ -40,7 +45,7 @@ struct HomeView: View {
 
                         // TODO: Create component for Sample Preview
 
-                        HStack(spacing: Decimal.d16) {
+                        LazyVGrid(columns: columns, spacing: 16) {
                             HomeActivityComponent(
                                 fileName: "image 41",
                                 slideId: "24/11/1/0123A",
@@ -49,7 +54,28 @@ struct HomeView: View {
                                 time: "14.39"
                             )
                             HomeActivityComponent(
-                                fileName: "Instruction",
+                                fileName: "image 41",
+                                slideId: "24/11/1/0123A",
+                                status: .draft,
+                                date: "18 September 2024",
+                                time: "14.39"
+                            )
+                            HomeActivityComponent(
+                                fileName: "image 41",
+                                slideId: "24/11/1/0123A",
+                                status: .draft,
+                                date: "18 September 2024",
+                                time: "14.39"
+                            )
+                            HomeActivityComponent(
+                                fileName: "image 41",
+                                slideId: "24/11/1/0123A",
+                                status: .draft,
+                                date: "18 September 2024",
+                                time: "14.39"
+                            )
+                            HomeActivityComponent(
+                                fileName: "image 41",
                                 slideId: "24/11/1/0123A",
                                 status: .draft,
                                 date: "18 September 2024",
