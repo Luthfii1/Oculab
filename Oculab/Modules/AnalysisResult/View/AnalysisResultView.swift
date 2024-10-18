@@ -12,10 +12,37 @@ struct AnalysisResultView: View {
     @State var numOfBTA: String = ""
     @State var inspectorNotes: String = ""
     @State private var currentStep: Int = 3
-    @State var isPopUpVisible = false
+    @State var isVerifPopUpVisible = false
+    @State var isLeavePopUpVisible = false
 
     var body: some View {
         ZStack {
+            AppPopup(
+                image: "Confirm-Leave",
+                title: "Pemeriksaan Belum Selesai",
+                description: "Pemeriksaan disimpan sebagai draft dan dapat diakses di halaman riwayat",
+                buttons: [
+                    AppButton(
+                        title: "Keluar",
+                        colorType: .destructive(.primary),
+                        size: .large,
+                        isEnabled: true
+                    ) {
+                        print("Simpan Tapped")
+                    },
+
+                    AppButton(
+                        title: "Periksa Kembali",
+                        colorType: .destructive(.secondary),
+                        isEnabled: true
+                    ) {
+                        isLeavePopUpVisible = false
+                        print("Kembali ke Pemeriksaan")
+                    }
+                ],
+                isVisible: $isLeavePopUpVisible
+            )
+
             AppPopup(
                 image: "Confirm",
                 title: "Simpan Hasil Pemeriksaan",
@@ -35,16 +62,19 @@ struct AnalysisResultView: View {
                         colorType: .tertiary,
                         isEnabled: true
                     ) {
-                        isPopUpVisible = false
+                        isVerifPopUpVisible = false
                         print("Periksa Kembali Tapped")
                     }
                 ],
-                isVisible: $isPopUpVisible
+                isVisible: $isVerifPopUpVisible
             )
+
             NavigationView {
                 VStack {
                     HStack {
-                        Button(action: {}) {
+                        Button(action: {
+                            isLeavePopUpVisible = true
+                        }) {
                             ZStack {
                                 Circle()
                                     .stroke(AppColors.slate100, lineWidth: 1)
@@ -186,7 +216,7 @@ struct AnalysisResultView: View {
                                             }
                                         }()
                                     ) {
-                                        isPopUpVisible = true
+                                        isVerifPopUpVisible = true
                                         print("Primary Button Tapped")
                                     }
                                 }

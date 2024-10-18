@@ -14,6 +14,16 @@ struct AppButton: View, Identifiable {
 
     enum ButtonColorType {
         case primary, secondary, tertiary
+        case destructive(DestructiveType)
+        case neutral(NeutralType)
+
+        enum DestructiveType {
+            case primary, secondary
+        }
+
+        enum NeutralType {
+            case primary, secondary
+        }
     }
 
     @State private var isPressed: Bool = false
@@ -38,6 +48,20 @@ struct AppButton: View, Identifiable {
                 return AppColors.purple100
             case .tertiary:
                 return AppColors.slate0
+            case let .destructive(type):
+                switch type {
+                case .primary:
+                    return AppColors.red700
+                case .secondary:
+                    return AppColors.red100
+                }
+            case let .neutral(type):
+                switch type {
+                case .primary:
+                    return AppColors.slate50
+                case .secondary:
+                    return .clear
+                }
             }
         } else {
             switch colorType {
@@ -47,6 +71,20 @@ struct AppButton: View, Identifiable {
                 return isEnabled ? AppColors.purple50 : .clear
             case .tertiary:
                 return .clear
+            case let .destructive(type):
+                switch type {
+                case .primary:
+                    return isEnabled ? AppColors.red500 : AppColors.slate50
+                case .secondary:
+                    return isEnabled ? AppColors.red50 : AppColors.slate50
+                }
+            case let .neutral(type):
+                switch type {
+                case .primary:
+                    return isEnabled ? AppColors.slate0 : AppColors.slate50
+                case .secondary:
+                    return .clear
+                }
             }
         }
     }
@@ -59,6 +97,20 @@ struct AppButton: View, Identifiable {
             return isEnabled ? AppColors.purple500 : AppColors.slate400
         case .tertiary:
             return isEnabled ? AppColors.purple500 : AppColors.slate200
+        case let .destructive(type):
+            switch type {
+            case .primary:
+                return isEnabled ? AppColors.slate0 : AppColors.slate200
+            case .secondary:
+                return isEnabled ? AppColors.red500 : AppColors.slate200
+            }
+        case let .neutral(type):
+            switch type {
+            case .primary:
+                return isEnabled ? AppColors.slate900 : AppColors.slate200
+            case .secondary:
+                return isEnabled ? AppColors.slate0 : AppColors.slate200
+            }
         }
     }
 
@@ -216,6 +268,42 @@ struct AppButton: View, Identifiable {
             isEnabled: false // Disabled
         ) {
             print("Should not be tapped")
+        }
+
+        AppButton(
+            title: "Destructive Primary Enabled",
+            colorType: .destructive(.primary),
+            size: .small,
+            isEnabled: true
+        ) {
+            print("Destructive Button Tapped")
+        }
+
+        AppButton(
+            title: "Destructive Secondary Enabled",
+            colorType: .destructive(.secondary),
+            size: .small,
+            isEnabled: true
+        ) {
+            print("Destructive Button Tapped")
+        }
+
+        AppButton(
+            title: "Neutral Primary Enabled",
+            colorType: .neutral(.primary),
+            size: .small,
+            isEnabled: true
+        ) {
+            print("Neutral Button Tapped")
+        }
+
+        AppButton(
+            title: "Neutral Secondary Enabled",
+            colorType: .neutral(.secondary),
+            size: .small,
+            isEnabled: true
+        ) {
+            print("Neutral Button Tapped")
         }
     }
 }
