@@ -66,7 +66,7 @@ struct SavedResultView: View {
                         Text("Interpretasi Petugas")
                             .font(AppTypography.s5)
                             .foregroundColor(AppColors.slate300)
-                        InterpretationCardComponent(
+                        GradingCardComponent(
                             type: .SCANTY,
                             confidenceLevel: .lowConfidence
                         )
@@ -83,7 +83,7 @@ struct SavedResultView: View {
                             Text("Interpretasi sistem bukan merupakan hasil akhir untuk pasien")
                                 .font(AppTypography.p4)
                         }
-                        InterpretationCardComponent(
+                        GradingCardComponent(
                             type: .SCANTY,
                             confidenceLevel: .lowConfidence
                         )

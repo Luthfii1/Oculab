@@ -164,7 +164,7 @@ struct AnalysisResultView: View {
                                         Text("Interpretasi sistem bukan merupakan hasil akhir untuk pasien")
                                     }
 
-                                    InterpretationCardComponent(
+                                    GradingCardComponent(
                                         type: .SCANTY,
                                         confidenceLevel: .lowConfidence
                                     )

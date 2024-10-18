@@ -1,5 +1,5 @@
 //
-//  InterpretationCardComponent.swift
+//  GradingCardComponent.swift
 //  Oculab
 //
 //  Created by Alifiyah Ariandri on 14/10/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct InterpretationCardComponent: View {
+struct GradingCardComponent: View {
     var type: GradingType
     var confidenceLevel: ConfidenceLevel
 
@@ -43,7 +43,7 @@ struct InterpretationCardComponent: View {
 }
 
 #Preview {
-    InterpretationCardComponent(
+    GradingCardComponent(
         type: .NEGATIVE,
         confidenceLevel: .mediumConfidence
     )
