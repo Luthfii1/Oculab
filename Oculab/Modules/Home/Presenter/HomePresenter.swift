@@ -25,7 +25,7 @@ class HomePresenter: ObservableObject {
     }
 
     func newInputRecord() {
-        Router.shared.navigateTo(.instructionRecord)
+        Router.shared.navigateTo(.newExam)
     }
 
     func filterLatestActivity(typeActivity: LatestActivityType) {

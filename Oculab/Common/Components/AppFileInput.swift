@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct AppFileInput: View {
+    @EnvironmentObject var examPresenter: ExamDataPresenter
+
     var title: String
     var isRequired: Bool
     var isEmpty: Bool
@@ -16,10 +18,9 @@ struct AppFileInput: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Decimal.d8) {
-            // Title with optional 'Required' marker
             HStack(spacing: Decimal.d2) {
                 Text(title)
-                    .font(AppTypography.h4)
+                    .font(AppTypography.s4_1)
                     .foregroundColor(AppColors.slate900)
 
                 if isRequired {
@@ -30,10 +31,10 @@ struct AppFileInput: View {
             }
 
             VStack(alignment: .center) {
-                // File selection button
                 if selectedFileName.isEmpty {
                     AppButton(title: "Ambil Gambar", leftIcon: "camera", colorType: .secondary, size: .small) {
                         selectFile()
+                        examPresenter.newVideoRecord()
                     }
                 } else {
                     Image(selectedFileName)
@@ -52,16 +53,14 @@ struct AppFileInput: View {
                     .stroke(style: StrokeStyle(
                         lineWidth: 2,
                         dash: selectedFileName.isEmpty ? [10] : []
-                    )) // Dashed border if no file is selected
+                    ))
                     .foregroundColor(AppColors.slate100)
             )
         }
     }
 
-    // Dummy function to simulate file selection
     private func selectFile() {
-        // Simulate file selection for now
-        selectedFileName = "sample_file.pdf" // Example file name
+        selectedFileName = "sample_file.pdf"
     }
 }
 
