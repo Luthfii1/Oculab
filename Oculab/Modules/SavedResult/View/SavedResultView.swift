@@ -47,15 +47,15 @@ struct SavedResultView: View {
                             .frame(height: 200)
 
                         FolderCardComponent(
-                            title: .zeroBTA,
+                            title: .BTA0,
                             numOfImage: 9
                         )
                         FolderCardComponent(
-                            title: .lowBTA,
+                            title: .BTA1TO9,
                             numOfImage: 9
                         )
                         FolderCardComponent(
-                            title: .highBTA,
+                            title: .BTAABOVE9,
                             numOfImage: 9
                         )
                     }
@@ -67,7 +67,7 @@ struct SavedResultView: View {
                             .font(AppTypography.s5)
                             .foregroundColor(AppColors.slate300)
                         InterpretationCardComponent(
-                            type: .scanty,
+                            type: .SCANTY,
                             confidenceLevel: .lowConfidence
                         )
                     }
@@ -84,7 +84,7 @@ struct SavedResultView: View {
                                 .font(AppTypography.p4)
                         }
                         InterpretationCardComponent(
-                            type: .scanty,
+                            type: .SCANTY,
                             confidenceLevel: .lowConfidence
                         )
                     }

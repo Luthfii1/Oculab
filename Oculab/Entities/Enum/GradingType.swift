@@ -7,13 +7,13 @@
 
 import Foundation
 
-enum GradingType: String, Decodable {
+enum GradingType: String, Decodable, CaseIterable {
     case NEGATIVE = "Negatif"
     case SCANTY = "Scanty"
     case Plus1 = "Positif (1+)"
     case Plus2 = "Positif (2+)"
     case Plus3 = "Positif (3+)"
-    
+
     var description: String {
         switch self {
         case .NEGATIVE:
