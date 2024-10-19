@@ -8,7 +8,7 @@
 import Foundation
 
 enum FOVType: String, Decodable {
-    case BTA0
-    case BTA1TO9
-    case BTAABOVE9
+    case BTA0 = "0 BTA"
+    case BTA1TO9 = "1-9 BTA"
+    case BTAABOVE9 = "≥ 10 BTA"
 }

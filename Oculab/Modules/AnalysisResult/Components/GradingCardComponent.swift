@@ -1,5 +1,5 @@
 //
-//  InterpretationCardComponent.swift
+//  GradingCardComponent.swift
 //  Oculab
 //
 //  Created by Alifiyah Ariandri on 14/10/24.
@@ -7,15 +7,15 @@
 
 import SwiftUI
 
-struct InterpretationCardComponent: View {
-    var type: TBGrade
+struct GradingCardComponent: View {
+    var type: GradingType
     var confidenceLevel: ConfidenceLevel
 
     var body: some View {
         VStack(alignment: .leading, spacing: Decimal.d8) {
             HStack {
                 Text(type.rawValue).font(AppTypography.h4)
-                    .foregroundColor(type == TBGrade.negative ? AppColors.blue500 : AppColors.red500)
+                    .foregroundColor(type == .NEGATIVE ? AppColors.blue500 : AppColors.red500)
 
                 HStack {
                     Image("robot")
@@ -29,7 +29,7 @@ struct InterpretationCardComponent: View {
                     }
                 }
             }
-            Text(gradeResultDesc[type]!).font(AppTypography.p3)
+            Text(gradingResultDesc[type]!).font(AppTypography.p3)
         }
         .padding(Decimal.d12)
         .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -43,8 +43,8 @@ struct InterpretationCardComponent: View {
 }
 
 #Preview {
-    InterpretationCardComponent(
-        type: .negative,
+    GradingCardComponent(
+        type: .NEGATIVE,
         confidenceLevel: .mediumConfidence
     )
 }

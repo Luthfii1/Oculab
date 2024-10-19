@@ -120,15 +120,15 @@ struct AnalysisResultView: View {
 
                                 // Example placeholder for image results
                                 FolderCardComponent(
-                                    title: .zeroBTA,
+                                    title: .BTA0,
                                     numOfImage: 9
                                 )
                                 FolderCardComponent(
-                                    title: .lowBTA,
+                                    title: .BTA1TO9,
                                     numOfImage: 9
                                 )
                                 FolderCardComponent(
-                                    title: .highBTA,
+                                    title: .BTAABOVE9,
                                     numOfImage: 9
                                 )
                             }
@@ -164,8 +164,8 @@ struct AnalysisResultView: View {
                                         Text("Interpretasi sistem bukan merupakan hasil akhir untuk pasien")
                                     }
 
-                                    InterpretationCardComponent(
-                                        type: .scanty,
+                                    GradingCardComponent(
+                                        type: .SCANTY,
                                         confidenceLevel: .lowConfidence
                                     )
 
@@ -178,12 +178,12 @@ struct AnalysisResultView: View {
                                         isRequired: false,
                                         rightIcon: "chevron.down",
                                         isDisabled: false,
-                                        choices: TBGrade.allCases.map { $0.rawValue },
+                                        choices: GradingType.allCases.map { $0.rawValue },
                                         isExtended: true,
                                         selectedChoice: $selectedTBGrade
                                     )
 
-                                    if selectedTBGrade == TBGrade.scanty.rawValue {
+                                    if selectedTBGrade == GradingType.SCANTY.rawValue {
                                         AppTextField(
                                             title: "Jumlah BTA",
                                             isRequired: false,
@@ -209,7 +209,7 @@ struct AnalysisResultView: View {
                                         colorType: .primary,
                                         size: .large,
                                         isEnabled: {
-                                            if selectedTBGrade == TBGrade.scanty.rawValue {
+                                            if selectedTBGrade == GradingType.SCANTY.rawValue {
                                                 return !numOfBTA.isEmpty && Int(numOfBTA) != nil
                                             } else {
                                                 return selectedTBGrade != nil
