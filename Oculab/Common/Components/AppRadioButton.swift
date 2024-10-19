@@ -11,13 +11,13 @@ struct AppRadioButton: View {
     var title: String
     var isRequired: Bool
     var choices: [String]
-    @State private var selectedChoice: String?
+    @State var selectedChoice: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: Decimal.d8) {
             HStack(spacing: Decimal.d2) {
                 Text(title)
-                    .font(AppTypography.h4)
+                    .font(AppTypography.s4_1)
                     .foregroundColor(AppColors.slate900)
 
                 if isRequired {
