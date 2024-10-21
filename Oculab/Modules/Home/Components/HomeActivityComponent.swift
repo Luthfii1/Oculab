@@ -16,7 +16,7 @@ struct HomeActivityComponent: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Decimal.d12) {
-            ZStack(alignment: .topTrailing) {
+            ZStack(alignment: .top) {
                 AsyncImage(url: URL(string: fileName)) { phase in
                     switch phase {
                     case .empty:
