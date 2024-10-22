@@ -104,7 +104,7 @@ struct AnalysisResultView: View {
                     )
                     .padding(.vertical, Decimal.d16)
 
-                    ScrollView {
+                    ScrollView(showsIndicators: false) {
                         VStack(alignment: .leading, spacing: Decimal.d24) {
                             VStack(alignment: .leading, spacing: Decimal.d16) {
                                 HStack {
