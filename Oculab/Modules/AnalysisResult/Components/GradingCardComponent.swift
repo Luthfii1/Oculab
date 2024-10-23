@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct GradingCardComponent: View {
-    var type: GradingType
-    var confidenceLevel: ConfidenceLevel
+    var type: GradingType = .unknown
+    var confidenceLevel: ConfidenceLevel = .unpredicted
+    var n: Int = 0
 
     var body: some View {
         VStack(alignment: .leading, spacing: Decimal.d8) {
@@ -29,7 +30,7 @@ struct GradingCardComponent: View {
                     }
                 }
             }
-            Text(gradingResultDesc[type]!).font(AppTypography.p3)
+            Text(type.description(withValues: n)).font(AppTypography.p3)
         }
         .padding(Decimal.d12)
         .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -45,6 +46,7 @@ struct GradingCardComponent: View {
 #Preview {
     GradingCardComponent(
         type: .NEGATIVE,
-        confidenceLevel: .mediumConfidence
+        confidenceLevel: .mediumConfidence,
+        n: 1
     )
 }

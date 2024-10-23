@@ -63,14 +63,15 @@ struct AppStepper: View {
                             Rectangle()
                                 .fill(AppColors.slate100)
 //                                    .frame(width: geometry.size.width * 0.06, height: 2)
-                                .frame(width: 20, height: 2)
+                                .frame(width: 16, height: 2)
                                 .cornerRadius(Decimal.d12)
                         }
                     }
                 }
             }
 //            }
-        }.frame(maxHeight: 40)
+        }
+//        .frame(maxHeight: 40)
     }
 }
 

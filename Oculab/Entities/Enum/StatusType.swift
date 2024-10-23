@@ -13,6 +13,7 @@ enum StatusType: String, Decodable, CaseIterable {
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let status = try container.decode(String.self)
+        self = StatusType.allCases.first { $0.rawValue.caseInsensitiveCompare(status) == .orderedSame } ?? .none
 
         // Custom mapping logic
         switch status {
