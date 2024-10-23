@@ -8,7 +8,7 @@
 import Foundation
 
 enum GradingType: String, Decodable, CaseIterable {
-    case NEGATIVE = "Negative" // TODO: either ubah ini jadi eng or database jd indo
+    case NEGATIVE = "Negative"
     case SCANTY = "Scanty"
     case Plus1 = "Positive 1+"
     case Plus2 = "Positive 2+"
