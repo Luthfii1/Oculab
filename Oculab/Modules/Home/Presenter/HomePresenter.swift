@@ -20,8 +20,6 @@ class HomePresenter: ObservableObject {
     func getStatisticData() {
         positifCount = 5
         negatifCount = 2
-
-        print("halo")
     }
 
     func newInputRecord() {
@@ -45,9 +43,7 @@ class HomePresenter: ObservableObject {
     }
 
     func fetchData() {
-        print("hi")
         interactor?.getAllData { [weak self] result in
-            print("hehe")
             switch result {
             case let .success(examinations):
                 self?.latestExamination = examinations
