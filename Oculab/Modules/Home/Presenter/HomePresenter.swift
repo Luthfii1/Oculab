@@ -18,8 +18,14 @@ class HomePresenter: ObservableObject {
     @Published var filteredExamination: [ExaminationCardData] = []
 
     func getStatisticData() {
-        positifCount = 5
-        negatifCount = 2
+        interactor?.getStatisticExamination { result in
+            switch result {
+            case let .success(data):
+                print("data: ", data)
+            case let .failure(error):
+                print("Error: \(error.localizedDescription)")
+            }
+        }
     }
 
     func newInputRecord() {

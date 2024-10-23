@@ -7,8 +7,34 @@
 
 import Foundation
 
+struct ExaminationStatistic: Decodable {
+    var negatifCount: Int
+    var positifCount: Int
+}
+
 class HomeInteractor {
-    private let apiURL = URL(string: "https://example.com/api/examinations")!
+    private let apiURL = "https://jsonplaceholder.typicode.com/todos/1"
+
+    func getStatisticExamination(completion: @escaping (Result<Todo, NetworkErrorType>) -> Void) {
+        NetworkHelper.shared.get(urlString: apiURL) { (result: Result<Todo, NetworkErrorType>) in
+            DispatchQueue.main.async {
+//                    print("res: ", result)
+                completion(result) // Forward result to presenter
+            }
+        }
+    }
+
+//    func exampleNetworkManager() {
+//        let updateData = UpdateExaminationData(examinationId: "sampleId", statusExamination: "completed")
+//        NetworkHelper.shared.update(urlString: "https://example.com/api/examinations/\(updateData.examinationId)", body: updateData) { (result: Result<ExaminationDataResponse, NetworkErrorType>) in
+//            switch result {
+//            case .success(let data):
+//                print("Data updated successfully: \(data)")
+//            case .failure(let error):
+//                print("Error occurred: \(error)")
+//            }
+//        }
+//    }
 
     func getAllData(completion: @escaping (Result<[ExaminationCardData], Error>) -> Void) {
         // Simulating API data response
