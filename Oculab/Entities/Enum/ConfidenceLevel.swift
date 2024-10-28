@@ -29,4 +29,21 @@ enum ConfidenceLevel: String, CaseIterable {
             return "0% - 9%"
         }
     }
+
+    static func classify(aggregatedConfidence: Double) -> ConfidenceLevel {
+        switch aggregatedConfidence {
+        case 1.0:
+            return .fullConfidence
+        case 0.9...0.99:
+            return .highConfidence
+        case 0.7...0.89:
+            return .mediumConfidence
+        case 0.5...0.69:
+            return .lowConfidence
+        case 0.1...0.49:
+            return .veryLowConfidence
+        default:
+            return .unpredicted
+        }
+    }
 }

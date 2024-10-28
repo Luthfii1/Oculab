@@ -8,32 +8,33 @@
 import Foundation
 
 enum GradingType: String, Decodable, CaseIterable {
-    case NEGATIVE = "Negatif"
+    case NEGATIVE = "Negative"
     case SCANTY = "Scanty"
-    case Plus1 = "Positif (1+)"
-    case Plus2 = "Positif (2+)"
-    case Plus3 = "Positif (3+)"
+    case Plus1 = "Positive 1+"
+    case Plus2 = "Positive 2+"
+    case Plus3 = "Positive 3+"
+    case unknown
 
-    var description: String {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let rawValue = try container.decode(String.self)
+        self = GradingType.allCases.first { $0.rawValue.caseInsensitiveCompare(rawValue) == .orderedSame } ?? .unknown
+    }
+
+    func description(withValues value: Int) -> String {
         switch self {
         case .NEGATIVE:
-            return "Tidak ditemukan BTA minimal dalam 100 lapang pandang"
+            return "Tidak ditemukan BTA dari 100 gambar lapangan pandang"
         case .SCANTY:
-            return "1 - 9 BTA dalam 100 lapang pandang"
+            return "Ditemukan \(value) BTA dari 100 gambar lapangan pandang"
         case .Plus1:
-            return "10 – 99 BTA dalam 100 lapang pandang"
+            return "Ditemukan \(value) BTA dari 100 gambar lapangan pandang"
         case .Plus2:
-            return "1 – 10 BTA setiap 1 lapang pandang, minimal terdapat di 50 lapang pandang"
+            return "Ditemukan 1-9 BTA BTA dari \(value) gambar lapangan pandang"
         case .Plus3:
-            return "≥ 10 BTA setiap 1 lapang pandang, minimal terdapat di 20 lapang pandang"
+            return "Ditemukan ≥ 10 BTA BTA dari \(value) gambar lapangan pandang"
+        case .unknown:
+            return "null"
         }
     }
 }
-
-var gradingResultDesc: [GradingType: String] = [
-    .NEGATIVE: "Tidak ditemukan BTA dari 100 gambar lapangan pandang",
-    .SCANTY: "Ditemukan {1-9} BTA dari 100 gambar lapangan pandang",
-    .Plus1: "Ditemukan {10-99} BTA dari 100 gambar lapangan pandang",
-    .Plus2: "Ditemukan 1-9 BTA dari {>= 50} gambar lapangan pandang",
-    .Plus3: "Ditemukan ≥ 10 BTA dari {>= 20} gambar lapangan pandang",
-]
