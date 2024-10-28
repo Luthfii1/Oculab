@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct HomeView: View {
-    @StateObject private var homePresenter = HomePresenter()
+    @ObservedObject private var homePresenter = HomePresenter()
 
     var body: some View {
         NavigationView {
-            ScrollView {
+            ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 24) {
                     StatisticComponent()
                         .environmentObject(homePresenter)
@@ -38,20 +38,33 @@ struct HomeView: View {
                             .padding(.horizontal, 1)
                         }
 
-                        // TODO: Create component for Sample Preview
+                        LazyVGrid(columns: [
+                            GridItem(.flexible(), spacing: 16),
+                            GridItem(.flexible(), spacing: 16)
+                        ], spacing: 16) {
+                            ForEach(homePresenter.filteredExamination) { exam in
+                                HomeActivityComponent(
+                                    fileName: exam.imagePreview,
+                                    slideId: exam.slideId,
+                                    status: exam.statusExamination,
+                                    date: exam.date,
+                                    time: exam.time
+                                )
+                            }
+                        }
                     }
                 }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 20)
             }
-            .padding(.bottom, 24)
-            .padding(.horizontal, 20)
             .navigationTitle("Ringkasan")
-            .foregroundStyle(AppColors.slate900)
         }
-        .background(AppColors.slate0)
         .ignoresSafeArea()
         .onAppear {
             homePresenter.getStatisticData()
+            homePresenter.fetchData()
         }
+        .navigationBarBackButtonHidden(true)
     }
 }
 

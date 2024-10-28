@@ -8,24 +8,24 @@
 import SwiftUI
 
 struct FolderCardComponent: View {
-    var title: String
-    var images: String
+    var title: FOVType
+    var numOfImage: Int = 0
 
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
                 Image(systemName: "rectangle.stack.fill")
                     .foregroundColor(AppColors.purple500)
-                Text(title)
+                Text(title.rawValue)
+                    .font(AppTypography.s4_1)
                     .padding(.leading, Decimal.d8)
                     .font(AppTypography.s4_1)
                 Spacer()
-                Text(images)
-                    .font(AppTypography.p3)
+                Text("\(numOfImage) Gambar")
                 Image(systemName: "chevron.right")
             }
         }
-
+        .font(AppTypography.p3)
         .padding(.horizontal, Decimal.d16)
         .padding(.vertical, Decimal.d12)
         .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -40,7 +40,7 @@ struct FolderCardComponent: View {
 
 #Preview {
     FolderCardComponent(
-        title: "0 BTA",
-        images: "9 Gambar"
+        title: .BTA1TO9,
+        numOfImage: 9
     )
 }

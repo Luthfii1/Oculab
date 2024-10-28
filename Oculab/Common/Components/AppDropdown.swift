@@ -17,8 +17,8 @@ struct AppDropdown: View {
     var choices: [String] // List of dropdown choices
     var isExtended: Bool = false // If true, allows multi-line choices display
     var description: String? = nil // Description or additional info
+    @Binding var selectedChoice: String?
 
-    @State private var selectedChoice: String? = nil
     @State private var isDropdownOpen: Bool = false
 
     // Colors based on the state (disabled or normal)
@@ -66,7 +66,7 @@ struct AppDropdown: View {
 
                     // Placeholder or selected choice
                     Text(selectedChoice ?? placeholder)
-                        .foregroundColor(selectedChoice == nil ? AppColors.slate400 : textColor)
+                        .foregroundColor(selectedChoice == nil ? AppColors.slate100 : textColor)
                         .padding(.horizontal, 8)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -136,7 +136,8 @@ struct AppDropdown: View {
             isDisabled: false,
             choices: ["Option 1", "Option 2", "Option 3", "Option 4"],
             isExtended: false,
-            description: "Please select an option from the dropdown"
+            description: "Please select an option from the dropdown",
+            selectedChoice: .constant("Option 1")
         )
 
         AppDropdown(
@@ -148,7 +149,8 @@ struct AppDropdown: View {
             isDisabled: true,
             choices: ["Option A", "Option B"],
             isExtended: false,
-            description: "This dropdown is disabled"
+            description: "This dropdown is disabled",
+            selectedChoice: .constant("Option A")
         )
 
         AppDropdown(
@@ -167,7 +169,8 @@ struct AppDropdown: View {
                 "Extended Option 6"
             ],
             isExtended: true,
-            description: "This dropdown allows more options to be visible."
+            description: "This dropdown allows more options to be visible.",
+            selectedChoice: .constant("Extended Option 6")
         )
     }
     .padding()

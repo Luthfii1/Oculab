@@ -10,6 +10,7 @@ import SwiftUI
 
 struct VideoPreview: View {
     @EnvironmentObject private var videoRecordPresenter: VideoRecordPresenter
+    @EnvironmentObject private var examPresenter: ExamDataPresenter
 
     var body: some View {
         ZStack {
@@ -19,23 +20,23 @@ struct VideoPreview: View {
             }
 
             // Control buttons (Retake & Save) at the bottom
-            VStack(alignment: .center, spacing: 32) {
+            VStack(alignment: .center, spacing: Decimal.d16) {
                 // Button to save video
                 AppButton(
                     title: "Simpan Video",
                     rightIcon: "checkmark",
-                    colorType: .primary,
+                    colorType: .neutral(.primary),
                     size: .large,
                     cornerRadius: 8
                 ) {
-                    videoRecordPresenter.saveVideoToPhotos()
+                    videoRecordPresenter.navigateBack()
                 }
 
                 // Button to retake video
                 AppButton(
                     title: "Ambil Ulang",
                     leftIcon: "arrow.counterclockwise",
-                    colorType: .tertiary,
+                    colorType: .neutral(.secondary),
                     size: .large
                 ) {
                     videoRecordPresenter.previewURL = nil

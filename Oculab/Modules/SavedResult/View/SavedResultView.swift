@@ -47,16 +47,16 @@ struct SavedResultView: View {
                             .frame(height: 200)
 
                         FolderCardComponent(
-                            title: "0 BTA",
-                            images: "9 Gambar"
+                            title: .BTA0,
+                            numOfImage: 9
                         )
                         FolderCardComponent(
-                            title: "1-9 BTA",
-                            images: "9 Gambar"
+                            title: .BTA1TO9,
+                            numOfImage: 9
                         )
                         FolderCardComponent(
-                            title: "≥ 10 BTA",
-                            images: "9 Gambar"
+                            title: .BTAABOVE9,
+                            numOfImage: 9
                         )
                     }
                 }
@@ -66,10 +66,9 @@ struct SavedResultView: View {
                         Text("Interpretasi Petugas")
                             .font(AppTypography.s5)
                             .foregroundColor(AppColors.slate300)
-                        InterpretationCardComponent(
-                            type: "Negatif",
-                            confidenceLevel: "",
-                            notes: "Tidak ditemukan BTA dari 100 gambar lapangan pandang"
+                        GradingCardComponent(
+                            type: .SCANTY,
+                            confidenceLevel: .lowConfidence
                         )
                     }
 
@@ -84,10 +83,9 @@ struct SavedResultView: View {
                             Text("Interpretasi sistem bukan merupakan hasil akhir untuk pasien")
                                 .font(AppTypography.p4)
                         }
-                        InterpretationCardComponent(
-                            type: "Positif 2+",
-                            confidenceLevel: "Low",
-                            notes: "Ditemukan 1-9 BTA dari 70 gambar lapangan pandang"
+                        GradingCardComponent(
+                            type: .SCANTY,
+                            confidenceLevel: .lowConfidence
                         )
                     }
 

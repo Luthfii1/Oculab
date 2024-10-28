@@ -18,6 +18,7 @@ class Router: ObservableObject {
         case pdf
         case analysisResult
         case instructionRecord
+        case newExam
     }
 
     @Published var path: NavigationPath = .init()
@@ -35,6 +36,8 @@ class Router: ObservableObject {
             AnalysisResultView()
         case .instructionRecord:
             InstructionRecordView()
+        case .newExam:
+            ExamDataView()
         }
     }
 
