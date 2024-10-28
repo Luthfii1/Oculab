@@ -9,11 +9,12 @@ enum StatusType: String, Decodable, CaseIterable {
     case INPROGRESS = "Sedang dianalisa sistem"
     case NEEDVALIDATION = "Belum disimpulkan"
     case FINISHED = "Selesai"
+    case NONE = ""
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let status = try container.decode(String.self)
-        self = StatusType.allCases.first { $0.rawValue.caseInsensitiveCompare(status) == .orderedSame } ?? .none
+        self = StatusType.allCases.first { $0.rawValue.caseInsensitiveCompare(status) == .orderedSame } ?? .NONE
 
         // Custom mapping logic
         switch status {
@@ -21,8 +22,10 @@ enum StatusType: String, Decodable, CaseIterable {
             self = .FINISHED
         case "NEEDVALIDATION":
             self = .NEEDVALIDATION
-        default:
+        case "INPROGRESS":
             self = .INPROGRESS
+        default:
+            self = .NONE
         }
     }
 }

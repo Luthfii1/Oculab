@@ -44,6 +44,9 @@ struct StatusTagComponent: View {
             .padding(.vertical, Decimal.d6)
             .background(AppColors.purple50)
             .cornerRadius(Decimal.d4)
+
+        case .NONE:
+            EmptyView()
         }
     }
 }
