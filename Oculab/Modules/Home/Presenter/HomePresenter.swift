@@ -40,9 +40,9 @@ class HomePresenter: ObservableObject {
         case .semua:
             filteredExamination = latestExamination
         case .selesai:
-            filteredExamination = latestExamination.filter { $0.statusExamination == .done }
+            filteredExamination = latestExamination.filter { $0.statusExamination == .FINISHED }
         case .belumDisimpulkan:
-            filteredExamination = latestExamination.filter { $0.statusExamination == .draft }
+            filteredExamination = latestExamination.filter { $0.statusExamination == .NEEDVALIDATION }
         }
 
         print("Pressed: ", typeActivity.rawValue)

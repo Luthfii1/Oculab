@@ -54,11 +54,11 @@ class HomeInteractor {
                 let timeFormatter = DateFormatter()
                 timeFormatter.dateFormat = "HH:mm"
 
-                let formattedDate = dateFormatter.string(from: exam.timestamp)
-                let formattedTime = timeFormatter.string(from: exam.timestamp)
+                let formattedDate = dateFormatter.string(from: exam.examinationDate)
+                let formattedTime = timeFormatter.string(from: exam.examinationDate)
 
                 return ExaminationCardData(
-                    examinationId: exam.examinationId.uuidString,
+                    examinationId: exam._id.uuidString,
                     statusExamination: exam.statusExamination,
                     imagePreview: exam.imagePreview,
                     date: formattedDate,

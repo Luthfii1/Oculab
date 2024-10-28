@@ -12,7 +12,7 @@ class ExpertExamResult: Decodable, Identifiable {
     var finalGrading: GradingType
     var bacteriaTotalCount: Int?
     var notes: String
-    
+
     init(
         _id: UUID,
         finalGrading: GradingType,
@@ -24,14 +24,14 @@ class ExpertExamResult: Decodable, Identifiable {
         self.bacteriaTotalCount = bacteriaTotalCount
         self.notes = notes
     }
-    
+
     enum CodingKeys: CodingKey {
         case _id
         case finalGrading
         case bacteriaTotalCount
         case notes
     }
-    
+
     required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self._id = try container.decode(UUID.self, forKey: ._id)

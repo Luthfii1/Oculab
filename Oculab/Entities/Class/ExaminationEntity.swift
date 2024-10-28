@@ -67,7 +67,7 @@ class Examination: Decodable, Identifiable {
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let _idString = try container.decode(String.self, forKey: ._id)
-        
+
         self._id = UUID(uuidString: _idString) ?? UUID()
         self.goal = try container.decodeIfPresent(ExamGoalType.self, forKey: .goal)
         self.preparationType = try container.decode(ExamPreparationType.self, forKey: .preparationType)

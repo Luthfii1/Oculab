@@ -74,7 +74,7 @@ struct HomeActivityComponent: View {
     HomeActivityComponent(
         fileName: "https://is3.cloudhost.id/oculab-fov/oculab-fov/eead8004-2fd7-4f40-be1f-1d02cb886af4.png",
         slideId: "24/11/1/0123A",
-        status: .draft,
+        status: .INPROGRESS,
         date: "18 September 2024",
         time: "14.39"
     )
@@ -82,7 +82,7 @@ struct HomeActivityComponent: View {
     HomeActivityComponent(
         fileName: "https://is3.cloudhost.id/oculab-fov/oculab-fov/eead8004-2fd7-4f40-be1f-1d02cb886af4.png",
         slideId: "24/11/1/0123A",
-        status: .done,
+        status: .FINISHED,
         date: "18 September 2024",
         time: "14.39"
     )
