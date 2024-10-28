@@ -36,7 +36,7 @@ struct StatusTagComponent: View {
 
         case .NEEDVALIDATION:
             VStack(alignment: .leading) {
-                Text(StatusType.FINISHED.rawValue)
+                Text(StatusType.NEEDVALIDATION.rawValue)
                     .foregroundStyle(AppColors.purple500)
             }
             .font(AppTypography.s6)

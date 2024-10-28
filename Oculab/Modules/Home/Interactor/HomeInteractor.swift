@@ -8,33 +8,29 @@
 import Foundation
 
 struct ExaminationStatistic: Decodable {
-    var negatifCount: Int
-    var positifCount: Int
+    var numberOfPositive: Int = 0
+    var numberOfNegative: Int = 0
 }
 
 class HomeInteractor {
-    private let apiURL = "https://jsonplaceholder.typicode.com/todos/1"
+    private let apiURL = API.BE + "/examination/get-number-of-examinations"
 
-    func getStatisticExamination(completion: @escaping (Result<Todo, NetworkErrorType>) -> Void) {
-        NetworkHelper.shared.get(urlString: apiURL) { (result: Result<Todo, NetworkErrorType>) in
+    func getStatisticExamination(completion: @escaping (Result<ExaminationStatistic, NetworkErrorType>) -> Void) {
+        NetworkHelper.shared.get(urlString: apiURL) { (result: Result<
+            APIResponse<ExaminationStatistic>,
+            NetworkErrorType
+        >) in
             DispatchQueue.main.async {
-//                    print("res: ", result)
-                completion(result) // Forward result to presenter
+                switch result {
+                case let .success(apiResponse):
+                    // Use apiResponse.data to access the ExaminationStatistic
+                    completion(.success(apiResponse.data))
+                case let .failure(error):
+                    completion(.failure(error))
+                }
             }
         }
     }
-
-//    func exampleNetworkManager() {
-//        let updateData = UpdateExaminationData(examinationId: "sampleId", statusExamination: "completed")
-//        NetworkHelper.shared.update(urlString: "https://example.com/api/examinations/\(updateData.examinationId)", body: updateData) { (result: Result<ExaminationDataResponse, NetworkErrorType>) in
-//            switch result {
-//            case .success(let data):
-//                print("Data updated successfully: \(data)")
-//            case .failure(let error):
-//                print("Error occurred: \(error)")
-//            }
-//        }
-//    }
 
     func getAllData(completion: @escaping (Result<[ExaminationCardData], Error>) -> Void) {
         // Simulating API data response

@@ -11,40 +11,75 @@ class DummyJSON {
     let examinationCards = """
     [
         {
-            "examinationId": "sampleId1",
-            "statusExamination": "INPROGRESS",
+            "_id": "sampleId1",
+            "goal": null,
+            "preparationType": "SPS",
+            "slideId": "slide1",
+            "recordVideo": null,
+            "WSI": null,
+            "examinationDate": "2022-01-01T12:00:00Z",
+            "FOV": null,
             "imagePreview": "https://is3.cloudhost.id/oculab-fov/oculab-fov/eead8004-2fd7-4f40-be1f-1d02cb886af4.png",
-            "timestamp": "2022-01-01T12:00:00Z",
-            "slideId": "slide1"
+            "statusExamination": "INPROGRESS",
+            "systemResult": null,
+            "expertResult": null
         },
         {
-            "examinationId": "sampleId2",
-            "statusExamination": "INPROGRESS",
+            "_id": "sampleId2",
+            "goal": null,
+            "preparationType": "SP",
+            "slideId": "slide2",
+            "recordVideo": null,
+            "WSI": null,
+            "examinationDate": "2022-01-02T12:00:00Z",
+            "FOV": null,
             "imagePreview": "https://is3.cloudhost.id/oculab-fov/oculab-fov/eead8004-2fd7-4f40-be1f-1d02cb886af4.png",
-            "timestamp": "2022-01-02T12:00:00Z",
-            "slideId": "slide2"
+            "statusExamination": "INPROGRESS",
+            "systemResult": null,
+            "expertResult": null
         },
         {
-            "examinationId": "sampleId3",
+            "_id": "sampleId3",
+            "goal": null,
+            "preparationType": "SP",
+            "slideId": "slide3",
+            "recordVideo": null,
+            "WSI": null,
+            "examinationDate": "2022-01-12T12:00:00Z",
+            "FOV": null,
+            "imagePreview": "https://is3.cloudhost.id/oculab-fov/oculab-fov/eead8004-2fd7-4f40-be1f-1d02cb886af4.png",
             "statusExamination": "FINISHED",
-            "imagePreview": "https://is3.cloudhost.id/oculab-fov/oculab-fov/eead8004-2fd7-4f40-be1f-1d02cb886af4.png",
-            "timestamp": "2022-01-12T12:00:00Z",
-            "slideId": "slide3"
+            "systemResult": null,
+            "expertResult": null
         },
         {
-            "examinationId": "sampleId4",
-            "statusExamination": "NEEDVALIDATION",
+            "_id": "sampleId4",
+            "goal": null,
+            "preparationType": "SPS",
+            "slideId": "slide4",
+            "recordVideo": null,
+            "WSI": null,
+            "examinationDate": "2022-01-12T12:00:00Z",
+            "FOV": null,
             "imagePreview": "https://is3.cloudhost.id/oculab-fov/oculab-fov/eead8004-2fd7-4f40-be1f-1d02cb886af4.png",
-            "timestamp": "2022-01-12T12:00:00Z",
-            "slideId": "slide4"
+            "statusExamination": "NEEDVALIDATION",
+            "systemResult": null,
+            "expertResult": null
         },
         {
-            "examinationId": "sampleId5",
-            "statusExamination": "NEEDVALIDATION",
+            "_id": "sampleId5",
+            "goal": null,
+            "preparationType": "SP",
+            "slideId": "slide5",
+            "recordVideo": null,
+            "WSI": null,
+            "examinationDate": "2022-01-12T12:00:00Z",
+            "FOV": null,
             "imagePreview": "https://is3.cloudhost.id/oculab-fov/oculab-fov/eead8004-2fd7-4f40-be1f-1d02cb886af4.png",
-            "timestamp": "2022-01-12T12:00:00Z",
-            "slideId": "slide5"
-        },
+            "statusExamination": "NEEDVALIDATION",
+            "systemResult": null,
+            "expertResult": null
+        }
     ]
     """.data(using: .utf8)!
 }
