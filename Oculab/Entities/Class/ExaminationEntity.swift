@@ -19,6 +19,7 @@ class Examination: Decodable, Identifiable {
     var imagePreview: String
     var statusExamination: StatusType
     var systemResult: SystemExamResult?
+    var expertResult: ExpertExamResult?
 
     init(
         _id: UUID,
@@ -31,7 +32,8 @@ class Examination: Decodable, Identifiable {
         FOV: [FOVData]? = nil,
         imagePreview: String,
         statusExamination: StatusType,
-        systemResult: SystemExamResult? = nil
+        systemResult: SystemExamResult? = nil,
+        expertResult: ExpertExamResult? = nil
     ) {
         self._id = _id
         self.goal = goal
@@ -44,10 +46,22 @@ class Examination: Decodable, Identifiable {
         self.imagePreview = imagePreview
         self.statusExamination = statusExamination
         self.systemResult = systemResult
+        self.expertResult = expertResult
     }
 
     enum CodingKeys: String, CodingKey {
-        case _id, goal, preparationType, slideId, recordVideo, WSI, examinationDate, FOV, imagePreview, statusExamination, systemResult
+        case _id
+        case goal
+        case preparationType
+        case slideId
+        case recordVideo
+        case WSI
+        case examinationDate
+        case FOV
+        case imagePreview
+        case statusExamination
+        case systemResult
+        case expertResult
     }
 
     required init(from decoder: Decoder) throws {
@@ -65,5 +79,6 @@ class Examination: Decodable, Identifiable {
         self.imagePreview = try container.decode(String.self, forKey: .imagePreview)
         self.statusExamination = try container.decode(StatusType.self, forKey: .statusExamination)
         self.systemResult = try container.decodeIfPresent(SystemExamResult.self, forKey: .systemResult)
+        self.expertResult = try container.decodeIfPresent(ExpertExamResult.self, forKey: .expertResult)
     }
 }
