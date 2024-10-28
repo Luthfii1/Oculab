@@ -18,8 +18,14 @@ class HomePresenter: ObservableObject {
     @Published var filteredExamination: [ExaminationCardData] = []
 
     func getStatisticData() {
-        positifCount = 5
-        negatifCount = 2
+        interactor?.getStatisticExamination { result in
+            switch result {
+            case let .success(data):
+                print("data: ", data)
+            case let .failure(error):
+                print("Error: \(error.localizedDescription)")
+            }
+        }
     }
 
     func newInputRecord() {
@@ -34,9 +40,9 @@ class HomePresenter: ObservableObject {
         case .semua:
             filteredExamination = latestExamination
         case .selesai:
-            filteredExamination = latestExamination.filter { $0.statusExamination == .done }
+            filteredExamination = latestExamination.filter { $0.statusExamination == .FINISHED }
         case .belumDisimpulkan:
-            filteredExamination = latestExamination.filter { $0.statusExamination == .draft }
+            filteredExamination = latestExamination.filter { $0.statusExamination == .NEEDVALIDATION }
         }
 
         print("Pressed: ", typeActivity.rawValue)

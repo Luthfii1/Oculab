@@ -12,9 +12,9 @@ struct StatusTagComponent: View {
 
     var body: some View {
         switch type {
-        case .draft:
+        case .INPROGRESS:
             VStack(alignment: .leading) {
-                Text(StatusType.draft.rawValue)
+                Text(StatusType.INPROGRESS.rawValue)
                     .foregroundStyle(AppColors.orange500)
             }
             .font(AppTypography.s6)
@@ -23,9 +23,9 @@ struct StatusTagComponent: View {
             .background(AppColors.orange50)
             .cornerRadius(Decimal.d4)
 
-        case .done:
+        case .FINISHED:
             VStack(alignment: .leading) {
-                Text(StatusType.done.rawValue)
+                Text(StatusType.FINISHED.rawValue)
                     .foregroundStyle(AppColors.blue500)
             }
             .font(AppTypography.s6)
@@ -34,14 +34,22 @@ struct StatusTagComponent: View {
             .background(AppColors.blue50)
             .cornerRadius(Decimal.d4)
 
-        case .none:
-            EmptyView()
+        case .NEEDVALIDATION:
+            VStack(alignment: .leading) {
+                Text(StatusType.FINISHED.rawValue)
+                    .foregroundStyle(AppColors.purple500)
+            }
+            .font(AppTypography.s6)
+            .padding(.horizontal, Decimal.d8)
+            .padding(.vertical, Decimal.d6)
+            .background(AppColors.purple50)
+            .cornerRadius(Decimal.d4)
         }
     }
 }
 
 #Preview {
     StatusTagComponent(
-        type: .done
+        type: .FINISHED
     )
 }

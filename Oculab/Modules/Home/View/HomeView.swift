@@ -10,11 +10,6 @@ import SwiftUI
 struct HomeView: View {
     @ObservedObject private var homePresenter = HomePresenter()
 
-    let columns = [
-        GridItem(.flexible(), spacing: 16),
-        GridItem(.flexible(), spacing: 16)
-    ]
-
     var body: some View {
         NavigationView {
             ScrollView(showsIndicators: false) {
@@ -43,7 +38,10 @@ struct HomeView: View {
                             .padding(.horizontal, 1)
                         }
 
-                        LazyVGrid(columns: columns, spacing: 16) {
+                        LazyVGrid(columns: [
+                            GridItem(.flexible(), spacing: 16),
+                            GridItem(.flexible(), spacing: 16)
+                        ], spacing: 16) {
                             ForEach(homePresenter.filteredExamination) { exam in
                                 HomeActivityComponent(
                                     fileName: exam.imagePreview,
@@ -56,13 +54,11 @@ struct HomeView: View {
                         }
                     }
                 }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 20)
             }
-            .padding(.bottom, 24)
-            .padding(.horizontal, 20)
             .navigationTitle("Ringkasan")
-            .foregroundStyle(AppColors.slate900)
         }
-        .background(AppColors.slate0)
         .ignoresSafeArea()
         .onAppear {
             homePresenter.getStatisticData()

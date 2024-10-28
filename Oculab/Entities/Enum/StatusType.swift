@@ -6,9 +6,9 @@
 //
 
 enum StatusType: String, Decodable, CaseIterable {
-    case draft = "Belum disimpulkan"
-    case done = "Selesai"
-    case none = ""
+    case INPROGRESS = "Sedang dianalisa sistem"
+    case NEEDVALIDATION = "Belum disimpulkan"
+    case FINISHED = "Selesai"
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -17,12 +17,12 @@ enum StatusType: String, Decodable, CaseIterable {
 
         // Custom mapping logic
         switch status {
-        case "completed":
-            self = .done
-        case "pending":
-            self = .draft
+        case "FINISHED":
+            self = .FINISHED
+        case "NEEDVALIDATION":
+            self = .NEEDVALIDATION
         default:
-            self = .none
+            self = .INPROGRESS
         }
     }
 }

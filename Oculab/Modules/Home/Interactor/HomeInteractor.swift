@@ -7,50 +7,38 @@
 
 import Foundation
 
+struct ExaminationStatistic: Decodable {
+    var negatifCount: Int
+    var positifCount: Int
+}
+
 class HomeInteractor {
-    private let apiURL = URL(string: "https://example.com/api/examinations")!
+    private let apiURL = "https://jsonplaceholder.typicode.com/todos/1"
+
+    func getStatisticExamination(completion: @escaping (Result<Todo, NetworkErrorType>) -> Void) {
+        NetworkHelper.shared.get(urlString: apiURL) { (result: Result<Todo, NetworkErrorType>) in
+            DispatchQueue.main.async {
+//                    print("res: ", result)
+                completion(result) // Forward result to presenter
+            }
+        }
+    }
+
+//    func exampleNetworkManager() {
+//        let updateData = UpdateExaminationData(examinationId: "sampleId", statusExamination: "completed")
+//        NetworkHelper.shared.update(urlString: "https://example.com/api/examinations/\(updateData.examinationId)", body: updateData) { (result: Result<ExaminationDataResponse, NetworkErrorType>) in
+//            switch result {
+//            case .success(let data):
+//                print("Data updated successfully: \(data)")
+//            case .failure(let error):
+//                print("Error occurred: \(error)")
+//            }
+//        }
+//    }
 
     func getAllData(completion: @escaping (Result<[ExaminationCardData], Error>) -> Void) {
         // Simulating API data response
-        let jsonData = """
-        [
-            {
-                "examinationId": "sampleId1",
-                "statusExamination": "completed",
-                "imagePreview": "https://is3.cloudhost.id/oculab-fov/oculab-fov/eead8004-2fd7-4f40-be1f-1d02cb886af4.png",
-                "timestamp": "2022-01-01T12:00:00Z",
-                "slideId": "slide1"
-            },
-            {
-                "examinationId": "sampleId2",
-                "statusExamination": "completed",
-                "imagePreview": "https://is3.cloudhost.id/oculab-fov/oculab-fov/eead8004-2fd7-4f40-be1f-1d02cb886af4.png",
-                "timestamp": "2022-01-02T12:00:00Z",
-                "slideId": "slide2"
-            },
-            {
-                "examinationId": "sampleId3",
-                "statusExamination": "completed",
-                "imagePreview": "https://is3.cloudhost.id/oculab-fov/oculab-fov/eead8004-2fd7-4f40-be1f-1d02cb886af4.png",
-                "timestamp": "2022-01-12T12:00:00Z",
-                "slideId": "slide3"
-            },
-            {
-                "examinationId": "sampleId4",
-                "statusExamination": "pending",
-                "imagePreview": "https://is3.cloudhost.id/oculab-fov/oculab-fov/eead8004-2fd7-4f40-be1f-1d02cb886af4.png",
-                "timestamp": "2022-01-12T12:00:00Z",
-                "slideId": "slide4"
-            },
-            {
-                "examinationId": "sampleId5",
-                "statusExamination": "pending",
-                "imagePreview": "https://is3.cloudhost.id/oculab-fov/oculab-fov/eead8004-2fd7-4f40-be1f-1d02cb886af4.png",
-                "timestamp": "2022-01-12T12:00:00Z",
-                "slideId": "slide5"
-            },
-        ]
-        """.data(using: .utf8)!
+        let jsonData = DummyJSON().examinationCards
 
         do {
             let decoder = JSONDecoder()
@@ -66,11 +54,11 @@ class HomeInteractor {
                 let timeFormatter = DateFormatter()
                 timeFormatter.dateFormat = "HH:mm"
 
-                let formattedDate = dateFormatter.string(from: exam.timestamp)
-                let formattedTime = timeFormatter.string(from: exam.timestamp)
+                let formattedDate = dateFormatter.string(from: exam.examinationDate)
+                let formattedTime = timeFormatter.string(from: exam.examinationDate)
 
                 return ExaminationCardData(
-                    examinationId: exam.examinationId.uuidString,
+                    examinationId: exam._id.uuidString,
                     statusExamination: exam.statusExamination,
                     imagePreview: exam.imagePreview,
                     date: formattedDate,
@@ -87,17 +75,4 @@ class HomeInteractor {
             print("Failed to decode data: \(error)")
         }
     }
-}
-
-struct ExaminationCardData: Decodable, Identifiable {
-    var id: String {
-        examinationId
-    }
-
-    var examinationId: String
-    var statusExamination: StatusType
-    var imagePreview: String
-    var date: String
-    var time: String
-    var slideId: String
 }
