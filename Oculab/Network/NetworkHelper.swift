@@ -57,6 +57,7 @@ class NetworkHelper {
             let decodedData = try JSONDecoder().decode(T.self, from: data)
             completion(.success(decodedData))
         } catch {
+            print("Decode error: \(error.localizedDescription)") // Print the error message
             completion(.failure(.decodingError(error)))
         }
     }

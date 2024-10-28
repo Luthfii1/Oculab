@@ -23,7 +23,7 @@ struct StatisticComponent: View {
 
             HStack(alignment: .center, spacing: 16) {
                 VStack(alignment: .center, spacing: 4) {
-                    Text(String(homePresenter.positifCount))
+                    Text(String(homePresenter.statisticExam.numberOfPositive))
                         .foregroundStyle(AppColors.red500)
                         .font(AppTypography.h1)
 
@@ -37,7 +37,7 @@ struct StatisticComponent: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8))
 
                 VStack(alignment: .center, spacing: 4) {
-                    Text(String(homePresenter.negatifCount))
+                    Text(String(homePresenter.statisticExam.numberOfNegative))
                         .foregroundStyle(AppColors.purple500)
                         .font(AppTypography.h1)
 

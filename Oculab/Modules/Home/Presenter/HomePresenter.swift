@@ -11,8 +11,7 @@ class HomePresenter: ObservableObject {
     var view: HomeView?
     var interactor: HomeInteractor? = HomeInteractor()
 
-    @Published var positifCount: Int = 0
-    @Published var negatifCount: Int = 0
+    @Published var statisticExam: ExaminationStatistic = .init()
     @Published var selectedLatestActivity: LatestActivityType = .semua
     @Published var latestExamination: [ExaminationCardData] = []
     @Published var filteredExamination: [ExaminationCardData] = []
@@ -21,7 +20,7 @@ class HomePresenter: ObservableObject {
         interactor?.getStatisticExamination { result in
             switch result {
             case let .success(data):
-                print("data: ", data)
+                self.statisticExam = data
             case let .failure(error):
                 print("Error: \(error.localizedDescription)")
             }
@@ -55,7 +54,7 @@ class HomePresenter: ObservableObject {
                 self?.latestExamination = examinations
                 self?.filteredExamination = self?.latestExamination ?? []
             case let .failure(error):
-                print("error")
+                print("error: ", error.localizedDescription)
             }
         }
     }
