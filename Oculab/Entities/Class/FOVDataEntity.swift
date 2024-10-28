@@ -8,19 +8,21 @@
 import Foundation
 
 class FOVData: Decodable, Identifiable {
-    var id: UUID = .init()
-    var link: String
+    var _id: UUID = .init()
+    var image: String
     var type: FOVType
     var order: Int
     var comment: [String]?
-    var count: Int
+    var systemCount: Int
+    var confidenceLevel: Double
 
-    init(id: UUID, link: String, type: FOVType, order: Int, comment: [String]? = nil, count: Int) {
-        self.id = id
-        self.link = link
+    init(_id: UUID, image: String, type: FOVType, order: Int, comment: [String]? = nil, systemCount: Int, confidenceLevel: Double) {
+        self._id = _id
+        self.image = image
         self.type = type
         self.order = order
         self.comment = comment
-        self.count = count
+        self.systemCount = systemCount
+        self.confidenceLevel = confidenceLevel
     }
 }

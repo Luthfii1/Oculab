@@ -8,20 +8,20 @@
 import Foundation
 
 class Examination: Decodable, Identifiable {
-    var examinationId: UUID = .init()
+    var _id: UUID = .init()
     var goal: ExamGoalType?
-    var preparationType: ExamPreparationType?
+    var preparationType: ExamPreparationType
     var slideId: String
     var recordVideo: Data?
     var WSI: String?
-    var timestamp: Date
+    var examinationDate: Date
     var FOV: [FOVData]?
     var result: ExamResult?
     var statusExamination: StatusType
     var imagePreview: String
 
     init(
-        examinationId: UUID,
+        _id: UUID,
         goal: ExamGoalType?,
         preparationType: ExamPreparationType?,
         slideId: String,
@@ -33,7 +33,7 @@ class Examination: Decodable, Identifiable {
         statusExamination: StatusType,
         imagePreview: String
     ) {
-        self.examinationId = examinationId
+        self._id = _id
         self.goal = goal
         self.preparationType = preparationType
         self.slideId = slideId
@@ -47,14 +47,14 @@ class Examination: Decodable, Identifiable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case examinationId, goal, preparationType, slideId, recordVideo, WSI, timestamp, FOV, result, statusExamination,
+        case _id, goal, preparationType, slideId, recordVideo, WSI, timestamp, FOV, result, statusExamination,
              imagePreview
     }
 
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let examinationIdString = try container.decode(String.self, forKey: .examinationId)
-        self.examinationId = UUID(uuidString: examinationIdString) ?? UUID()
+        let _idString = try container.decode(String.self, forKey: ._id)
+        self._id = UUID(uuidString: _idString) ?? UUID()
 
         self.goal = try container.decodeIfPresent(ExamGoalType.self, forKey: .goal)
         self.preparationType = try container.decodeIfPresent(ExamPreparationType.self, forKey: .preparationType)
