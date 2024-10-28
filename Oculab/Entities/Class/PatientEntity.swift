@@ -8,28 +8,28 @@
 import Foundation
 
 class Patient: Decodable, Identifiable {
-    var id: UUID = .init()
+    var _id: UUID = .init()
     var name: String
     var NIK: String
-    var age: Int
-    var gender: GenderType
+    var DoB: Date
+    var sex: SexType
     var BPJS: Int?
     var resultExamination: [Examination]?
 
     init(
-        id: UUID,
+        _id: UUID,
         name: String,
         NIK: String,
-        age: Int,
-        gender: GenderType,
+        DoB: Date,
+        sex: SexType,
         BPJS: Int? = nil,
         resultExamination: [Examination]? = nil
     ) {
-        self.id = id
+        self._id = _id
         self.name = name
         self.NIK = NIK
-        self.age = age
-        self.gender = gender
+        self.DoB = DoB
+        self.sex = sex
         self.BPJS = BPJS
         self.resultExamination = resultExamination
     }
