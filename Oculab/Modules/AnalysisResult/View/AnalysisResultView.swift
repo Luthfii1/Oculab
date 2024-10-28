@@ -104,7 +104,7 @@ struct AnalysisResultView: View {
                     )
                     .padding(.vertical, Decimal.d16)
 
-                    ScrollView {
+                    ScrollView(showsIndicators: false) {
                         VStack(alignment: .leading, spacing: Decimal.d24) {
                             VStack(alignment: .leading, spacing: Decimal.d16) {
                                 HStack {
@@ -151,7 +151,7 @@ struct AnalysisResultView: View {
                                         .font(AppTypography.s4_1)
                                         .padding(.leading, Decimal.d8)
                                     Spacer()
-                                    StatusTagComponent(type: .draft)
+                                    StatusTagComponent(type: .NEEDVALIDATION)
                                 }
 
                                 VStack(alignment: .leading, spacing: Decimal.d16) {
