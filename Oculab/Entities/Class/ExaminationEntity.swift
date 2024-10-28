@@ -16,22 +16,22 @@ class Examination: Decodable, Identifiable {
     var WSI: String?
     var examinationDate: Date
     var FOV: [FOVData]?
-    var result: ExamResult?
-    var statusExamination: StatusType
     var imagePreview: String
+    var statusExamination: StatusType
+    var systemResult: SystemExamResult?
 
     init(
         _id: UUID,
         goal: ExamGoalType?,
-        preparationType: ExamPreparationType?,
+        preparationType: ExamPreparationType,
         slideId: String,
         recordVideo: Data?,
         WSI: String? = nil,
-        timestamp: Date,
+        examinationDate: Date,
         FOV: [FOVData]? = nil,
-        result: ExamResult?,
+        imagePreview: String,
         statusExamination: StatusType,
-        imagePreview: String
+        systemResult: SystemExamResult? = nil
     ) {
         self._id = _id
         self.goal = goal
@@ -39,32 +39,31 @@ class Examination: Decodable, Identifiable {
         self.slideId = slideId
         self.recordVideo = recordVideo
         self.WSI = WSI
-        self.timestamp = timestamp
+        self.examinationDate = examinationDate
         self.FOV = FOV
-        self.result = result
-        self.statusExamination = statusExamination
         self.imagePreview = imagePreview
+        self.statusExamination = statusExamination
+        self.systemResult = systemResult
     }
 
     enum CodingKeys: String, CodingKey {
-        case _id, goal, preparationType, slideId, recordVideo, WSI, timestamp, FOV, result, statusExamination,
-             imagePreview
+        case _id, goal, preparationType, slideId, recordVideo, WSI, examinationDate, FOV, imagePreview, statusExamination, systemResult
     }
 
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let _idString = try container.decode(String.self, forKey: ._id)
+        
         self._id = UUID(uuidString: _idString) ?? UUID()
-
         self.goal = try container.decodeIfPresent(ExamGoalType.self, forKey: .goal)
-        self.preparationType = try container.decodeIfPresent(ExamPreparationType.self, forKey: .preparationType)
+        self.preparationType = try container.decode(ExamPreparationType.self, forKey: .preparationType)
         self.slideId = try container.decode(String.self, forKey: .slideId)
         self.recordVideo = try container.decodeIfPresent(Data.self, forKey: .recordVideo)
         self.WSI = try container.decodeIfPresent(String.self, forKey: .WSI)
-        self.timestamp = try container.decode(Date.self, forKey: .timestamp)
+        self.examinationDate = try container.decode(Date.self, forKey: .examinationDate)
         self.FOV = try container.decodeIfPresent([FOVData].self, forKey: .FOV)
-        self.result = try container.decodeIfPresent(ExamResult.self, forKey: .result)
-        self.statusExamination = try container.decode(StatusType.self, forKey: .statusExamination)
         self.imagePreview = try container.decode(String.self, forKey: .imagePreview)
+        self.statusExamination = try container.decode(StatusType.self, forKey: .statusExamination)
+        self.systemResult = try container.decodeIfPresent(SystemExamResult.self, forKey: .systemResult)
     }
 }
