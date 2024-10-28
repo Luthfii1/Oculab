@@ -23,7 +23,6 @@ class HomeInteractor {
             DispatchQueue.main.async {
                 switch result {
                 case let .success(apiResponse):
-                    // Use apiResponse.data to access the ExaminationStatistic
                     completion(.success(apiResponse.data))
                 case let .failure(error):
                     completion(.failure(error))
