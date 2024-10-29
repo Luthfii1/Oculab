@@ -20,6 +20,8 @@ class Examination: Codable, Identifiable {
     var statusExamination: StatusType
     var systemResult: SystemExamResult?
     var expertResult: ExpertExamResult?
+    var PIC: User
+    var examinationPlanDate: Date
 
     init(
         _id: UUID = UUID(),
@@ -33,7 +35,9 @@ class Examination: Codable, Identifiable {
         imagePreview: String,
         statusExamination: StatusType,
         systemResult: SystemExamResult? = nil,
-        expertResult: ExpertExamResult? = nil
+        expertResult: ExpertExamResult? = nil,
+        PIC: User,
+        examinationPlanDate: Date
     ) {
         self._id = _id
         self.goal = goal
@@ -47,6 +51,8 @@ class Examination: Codable, Identifiable {
         self.statusExamination = statusExamination
         self.systemResult = systemResult
         self.expertResult = expertResult
+        self.PIC = PIC
+        self.examinationPlanDate = examinationPlanDate
     }
 
     enum CodingKeys: String, CodingKey {
@@ -62,6 +68,8 @@ class Examination: Codable, Identifiable {
         case statusExamination
         case systemResult
         case expertResult
+        case PIC
+        case examinationPlanDate
     }
 
     required init(from decoder: Decoder) throws {
@@ -79,6 +87,8 @@ class Examination: Codable, Identifiable {
         self.statusExamination = try container.decode(StatusType.self, forKey: .statusExamination)
         self.systemResult = try container.decodeIfPresent(SystemExamResult.self, forKey: .systemResult)
         self.expertResult = try container.decodeIfPresent(ExpertExamResult.self, forKey: .expertResult)
+        self.PIC = try container.decode(User.self, forKey: .PIC)
+        self.examinationPlanDate = try container.decode(Date.self, forKey: .examinationPlanDate)
     }
 
     func encode(to encoder: Encoder) throws {
@@ -95,5 +105,7 @@ class Examination: Codable, Identifiable {
         try container.encode(statusExamination, forKey: .statusExamination)
         try container.encodeIfPresent(systemResult, forKey: .systemResult)
         try container.encodeIfPresent(expertResult, forKey: .expertResult)
+        try container.encode(PIC, forKey: .PIC)
+        try container.encode(examinationPlanDate, forKey: .examinationPlanDate)
     }
 }
