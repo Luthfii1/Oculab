@@ -27,6 +27,23 @@ class HomePresenter: ObservableObject {
         }
     }
 
+    func inputNewPatient() {
+        interactor?.createNewPatient { result in
+            switch result {
+            case let .success(data):
+                print("Patient ID: \(data._id)")
+                print("Name: \(data.name)")
+                print("NIK: \(data.NIK)")
+                print("Date of Birth: \(data.DoB)")
+                print("Sex: \(data.sex)")
+                print("BPJS: \(String(describing: data.BPJS))")
+                print("Result Examination: \(String(describing: data.resultExamination))")
+            case let .failure(error):
+                print("Error: ", error.localizedDescription)
+            }
+        }
+    }
+
     func newInputRecord() {
         Router.shared.navigateTo(.newExam)
     }

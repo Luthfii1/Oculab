@@ -63,6 +63,7 @@ struct HomeView: View {
         .onAppear {
             homePresenter.getStatisticData()
             homePresenter.fetchData()
+//            homePresenter.inputNewPatient()
         }
         .navigationBarBackButtonHidden(true)
     }

@@ -7,8 +7,8 @@
 
 import Foundation
 
-class Examination: Decodable, Identifiable {
-    var _id: UUID = .init()
+class Examination: Codable, Identifiable {
+    var _id: UUID
     var goal: ExamGoalType?
     var preparationType: ExamPreparationType
     var slideId: String
@@ -22,7 +22,7 @@ class Examination: Decodable, Identifiable {
     var expertResult: ExpertExamResult?
 
     init(
-        _id: UUID,
+        _id: UUID = UUID(),
         goal: ExamGoalType?,
         preparationType: ExamPreparationType,
         slideId: String,
@@ -79,5 +79,21 @@ class Examination: Decodable, Identifiable {
         self.statusExamination = try container.decode(StatusType.self, forKey: .statusExamination)
         self.systemResult = try container.decodeIfPresent(SystemExamResult.self, forKey: .systemResult)
         self.expertResult = try container.decodeIfPresent(ExpertExamResult.self, forKey: .expertResult)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(_id.uuidString, forKey: ._id)
+        try container.encodeIfPresent(goal, forKey: .goal)
+        try container.encode(preparationType, forKey: .preparationType)
+        try container.encode(slideId, forKey: .slideId)
+        try container.encodeIfPresent(recordVideo, forKey: .recordVideo)
+        try container.encodeIfPresent(WSI, forKey: .WSI)
+        try container.encode(examinationDate, forKey: .examinationDate)
+        try container.encodeIfPresent(FOV, forKey: .FOV)
+        try container.encode(imagePreview, forKey: .imagePreview)
+        try container.encode(statusExamination, forKey: .statusExamination)
+        try container.encodeIfPresent(systemResult, forKey: .systemResult)
+        try container.encodeIfPresent(expertResult, forKey: .expertResult)
     }
 }
