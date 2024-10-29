@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum GradingType: String, Decodable, CaseIterable {
+enum GradingType: String, Codable, CaseIterable {
     case NEGATIVE = "Negative"
     case SCANTY = "Scanty"
     case Plus1 = "Positive 1+"
@@ -19,6 +19,11 @@ enum GradingType: String, Decodable, CaseIterable {
         let container = try decoder.singleValueContainer()
         let rawValue = try container.decode(String.self)
         self = GradingType.allCases.first { $0.rawValue.caseInsensitiveCompare(rawValue) == .orderedSame } ?? .unknown
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
     }
 
     func description(withValues value: Int) -> String {
