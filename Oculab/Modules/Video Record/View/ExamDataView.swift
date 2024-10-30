@@ -27,13 +27,13 @@ struct ExamDataView: View {
                             title: "Tujuan Pemeriksaan",
                             isRequired: true,
                             choices: ["Skrinning", "Follow Up"],
-                            selectedChoice: presenter.examData.goal
+                            selectedChoice: $presenter.examData.goal
                         )
                         AppRadioButton(
                             title: "Jenis Sediaan",
                             isRequired: true,
                             choices: ["Pagi", "Sewaktu"],
-                            selectedChoice: presenter.examData.preparationType
+                            selectedChoice: $presenter.examData.preparationType
                         )
                         AppTextField(
                             title: "ID Sediaan",
@@ -67,7 +67,10 @@ struct ExamDataView: View {
                         title: "Mulai Analisis",
                         rightIcon: "arrow.right",
                         size: .large,
-                        isEnabled: true
+                        isEnabled: presenter.examData.slideId != "" && presenter.examData
+                            .recordVideo != nil && presenter.examData.goal != "" && presenter.examData
+                            .preparationType != ""
+
                     ) {
                         presenter.handleSubmit()
                     }

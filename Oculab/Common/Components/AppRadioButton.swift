@@ -11,7 +11,7 @@ struct AppRadioButton: View {
     var title: String
     var isRequired: Bool
     var choices: [String]
-    @State var selectedChoice: String?
+    @Binding var selectedChoice: String
 
     var body: some View {
         VStack(alignment: .leading, spacing: Decimal.d8) {
@@ -50,12 +50,12 @@ struct AppRadioButton: View {
     }
 }
 
-#Preview {
-    VStack(alignment: .leading) {
-        AppRadioButton(
-            title: "Gender",
-            isRequired: true,
-            choices: ["Male", "Female", "Other"]
-        )
-    }
-}
+// #Preview {
+//    VStack(alignment: .leading) {
+//        AppRadioButton(
+//            title: "Gender",
+//            isRequired: true,
+//            choices: ["Male", "Female", "Other"]
+//        )
+//    }
+// }
