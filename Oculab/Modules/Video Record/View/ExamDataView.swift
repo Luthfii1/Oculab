@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ExamDataView: View {
+    @StateObject private var videoRecordPresenter = VideoRecordPresenter.shared
+
     @StateObject var presenter = ExamDataPresenter(interactor: ExamInteractor())
     @Environment(\.presentationMode) var presentationMode
 
@@ -43,7 +45,7 @@ struct ExamDataView: View {
                             title: "Gambar Sediaan",
                             isRequired: true,
                             isEmpty: false,
-                            selectedFileName: presenter.examData.recordVideo
+                            selectedURL: $presenter.examData.recordVideo
                         ).environmentObject(presenter)
                     }
                 }
@@ -87,6 +89,9 @@ struct ExamDataView: View {
                     }
                 }
         }.navigationBarBackButtonHidden(true)
+            .onChange(of: videoRecordPresenter.previewURL) {
+                presenter.examData.recordVideo = videoRecordPresenter.previewURL
+            }
     }
 }
 

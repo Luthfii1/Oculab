@@ -10,7 +10,6 @@ import SwiftUI
 
 struct VideoPreview: View {
     @EnvironmentObject private var videoRecordPresenter: VideoRecordPresenter
-    @EnvironmentObject private var examPresenter: ExamDataPresenter
 
     var body: some View {
         ZStack {
@@ -51,6 +50,8 @@ struct VideoPreview: View {
 }
 
 #Preview {
+    let videoRecordPresenter = VideoRecordPresenter.shared
+
     VideoPreview()
-        .environmentObject(VideoRecordPresenter())
+        .environmentObject(videoRecordPresenter)
 }

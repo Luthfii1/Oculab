@@ -8,13 +8,15 @@
 import SwiftUI
 
 struct AppFileInput: View {
+    let videoPresenter = VideoRecordPresenter.shared
     @EnvironmentObject var examPresenter: ExamDataPresenter
 
     var title: String
     var isRequired: Bool
     var isEmpty: Bool
 
-    @State var selectedFileName: String = ""
+//    @State var selectedFileName: String = ""
+    @Binding var selectedURL: URL?
 
     var body: some View {
         VStack(alignment: .leading, spacing: Decimal.d8) {
@@ -31,17 +33,21 @@ struct AppFileInput: View {
             }
 
             VStack(alignment: .center) {
-                if selectedFileName.isEmpty {
+                if selectedURL == nil {
                     AppButton(title: "Ambil Gambar", leftIcon: "camera", colorType: .secondary, size: .small) {
                         selectFile()
                         examPresenter.newVideoRecord()
                     }
                 } else {
-                    Image(selectedFileName)
-                        .resizable()
-                        .frame(maxWidth: .infinity, maxHeight: 250.0, alignment: .center)
+                    // Display a preview for the video URL or an image placeholder if needed
+                    Text("Video Selected: \(selectedURL!.lastPathComponent)") // Display the file name
+                        .font(.caption)
+                        .foregroundColor(AppColors.slate900)
                         .padding(2)
-                    AppButton(title: "Preview Gambar", leftIcon: "eye", colorType: .secondary, size: .small) {}
+
+                    AppButton(title: "Preview Video", leftIcon: "eye", colorType: .secondary, size: .small) {
+                        previewVideo()
+                    }
                 }
             }
             .padding(.horizontal, Decimal.d16)
@@ -52,7 +58,7 @@ struct AppFileInput: View {
                 RoundedRectangle(cornerRadius: Decimal.d12)
                     .stroke(style: StrokeStyle(
                         lineWidth: 2,
-                        dash: selectedFileName.isEmpty ? [10] : []
+                        dash: selectedURL == nil ? [10] : []
                     ))
                     .foregroundColor(AppColors.slate100)
             )
@@ -60,25 +66,30 @@ struct AppFileInput: View {
     }
 
     private func selectFile() {
-        selectedFileName = "sample_file.pdf"
+        selectedURL = videoPresenter.previewURL
+    }
+
+    private func previewVideo() {
+        // Implement preview functionality here
+        print("Preview video at URL: \(selectedURL?.absoluteString ?? "No URL")")
     }
 }
 
-#Preview {
-    @State var fileName = "Instruction"
-
-    VStack {
-        AppFileInput(
-            title: "Upload Document",
-            isRequired: true,
-            isEmpty: true
-        )
-
-        AppFileInput(
-            title: "Profile Picture",
-            isRequired: false,
-            isEmpty: false,
-            selectedFileName: fileName
-        )
-    }
-}
+// #Preview {
+//    @State var fileName = "Instruction"
+//
+//    VStack {
+//        AppFileInput(
+//            title: "Upload Document",
+//            isRequired: true,
+//            isEmpty: true
+//        )
+//
+//        AppFileInput(
+//            title: "Profile Picture",
+//            isRequired: false,
+//            isEmpty: false,
+//            selectedFileName: fileName
+//        )
+//    }
+// }

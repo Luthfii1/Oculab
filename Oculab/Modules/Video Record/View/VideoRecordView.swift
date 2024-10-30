@@ -9,7 +9,7 @@ import AVKit
 import SwiftUI
 
 struct VideoRecordView: View {
-    @StateObject private var videoRecordPresenter = VideoRecordPresenter()
+    @StateObject private var videoRecordPresenter = VideoRecordPresenter.shared
 
     var body: some View {
         NavigationView {

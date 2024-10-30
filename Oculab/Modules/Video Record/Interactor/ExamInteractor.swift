@@ -41,5 +41,5 @@ struct ExaminationRequest: Codable {
     var goal: String
     var preparationType: String
     var slideId: String
-    var recordVideo: String
+    var recordVideo: URL?
 }

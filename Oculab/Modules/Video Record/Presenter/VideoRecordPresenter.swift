@@ -11,7 +11,16 @@ import Photos
 import SwiftUI
 
 class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate,
-AVCaptureFileOutputRecordingDelegate {
+    AVCaptureFileOutputRecordingDelegate
+{
+    static let shared = VideoRecordPresenter(interactor: VideoInteractor())
+
+    private let interactor: VideoInteractor
+
+    init(interactor: VideoInteractor) {
+        self.interactor = interactor
+    }
+
     @Published var session = AVCaptureSession()
     @Published var videoRecordingTitle: String = "Sediaan: -"
     @Published var alert = false

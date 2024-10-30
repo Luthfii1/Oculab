@@ -8,12 +8,14 @@
 import SwiftUI
 
 class ExamDataPresenter: ObservableObject {
+    let videoPresenter = VideoRecordPresenter.shared
+
     @Published var examData: ExaminationRequest = .init(
         examinationId: UUID().uuidString,
         goal: "",
         preparationType: "",
         slideId: "",
-        recordVideo: ""
+        recordVideo: nil
     )
 
     //    @Published var idSediaan: String = ""
@@ -39,6 +41,10 @@ class ExamDataPresenter: ObservableObject {
 //        )
 
         interactor.submitExamination(examData: examData)
+    }
+
+    func saveVideo() {
+        examData.recordVideo = videoPresenter.previewURL
     }
 
     func newVideoRecord() {
