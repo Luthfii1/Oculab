@@ -27,25 +27,25 @@ struct ExamDataView: View {
                             title: "Tujuan Pemeriksaan",
                             isRequired: true,
                             choices: ["Skrinning", "Follow Up"],
-                            selectedChoice: $presenter.examData.goal
+                            selectedChoice: $presenter.examData.examination.goal
                         )
                         AppRadioButton(
                             title: "Jenis Sediaan",
                             isRequired: true,
                             choices: ["Pagi", "Sewaktu"],
-                            selectedChoice: $presenter.examData.preparationType
+                            selectedChoice: $presenter.examData.examination.preparationType
                         )
                         AppTextField(
                             title: "ID Sediaan",
                             isRequired: true,
                             placeholder: "Contoh: 24/11/1/0123A",
-                            text: $presenter.examData.slideId
+                            text: $presenter.examData.examination.slideId
                         )
                         AppFileInput(
                             title: "Gambar Sediaan",
                             isRequired: true,
                             isEmpty: false,
-                            selectedURL: $presenter.examData.recordVideo
+                            selectedURL: $presenter.examData.examination.recordVideo
                         ).environmentObject(presenter)
                     }
                 }
@@ -67,12 +67,20 @@ struct ExamDataView: View {
                         title: "Mulai Analisis",
                         rightIcon: "arrow.right",
                         size: .large,
-                        isEnabled: presenter.examData.slideId != "" && presenter.examData
-                            .recordVideo != nil && presenter.examData.goal != "" && presenter.examData
+                        isEnabled: presenter.examData.examination.slideId != "" && presenter.examData.examination
+                            .recordVideo != nil && presenter.examData.examination.goal != "" && presenter.examData
+                            .examination
                             .preparationType != ""
 
                     ) {
-                        presenter.handleSubmit()
+                        presenter.handleSubmit { result in
+                            switch result {
+                            case .success:
+                                print("Examination submitted successfully.")
+                            case let .failure(error):
+                                print("Failed to submit examination: \(error)")
+                            }
+                        }
                     }
                     .frame(maxWidth: .infinity)
                 }
@@ -93,7 +101,9 @@ struct ExamDataView: View {
                 }
         }.navigationBarBackButtonHidden(true)
             .onChange(of: videoRecordPresenter.previewURL) {
-                presenter.examData.recordVideo = videoRecordPresenter.previewURL
+                presenter.examData.examination.recordVideo = videoRecordPresenter.previewURL
+
+                print(presenter.examData)
             }
     }
 }

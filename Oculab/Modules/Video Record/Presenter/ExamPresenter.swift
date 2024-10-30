@@ -28,23 +28,36 @@ class ExamDataPresenter: ObservableObject {
         self.interactor = interactor
     }
 
-    func handleSubmit() {
-//        let goal = examData.goal == "Skrinning" ? "SCREENING" : "FOLLOWUP"
-//        let preparationType = examData.preparationType == "Pagi" ? "SPS" : "SP"
+//    func handleSubmit() {
+    ////        let goal = examData.goal == "Skrinning" ? "SCREENING" : "FOLLOWUP"
+    ////        let preparationType = examData.preparationType == "Pagi" ? "SPS" : "SP"
+//
+    ////        let examRequest = ExaminationRequest(
+    ////            examinationId: UUID().uuidString,
+    ////            goal: goal,
+    ////            preparationType: preparationType,
+    ////            slideId: idSediaan,
+    ////            recordVideo: ""
+    ////        )
+//
+//        interactor.submitExamination(examData: examData, completion: <#(Result<VideoForwardResponse, NetworkErrorType>) -> Void#>)
+//    }
 
-//        let examRequest = ExaminationRequest(
-//            examinationId: UUID().uuidString,
-//            goal: goal,
-//            preparationType: preparationType,
-//            slideId: idSediaan,
-//            recordVideo: ""
-//        )
-
-        interactor.submitExamination(examData: examData)
+    func handleSubmit(completion: @escaping (Result<ExaminationResponse, NetworkErrorType>) -> Void) {
+        interactor.submitExamination(examData: examData) { result in
+            switch result {
+            case let .success(response):
+                print("Examination submitted successfully with response: \(response)")
+                completion(.success(response))
+            case let .failure(error):
+                print("Failed to submit examination: \(error)")
+                completion(.failure(error))
+            }
+        }
     }
 
     func saveVideo() {
-        examData.recordVideo = videoPresenter.previewURL
+        examData.examination.recordVideo = videoPresenter.previewURL
     }
 
     func newVideoRecord() {
