@@ -5,6 +5,7 @@
 //  Created by Alifiyah Ariandri on 16/10/24.
 //
 
+import AVKit
 import SwiftUI
 
 struct AppFileInput: View {
@@ -36,14 +37,19 @@ struct AppFileInput: View {
                 if selectedURL == nil {
                     AppButton(title: "Ambil Gambar", leftIcon: "camera", colorType: .secondary, size: .small) {
                         selectFile()
+                        videoPresenter.previewURL = nil
                         examPresenter.newVideoRecord()
                     }
                 } else {
                     // Display a preview for the video URL or an image placeholder if needed
-                    Text("Video Selected: \(selectedURL!.lastPathComponent)") // Display the file name
-                        .font(.caption)
-                        .foregroundColor(AppColors.slate900)
-                        .padding(2)
+//                    Text("Video Selected: \(selectedURL!.lastPathComponent)") // Display the file name
+//                        .font(.caption)
+//                        .foregroundColor(AppColors.slate900)
+//                        .padding(2)
+                    VideoPlayer(player: AVPlayer(url: selectedURL!))
+                        .aspectRatio(contentMode: .fill)
+                        .clipped()
+                        .cornerRadius(Decimal.d8)
 
                     AppButton(title: "Preview Video", leftIcon: "eye", colorType: .secondary, size: .small) {
                         previewVideo()
