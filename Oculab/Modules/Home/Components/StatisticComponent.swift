@@ -31,15 +31,15 @@ struct StatisticComponent: View {
                 }
             }
 
-            AppButton(
-                title: "Pemeriksaan Baru",
-                leftIcon: "doc.text.magnifyingglass",
-                colorType: .primary,
-                size: .large,
-                cornerRadius: 8
-            ) {
-                homePresenter.newInputRecord()
-            }
+//            AppButton(
+//                title: "Pemeriksaan Baru",
+//                leftIcon: "doc.text.magnifyingglass",
+//                colorType: .primary,
+//                size: .large,
+//                cornerRadius: 8
+//            ) {
+//                homePresenter.newInputRecord()
+//            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)

@@ -15,7 +15,6 @@ struct ExaminationCardData: Decodable, Identifiable {
     var examinationId: String
     var statusExamination: StatusType
     var imagePreview: String
-    var date: String
-    var time: String
+    var datePlan: String
     var slideId: String
 }

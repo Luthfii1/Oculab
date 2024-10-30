@@ -15,6 +15,8 @@ class Examination: Decodable, Identifiable {
     var recordVideo: Data?
     var WSI: String?
     var examinationDate: Date
+    var examinationPlanDate: Date
+
     var FOV: [FOVData]?
     var imagePreview: String = "https://is3.cloudhost.id/oculab-fov/oculab-fov/eead8004-2fd7-4f40-be1f-1d02cb886af4.png"
     var statusExamination: StatusType
@@ -29,6 +31,7 @@ class Examination: Decodable, Identifiable {
         recordVideo: Data?,
         WSI: String? = nil,
         examinationDate: Date,
+        examinationPlanDate: Date,
         FOV: [FOVData]? = nil,
         imagePreview: String,
         statusExamination: StatusType,
@@ -42,6 +45,7 @@ class Examination: Decodable, Identifiable {
         self.recordVideo = recordVideo
         self.WSI = WSI
         self.examinationDate = examinationDate
+        self.examinationPlanDate = examinationPlanDate
         self.FOV = FOV
         self.imagePreview = imagePreview
         self.statusExamination = statusExamination
@@ -57,6 +61,7 @@ class Examination: Decodable, Identifiable {
         case recordVideo
         case WSI
         case examinationDate
+        case examinationPlanDate
         case FOV
         case imagePreview
         case statusExamination
@@ -73,7 +78,32 @@ class Examination: Decodable, Identifiable {
         self.slideId = try container.decode(String.self, forKey: .slideId)
         self.recordVideo = try container.decodeIfPresent(Data.self, forKey: .recordVideo)
         self.WSI = try container.decodeIfPresent(String.self, forKey: .WSI)
-        self.examinationDate = try container.decode(Date.self, forKey: .examinationDate)
+
+//        self.examinationDate = try container.decode(Date.self, forKey: .examinationDate)
+        // Decode the examinationDate as a string and convert it to a Date using ISO8601 format
+        let dateString = try container.decode(String.self, forKey: .examinationDate)
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        guard let date = dateFormatter.date(from: dateString) else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .examinationDate,
+                in: container,
+                debugDescription: "Date string does not match format expected by formatter."
+            )
+        }
+        self.examinationDate = date
+
+        let datePlanString = try container.decode(String.self, forKey: .examinationPlanDate)
+
+        guard let datePlan = dateFormatter.date(from: datePlanString) else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .examinationPlanDate,
+                in: container,
+                debugDescription: "Date string does not match format expected by formatter."
+            )
+        }
+        self.examinationPlanDate = datePlan
+
         self.FOV = try container.decodeIfPresent([FOVData].self, forKey: .FOV)
         self.imagePreview = try container.decode(String.self, forKey: .imagePreview)
         self.statusExamination = try container.decode(StatusType.self, forKey: .statusExamination)

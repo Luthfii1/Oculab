@@ -12,7 +12,7 @@ class HomePresenter: ObservableObject {
     var interactor: HomeInteractor? = HomeInteractor()
 
     @Published var statisticExam: ExaminationStatistic = .init()
-    @Published var selectedLatestActivity: LatestActivityType = .semua
+    @Published var selectedLatestActivity: LatestActivityType = .belumDimulai
     @Published var latestExamination: [ExaminationCardData] = []
     @Published var filteredExamination: [ExaminationCardData] = []
 
@@ -36,23 +36,25 @@ class HomePresenter: ObservableObject {
 
         // Filter based on activity type
         switch typeActivity {
-        case .semua:
-            filteredExamination = latestExamination
-        case .selesai:
-            filteredExamination = latestExamination.filter { $0.statusExamination == .FINISHED }
+        case .belumDimulai:
+            filteredExamination = latestExamination.filter { $0.statusExamination == .NOTSTARTED }
         case .belumDisimpulkan:
-            filteredExamination = latestExamination.filter { $0.statusExamination == .NEEDVALIDATION }
+            filteredExamination = latestExamination.filter { $0.statusExamination == .INPROGRESS }
         }
 
         print("Pressed: ", typeActivity.rawValue)
     }
 
     func fetchData() {
+        print("masuk")
         interactor?.getAllData { [weak self] result in
             switch result {
             case let .success(examinations):
                 self?.latestExamination = examinations
-                self?.filteredExamination = self?.latestExamination ?? []
+
+                self?.filterLatestActivity(typeActivity: .belumDimulai)
+
+//                self?.filteredExamination = self?.latestExamination ?? []
             case let .failure(error):
                 print("error: ", error.localizedDescription)
             }
