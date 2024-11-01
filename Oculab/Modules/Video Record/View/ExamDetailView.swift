@@ -56,7 +56,7 @@ struct ExamDetailView: View {
                         title: "Gambar Sediaan",
                         isRequired: true,
                         isEmpty: false,
-                        selectedURL: $presenter.examData.examination.recordVideo
+                        selectedURL: $presenter.recordVideo
                     ).environmentObject(presenter)
 
                     VStack(alignment: .leading, spacing: Decimal.d24) {}
@@ -66,17 +66,11 @@ struct ExamDetailView: View {
                     title: "Mulai Analisis",
                     rightIcon: "arrow.right",
                     size: .large,
-                    isEnabled: presenter.examData.examination.recordVideo != nil
+                    isEnabled: presenter.recordVideo != nil
 
                 ) {
-                    presenter.handleSubmit { result in
-                        switch result {
-                        case .success:
-                            print("Examination submitted successfully.")
-                        case let .failure(error):
-                            print("Failed to submit examination: \(error)")
-                        }
-                    }
+                    presenter.handleSubmit()
+                    presenter.analysisResult()
                 }
 
             }.padding(.horizontal, Decimal.d20)
@@ -98,9 +92,9 @@ struct ExamDetailView: View {
                 presenter.fetchData(examId: examId, patientId: patientId)
             }
             .onChange(of: videoRecordPresenter.previewURL) {
-                presenter.examData.examination.recordVideo = videoRecordPresenter.previewURL
+                presenter.recordVideo = videoRecordPresenter.previewURL
 
-                print(presenter.examData)
+//                print(presenter.examData)
             }
     }
 }

@@ -10,20 +10,23 @@ import SwiftUI
 class ExamDataPresenter: ObservableObject {
     let videoPresenter = VideoRecordPresenter.shared
 
-    @Published var examData: ExaminationRequest = .init(
-        examinationId: UUID().uuidString,
-        goal: "",
-        preparationType: "",
+    @Published var recordVideo: URL?
+
+    @Published var examDetailData: ExaminationDetailData = .init(
+        examinationId: "",
+        pic: "",
         slideId: "",
-        recordVideo: nil
+        examinationGoal: "",
+        type: ""
     )
-
-    @Published var examDetailData: ExaminationDetailData = .init(pic: "", slideId: "", examinationGoal: "", type: "")
-    @Published var patientDetailData: PatientDetailData = .init(name: "", nik: "", dob: "", sex: "", bpjs: "")
-
-    //    @Published var idSediaan: String = ""
-//    @Published var selectedGoal: String = ""
-//    @Published var selectedPreparationType: String = ""
+    @Published var patientDetailData: PatientDetailData = .init(
+        patientId: "",
+        name: "",
+        nik: "",
+        dob: "",
+        sex: "",
+        bpjs: ""
+    )
 
     private let interactor: ExamInteractor
 
@@ -46,25 +49,41 @@ class ExamDataPresenter: ObservableObject {
 //        interactor.submitExamination(examData: examData, completion: <#(Result<VideoForwardResponse, NetworkErrorType>) -> Void#>)
 //    }
 
-    func handleSubmit(completion: @escaping (Result<ExaminationResponse, NetworkErrorType>) -> Void) {
-        interactor.submitExamination(examData: examData) { result in
-            switch result {
-            case let .success(response):
-                print("Examination submitted successfully with response: \(response)")
-                completion(.success(response))
-            case let .failure(error):
-                print("Failed to submit examination: \(error)")
-                completion(.failure(error))
+    func handleSubmit() {
+        if let fileURL = recordVideo {
+            do {
+                let videoData = try Data(contentsOf: fileURL)
+                print("Video data loaded successfully with size: \(videoData.count) bytes")
+
+                interactor.submitExamination(
+                    examVideo: videoData,
+                    examinationId: examDetailData.examinationId,
+                    patientId: patientDetailData.patientId
+                ) { result in
+                    switch result {
+                    case let .success(response):
+                        print("Examination submitted successfully with response: \(response)")
+                    case let .failure(error):
+                        print("Failed to submit examination: \(error)")
+                    }
+                }
+
+            } catch {
+                print("Error loading video data: \(error)")
             }
         }
     }
 
     func saveVideo() {
-        examData.examination.recordVideo = videoPresenter.previewURL
+        recordVideo = videoPresenter.previewURL
     }
 
     func newVideoRecord() {
         Router.shared.navigateTo(.videoRecord)
+    }
+
+    func analysisResult() {
+        Router.shared.navigateTo(.analysisResult)
     }
 
     func fetchData(examId: String, patientId: String) {

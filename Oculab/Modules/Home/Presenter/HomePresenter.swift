@@ -27,9 +27,10 @@ class HomePresenter: ObservableObject {
         }
     }
 
-    func newInputRecord() {
-        Router.shared.navigateTo(.newExam)
-    }
+//
+//    func newInputRecord() {
+//        Router.shared.navigateTo(.newExam)
+//    }
 
     func filterLatestActivity(typeActivity: LatestActivityType) {
         selectedLatestActivity = typeActivity
