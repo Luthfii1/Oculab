@@ -82,4 +82,25 @@ class DummyJSON {
         }
     ]
     """.data(using: .utf8)!
+
+    let examinationDetail = """
+    {
+        "data": {
+            "FOV": [],
+            "_id": "6f4e5288-3dfd-4be4-8a2e-8c60f09f07e2",
+            "goal": "SCREENING",
+            "preparationType": "SPS",
+            "slideId": "slide123",
+            "examinationDate": "2024-10-30T08:00:00.000Z",
+            "imagePreview": "http://example.com/image/eead8004-2fd7-4f40-be1f-1d02cb886af4.png",
+            "statusExamination": "NOTSTARTED",
+            "PIC": {
+                "_id": "d3f12345-6789-4bc8-91e6-bb3b67f8cabc",
+                "name": "Dr. Luthfi Munir",
+                "role": "LAB",
+                "email": "luthfi@example.com"
+            },
+            "examinationPlanDate": "2024-10-30T09:00:00.000Z"
+    }
+    """.data(using: .utf8)!
 }

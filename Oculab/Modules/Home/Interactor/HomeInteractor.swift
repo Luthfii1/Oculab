@@ -55,14 +55,16 @@ class HomeInteractor {
                         let dateFormatter = DateFormatter()
                         dateFormatter.dateFormat = "dd MMMM yyyy"
 
-                        let formattedDate = dateFormatter.string(from: exam.examinationPlanDate)
+                        let formattedDate = dateFormatter.string(from: exam.examinationPlanDate ?? Date())
                         return ExaminationCardData(
                             examinationId: exam._id.uuidString,
                             statusExamination: exam.statusExamination,
-                            imagePreview: "", // Provide a placeholder or actual URL if available
+                            imagePreview: "",
                             datePlan: formattedDate,
-                            slideId: exam.slideId
-                        )
+                            slideId: exam.slideId,
+                            patientName: exam.patientName ?? "",
+                            patientDob: exam.patientDoB ?? "",
+                            patientId: exam.patientId ?? "")
                     }
                     completion(.success(examinationDataCard))
 

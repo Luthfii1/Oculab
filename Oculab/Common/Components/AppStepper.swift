@@ -63,7 +63,7 @@ struct AppStepper: View {
                             Rectangle()
                                 .fill(AppColors.slate100)
 //                                    .frame(width: geometry.size.width * 0.06, height: 2)
-                                .frame(width: 16, height: 2)
+                                .frame(width: 18, height: 2)
                                 .cornerRadius(Decimal.d12)
                         }
                     }

@@ -9,6 +9,68 @@ import Foundation
 
 class ExamInteractor {
     let urlString = API.BE + "/examination/create-examination/2t3g4837-13da-4335-97c1-dd5e7eaba549"
+    let urlGetData = API.BE + "/examination/get-examination-by-id/"
+    let urlGetDataPatient = API.BE + "/patient/get-patient-by-id/"
+
+    // nanti ganti Error jadi NetworkErrorType kalo udah pake API
+    func getExamById(examId: String, completion: @escaping (Result<ExaminationDetailData, NetworkErrorType>) -> Void) {
+        print(urlGetData + examId.lowercased())
+
+        NetworkHelper.shared.get(urlString: urlGetData + examId.lowercased()) { (result: Result<
+            APIResponse<Examination>,
+            NetworkErrorType
+        >) in
+            DispatchQueue.main.async {
+                switch result {
+                case let .success(apiResponse):
+                    // Map `ExamResponse` to `ExaminationCardData`
+                    let examinationDetail = ExaminationDetailData(
+                        pic: apiResponse.data.PIC?.name ?? "Unknown",
+                        slideId: apiResponse.data.slideId,
+                        examinationGoal: apiResponse.data.goal?.rawValue ?? "No goal specified",
+                        type: apiResponse.data.preparationType.rawValue
+                    )
+
+                    completion(.success(examinationDetail))
+
+                case let .failure(error):
+                    completion(.failure(error))
+                    print(error)
+                }
+            }
+        }
+    }
+
+    func getPatientById(
+        patientId: String,
+        completion: @escaping (Result<PatientDetailData, NetworkErrorType>) -> Void
+    ) {
+        print(urlGetDataPatient + patientId.lowercased())
+
+        NetworkHelper.shared.get(urlString: urlGetDataPatient + patientId.lowercased()) { (result: Result<
+            APIResponse<Patient>,
+            NetworkErrorType
+        >) in
+            DispatchQueue.main.async {
+                switch result {
+                case let .success(apiResponse):
+                    let patientDetail = PatientDetailData(
+                        name: apiResponse.data.name,
+                        nik: apiResponse.data.NIK,
+                        dob: apiResponse.data.DoB?.formattedString() ?? "",
+                        sex: apiResponse.data.sex.rawValue,
+                        bpjs: apiResponse.data.BPJS ?? ""
+                    )
+
+                    completion(.success(patientDetail))
+
+                case let .failure(error):
+                    completion(.failure(error))
+                    print(error)
+                }
+            }
+        }
+    }
 
     func submitExamination(
         examData: ExaminationRequest,
@@ -106,4 +168,19 @@ struct ExaminationData: Codable {
         case systemBacteriaTotalCount
         case notes
     }
+}
+
+struct ExaminationDetailData {
+    var pic: String
+    var slideId: String
+    var examinationGoal: String
+    var type: String
+}
+
+struct PatientDetailData {
+    var name: String
+    var nik: String
+    var dob: String
+    var sex: String
+    var bpjs: String
 }

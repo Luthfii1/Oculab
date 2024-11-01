@@ -18,6 +18,9 @@ class ExamDataPresenter: ObservableObject {
         recordVideo: nil
     )
 
+    @Published var examDetailData: ExaminationDetailData = .init(pic: "", slideId: "", examinationGoal: "", type: "")
+    @Published var patientDetailData: PatientDetailData = .init(name: "", nik: "", dob: "", sex: "", bpjs: "")
+
     //    @Published var idSediaan: String = ""
 //    @Published var selectedGoal: String = ""
 //    @Published var selectedPreparationType: String = ""
@@ -62,5 +65,28 @@ class ExamDataPresenter: ObservableObject {
 
     func newVideoRecord() {
         Router.shared.navigateTo(.videoRecord)
+    }
+
+    func fetchData(examId: String, patientId: String) {
+        print("masukA")
+        interactor.getExamById(examId: examId) { [weak self] result in
+            switch result {
+            case let .success(examination):
+                self?.examDetailData = examination
+
+            case let .failure(error):
+                print("error: ", error.localizedDescription)
+            }
+        }
+
+        interactor.getPatientById(patientId: patientId) { [weak self] result in
+            switch result {
+            case let .success(patient):
+                self?.patientDetailData = patient
+
+            case let .failure(error):
+                print("error: ", error.localizedDescription)
+            }
+        }
     }
 }

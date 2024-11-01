@@ -110,12 +110,12 @@ struct HomeActivityComponent: View {
                     .background(AppColors.purple50)
                     .foregroundStyle(AppColors.purple500)
                     .cornerRadius(Decimal.d8)
-                Text(slideId).font(AppTypography.s4_1)
+                Text(slideId).font(AppTypography.s4_1).foregroundStyle(AppColors.slate900)
             }
             HStack(spacing: Decimal.d4) {
                 Text(patientName)
                 Text("(\(patientDOB))")
-            }.font(AppTypography.p4)
+            }.font(AppTypography.p4).foregroundStyle(AppColors.slate900)
         }
         .padding(Decimal.d12)
         .cornerRadius(Decimal.d12)

@@ -56,13 +56,20 @@ struct HomeView: View {
 
                         VStack(spacing: Decimal.d12) {
                             ForEach(homePresenter.filteredExamination) { exam in
-                                HomeActivityComponent(
-                                    slideId: exam.slideId,
-                                    status: exam.statusExamination,
-                                    date: exam.datePlan,
-                                    patientName: "Null",
-                                    patientDOB: "Null"
-                                )
+                                Button {
+                                    Router.shared.navigateTo(.examDetail(
+                                        examId: exam.id,
+                                        patientId: exam.patientId ?? ""
+                                    ))
+                                } label: {
+                                    HomeActivityComponent(
+                                        slideId: exam.slideId,
+                                        status: exam.statusExamination,
+                                        date: exam.datePlan,
+                                        patientName: exam.patientName,
+                                        patientDOB: exam.patientDob
+                                    )
+                                }
                             }
                         }
                     }
