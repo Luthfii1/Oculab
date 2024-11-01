@@ -12,6 +12,7 @@ import SwiftUI
 
 class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate,
 AVCaptureFileOutputRecordingDelegate {
+    static let shared = VideoRecordPresenter()
     @Published var session = AVCaptureSession()
     @Published var videoRecordingTitle: String = "Sediaan: -"
     @Published var alert = false
@@ -112,14 +113,31 @@ AVCaptureFileOutputRecordingDelegate {
         print(outputFileURL)
         previewURL = outputFileURL
 
-        // Extract frames at specific intervals and stitch them
-        let frameTimes = [
-            CMTime(seconds: 1, preferredTimescale: 600),
-            CMTime(seconds: 2, preferredTimescale: 600)
-        ] // Example frame times
-        for time in frameTimes {
-            if let frameImage = extractFrameFromVideo(at: outputFileURL, time: time) {
-                stitchNewFrame(frameImage)
+        // Extract frames from the video
+        extractFramesFromVideo(at: outputFileURL)
+    }
+
+    func extractFramesFromVideo(at url: URL) {
+        DispatchQueue.main.async {
+            let asset = AVAsset(url: url)
+            let duration = asset.duration
+            let interval = 0.1 // Set interval to 0.01 seconds
+
+            // Calculate the total number of frames based on the duration
+            let totalFrames = Int(duration.seconds / interval)
+
+            // Generate CMTime for every frame at 0.01-second intervals
+            var frameTimes: [CMTime] = []
+            for i in 0..<totalFrames {
+                let time = CMTime(seconds: Double(i) * interval, preferredTimescale: 600)
+                frameTimes.append(time)
+            }
+
+            // Extract frames at calculated times
+            for time in frameTimes {
+                if let frameImage = self.extractFrameFromVideo(at: url, time: time) {
+                    self.stitchNewFrame(frameImage)
+                }
             }
         }
     }
@@ -147,23 +165,23 @@ AVCaptureFileOutputRecordingDelegate {
     }
 
     func stitchNewFrame(_ newImage: UIImage) {
-        DispatchQueue.global(qos: .userInitiated).async {
+        DispatchQueue.main.async {
             guard let lastStitchedImage = self.stitchedImage else {
                 // First image, just set it as the stitched image
-                DispatchQueue.main.async {
-                    self.stitchedImage = newImage
-                }
+//                DispatchQueue.main.async {
+                self.stitchedImage = newImage
+//                }
                 return
             }
 
             ImageRegistration.shared.register(
                 floatingImage: newImage,
                 referenceImage: lastStitchedImage,
-                registrationMechanism: .homographic
-            ) { stitched, _ in
-                DispatchQueue.main.async {
-                    self.stitchedImage = stitched
-                }
+                registrationMechanism: .translational
+            ) { compositedImage, _ in
+//                DispatchQueue.main.async {
+                self.stitchedImage = compositedImage
+//                }
             }
         }
     }
@@ -182,6 +200,10 @@ AVCaptureFileOutputRecordingDelegate {
 
     func navigateBack() {
         Router.shared.navigateBack()
+    }
+
+    func navigateToStitch() {
+        Router.shared.navigateTo(.stitchImage)
     }
 
     func isBackButtonActive() -> Bool {

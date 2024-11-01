@@ -9,7 +9,7 @@ import AVKit
 import SwiftUI
 
 struct VideoRecordView: View {
-    @StateObject private var videoRecordPresenter = VideoRecordPresenter()
+    @StateObject private var videoRecordPresenter = VideoRecordPresenter.shared
 
     var body: some View {
         NavigationView {
@@ -67,7 +67,7 @@ struct VideoRecordView: View {
 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
-                        print("Detail information button")
+                        videoRecordPresenter.navigateToStitch()
                     }) {
                         Image(systemName: "info.circle")
                             .foregroundStyle(AppColors.slate0)

@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct StitchedImageView: View {
-    var stitchedImage: UIImage?
+    @StateObject private var videoRecordPresenter = VideoRecordPresenter.shared
 
     var body: some View {
         VStack {
-            if let image = stitchedImage {
+            if let image = videoRecordPresenter.stitchedImage {
                 Image(uiImage: image)
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
+                    .aspectRatio(contentMode: .fill)
                     .padding()
             } else {
                 Text("No stitched image available")
@@ -29,9 +29,4 @@ struct StitchedImageView: View {
     }
 }
 
-struct StitchedImageView_Previews: PreviewProvider {
-    static var previews: some View {
-        StitchedImageView(stitchedImage: nil) // Preview with no image
-        StitchedImageView(stitchedImage: UIImage(named: "example_image")) // Preview with an example image
-    }
-}
+#Preview { StitchedImageView() }
