@@ -22,6 +22,7 @@ AVCaptureFileOutputRecordingDelegate {
     @Published var recordedURLs: [URL] = []
     @Published var previewURL: URL?
     @Published var showPreview: Bool = false
+    @Published var stitchedImage: UIImage? // Add this line for stitched images
 
     let preRecordingInstructions: [String] = [
         "Gunakan lensa objektif 10x untuk menentukan fokus, kemudian teteskan minyak imersi",
@@ -36,7 +37,7 @@ AVCaptureFileOutputRecordingDelegate {
     ]
 
     func checkPermission() {
-        // check camera got permission
+        // Check camera permission
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
             setUp()
@@ -64,18 +65,23 @@ AVCaptureFileOutputRecordingDelegate {
             let audioDevice = AVCaptureDevice.default(for: .audio)
             let audioInput = try AVCaptureDeviceInput(device: audioDevice!)
 
-            // checking and adding to session....
+            // Checking and adding to session....
             if session.canAddInput(videoInput) && session.canAddInput(audioInput) {
                 session.addInput(videoInput)
                 session.addInput(audioInput)
             }
 
-            // same for output....
+            // Same for output....
             if session.canAddOutput(output) {
                 session.addOutput(output)
             }
 
             session.commitConfiguration()
+
+            // Start the session on a background thread
+            DispatchQueue.global(qos: .userInitiated).async {
+                self.session.startRunning()
+            }
         } catch {
             print(error.localizedDescription)
         }
@@ -105,6 +111,17 @@ AVCaptureFileOutputRecordingDelegate {
 
         print(outputFileURL)
         previewURL = outputFileURL
+
+        // Extract frames at specific intervals and stitch them
+        let frameTimes = [
+            CMTime(seconds: 1, preferredTimescale: 600),
+            CMTime(seconds: 2, preferredTimescale: 600)
+        ] // Example frame times
+        for time in frameTimes {
+            if let frameImage = extractFrameFromVideo(at: outputFileURL, time: time) {
+                stitchNewFrame(frameImage)
+            }
+        }
     }
 
     func handleButtonRecording() {
@@ -112,6 +129,42 @@ AVCaptureFileOutputRecordingDelegate {
             stopRecording()
         } else {
             startRecording()
+        }
+    }
+
+    func extractFrameFromVideo(at url: URL, time: CMTime) -> UIImage? {
+        let asset = AVAsset(url: url)
+        let imageGenerator = AVAssetImageGenerator(asset: asset)
+        imageGenerator.appliesPreferredTrackTransform = true
+
+        do {
+            let cgImage = try imageGenerator.copyCGImage(at: time, actualTime: nil)
+            return UIImage(cgImage: cgImage)
+        } catch {
+            print("Failed to extract frame: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
+    func stitchNewFrame(_ newImage: UIImage) {
+        DispatchQueue.global(qos: .userInitiated).async {
+            guard let lastStitchedImage = self.stitchedImage else {
+                // First image, just set it as the stitched image
+                DispatchQueue.main.async {
+                    self.stitchedImage = newImage
+                }
+                return
+            }
+
+            ImageRegistration.shared.register(
+                floatingImage: newImage,
+                referenceImage: lastStitchedImage,
+                registrationMechanism: .homographic
+            ) { stitched, _ in
+                DispatchQueue.main.async {
+                    self.stitchedImage = stitched
+                }
+            }
         }
     }
 

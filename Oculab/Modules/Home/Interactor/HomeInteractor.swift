@@ -30,6 +30,7 @@ class HomeInteractor {
     }
 
     // MARK: EXAMPLE ANOTHER METHOD FOR POST
+
     func createNewPatient(completion: @escaping (Result<Patient, NetworkErrorType>) -> Void) {
         let bodyPatient = Patient(name: "Luthfi Baru", NIK: "217509123", DoB: Date(), sex: .MALE)
 
@@ -51,6 +52,7 @@ class HomeInteractor {
     }
 
     // MARK: EXAMPLE ANOTHER METHOD FOR UPDATE AND DELETE
+
 //     // Updating an existing examination statistic
 //     func updateStatisticExamination(statisticId: String, updatedStatistic: ExaminationStatistic, completion:
 //     @escaping (Result<ExaminationStatistic, NetworkErrorType>) -> Void) {

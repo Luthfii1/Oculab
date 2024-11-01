@@ -14,12 +14,32 @@ struct VideoRecordView: View {
     var body: some View {
         NavigationView {
             ZStack(alignment: .bottom) {
-                // Camera View
+                // Display stitched image if available
+                if let stitchedImage = videoRecordPresenter.stitchedImage {
+                    Image(uiImage: stitchedImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxHeight: 200) // Adjust frame height as needed
+                        .padding()
+                        .background(Color.black.opacity(0.3))
+                        .cornerRadius(10)
+                        .padding()
+                        .overlay(
+                            Text("Stitched Image")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .padding(6)
+                                .background(Color.black.opacity(0.6))
+                                .cornerRadius(8),
+                            alignment: .topLeading
+                        )
+                }
+
+                // Video or camera preview
                 if videoRecordPresenter.previewURL != nil {
                     VideoPreview()
                         .environmentObject(videoRecordPresenter)
                 } else {
-                    // CameraView when not recording
                     CameraView()
                         .environmentObject(videoRecordPresenter)
                         .ignoresSafeArea()

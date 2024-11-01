@@ -14,7 +14,7 @@ class User: Codable, Identifiable {
     var token: String?
     var email: String
     var password: String?
-    
+
     init(
         _id: UUID = UUID(),
         name: String,
@@ -30,7 +30,7 @@ class User: Codable, Identifiable {
         self.email = email
         self.password = password
     }
-    
+
     enum CodingKeys: CodingKey {
         case _id
         case name
@@ -57,6 +57,6 @@ class User: Codable, Identifiable {
         try container.encode(role, forKey: .role)
         try container.encodeIfPresent(token, forKey: .token)
         try container.encode(email, forKey: .email)
-        try container.encodeIfPresent(password, forKey: .password)        
+        try container.encodeIfPresent(password, forKey: .password)
     }
 }
