@@ -8,7 +8,7 @@
 import Foundation
 
 class ExamInteractor {
-    let urlString = API.BE + "/examination/create-examination/2t3g4837-13da-4335-97c1-dd5e7eaba549"
+    let urlString = API.BE_Prod + "/examination/create-examination/2t3g4837-13da-4335-97c1-dd5e7eaba549"
 
     func submitExamination(
         examData: ExaminationRequest,

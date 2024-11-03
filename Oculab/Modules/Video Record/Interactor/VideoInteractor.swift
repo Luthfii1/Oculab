@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 class VideoInteractor {
     func forwardVideotoBackend(
@@ -13,7 +14,7 @@ class VideoInteractor {
         video: VideoForward,
         completion: @escaping (Result<VideoForwardResponse, NetworkErrorType>) -> Void
     ) {
-        let urlString = API.BE + "/examination/forward-video-to-ml/"
+        let urlString = API.BE_Prod + "/examination/forward-video-to-ml/"
 
         NetworkHelper.shared.post(urlString: urlString, body: video) { (result: Result<
             APIResponse<VideoForwardResponse>,
@@ -28,6 +29,13 @@ class VideoInteractor {
                 }
             }
         }
+    }
+
+    func getStitchedImage(
+        previousImage: CIImage,
+        currentImage: CIImage
+    ) -> UIImage {
+        return UIImage()
     }
 }
 

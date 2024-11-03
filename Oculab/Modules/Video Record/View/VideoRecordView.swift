@@ -14,35 +14,40 @@ struct VideoRecordView: View {
     var body: some View {
         NavigationView {
             ZStack(alignment: .bottom) {
-                // Display stitched image if available
-                if let stitchedImage = videoRecordPresenter.stitchedImage {
-                    Image(uiImage: stitchedImage)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxHeight: 200) // Adjust frame height as needed
-                        .padding()
-                        .background(Color.black.opacity(0.3))
-                        .cornerRadius(10)
-                        .padding()
-                        .overlay(
-                            Text("Stitched Image")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                                .padding(6)
-                                .background(Color.black.opacity(0.6))
-                                .cornerRadius(8),
-                            alignment: .topLeading
-                        )
-                }
-
-                // Video or camera preview
+                // Camera View
                 if videoRecordPresenter.previewURL != nil {
-                    VideoPreview()
-                        .environmentObject(videoRecordPresenter)
+                    ZStack {
+                        VideoPreview()
+                            .environmentObject(videoRecordPresenter)
+
+                        // ADD HERE
+                        if let progressImage = videoRecordPresenter.stitchedImage {
+                            Image(uiImage: progressImage)
+                                .resizable()
+                                .frame(width: 300, height: 300)
+                                .background(Color.black.opacity(0.5))
+                                .cornerRadius(8)
+                                .shadow(radius: 10)
+                            Spacer()
+                        }
+                    }
+
                 } else {
+                    // CameraView when not recording
                     CameraView()
                         .environmentObject(videoRecordPresenter)
                         .ignoresSafeArea()
+
+                    // ADD HERE
+                    if let progressImage = videoRecordPresenter.stitchedImage {
+                        Image(uiImage: progressImage)
+                            .resizable()
+                            .frame(width: 300, height: 300)
+                            .background(Color.black.opacity(0.5))
+                            .cornerRadius(8)
+                            .shadow(radius: 10)
+                        Spacer()
+                    }
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -67,7 +72,7 @@ struct VideoRecordView: View {
 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
-                        videoRecordPresenter.navigateToStitch()
+                        print("Detail information button")
                     }) {
                         Image(systemName: "info.circle")
                             .foregroundStyle(AppColors.slate0)
