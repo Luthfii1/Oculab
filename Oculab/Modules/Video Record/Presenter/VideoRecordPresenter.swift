@@ -94,6 +94,8 @@ AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelega
             if session.canAddOutput(videoDataOutput) { session.addOutput(videoDataOutput) }
 
             session.commitConfiguration()
+            
+            session.startRunning()
 
         } catch {
             print("Error configuring session: \(error.localizedDescription)")
