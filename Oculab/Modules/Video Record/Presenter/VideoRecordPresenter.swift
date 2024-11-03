@@ -129,8 +129,6 @@ AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelega
         isRecording ? stopRecording() : startRecording()
     }
 
-  
-
     func captureOutput(
         _ output: AVCaptureOutput,
         didOutput sampleBuffer: CMSampleBuffer,
@@ -160,22 +158,42 @@ AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelega
     }
 
     func stitchNewFrame(_ newImage: UIImage) {
-        guard let lastStitchedImage = stitchedImage else {
-            // First image, set as the stitched image
-            DispatchQueue.main.async {
+        DispatchQueue.main.async {
+            // If no stitched image exists yet, just set the new image as stitched image
+            guard let lastStitchedImage = self.stitchedImage else {
                 self.stitchedImage = newImage
+                return
             }
-            return
-        }
 
-        ImageRegistration.shared.register(
-            floatingImage: newImage,
-            referenceImage: lastStitchedImage,
-            registrationMechanism: .translational
-        ) { compositedImage, _ in
-            DispatchQueue.main.async {
-                self.stitchedImage = compositedImage
-            }
+            // Calculate the new size for the stitched image
+            let newWidth = max(lastStitchedImage.size.width, newImage.size.width)
+            let newHeight = lastStitchedImage.size.height + newImage.size.height // Stack vertically
+
+            // Create a new graphics context for the stitched image
+            UIGraphicsBeginImageContext(CGSize(width: newWidth, height: newHeight))
+
+            // Draw the last stitched image
+            lastStitchedImage.draw(in: CGRect(
+                x: 0,
+                y: 0,
+                width: lastStitchedImage.size.width,
+                height: lastStitchedImage.size.height
+            ))
+
+            // Draw the new image below the last stitched image
+            newImage.draw(in: CGRect(
+                x: 0,
+                y: lastStitchedImage.size.height,
+                width: newImage.size.width,
+                height: newImage.size.height
+            ))
+
+            // Get the new stitched image from the graphics context
+            let stitchedImage = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+
+            // Update the stitched image property
+            self.stitchedImage = stitchedImage
         }
     }
 
