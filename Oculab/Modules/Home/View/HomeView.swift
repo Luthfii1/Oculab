@@ -13,16 +13,17 @@ struct HomeView: View {
     var body: some View {
         NavigationView {
             ScrollView(showsIndicators: false) {
+                Spacer().frame(height: Decimal.d24)
                 VStack(alignment: .leading, spacing: 24) {
                     StatisticComponent()
                         .environmentObject(homePresenter)
 
                     VStack(alignment: .leading, spacing: 16) {
                         HStack(alignment: .center, spacing: 8) {
-                            Image(systemName: "clock")
+                            Image(systemName: "doc.on.doc.fill")
                                 .foregroundStyle(AppColors.purple500)
 
-                            Text("Aktivitas Terbaru")
+                            Text("Tugas Pemeriksaan")
                                 .foregroundStyle(AppColors.slate900)
                                 .font(AppTypography.s4_1)
                         }
@@ -57,7 +58,7 @@ struct HomeView: View {
                 .padding(.horizontal, 20)
                 .padding(.bottom, 20)
             }
-            .navigationTitle("Ringkasan")
+            .navigationTitle("Tugas Pemeriksaan")
         }
         .ignoresSafeArea()
         .onAppear {
