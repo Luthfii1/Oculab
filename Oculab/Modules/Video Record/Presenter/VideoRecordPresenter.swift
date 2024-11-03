@@ -141,7 +141,9 @@ AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelega
         }
 
         let ciImage = CIImage(cvPixelBuffer: imageBuffer)
-        let cgImage = CIContext().createCGImage(ciImage, from: ciImage.extent)!
+        guard let cgImage = CIContext().createCGImage(ciImage, from: ciImage.extent) else {
+            return
+        }
         let uiImage = UIImage(cgImage: cgImage)
 
         // Update the progress image to reflect the latest frame
