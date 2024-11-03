@@ -21,14 +21,17 @@ struct VideoRecordView: View {
                             .environmentObject(videoRecordPresenter)
 
                         // ADD HERE
-                        if let progressImage = videoRecordPresenter.stitchedImage {
-                            Image(uiImage: progressImage)
-                                .resizable()
-                                .frame(width: 300, height: 300)
-                                .background(Color.black.opacity(0.5))
-                                .cornerRadius(8)
-                                .shadow(radius: 10)
-                            Spacer()
+                        VStack {
+                            if let progressImage = videoRecordPresenter.stitchedImage {
+                                Image(uiImage: progressImage)
+                                    .resizable()
+                                    .frame(width: 300, height: 300)
+                                    .background(Color.black.opacity(0.5))
+                                    .cornerRadius(8)
+                                    .shadow(radius: 10)
+                                    .rotationEffect(.degrees(90))
+                                Spacer()
+                            }
                         }
                     }
 
@@ -39,14 +42,17 @@ struct VideoRecordView: View {
                         .ignoresSafeArea()
 
                     // ADD HERE
-                    if let progressImage = videoRecordPresenter.stitchedImage {
-                        Image(uiImage: progressImage)
-                            .resizable()
-                            .frame(width: 300, height: 300)
-                            .background(Color.black.opacity(0.5))
-                            .cornerRadius(8)
-                            .shadow(radius: 10)
-                        Spacer()
+                    VStack {
+                        if let progressImage = videoRecordPresenter.stitchedImage {
+                            Image(uiImage: progressImage)
+                                .resizable()
+                                .frame(width: 300, height: 300)
+                                .background(Color.black.opacity(0.5))
+                                .cornerRadius(8)
+                                .shadow(radius: 10)
+                                .rotationEffect(.degrees(90))
+                            Spacer()
+                        }
                     }
                 }
             }
