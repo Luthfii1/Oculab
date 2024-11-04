@@ -8,102 +8,152 @@
 import Foundation
 
 class ExamInteractor {
-    let urlString = API.BE_Prod + "/examination/create-examination/2t3g4837-13da-4335-97c1-dd5e7eaba549"
+    let urlString = API.BE + "/examination/create-examination/2t3g4837-13da-4335-97c1-dd5e7eaba549"
+    let urlGetData = API.BE + "/examination/get-examination-by-id/"
+    let urlGetDataPatient = API.BE + "/patient/get-patient-by-id/"
+    let urlForwardVideo = API.BE + "/examination/forward-video-to-ml/"
+//    let urlForwardVideo = "https://f097-158-140-189-122.ngrok-free.app" + "/examination/forward-video-to-ml/"
 
-    func submitExamination(
-        examData: ExaminationRequest,
-        completion: @escaping (Result<ExaminationResponse, NetworkErrorType>) -> Void
-    ) {
-        NetworkHelper.shared.post(urlString: urlString, body: examData) { (result: Result<
-            APIResponse<ExaminationResponse>,
+    func getExamById(examId: String, completion: @escaping (Result<ExaminationDetailData, NetworkErrorType>) -> Void) {
+        print(urlGetData + examId.lowercased())
+
+        NetworkHelper.shared.get(urlString: urlGetData + examId.lowercased()) { (result: Result<
+            APIResponse<Examination>,
             NetworkErrorType
         >) in
             DispatchQueue.main.async {
                 switch result {
                 case let .success(apiResponse):
-                    completion(.success(apiResponse.data))
+                    let examinationDetail = ExaminationDetailData(
+                        examinationId: apiResponse.data._id.uuidString,
+                        pic: apiResponse.data.PIC?.name ?? "Unknown",
+                        slideId: apiResponse.data.slideId,
+                        examinationGoal: apiResponse.data.goal?.rawValue ?? "No goal specified",
+                        type: apiResponse.data.preparationType.rawValue
+                    )
+
+                    print(examinationDetail)
+
+                    completion(.success(examinationDetail))
+
                 case let .failure(error):
                     completion(.failure(error))
+                    print(error)
                 }
             }
         }
-
-//        var request = URLRequest(urlString: urlString)
-//        request.httpMethod = "POST"
-//        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-//
-//        do {
-//            let jsonData = try JSONEncoder().encode(examData)
-//            request.httpBody = jsonData
-//        } catch {
-//            print("Failed to encode examination data: \(error)")
-//            return
-//        }
-//
-//        let task = URLSession.shared.dataTask(with: request) { data, _, error in
-//            if let error = error {
-//                print("Error submitting examination data: \(error)")
-//                return
-//            }
-//            guard let data = data else { return }
-//
-//            print("Response: \(String(data: data, encoding: .utf8) ?? "")")
-//        }
-//        task.resume()
-    }
-}
-
-struct ExaminationRequest: Codable {
-    var examination: Examination
-
-    init(examinationId: String, goal: String, preparationType: String, slideId: String, recordVideo: URL?) {
-        self.examination = Examination(
-            id: examinationId,
-            goal: goal,
-            preparationType: preparationType,
-            slideId: slideId,
-            systemBacteriaTotalCount: nil,
-            notes: nil,
-            recordVideo: recordVideo
-        )
     }
 
-    struct Examination: Codable {
-        var id: String
-        var goal: String
-        var preparationType: String
-        var slideId: String
-        var systemBacteriaTotalCount: Int?
-        var notes: String?
-        var recordVideo: URL?
+    func getPatientById(
+        patientId: String,
+        completion: @escaping (Result<PatientDetailData, NetworkErrorType>) -> Void
+    ) {
+        print(urlGetDataPatient + patientId.lowercased())
 
-        // Map `_id` to `id` to match JSON format
-        enum CodingKeys: String, CodingKey {
-            case id = "_id"
-            case goal, preparationType, slideId, systemBacteriaTotalCount, notes, recordVideo
+        NetworkHelper.shared.get(urlString: urlGetDataPatient + patientId.lowercased()) { (result: Result<
+            APIResponse<Patient>,
+            NetworkErrorType
+        >) in
+            DispatchQueue.main.async {
+                switch result {
+                case let .success(apiResponse):
+                    let patientDetail = PatientDetailData(
+                        patientId: apiResponse.data._id.uuidString,
+                        name: apiResponse.data.name,
+                        nik: apiResponse.data.NIK,
+                        dob: apiResponse.data.DoB?.formattedString() ?? "",
+                        sex: apiResponse.data.sex.rawValue,
+                        bpjs: apiResponse.data.BPJS ?? ""
+                    )
+
+                    completion(.success(patientDetail))
+
+                case let .failure(error):
+                    completion(.failure(error))
+                    print(error)
+                }
+            }
         }
     }
-}
 
-struct ExaminationResponse: Codable {
-    var examination: ExaminationData
-}
+//    func submitExamination(
+//        examVideo: Data,
+//        examinationId: String,
+//        patientId: String,
+//        completion: @escaping (Result<Response, NetworkErrorType>) -> Void
+//    ) {
+//        print(urlForwardVideo + patientId + "/\(examinationId)")
+//        let forwardBody = ForwardBody(video: examVideo)
+//        NetworkHelper.shared
+//            .post(urlString: urlForwardVideo + patientId + "/\(examinationId)", body: forwardBody) { (result: Result<
+//                APIResponse<Response>,
+//                NetworkErrorType
+//            >) in
+//                DispatchQueue.main.async {
+//                    switch result {
+//                    case let .success(apiResponse):
+//                        completion(.success(apiResponse.data))
+//                    case let .failure(error):
+//                        completion(.failure(error))
+//                    }
+//                }
+//            }
+//    }
 
-struct ExaminationData: Codable {
-    var id: String
-    var goal: String
-    var preparationType: String
-    var slideId: String
-    var systemBacteriaTotalCount: Int?
-    var notes: String?
+    func submitExamination(
+        examVideo: Data,
+        examinationId: String,
+        patientId: String,
+        completion: @escaping (Result<Response, NetworkErrorType>) -> Void
+    ) {
+        let urlString = urlForwardVideo + patientId.lowercased() + "/\(examinationId.lowercased())"
+        print(urlString)
+        let boundary = UUID().uuidString
 
-    // Map `_id` to `id`
-    enum CodingKeys: String, CodingKey {
-        case id = "_id"
-        case goal
-        case preparationType
-        case slideId
-        case systemBacteriaTotalCount
-        case notes
+        // Prepare parameters for multipart request
+        let parameters = ["video": examVideo]
+
+        // Create the multipart request
+        guard let request = NetworkHelper.shared.createMultipartRequest(
+            urlString: urlString,
+            httpMethod: "POST",
+            parameters: parameters,
+            boundary: boundary
+        ) else {
+            completion(.failure(.invalidURL))
+            return
+        }
+
+        // Execute the request
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            NetworkHelper.shared.handleResponse(data, response, error, completion: completion)
+        }.resume()
     }
+}
+
+struct ExaminationDetailData {
+    var examinationId: String
+    var pic: String
+    var slideId: String
+    var examinationGoal: String
+    var type: String
+}
+
+struct PatientDetailData {
+    var patientId: String
+    var name: String
+    var nik: String
+    var dob: String
+    var sex: String
+    var bpjs: String
+}
+
+struct Response: Decodable {
+    var message: String?
+    var data: String?
+    var error: String?
+}
+
+struct ForwardBody: Encodable {
+    var video: Data
 }

@@ -23,11 +23,16 @@ struct ContentView: View {
                         Text("PDF")
                     }
 
-                AnalysisResultView()
+                PDFPageView()
                     .tabItem {
-                        Image(systemName: "person.crop.circle.fill")
-                        Text("Analyze")
+                        Image(systemName: "folder.fill.badge.person.crop")
+                        Text("PDF")
                     }
+//                AnalysisResultView()
+//                    .tabItem {
+//                        Image(systemName: "person.crop.circle.fill")
+//                        Text("Analyze")
+//                    }
             }
             .tint(AppColors.purple500)
         }

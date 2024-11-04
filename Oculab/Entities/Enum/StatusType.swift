@@ -8,6 +8,7 @@
 enum StatusType: String, Codable, CaseIterable {
     case INPROGRESS = "Sedang dianalisa sistem"
     case NEEDVALIDATION = "Belum disimpulkan"
+    case NOTSTARTED = "Belum Dimulai"
     case FINISHED = "Selesai"
     case NONE = ""
 
@@ -22,6 +23,8 @@ enum StatusType: String, Codable, CaseIterable {
             self = .FINISHED
         case "NEEDVALIDATION":
             self = .NEEDVALIDATION
+        case "NOTSTARTED":
+            self = .NOTSTARTED
         case "INPROGRESS":
             self = .INPROGRESS
         default:

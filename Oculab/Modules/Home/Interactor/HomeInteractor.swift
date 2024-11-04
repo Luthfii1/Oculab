@@ -12,7 +12,20 @@ struct ExaminationStatistic: Decodable {
     var numberOfNegative: Int = 0
 }
 
+// struct ExamResponse: Decodable {
+//    var _id: String
+//    var goal: String
+//    var preparationType: String
+//    var slideId: String
+//    var examinationDate: String
+//    var statusExamination: StatusType
+//    var examinationPlanDate: String
+// }
+
 class HomeInteractor {
+    private let apiURL = API.BE + "/examination/get-number-of-examinations"
+    private let apiGetAllData = API.BE + "/examination/get-all-examinations"
+
     func getStatisticExamination(completion: @escaping (Result<ExaminationStatistic, NetworkErrorType>) -> Void) {
         NetworkHelper.shared.get(urlString: API.BE_Prod + "/examination/get-number-of-examinations") { (result: Result<
             APIResponse<ExaminationStatistic>,
@@ -29,105 +42,77 @@ class HomeInteractor {
         }
     }
 
-    // MARK: EXAMPLE ANOTHER METHOD FOR POST
+    func getAllData(completion: @escaping (Result<[ExaminationCardData], NetworkErrorType>) -> Void) {
+        NetworkHelper.shared.get(urlString: apiGetAllData) { (result: Result<
+            APIResponse<[Examination]>,
+            NetworkErrorType
+        >) in
+            DispatchQueue.main.async {
+                switch result {
+                case let .success(apiResponse):
+                    // Map `ExamResponse` to `ExaminationCardData`
+                    let examinationDataCard = apiResponse.data.map { exam -> ExaminationCardData in
+                        let dateFormatter = DateFormatter()
+                        dateFormatter.dateFormat = "dd MMMM yyyy"
 
-    func createNewPatient(completion: @escaping (Result<Patient, NetworkErrorType>) -> Void) {
-        let bodyPatient = Patient(name: "Luthfi Baru", NIK: "217509123", DoB: Date(), sex: .MALE)
-
-        NetworkHelper.shared
-            .post(
-                urlString: API.BE_Prod + "/patient/create-new-patient",
-                body: bodyPatient
-            ) { (result: Result<APIResponse<Patient>, NetworkErrorType>) in
-                DispatchQueue.main.async {
-                    switch result {
-                    case let .success(response):
-                        completion(.success(response.data))
-                    case let .failure(error):
-                        print("error interactor")
-                        completion(.failure(error))
+                        let formattedDate = dateFormatter.string(from: exam.examinationPlanDate ?? Date())
+                        return ExaminationCardData(
+                            examinationId: exam._id.uuidString,
+                            statusExamination: exam.statusExamination,
+                            imagePreview: "",
+                            datePlan: formattedDate,
+                            slideId: exam.slideId,
+                            patientName: exam.patientName ?? "",
+                            patientDob: exam.patientDoB ?? "",
+                            patientId: exam.patientId ?? "")
                     }
+                    completion(.success(examinationDataCard))
+
+                case let .failure(error):
+                    completion(.failure(error))
+                    print(error)
                 }
             }
-    }
-
-    // MARK: EXAMPLE ANOTHER METHOD FOR UPDATE AND DELETE
-
-//     // Updating an existing examination statistic
-//     func updateStatisticExamination(statisticId: String, updatedStatistic: ExaminationStatistic, completion:
-//     @escaping (Result<ExaminationStatistic, NetworkErrorType>) -> Void) {
-//         let urlString = API.BE + "/examination/update-statistic/\(statisticId)"
-//         NetworkHelper.shared.put(urlString: urlString, body: updatedStatistic) { (result: Result<
-//             APIResponse<ExaminationStatistic>,
-//             NetworkErrorType
-//         >) in
-//             DispatchQueue.main.async {
-//                 switch result {
-//                 case let .success(apiResponse):
-//                     completion(.success(apiResponse.data))
-//                 case let .failure(error):
-//                     completion(.failure(error))
-//                 }
-//             }
-//         }
-//     }
-//
-//     // Deleting an examination statistic
-//     func deleteStatisticExamination(statisticId: String, completion: @escaping (Result<Void, NetworkErrorType>) ->
-//     Void) {
-//         let urlString = API.BE + "/examination/delete-statistic/\(statisticId)"
-//         NetworkHelper.shared.delete(urlString: urlString) { (result: Result<
-//             APIResponse<Void>,
-//             NetworkErrorType
-//         >) in
-//             DispatchQueue.main.async {
-//                 switch result {
-//                 case .success:
-//                     completion(.success(()))
-//                 case let .failure(error):
-//                     completion(.failure(error))
-//                 }
-//             }
-//         }
-//     }
-
-    func getAllData(completion: @escaping (Result<[ExaminationCardData], Error>) -> Void) {
-        // Simulating API data response
-        let jsonData = DummyJSON().examinationCards
-
-        do {
-            let decoder = JSONDecoder()
-            decoder.keyDecodingStrategy = .convertFromSnakeCase
-            decoder.dateDecodingStrategy = .iso8601
-
-            let examinationData = try decoder.decode([Examination].self, from: jsonData)
-
-            let examinationDataCard = examinationData.map { exam -> ExaminationCardData in
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "dd MMMM yyyy"
-
-                let timeFormatter = DateFormatter()
-                timeFormatter.dateFormat = "HH:mm"
-
-                let formattedDate = dateFormatter.string(from: exam.examinationDate)
-                let formattedTime = timeFormatter.string(from: exam.examinationDate)
-
-                return ExaminationCardData(
-                    examinationId: exam._id.uuidString,
-                    statusExamination: exam.statusExamination,
-                    imagePreview: exam.imagePreview,
-                    date: formattedDate,
-                    time: formattedTime,
-                    slideId: exam.slideId
-                )
-            }
-            completion(.success(examinationDataCard))
-
-        } catch {
-            DispatchQueue.main.async {
-                completion(.failure(error))
-            }
-            print("Failed to decode data: \(error)")
         }
     }
 }
+
+//    func getAllData(completion: @escaping (Result<[ExaminationCardData], Error>) -> Void) {
+//        // Simulating API data response
+//        let jsonData = DummyJSON().examinationCards
+//
+//        do {
+//            let decoder = JSONDecoder()
+//            decoder.keyDecodingStrategy = .convertFromSnakeCase
+//            decoder.dateDecodingStrategy = .iso8601
+//
+//            let examinationData = try decoder.decode([Examination].self, from: jsonData)
+//
+//            let examinationDataCard = examinationData.map { exam -> ExaminationCardData in
+//                let dateFormatter = DateFormatter()
+//                dateFormatter.dateFormat = "dd MMMM yyyy"
+//
+//                let timeFormatter = DateFormatter()
+//                timeFormatter.dateFormat = "HH:mm"
+//
+//                let formattedDate = dateFormatter.string(from: exam.examinationDate)
+//                let formattedTime = timeFormatter.string(from: exam.examinationDate)
+//
+//                return ExaminationCardData(
+//                    examinationId: exam._id.uuidString,
+//                    statusExamination: exam.statusExamination,
+//                    imagePreview: exam.imagePreview,
+//                    date: formattedDate,
+//                    time: formattedTime,
+//                    slideId: exam.slideId
+//                )
+//            }
+//            completion(.success(examinationDataCard))
+//
+//        } catch {
+//            DispatchQueue.main.async {
+//                completion(.failure(error))
+//            }
+//            print("Failed to decode data: \(error)")
+//        }
+//    }

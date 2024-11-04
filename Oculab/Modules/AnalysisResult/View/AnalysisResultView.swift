@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct AnalysisResultView: View {
+    var examinationId: String
+
     @StateObject private var presenter = AnalysisResultPresenter()
 
     @State var selectedTBGrade: String? = nil
@@ -101,8 +103,8 @@ struct AnalysisResultView: View {
                     .frame(height: 24)
 
                     AppStepper(
-                        stepTitles: ["Data Pasien", "Data Sediaan", "Hasil"],
-                        currentStep: 2
+                        stepTitles: ["Data Pemeriksaan", "Hasil Pemeriksaan"],
+                        currentStep: 1
                     )
                     .padding(.vertical, Decimal.d16)
 
@@ -272,7 +274,7 @@ struct AnalysisResultView: View {
                     }
                 }
                 .onAppear {
-                    presenter.fetchData(examinationId: "d6a81b19-7e4f-42da-a9f8-3e49ad3d4b7c")
+                    presenter.fetchData(examinationId: examinationId)
                 }
 
                 Spacer()
@@ -283,5 +285,5 @@ struct AnalysisResultView: View {
 }
 
 #Preview {
-    AnalysisResultView()
+    AnalysisResultView(examinationId: "6f4e5288-3dfd-4be4-8a2e-8c60f09f07e2")
 }

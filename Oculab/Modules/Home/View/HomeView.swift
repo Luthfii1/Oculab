@@ -39,18 +39,37 @@ struct HomeView: View {
                             .padding(.horizontal, 1)
                         }
 
-                        LazyVGrid(columns: [
-                            GridItem(.flexible(), spacing: 16),
-                            GridItem(.flexible(), spacing: 16)
-                        ], spacing: 16) {
+//                        LazyVGrid(columns: [
+//                            GridItem(.flexible(), spacing: 16),
+//                            GridItem(.flexible(), spacing: 16)
+//                        ], spacing: 16) {
+//                            ForEach(homePresenter.filteredExamination) { exam in
+//                                HomeActivityComponent(
+//                                    slideId: exam.slideId,
+//                                    status: exam.statusExamination,
+//                                    date: exam.datePlan,
+//                                    patientName: "Null",
+//                                    patientDOB: "Null"
+//                                )
+//                            }
+//                        }
+
+                        VStack(spacing: Decimal.d12) {
                             ForEach(homePresenter.filteredExamination) { exam in
-                                HomeActivityComponent(
-                                    fileName: exam.imagePreview,
-                                    slideId: exam.slideId,
-                                    status: exam.statusExamination,
-                                    date: exam.date,
-                                    time: exam.time
-                                )
+                                Button {
+                                    Router.shared.navigateTo(.examDetail(
+                                        examId: exam.id,
+                                        patientId: exam.patientId ?? ""
+                                    ))
+                                } label: {
+                                    HomeActivityComponent(
+                                        slideId: exam.slideId,
+                                        status: exam.statusExamination,
+                                        date: exam.datePlan,
+                                        patientName: exam.patientName,
+                                        patientDOB: exam.patientDob
+                                    )
+                                }
                             }
                         }
                     }

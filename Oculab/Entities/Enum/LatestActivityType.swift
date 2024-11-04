@@ -8,7 +8,8 @@
 import Foundation
 
 enum LatestActivityType: String, CaseIterable {
-    case semua = "Semua"
+//    case semua = "Semua"
+    case belumDimulai = "Belum Dimulai"
+
     case belumDisimpulkan = "Belum Disimpulkan"
-    case selesai = "Selesai"
 }

@@ -61,4 +61,37 @@ class NetworkHelper {
             completion(.failure(.decodingError(error)))
         }
     }
+
+    func createMultipartRequest(
+        urlString: String,
+        httpMethod: String,
+        parameters: [String: Data],
+        boundary: String
+    ) -> URLRequest? {
+        guard let url = URL(string: urlString) else { return nil }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = httpMethod
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+
+        // Construct the multipart body
+        var body = Data()
+        for (key, value) in parameters {
+            body.append("--\(boundary)\r\n".data(using: .utf8)!)
+            body
+                .append(
+                    "Content-Disposition: form-data; name=\"\(key)\"; filename=\"\(key).mov\"\r\n"
+                        .data(using: .utf8)!
+                )
+            body.append("Content-Type: video/quicktime\r\n\r\n".data(using: .utf8)!)
+            body.append(value)
+            body.append("\r\n".data(using: .utf8)!)
+        }
+        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+
+        request.httpBody = body
+        request.setValue(String(body.count), forHTTPHeaderField: "Content-Length")
+
+        return request
+    }
 }
