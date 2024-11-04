@@ -39,7 +39,6 @@ class AnalysisResultInteractor {
                         systemGrading: GradingType(
                             rawValue: (apiResponse.data.systemResult?.systemGrading)!.rawValue) ??
                             .NEGATIVE,
-//                        systemGrading: .NEGATIVE,
                         bacteriaTotalCount: apiResponse.data.systemResult?.systemBacteriaTotalCount ?? 0)
 
                     print("hore")
@@ -55,50 +54,31 @@ class AnalysisResultInteractor {
         }
     }
 
-//    func fetchData(examinationId: String, completion: @escaping (Result<ExaminationResultData, Error>) -> Void) {
-//
-//
-//        guard let url = createURL(with: examinationId) else {
-//            completion(.failure(NSError(domain: "Invalid URL", code: 0, userInfo: nil)))
-//            return
-//        }
-//
-//        let task = URLSession.shared.dataTask(with: url) { data, _, error in
-//            if let error = error {
-//                completion(.failure(error))
-//                return
-//            }
-//
-//            guard let data = data else {
-//                completion(.failure(NSError(domain: "No data", code: 0, userInfo: nil)))
-//                return
-//            }
-//
-//            do {
-//                // Decode only the "data" field
-//                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-//                   let dataField = json["data"]
-//                {
-//                    // Convert "data" field back to JSON data
-//                    let dataJson = try JSONSerialization.data(withJSONObject: dataField, options: [])
-//
-//                    // Decode the JSON data into an ExaminationResultData object
-//                    let decoder = JSONDecoder()
-//                    decoder.keyDecodingStrategy = .convertFromSnakeCase
-//                    decoder.dateDecodingStrategy = .iso8601
-//
-//                    let examination = try decoder.decode(ExaminationResultData.self, from: dataJson)
-//                    completion(.success(examination))
-//
-//                } else {
-//                    completion(.failure(NSError(domain: "Invalid data format", code: 0, userInfo: nil)))
-//                }
-//            } catch {
-//                completion(.failure(error))
-//            }
-//        }
-//        task.resume()
-//    }
+    func fetchFOVData(examId: String, completion: @escaping (Result<FOVGrouping, NetworkErrorType>) -> Void) {
+        NetworkHelper.shared
+            .get(
+                urlString: "https://oculab-be.vercel.app/fov/get-all-fov-by-examination-id/" +
+                    "b12ac121-d42d-4179-864b-154360bce28f"
+                    .lowercased())
+        { (result: Result<
+            APIResponse<FOVGrouping>,
+            NetworkErrorType
+        >) in
+            DispatchQueue.main.async {
+                switch result {
+                case let .success(apiResponse):
+
+                    print(apiResponse.data)
+
+                    completion(.success(apiResponse.data))
+
+                case let .failure(error):
+                    completion(.failure(error))
+                    print(error)
+                }
+            }
+        }
+    }
 }
 
 struct ExaminationResultData: Decodable {
@@ -110,13 +90,14 @@ struct ExaminationResultData: Decodable {
     var bacteriaTotalCount: Int
 }
 
-struct FOV: Decodable {
-    let image: String
-    let type: FOVType
-    let order: Int
-    let fovDataId: String
-}
+struct FOVGrouping: Decodable {
+    var bta0: [FOVData]
+    var bta1to9: [FOVData]
+    var btaabove9: [FOVData]
 
-// struct FOVGrouping {
-//    var
-// }
+    private enum CodingKeys: String, CodingKey {
+        case bta0 = "BTA0"
+        case bta1to9 = "BTA1TO9"
+        case btaabove9 = "BTAABOVE9"
+    }
+}

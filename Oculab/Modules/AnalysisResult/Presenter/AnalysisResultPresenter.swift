@@ -16,43 +16,26 @@ class AnalysisResultPresenter: ObservableObject {
 
     @Published var confidenceLevel: ConfidenceLevel = .unpredicted
     @Published var resultQuantity: Int = 0
-    @Published var groupedFOVs: [FOVType: [FOV]] = [:]
+    @Published var groupedFOVs: FOVGrouping?
 
     func fetchData(examinationId: String) {
         interactor?.fetchData(examId: examinationId) { [weak self] result in
             switch result {
             case let .success(examination):
                 self?.examinationResult = examination
-                
-
-//                self?.filteredExamination = self?.latestExamination ?? []
             case let .failure(error):
                 print("error: ", error.localizedDescription)
             }
-//            DispatchQueue.main.async {
-//                switch result {
-//                case let .success(examinationResult):
-//                    self?.examinationResult = examinationResult
-//                    self?.confidenceLevel = ConfidenceLevel
-//                        .classify(aggregatedConfidence: examinationResult.confidenceLevelAggregated)
-//                    self?.groupedFOVs = Dictionary(grouping: examinationResult.fov, by: { $0.type })
-//
-//                    if self?.examinationResult?.systemGrading == .SCANTY || self?.examinationResult?
-//                        .systemGrading == .Plus1
-//                    {
-//                        self?.resultQuantity = examinationResult.bacteriaTotalCount
-//
-//                    } else if self?.examinationResult?.systemGrading == .Plus2 {
-//                        self?.resultQuantity = self?.groupedFOVs[.BTA1TO9]?.count ?? 0
-//
-//                    } else if self?.examinationResult?.systemGrading == .Plus3 {
-//                        self?.resultQuantity = self?.groupedFOVs[.BTAABOVE9]?.count ?? 0
-//                    }
-//
-//                case let .failure(error):
-//                    self?.errorMessage = "Failed to load examination data: \(error.localizedDescription)"
-//                }
-//            }
+        }
+
+        interactor?.fetchFOVData(examId: examinationId) { [weak self] result in
+            print("=================================")
+            switch result {
+            case let .success(fov):
+                self?.groupedFOVs = fov
+            case let .failure(error):
+                print("error: ", error.localizedDescription)
+            }
         }
     }
 }
