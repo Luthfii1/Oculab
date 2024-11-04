@@ -16,7 +16,7 @@ class Router: ObservableObject {
         case home
         case videoRecord
         case pdf
-        case analysisResult
+        case analysisResult(examinationId: String)
         case instructionRecord
 //        case newExam
         case examDetail(examId: String, patientId: String)
@@ -33,8 +33,8 @@ class Router: ObservableObject {
             VideoRecordView()
         case .pdf:
             PDFPageView()
-        case .analysisResult:
-            AnalysisResultView()
+        case let .analysisResult(examinationId):
+            AnalysisResultView(examinationId: examinationId)
         case .instructionRecord:
             InstructionRecordView()
 //        case .newExam:

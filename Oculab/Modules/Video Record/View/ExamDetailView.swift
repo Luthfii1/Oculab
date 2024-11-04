@@ -70,7 +70,7 @@ struct ExamDetailView: View {
 
                 ) {
                     presenter.handleSubmit()
-                    presenter.analysisResult()
+                    presenter.analysisResult(examinationId: presenter.examDetailData.examinationId)
                 }
 
             }.padding(.horizontal, Decimal.d20)

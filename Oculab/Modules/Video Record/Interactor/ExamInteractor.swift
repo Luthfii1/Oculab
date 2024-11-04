@@ -12,6 +12,7 @@ class ExamInteractor {
     let urlGetData = API.BE + "/examination/get-examination-by-id/"
     let urlGetDataPatient = API.BE + "/patient/get-patient-by-id/"
     let urlForwardVideo = API.BE + "/examination/forward-video-to-ml/"
+//    let urlForwardVideo = "https://f097-158-140-189-122.ngrok-free.app" + "/examination/forward-video-to-ml/"
 
     func getExamById(examId: String, completion: @escaping (Result<ExaminationDetailData, NetworkErrorType>) -> Void) {
         print(urlGetData + examId.lowercased())
@@ -30,6 +31,8 @@ class ExamInteractor {
                         examinationGoal: apiResponse.data.goal?.rawValue ?? "No goal specified",
                         type: apiResponse.data.preparationType.rawValue
                     )
+
+                    print(examinationDetail)
 
                     completion(.success(examinationDetail))
 
@@ -73,28 +76,58 @@ class ExamInteractor {
         }
     }
 
+//    func submitExamination(
+//        examVideo: Data,
+//        examinationId: String,
+//        patientId: String,
+//        completion: @escaping (Result<Response, NetworkErrorType>) -> Void
+//    ) {
+//        print(urlForwardVideo + patientId + "/\(examinationId)")
+//        let forwardBody = ForwardBody(video: examVideo)
+//        NetworkHelper.shared
+//            .post(urlString: urlForwardVideo + patientId + "/\(examinationId)", body: forwardBody) { (result: Result<
+//                APIResponse<Response>,
+//                NetworkErrorType
+//            >) in
+//                DispatchQueue.main.async {
+//                    switch result {
+//                    case let .success(apiResponse):
+//                        completion(.success(apiResponse.data))
+//                    case let .failure(error):
+//                        completion(.failure(error))
+//                    }
+//                }
+//            }
+//    }
+
     func submitExamination(
         examVideo: Data,
         examinationId: String,
         patientId: String,
         completion: @escaping (Result<Response, NetworkErrorType>) -> Void
     ) {
-        print(urlForwardVideo + patientId + "/\(examinationId)")
-        let forwardBody = ForwardBody(video: examVideo)
-        NetworkHelper.shared
-            .post(urlString: urlForwardVideo + patientId + "/\(examinationId)", body: forwardBody) { (result: Result<
-                APIResponse<Response>,
-                NetworkErrorType
-            >) in
-                DispatchQueue.main.async {
-                    switch result {
-                    case let .success(apiResponse):
-                        completion(.success(apiResponse.data))
-                    case let .failure(error):
-                        completion(.failure(error))
-                    }
-                }
-            }
+        let urlString = urlForwardVideo + patientId.lowercased() + "/\(examinationId.lowercased())"
+        print(urlString)
+        let boundary = UUID().uuidString
+
+        // Prepare parameters for multipart request
+        let parameters = ["video": examVideo]
+
+        // Create the multipart request
+        guard let request = NetworkHelper.shared.createMultipartRequest(
+            urlString: urlString,
+            httpMethod: "POST",
+            parameters: parameters,
+            boundary: boundary
+        ) else {
+            completion(.failure(.invalidURL))
+            return
+        }
+
+        // Execute the request
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            NetworkHelper.shared.handleResponse(data, response, error, completion: completion)
+        }.resume()
     }
 }
 

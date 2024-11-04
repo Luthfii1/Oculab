@@ -82,8 +82,8 @@ class ExamDataPresenter: ObservableObject {
         Router.shared.navigateTo(.videoRecord)
     }
 
-    func analysisResult() {
-        Router.shared.navigateTo(.analysisResult)
+    func analysisResult(examinationId: String) {
+        Router.shared.navigateTo(.analysisResult(examinationId: examinationId))
     }
 
     func fetchData(examId: String, patientId: String) {
