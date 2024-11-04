@@ -23,6 +23,7 @@ class AnalysisResultPresenter: ObservableObject {
             switch result {
             case let .success(examination):
                 self?.examinationResult = examination
+                
 
 //                self?.filteredExamination = self?.latestExamination ?? []
             case let .failure(error):

@@ -20,7 +20,8 @@ class AnalysisResultInteractor {
     func fetchData(examId: String, completion: @escaping (Result<ExaminationResultData, NetworkErrorType>) -> Void) {
         NetworkHelper.shared
             .get(
-                urlString: "https://oculab-be.vercel.app/examination/get-examination-by-id/" + examId
+                urlString: "https://oculab-be.vercel.app/examination/get-examination-by-id/" +
+                    "b12ac121-d42d-4179-864b-154360bce28f"
                     .lowercased())
         { (result: Result<
             APIResponse<Examination>,
@@ -29,15 +30,16 @@ class AnalysisResultInteractor {
             DispatchQueue.main.async {
                 switch result {
                 case let .success(apiResponse):
+
                     let examinationDetail = ExaminationResultData(
                         examinationId: apiResponse.data._id.uuidString,
                         imagePreview: apiResponse.data.imagePreview ?? "",
                         fov: apiResponse.data.FOV ?? [],
                         confidenceLevelAggregated: 0.0,
-//                        systemGrading: GradingType(
-//                            rawValue: (apiResponse.data.systemResult?.systemGrading)!.rawValue) ??
-//                            .NEGATIVE,
-                        systemGrading: .NEGATIVE,
+                        systemGrading: GradingType(
+                            rawValue: (apiResponse.data.systemResult?.systemGrading)!.rawValue) ??
+                            .NEGATIVE,
+//                        systemGrading: .NEGATIVE,
                         bacteriaTotalCount: apiResponse.data.systemResult?.systemBacteriaTotalCount ?? 0)
 
                     print("hore")
