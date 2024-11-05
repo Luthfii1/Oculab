@@ -94,7 +94,7 @@ AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelega
             if session.canAddOutput(videoDataOutput) { session.addOutput(videoDataOutput) }
 
             session.commitConfiguration()
-            
+
             session.startRunning()
 
         } catch {
@@ -136,48 +136,50 @@ AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelega
         didOutput sampleBuffer: CMSampleBuffer,
         from connection: AVCaptureConnection
     ) {
-        guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
-            return
-        }
+        if isRecording {
+            guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
+                return
+            }
 
-        let ciImage = CIImage(cvPixelBuffer: imageBuffer)
-        guard let cgImage = CIContext().createCGImage(ciImage, from: ciImage.extent) else {
-            return
-        }
-        let uiImage = UIImage(cgImage: cgImage)
+            let ciImage = CIImage(cvPixelBuffer: imageBuffer)
+            guard let cgImage = CIContext().createCGImage(ciImage, from: ciImage.extent) else {
+                return
+            }
+            let uiImage = UIImage(cgImage: cgImage)
 
-        // Update the progress image to reflect the latest frame
-        DispatchQueue.main.async {
-            self.progressImage = uiImage
-        }
+            // Update the progress image to reflect the latest frame
+            DispatchQueue.main.async {
+                self.progressImage = uiImage
+            }
 
-        // Check if 0.5 seconds have passed since the last stitch
-        let now = Date()
-        if lastStitchTime == nil || now.timeIntervalSince(lastStitchTime!) >= stitchInterval {
-            lastStitchTime = now
-            stitchNewFrame(uiImage)
+            // Check if 0.5 seconds have passed since the last stitch
+            let now = Date()
+            if lastStitchTime == nil || now.timeIntervalSince(lastStitchTime!) >= stitchInterval {
+                lastStitchTime = now
+                stitchNewFrame(uiImage)
+            }
         }
     }
 
     func stitchNewFrame(_ newImage: UIImage) {
-            guard let lastStitchedImage = stitchedImage else {
-                // First image, set as the stitched image
-                DispatchQueue.main.async {
-                    self.stitchedImage = newImage
-                }
-                return
+        guard let lastStitchedImage = stitchedImage else {
+            // First image, set as the stitched image
+            DispatchQueue.main.async {
+                self.stitchedImage = newImage
             }
+            return
+        }
 
-            ImageRegistration.shared.register(
-                floatingImage: newImage,
-                referenceImage: lastStitchedImage,
-                registrationMechanism: .translational
-            ) { compositedImage, _ in
-                DispatchQueue.main.async {
-                    self.stitchedImage = compositedImage
-                }
+        ImageRegistration.shared.register(
+            floatingImage: newImage,
+            referenceImage: lastStitchedImage,
+            registrationMechanism: .translational
+        ) { compositedImage, _ in
+            DispatchQueue.main.async {
+                self.stitchedImage = compositedImage
             }
         }
+    }
 
     func getIconButtonRecording() -> String {
         return isRecording ? "circle.fill" : "button.programmable"
@@ -193,10 +195,6 @@ AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelega
 
     func navigateBack() {
         Router.shared.navigateBack()
-    }
-
-    func navigateToStitch() {
-        Router.shared.navigateTo(.stitchImage)
     }
 
     func isBackButtonActive() -> Bool {

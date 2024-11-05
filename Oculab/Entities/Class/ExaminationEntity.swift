@@ -7,7 +7,7 @@
 
 import Foundation
 
-class Examination: Codable, Identifiable {
+class Examination: Decodable, Identifiable {
     var _id: UUID
     var goal: ExamGoalType?
     var preparationType: ExamPreparationType

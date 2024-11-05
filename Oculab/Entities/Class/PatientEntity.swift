@@ -7,8 +7,8 @@
 
 import Foundation
 
-class Patient: Codable, Identifiable {
-    var _id: UUID
+class Patient: Decodable, Identifiable {
+    var _id: UUID = .init()
     var name: String
     var NIK: String
     var DoB: Date?
@@ -17,7 +17,7 @@ class Patient: Codable, Identifiable {
     var resultExamination: [Examination]?
 
     init(
-        _id: UUID = UUID(),
+        _id: UUID,
         name: String,
         NIK: String,
         DoB: Date,
@@ -45,7 +45,7 @@ class Patient: Codable, Identifiable {
         case patientId
     }
 
-    required init(from decoder: Decoder) throws {
+    required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         if let _idString = try container.decodeIfPresent(String.self, forKey: ._id) ?? container.decodeIfPresent(

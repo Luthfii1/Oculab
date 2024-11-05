@@ -27,7 +27,7 @@ class HomeInteractor {
     private let apiGetAllData = API.BE + "/examination/get-all-examinations"
 
     func getStatisticExamination(completion: @escaping (Result<ExaminationStatistic, NetworkErrorType>) -> Void) {
-        NetworkHelper.shared.get(urlString: API.BE_Prod + "/examination/get-number-of-examinations") { (result: Result<
+        NetworkHelper.shared.get(urlString: API.BE + "/examination/get-number-of-examinations") { (result: Result<
             APIResponse<ExaminationStatistic>,
             NetworkErrorType
         >) in
