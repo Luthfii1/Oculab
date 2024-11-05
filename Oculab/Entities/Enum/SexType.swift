@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum SexType: String, Decodable {
+enum SexType: String, Codable {
     case MALE
     case FEMALE
 }

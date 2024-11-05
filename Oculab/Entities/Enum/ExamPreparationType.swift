@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum ExamPreparationType: String, Decodable {
+enum ExamPreparationType: String, Codable {
     case SPS
     case SP
 }

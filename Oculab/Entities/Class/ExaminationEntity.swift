@@ -8,7 +8,7 @@
 import Foundation
 
 class Examination: Decodable, Identifiable {
-    var _id: UUID = .init()
+    var _id: UUID
     var goal: ExamGoalType?
     var preparationType: ExamPreparationType
     var slideId: String
@@ -29,7 +29,7 @@ class Examination: Decodable, Identifiable {
     var patientDoB: String?
 
     init(
-        _id: UUID,
+        _id: UUID = UUID(),
         goal: ExamGoalType?,
         preparationType: ExamPreparationType,
         slideId: String,

@@ -16,13 +16,44 @@ struct VideoRecordView: View {
             ZStack(alignment: .bottom) {
                 // Camera View
                 if videoRecordPresenter.previewURL != nil {
-                    VideoPreview()
-                        .environmentObject(videoRecordPresenter)
+                    ZStack {
+                        VideoPreview()
+                            .environmentObject(videoRecordPresenter)
+
+                        // ADD HERE
+                        VStack {
+                            if let progressImage = videoRecordPresenter.stitchedImage {
+                                Image(uiImage: progressImage)
+                                    .resizable()
+                                    .frame(width: 300, height: 300)
+                                    .background(Color.black.opacity(0.5))
+                                    .cornerRadius(8)
+                                    .shadow(radius: 10)
+                                    .rotationEffect(.degrees(90))
+                                Spacer()
+                            }
+                        }
+                    }
+
                 } else {
                     // CameraView when not recording
                     CameraView()
                         .environmentObject(videoRecordPresenter)
                         .ignoresSafeArea()
+
+                    // ADD HERE
+                    VStack {
+                        if let progressImage = videoRecordPresenter.stitchedImage {
+                            Image(uiImage: progressImage)
+                                .resizable()
+                                .frame(width: 300, height: 300)
+                                .background(Color.black.opacity(0.5))
+                                .cornerRadius(8)
+                                .shadow(radius: 10)
+                                .rotationEffect(.degrees(90))
+                            Spacer()
+                        }
+                    }
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
