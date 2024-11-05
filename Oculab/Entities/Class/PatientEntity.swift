@@ -14,7 +14,7 @@ class Patient: Decodable, Identifiable {
     var DoB: Date?
     var sex: SexType
     var BPJS: String?
-    var resultExamination: [Examination]?
+    var resultExamination: [String]?
 
     init(
         _id: UUID,
@@ -23,7 +23,7 @@ class Patient: Decodable, Identifiable {
         DoB: Date,
         sex: SexType,
         BPJS: String? = nil,
-        resultExamination: [Examination]? = nil
+        resultExamination: [String]? = nil
     ) {
         self._id = _id
         self.name = name
@@ -78,6 +78,6 @@ class Patient: Decodable, Identifiable {
 
         self.sex = try container.decode(SexType.self, forKey: .sex)
         self.BPJS = try container.decodeIfPresent(String.self, forKey: .BPJS)
-        self.resultExamination = try container.decodeIfPresent([Examination].self, forKey: .resultExamination)
+        self.resultExamination = try container.decodeIfPresent([String].self, forKey: .resultExamination)
     }
 }

@@ -131,35 +131,35 @@ AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelega
         isRecording ? stopRecording() : startRecording()
     }
 
-    func captureOutput(
-        _ output: AVCaptureOutput,
-        didOutput sampleBuffer: CMSampleBuffer,
-        from connection: AVCaptureConnection
-    ) {
-        if isRecording {
-            guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
-                return
-            }
-
-            let ciImage = CIImage(cvPixelBuffer: imageBuffer)
-            guard let cgImage = CIContext().createCGImage(ciImage, from: ciImage.extent) else {
-                return
-            }
-            let uiImage = UIImage(cgImage: cgImage)
-
-            // Update the progress image to reflect the latest frame
-            DispatchQueue.main.async {
-                self.progressImage = uiImage
-            }
-
-            // Check if 0.5 seconds have passed since the last stitch
-            let now = Date()
-            if lastStitchTime == nil || now.timeIntervalSince(lastStitchTime!) >= stitchInterval {
-                lastStitchTime = now
-                stitchNewFrame(uiImage)
-            }
-        }
-    }
+//    func captureOutput(
+//        _ output: AVCaptureOutput,
+//        didOutput sampleBuffer: CMSampleBuffer,
+//        from connection: AVCaptureConnection
+//    ) {
+//        if isRecording {
+//            guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
+//                return
+//            }
+//
+//            let ciImage = CIImage(cvPixelBuffer: imageBuffer)
+//            guard let cgImage = CIContext().createCGImage(ciImage, from: ciImage.extent) else {
+//                return
+//            }
+//            let uiImage = UIImage(cgImage: cgImage)
+//
+//            // Update the progress image to reflect the latest frame
+//            DispatchQueue.main.async {
+//                self.progressImage = uiImage
+//            }
+//
+//            // Check if 0.5 seconds have passed since the last stitch
+//            let now = Date()
+//            if lastStitchTime == nil || now.timeIntervalSince(lastStitchTime!) >= stitchInterval {
+//                lastStitchTime = now
+//                stitchNewFrame(uiImage)
+//            }
+//        }
+//    }
 
     func stitchNewFrame(_ newImage: UIImage) {
         guard let lastStitchedImage = stitchedImage else {

@@ -17,84 +17,85 @@ struct ExamDetailView: View {
 
     var body: some View {
         NavigationView {
-            VStack(spacing: Decimal.d24) {
+            VStack {
                 AppStepper(
                     stepTitles: ["Data Pemeriksaan", "Hasil Pemeriksaan"],
                     currentStep: 0
                 ).padding(.top, Decimal.d12)
 
-                ScrollView {
-                    AppCard(
-                        icon: "person.fill",
-                        title: "Data Pasien",
-                        spacing: Decimal.d8,
-                        isBorderDisabled: true
-                    ) {
-                        ExtendedCard(data: [
-                            (key: "Nama", value: presenter.patientDetailData.name),
-                            (key: "NIK", value: presenter.patientDetailData.nik),
-                            (key: "Tanggal Lahir", value: presenter.patientDetailData.dob),
-                            (key: "Jenis Kelamin", value: presenter.patientDetailData.sex),
-                            (key: "Nomor BPJS", value: presenter.patientDetailData.bpjs)
-                        ], titleSize: AppTypography.s5)
+                VStack(spacing: Decimal.d24) {
+                    ScrollView {
+                        AppCard(
+                            icon: "person.fill",
+                            title: "Data Pasien",
+                            spacing: Decimal.d8,
+                            isBorderDisabled: true
+                        ) {
+                            ExtendedCard(data: [
+                                (key: "Nama", value: presenter.patientDetailData.name),
+                                (key: "NIK", value: presenter.patientDetailData.nik),
+                                (key: "Tanggal Lahir", value: presenter.patientDetailData.dob),
+                                (key: "Jenis Kelamin", value: presenter.patientDetailData.sex),
+                                (key: "Nomor BPJS", value: presenter.patientDetailData.bpjs)
+                            ], titleSize: AppTypography.s5)
+                        }
+
+                        AppCard(
+                            icon: "doc.text.magnifyingglass",
+                            title: "Detail Sediaan",
+                            spacing: Decimal.d8,
+                            isBorderDisabled: true
+                        ) {
+                            ExtendedCard(data: [
+                                (key: "ID Sediaan", value: presenter.examDetailData.slideId),
+                                (key: "Tujuan Pemeriksaan", value: presenter.examDetailData.examinationGoal),
+                                (key: "Jenis Sediaan", value: presenter.examDetailData.type)
+                            ], titleSize: AppTypography.s5)
+                        }
+
+                        AppFileInput(
+                            title: "Gambar Sediaan",
+                            isRequired: true,
+                            isEmpty: false,
+                            selectedURL: $presenter.recordVideo
+                        ).environmentObject(presenter)
+
+                        VStack(alignment: .leading, spacing: Decimal.d24) {}
                     }
 
-                    AppCard(
-                        icon: "doc.text.magnifyingglass",
-                        title: "Detail Sediaan",
-                        spacing: Decimal.d8,
-                        isBorderDisabled: true
+                    AppButton(
+                        title: "Mulai Analisis",
+                        rightIcon: "arrow.right",
+                        size: .large,
+                        isEnabled: presenter.recordVideo != nil
+
                     ) {
-                        ExtendedCard(data: [
-                            (key: "ID Sediaan", value: presenter.examDetailData.slideId),
-                            (key: "Tujuan Pemeriksaan", value: presenter.examDetailData.examinationGoal),
-                            (key: "Jenis Sediaan", value: presenter.examDetailData.type)
-                        ], titleSize: AppTypography.s5)
+                        presenter.handleSubmit()
+                        presenter.analysisResult(examinationId: presenter.examDetailData.examinationId)
                     }
 
-                    AppFileInput(
-                        title: "Gambar Sediaan",
-                        isRequired: true,
-                        isEmpty: false,
-                        selectedURL: $presenter.recordVideo
-                    ).environmentObject(presenter)
-
-                    VStack(alignment: .leading, spacing: Decimal.d24) {}
-                }
-
-                AppButton(
-                    title: "Mulai Analisis",
-                    rightIcon: "arrow.right",
-                    size: .large,
-                    isEnabled: presenter.recordVideo != nil
-
-                ) {
-                    presenter.handleSubmit()
-                    presenter.analysisResult(examinationId: presenter.examDetailData.examinationId)
-                }
-
-            }.padding(.horizontal, Decimal.d20)
-                .navigationTitle("Pemeriksaan Baru")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        Button(action: {
-                            presentationMode.wrappedValue.dismiss()
-                        }) {
-                            HStack {
-                                Image("back")
+                }.padding(.horizontal, Decimal.d20)
+                    .navigationTitle("Pemeriksaan Baru")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button(action: {
+                                presentationMode.wrappedValue.dismiss()
+                            }) {
+                                HStack {
+                                    Image("back")
+                                }
                             }
                         }
                     }
-                }
+            }
+
         }.navigationBarBackButtonHidden(true)
             .onAppear {
                 presenter.fetchData(examId: examId, patientId: patientId)
             }
             .onChange(of: videoRecordPresenter.previewURL) {
                 presenter.recordVideo = videoRecordPresenter.previewURL
-
-//                print(presenter.examData)
             }
     }
 }
