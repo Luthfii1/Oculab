@@ -8,9 +8,6 @@
 import Foundation
 
 class AnalysisResultInteractor {
-//    private /*let examinationURL = "http://localhost:3000/examination/get-examination-by-id/"*/
-//    private let fovGroupURL = "http://localhost:3000/fov/create-fov-group/"
-
     private func createURL(with examinationId: String) -> URL? {
         let examinationURL = "https://oculab-be.vercel.app/examination/get-examination-by-id/"
         print(examinationURL + examinationId.lowercased())

@@ -7,7 +7,7 @@
 
 enum StatusType: String, Codable, CaseIterable {
     case INPROGRESS = "Sedang dianalisa sistem"
-    case NEEDVALIDATION = "Belum disimpulkan"
+    case NEEDVALIDATION = "Sedang Berlangsung"
     case NOTSTARTED = "Belum Dimulai"
     case FINISHED = "Selesai"
     case NONE = ""
