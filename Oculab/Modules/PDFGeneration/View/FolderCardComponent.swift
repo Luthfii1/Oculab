@@ -19,10 +19,12 @@ struct FolderCardComponent: View {
                 Text(title.rawValue)
                     .font(AppTypography.s4_1)
                     .padding(.leading, Decimal.d8)
-                    .font(AppTypography.s4_1)
+                    .font(AppTypography.s4_1).foregroundStyle(AppColors.slate900)
+
                 Spacer()
-                Text("\(numOfImage) Gambar")
-                Image(systemName: "chevron.right")
+                Text("\(numOfImage) Gambar").foregroundStyle(AppColors.slate900)
+
+                Image(systemName: "chevron.right").foregroundStyle(AppColors.slate900)
             }
         }
         .font(AppTypography.p3)

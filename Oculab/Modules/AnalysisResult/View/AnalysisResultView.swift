@@ -150,18 +150,32 @@ struct AnalysisResultView: View {
                                     }
                                     .cornerRadius(Decimal.d8)
 
-                                    FolderCardComponent(
-                                        title: .BTA0,
-                                        numOfImage: presenter.groupedFOVs[.BTA0]?.count ?? 0
-                                    )
-                                    FolderCardComponent(
-                                        title: .BTA1TO9,
-                                        numOfImage: presenter.groupedFOVs[.BTA1TO9]?.count ?? 0
-                                    )
-                                    FolderCardComponent(
-                                        title: .BTAABOVE9,
-                                        numOfImage: presenter.groupedFOVs[.BTAABOVE9]?.count ?? 0
-                                    )
+                                    if presenter.groupedFOVs?.bta0.isEmpty != true {
+                                        Button {} label: {
+                                            FolderCardComponent(
+                                                title: .BTA0,
+                                                numOfImage: presenter.groupedFOVs?.bta0.count ?? 0
+                                            )
+                                        }
+                                    }
+
+                                    if presenter.groupedFOVs?.bta1to9.isEmpty != true {
+                                        Button {} label: {
+                                            FolderCardComponent(
+                                                title: .BTA1TO9,
+                                                numOfImage: presenter.groupedFOVs?.bta1to9.count ?? 0
+                                            )
+                                        }
+                                    }
+
+                                    if presenter.groupedFOVs?.btaabove9.isEmpty != true {
+                                        Button {} label: {
+                                            FolderCardComponent(
+                                                title: .BTAABOVE9,
+                                                numOfImage: presenter.groupedFOVs?.btaabove9.count ?? 0
+                                            )
+                                        }
+                                    }
                                 }
                                 .padding(.horizontal, Decimal.d16)
                                 .padding(.vertical, Decimal.d16)
