@@ -5,9 +5,10 @@
 //  Created by Risa on 14/10/24.
 //
 
-enum StatusType: String, Decodable, CaseIterable {
+enum StatusType: String, Codable, CaseIterable {
     case INPROGRESS = "Sedang dianalisa sistem"
-    case NEEDVALIDATION = "Belum disimpulkan"
+    case NEEDVALIDATION = "Sedang Berlangsung"
+    case NOTSTARTED = "Belum Dimulai"
     case FINISHED = "Selesai"
     case NONE = ""
 
@@ -22,6 +23,8 @@ enum StatusType: String, Decodable, CaseIterable {
             self = .FINISHED
         case "NEEDVALIDATION":
             self = .NEEDVALIDATION
+        case "NOTSTARTED":
+            self = .NOTSTARTED
         case "INPROGRESS":
             self = .INPROGRESS
         default:

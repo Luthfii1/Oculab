@@ -9,7 +9,7 @@ import AVFoundation
 import SwiftUI
 
 struct CameraView: View {
-    @EnvironmentObject var videoRecordPresenter: VideoRecordPresenter
+    @StateObject private var videoRecordPresenter = VideoRecordPresenter.shared
 
     var body: some View {
         GeometryReader { proxy in

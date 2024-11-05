@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum ExamGoalType: String, Decodable {
+enum ExamGoalType: String, Codable {
     case SCREENING
     case TREATMENT
 }

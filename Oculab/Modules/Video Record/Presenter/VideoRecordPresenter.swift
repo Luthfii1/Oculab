@@ -10,8 +10,21 @@ import Foundation
 import Photos
 import SwiftUI
 
+import AVFoundation
+import Photos
+import SwiftUI
+import UIKit
+
 class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate,
-AVCaptureFileOutputRecordingDelegate {
+AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelegate {
+    static let shared = VideoRecordPresenter(interactor: VideoInteractor())
+
+    private let interactor: VideoInteractor
+
+    init(interactor: VideoInteractor) {
+        self.interactor = interactor
+    }
+
     @Published var session = AVCaptureSession()
     @Published var videoRecordingTitle: String = "Sediaan: -"
     @Published var alert = false
@@ -22,6 +35,13 @@ AVCaptureFileOutputRecordingDelegate {
     @Published var recordedURLs: [URL] = []
     @Published var previewURL: URL?
     @Published var showPreview: Bool = false
+    @Published var stitchedImage: UIImage? // For stitched images
+    @Published var progressImage: UIImage?
+    @Published var progressImageChecker: String = ""
+
+    private let videoDataOutput = AVCaptureVideoDataOutput()
+    private var lastStitchTime: Date?
+    private let stitchInterval: TimeInterval = Stitch.clippingDuration
 
     let preRecordingInstructions: [String] = [
         "Gunakan lensa objektif 10x untuk menentukan fokus, kemudian teteskan minyak imersi",
@@ -36,20 +56,15 @@ AVCaptureFileOutputRecordingDelegate {
     ]
 
     func checkPermission() {
-        // check camera got permission
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
             setUp()
-            return
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .video) { status in
-                if status {
-                    self.setUp()
-                }
+                if status { self.setUp() }
             }
         case .denied:
             alert.toggle()
-            return
         default:
             return
         }
@@ -59,31 +74,37 @@ AVCaptureFileOutputRecordingDelegate {
         do {
             session.beginConfiguration()
 
-            let cameraDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
-            let videoInput = try AVCaptureDeviceInput(device: cameraDevice!)
-            let audioDevice = AVCaptureDevice.default(for: .audio)
-            let audioInput = try AVCaptureDeviceInput(device: audioDevice!)
-
-            // checking and adding to session....
-            if session.canAddInput(videoInput) && session.canAddInput(audioInput) {
-                session.addInput(videoInput)
-                session.addInput(audioInput)
+            guard let cameraDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
+                  let videoInput = try? AVCaptureDeviceInput(device: cameraDevice),
+                  let audioDevice = AVCaptureDevice.default(for: .audio),
+                  let audioInput = try? AVCaptureDeviceInput(device: audioDevice)
+            else {
+                print("Error setting up camera inputs")
+                return
             }
 
-            // same for output....
-            if session.canAddOutput(output) {
-                session.addOutput(output)
-            }
+            if session.canAddInput(videoInput) { session.addInput(videoInput) }
+            if session.canAddInput(audioInput) { session.addInput(audioInput) }
+
+            // Set up the movie output
+            if session.canAddOutput(output) { session.addOutput(output) }
+
+            // Set up the video data output for frame extraction
+            videoDataOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "videoFrameQueue"))
+            if session.canAddOutput(videoDataOutput) { session.addOutput(videoDataOutput) }
 
             session.commitConfiguration()
+
+            session.startRunning()
+
         } catch {
-            print(error.localizedDescription)
+            print("Error configuring session: \(error.localizedDescription)")
         }
     }
 
     func startRecording() {
-        let tempURL = NSTemporaryDirectory() + "\(Date()).mov"
-        output.startRecording(to: URL(filePath: tempURL), recordingDelegate: self)
+        let tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(Date()).mov")
+        output.startRecording(to: tempURL, recordingDelegate: self)
         isRecording = true
     }
 
@@ -99,19 +120,64 @@ AVCaptureFileOutputRecordingDelegate {
         error: Error?
     ) {
         if let error = error {
-            print(error.localizedDescription)
+            print("Recording error: \(error.localizedDescription)")
             return
         }
 
-        print(outputFileURL)
         previewURL = outputFileURL
     }
 
     func handleButtonRecording() {
-        if isRecording {
-            stopRecording()
-        } else {
-            startRecording()
+        isRecording ? stopRecording() : startRecording()
+    }
+
+//    func captureOutput(
+//        _ output: AVCaptureOutput,
+//        didOutput sampleBuffer: CMSampleBuffer,
+//        from connection: AVCaptureConnection
+//    ) {
+//        if isRecording {
+//            guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
+//                return
+//            }
+//
+//            let ciImage = CIImage(cvPixelBuffer: imageBuffer)
+//            guard let cgImage = CIContext().createCGImage(ciImage, from: ciImage.extent) else {
+//                return
+//            }
+//            let uiImage = UIImage(cgImage: cgImage)
+//
+//            // Update the progress image to reflect the latest frame
+//            DispatchQueue.main.async {
+//                self.progressImage = uiImage
+//            }
+//
+//            // Check if 0.5 seconds have passed since the last stitch
+//            let now = Date()
+//            if lastStitchTime == nil || now.timeIntervalSince(lastStitchTime!) >= stitchInterval {
+//                lastStitchTime = now
+//                stitchNewFrame(uiImage)
+//            }
+//        }
+//    }
+
+    func stitchNewFrame(_ newImage: UIImage) {
+        guard let lastStitchedImage = stitchedImage else {
+            // First image, set as the stitched image
+            DispatchQueue.main.async {
+                self.stitchedImage = newImage
+            }
+            return
+        }
+
+        ImageRegistration.shared.register(
+            floatingImage: newImage,
+            referenceImage: lastStitchedImage,
+            registrationMechanism: .translational
+        ) { compositedImage, _ in
+            DispatchQueue.main.async {
+                self.stitchedImage = compositedImage
+            }
         }
     }
 
@@ -141,11 +207,8 @@ AVCaptureFileOutputRecordingDelegate {
             return
         }
 
-        // Request authorization to save to Photos library
         PHPhotoLibrary.requestAuthorization { status in
-            switch status {
-            case .authorized:
-                // Perform the changes to save the video
+            if status == .authorized {
                 PHPhotoLibrary.shared().performChanges({
                     PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: videoURL)
                 }) { success, error in
@@ -156,14 +219,8 @@ AVCaptureFileOutputRecordingDelegate {
                         print("Error saving video: \(error.localizedDescription)")
                     }
                 }
-            case .denied, .restricted:
+            } else {
                 print("Access to Photos library denied or restricted.")
-            case .notDetermined:
-                print("Photo library access has not been determined.")
-            case .limited:
-                print("Photo library just limited to some photos")
-            @unknown default:
-                break
             }
         }
     }

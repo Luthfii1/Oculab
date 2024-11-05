@@ -13,16 +13,17 @@ struct HomeView: View {
     var body: some View {
         NavigationView {
             ScrollView(showsIndicators: false) {
+                Spacer().frame(height: Decimal.d24)
                 VStack(alignment: .leading, spacing: 24) {
                     StatisticComponent()
                         .environmentObject(homePresenter)
 
                     VStack(alignment: .leading, spacing: 16) {
                         HStack(alignment: .center, spacing: 8) {
-                            Image(systemName: "clock")
+                            Image(systemName: "doc.on.doc.fill")
                                 .foregroundStyle(AppColors.purple500)
 
-                            Text("Aktivitas Terbaru")
+                            Text("Tugas Pemeriksaan")
                                 .foregroundStyle(AppColors.slate900)
                                 .font(AppTypography.s4_1)
                         }
@@ -38,18 +39,37 @@ struct HomeView: View {
                             .padding(.horizontal, 1)
                         }
 
-                        LazyVGrid(columns: [
-                            GridItem(.flexible(), spacing: 16),
-                            GridItem(.flexible(), spacing: 16)
-                        ], spacing: 16) {
+//                        LazyVGrid(columns: [
+//                            GridItem(.flexible(), spacing: 16),
+//                            GridItem(.flexible(), spacing: 16)
+//                        ], spacing: 16) {
+//                            ForEach(homePresenter.filteredExamination) { exam in
+//                                HomeActivityComponent(
+//                                    slideId: exam.slideId,
+//                                    status: exam.statusExamination,
+//                                    date: exam.datePlan,
+//                                    patientName: "Null",
+//                                    patientDOB: "Null"
+//                                )
+//                            }
+//                        }
+
+                        VStack(spacing: Decimal.d12) {
                             ForEach(homePresenter.filteredExamination) { exam in
-                                HomeActivityComponent(
-                                    fileName: exam.imagePreview,
-                                    slideId: exam.slideId,
-                                    status: exam.statusExamination,
-                                    date: exam.date,
-                                    time: exam.time
-                                )
+                                Button {
+                                    Router.shared.navigateTo(.examDetail(
+                                        examId: exam.id,
+                                        patientId: exam.patientId ?? ""
+                                    ))
+                                } label: {
+                                    HomeActivityComponent(
+                                        slideId: exam.slideId,
+                                        status: exam.statusExamination,
+                                        date: exam.datePlan,
+                                        patientName: exam.patientName,
+                                        patientDOB: exam.patientDob
+                                    )
+                                }
                             }
                         }
                     }
@@ -57,12 +77,13 @@ struct HomeView: View {
                 .padding(.horizontal, 20)
                 .padding(.bottom, 20)
             }
-            .navigationTitle("Ringkasan")
+            .navigationTitle("Tugas Pemeriksaan")
         }
         .ignoresSafeArea()
         .onAppear {
             homePresenter.getStatisticData()
             homePresenter.fetchData()
+//            homePresenter.inputNewPatient()
         }
         .navigationBarBackButtonHidden(true)
     }

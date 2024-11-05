@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct InstructionRecordView: View {
-    @StateObject private var videoRecordPresenter = VideoRecordPresenter()
+    let videoRecordPresenter = VideoRecordPresenter.shared
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {

@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum FOVType: String, Decodable {
+enum FOVType: String, Codable {
     case BTA0 = "0 BTA"
     case BTA1TO9 = "1-9 BTA"
     case BTAABOVE9 = "≥ 10 BTA"
@@ -24,5 +24,10 @@ enum FOVType: String, Decodable {
         }
 
         self = type
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
     }
 }

@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct AnalysisResultView: View {
+    var examinationId: String
+
     @StateObject private var presenter = AnalysisResultPresenter()
 
     @State var selectedTBGrade: String? = nil
@@ -30,7 +32,7 @@ struct AnalysisResultView: View {
                         size: .large,
                         isEnabled: true
                     ) {
-                        print("Simpan Tapped")
+                        presenter.popToRoot()
                     },
 
                     AppButton(
@@ -101,8 +103,8 @@ struct AnalysisResultView: View {
                     .frame(height: 24)
 
                     AppStepper(
-                        stepTitles: ["Data Pasien", "Data Sediaan", "Hasil"],
-                        currentStep: 2
+                        stepTitles: ["Data Pemeriksaan", "Hasil Pemeriksaan"],
+                        currentStep: 1
                     )
                     .padding(.vertical, Decimal.d16)
 
@@ -125,41 +127,61 @@ struct AnalysisResultView: View {
                                         .font(AppTypography.p3)
                                         .foregroundStyle(AppColors.slate300)
 
-                                    AsyncImage(url: URL(string: examination.imagePreview)) { phase in
-                                        switch phase {
-                                        case .empty:
-                                            ProgressView()
-                                                .frame(height: 114)
-                                        case let .success(image):
-                                            image
-                                                .resizable()
-                                                .scaledToFill()
-                                                .frame(height: 114)
-                                                .clipped()
-                                        case .failure:
-                                            Image(systemName: "exclamationmark.triangle.fill")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(height: 114)
-                                                .foregroundColor(.red)
-                                        @unknown default:
-                                            EmptyView()
+                                    if presenter.groupedFOVs?.bta0.isEmpty == true && presenter.groupedFOVs?.bta1to9
+                                        .isEmpty == true && presenter.groupedFOVs?.btaabove9.isEmpty == true
+                                    {
+                                        ProgressView()
+                                    } else {
+                                        AsyncImage(url: URL(string: examination.imagePreview)) { phase in
+                                            switch phase {
+                                            case .empty:
+                                                ProgressView()
+                                                    .frame(height: 114)
+                                            case let .success(image):
+                                                image
+                                                    .resizable()
+                                                    .scaledToFill()
+                                                    .frame(height: 114)
+                                                    .clipped()
+                                            case .failure:
+                                                Image(systemName: "exclamationmark.triangle.fill")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(height: 114)
+                                                    .foregroundColor(.red)
+                                            @unknown default:
+                                                EmptyView()
+                                            }
+                                        }
+                                        .cornerRadius(Decimal.d8)
+
+                                        if presenter.groupedFOVs?.bta0.isEmpty != true {
+                                            Button {} label: {
+                                                FolderCardComponent(
+                                                    title: .BTA0,
+                                                    numOfImage: presenter.groupedFOVs?.bta0.count ?? 0
+                                                )
+                                            }
+                                        }
+
+                                        if presenter.groupedFOVs?.bta1to9.isEmpty != true {
+                                            Button {} label: {
+                                                FolderCardComponent(
+                                                    title: .BTA1TO9,
+                                                    numOfImage: presenter.groupedFOVs?.bta1to9.count ?? 0
+                                                )
+                                            }
+                                        }
+
+                                        if presenter.groupedFOVs?.btaabove9.isEmpty != true {
+                                            Button {} label: {
+                                                FolderCardComponent(
+                                                    title: .BTAABOVE9,
+                                                    numOfImage: presenter.groupedFOVs?.btaabove9.count ?? 0
+                                                )
+                                            }
                                         }
                                     }
-                                    .cornerRadius(Decimal.d8)
-
-                                    FolderCardComponent(
-                                        title: .BTA0,
-                                        numOfImage: presenter.groupedFOVs[.BTA0]?.count ?? 0
-                                    )
-                                    FolderCardComponent(
-                                        title: .BTA1TO9,
-                                        numOfImage: presenter.groupedFOVs[.BTA1TO9]?.count ?? 0
-                                    )
-                                    FolderCardComponent(
-                                        title: .BTAABOVE9,
-                                        numOfImage: presenter.groupedFOVs[.BTAABOVE9]?.count ?? 0
-                                    )
                                 }
                                 .padding(.horizontal, Decimal.d16)
                                 .padding(.vertical, Decimal.d16)
@@ -272,7 +294,7 @@ struct AnalysisResultView: View {
                     }
                 }
                 .onAppear {
-                    presenter.fetchData(examinationId: "d6a81b19-7e4f-42da-a9f8-3e49ad3d4b7c")
+                    presenter.fetchData(examinationId: examinationId)
                 }
 
                 Spacer()
@@ -283,5 +305,5 @@ struct AnalysisResultView: View {
 }
 
 #Preview {
-    AnalysisResultView()
+    AnalysisResultView(examinationId: "6f4e5288-3dfd-4be4-8a2e-8c60f09f07e2")
 }

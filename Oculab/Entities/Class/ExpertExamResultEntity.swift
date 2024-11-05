@@ -7,14 +7,14 @@
 
 import Foundation
 
-class ExpertExamResult: Decodable, Identifiable {
-    var _id: UUID = .init()
+class ExpertExamResult: Codable, Identifiable {
+    var _id: UUID
     var finalGrading: GradingType
     var bacteriaTotalCount: Int?
     var notes: String
 
     init(
-        _id: UUID,
+        _id: UUID = UUID(),
         finalGrading: GradingType,
         bacteriaTotalCount: Int? = nil,
         notes: String
@@ -38,5 +38,13 @@ class ExpertExamResult: Decodable, Identifiable {
         self.finalGrading = try container.decode(GradingType.self, forKey: .finalGrading)
         self.bacteriaTotalCount = try container.decodeIfPresent(Int.self, forKey: .bacteriaTotalCount)
         self.notes = try container.decode(String.self, forKey: .notes)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(_id.uuidString, forKey: ._id) // Store UUID as String for encoding
+        try container.encode(finalGrading, forKey: .finalGrading)
+        try container.encodeIfPresent(bacteriaTotalCount, forKey: .bacteriaTotalCount)
+        try container.encode(notes, forKey: .notes)
     }
 }

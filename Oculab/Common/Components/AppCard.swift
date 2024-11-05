@@ -11,13 +11,21 @@ struct AppCard<Content: View>: View {
     var icon: String
     var title: String
     var spacing: CGFloat
+    var isBorderDisabled: Bool
+
     var content: Content
 
-    init(icon: String, title: String, spacing: CGFloat, @ViewBuilder content: () -> Content) {
+    init(
+        icon: String,
+        title: String,
+        spacing: CGFloat,
+        isBorderDisabled: Bool = false,
+        @ViewBuilder content: () -> Content
+    ) {
         self.icon = icon
         self.title = title
         self.spacing = spacing
-
+        self.isBorderDisabled = isBorderDisabled
         self.content = content()
     }
 
@@ -35,19 +43,27 @@ struct AppCard<Content: View>: View {
             // Custom Content
             content
         }
-        .padding(.horizontal, Decimal.d16)
+        .padding(.horizontal, isBorderDisabled ? .zero : Decimal.d16)
         .padding(.vertical, Decimal.d16)
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .cornerRadius(Decimal.d12)
         .overlay(
             RoundedRectangle(cornerRadius: Decimal.d12)
-                .stroke(AppColors.slate100)
+                .stroke(isBorderDisabled ? .clear : AppColors.slate100)
         )
     }
 }
 
 #Preview {
     AppCard(icon: "person.fill", title: "Profile", spacing: Decimal.d16) {
+        VStack(alignment: .leading) {
+            Text("Name: Alya Annisa Kirana")
+            Text("Age: 23 Years")
+            Text("Gender: Female")
+        }
+    }
+
+    AppCard(icon: "person.fill", title: "Profile", spacing: Decimal.d16, isBorderDisabled: true) {
         VStack(alignment: .leading) {
             Text("Name: Alya Annisa Kirana")
             Text("Age: 23 Years")

@@ -14,20 +14,25 @@ struct ContentView: View {
                 HomeView()
                     .tabItem {
                         Image(systemName: "rectangle.split.2x2.fill")
-                        Text("Ringkasan")
+                        Text("Pemeriksaan")
                     }
 
                 PDFPageView()
                     .tabItem {
-                        Image(systemName: "folder.fill.badge.person.crop")
-                        Text("PDF")
+                        Image(systemName: "clock.arrow.circlepath")
+                        Text("Riwayat")
                     }
 
-                AnalysisResultView()
+                PDFPageView()
                     .tabItem {
-                        Image(systemName: "person.crop.circle.fill")
-                        Text("Analyze")
+                        Image(systemName: "person.circle")
+                        Text("Profil")
                     }
+//                AnalysisResultView()
+//                    .tabItem {
+//                        Image(systemName: "person.crop.circle.fill")
+//                        Text("Analyze")
+//                    }
             }
             .tint(AppColors.purple500)
         }

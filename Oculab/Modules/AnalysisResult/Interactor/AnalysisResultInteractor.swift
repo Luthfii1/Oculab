@@ -8,74 +8,101 @@
 import Foundation
 
 class AnalysisResultInteractor {
-//    private /*let examinationURL = "http://localhost:3000/examination/get-examination-by-id/"*/
-//    private let fovGroupURL = "http://localhost:3000/fov/create-fov-group/"
-
     private func createURL(with examinationId: String) -> URL? {
         let examinationURL = "https://oculab-be.vercel.app/examination/get-examination-by-id/"
-        return URL(string: examinationURL + examinationId)
+        print(examinationURL + examinationId.lowercased())
+        return URL(string: examinationURL + examinationId.lowercased())
     }
 
-    func fetchData(examinationId: String, completion: @escaping (Result<ExaminationResultData, Error>) -> Void) {
-        guard let url = createURL(with: examinationId) else {
-            completion(.failure(NSError(domain: "Invalid URL", code: 0, userInfo: nil)))
-            return
-        }
+    func fetchData(examId: String, completion: @escaping (Result<ExaminationResultData, NetworkErrorType>) -> Void) {
+        NetworkHelper.shared
+            .get(
+                urlString: "https://oculab-be.vercel.app/examination/get-examination-by-id/" + examId.lowercased())
+        { (result: Result<
+            APIResponse<Examination>,
+            NetworkErrorType
+        >) in
+            DispatchQueue.main.async {
+                switch result {
+                case let .success(apiResponse):
 
-        let task = URLSession.shared.dataTask(with: url) { data, _, error in
-            if let error = error {
-                completion(.failure(error))
-                return
-            }
+                    let examinationDetail = ExaminationResultData(
+                        examinationId: apiResponse.data._id.uuidString,
+                        imagePreview: apiResponse.data.imagePreview ?? "",
+                        fov: apiResponse.data.FOV ?? [],
+                        confidenceLevelAggregated: 0.0,
+                        systemGrading: GradingType(
+                            rawValue: apiResponse.data.systemResult?.systemGrading.rawValue ?? GradingType.NEGATIVE
+                                .rawValue) ?? .unknown,
+                        bacteriaTotalCount: apiResponse.data.systemResult?.systemBacteriaTotalCount ?? 0)
 
-            guard let data = data else {
-                completion(.failure(NSError(domain: "No data", code: 0, userInfo: nil)))
-                return
-            }
+                    print("hore")
+                    print(examinationDetail)
 
-            do {
-                // Decode only the "data" field
-                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                   let dataField = json["data"]
-                {
-                    // Convert "data" field back to JSON data
-                    let dataJson = try JSONSerialization.data(withJSONObject: dataField, options: [])
+                    completion(.success(examinationDetail))
 
-                    // Decode the JSON data into an ExaminationResultData object
-                    let decoder = JSONDecoder()
-                    decoder.keyDecodingStrategy = .convertFromSnakeCase
-                    decoder.dateDecodingStrategy = .iso8601
-
-                    let examination = try decoder.decode(ExaminationResultData.self, from: dataJson)
-                    completion(.success(examination))
-
-                } else {
-                    completion(.failure(NSError(domain: "Invalid data format", code: 0, userInfo: nil)))
+                case let .failure(error):
+                    completion(.failure(error))
+                    print(error)
                 }
-            } catch {
-                completion(.failure(error))
             }
         }
-        task.resume()
+    }
+
+    func fetchFOVData(examId: String, completion: @escaping (Result<FOVGrouping, NetworkErrorType>) -> Void) {
+        print(
+            "https://oculab-be.vercel.app/fov/get-all-fov-by-examination-id/" +
+                examId.lowercased())
+        NetworkHelper.shared
+            .get(
+                urlString: "https://oculab-be.vercel.app/fov/get-all-fov-by-examination-id/" +
+                    examId.lowercased())
+        { (result: Result<
+            APIResponse<FOVGrouping>,
+            NetworkErrorType
+        >) in
+            DispatchQueue.main.async {
+                switch result {
+                case let .success(apiResponse):
+
+                    print(apiResponse.data)
+
+                    completion(.success(apiResponse.data))
+
+                case let .failure(error):
+                    completion(.failure(error))
+                    print(error)
+                }
+            }
+        }
     }
 }
 
 struct ExaminationResultData: Decodable {
     var examinationId: String
     var imagePreview: String
-    var fov: [FOV]
+    var fov: [FOVData]
     var confidenceLevelAggregated: Double
     var systemGrading: GradingType
     var bacteriaTotalCount: Int
 }
 
-struct FOV: Decodable {
-    let image: String
-    let type: FOVType
-    let order: Int
-    let fovDataId: String
-}
+struct FOVGrouping: Decodable {
+    var bta0: [FOVData] = []
+    var bta1to9: [FOVData] = []
+    var btaabove9: [FOVData] = []
 
-// struct FOVGrouping {
-//    var
-// }
+    private enum CodingKeys: String, CodingKey {
+        case bta0 = "BTA0"
+        case bta1to9 = "BTA1TO9"
+        case btaabove9 = "BTAABOVE9"
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        self.bta0 = try container.decodeIfPresent([FOVData].self, forKey: .bta0) ?? []
+        self.bta1to9 = try container.decodeIfPresent([FOVData].self, forKey: .bta1to9) ?? []
+        self.btaabove9 = try container.decodeIfPresent([FOVData].self, forKey: .btaabove9) ?? []
+    }
+}

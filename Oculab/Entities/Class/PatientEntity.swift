@@ -11,10 +11,10 @@ class Patient: Decodable, Identifiable {
     var _id: UUID = .init()
     var name: String
     var NIK: String
-    var DoB: Date
+    var DoB: Date?
     var sex: SexType
-    var BPJS: Int?
-    var resultExamination: [Examination]?
+    var BPJS: String?
+    var resultExamination: [String]?
 
     init(
         _id: UUID,
@@ -22,8 +22,8 @@ class Patient: Decodable, Identifiable {
         NIK: String,
         DoB: Date,
         sex: SexType,
-        BPJS: Int? = nil,
-        resultExamination: [Examination]? = nil
+        BPJS: String? = nil,
+        resultExamination: [String]? = nil
     ) {
         self._id = _id
         self.name = name
@@ -42,16 +42,42 @@ class Patient: Decodable, Identifiable {
         case sex
         case BPJS
         case resultExamination
+        case patientId
     }
 
     required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self._id = try container.decode(UUID.self, forKey: ._id)
+
+        if let _idString = try container.decodeIfPresent(String.self, forKey: ._id) ?? container.decodeIfPresent(
+            String.self,
+            forKey: .patientId
+        ) {
+            self._id = UUID(uuidString: _idString) ?? UUID()
+        } else {
+            self._id = UUID()
+        }
+
         self.name = try container.decode(String.self, forKey: .name)
         self.NIK = try container.decode(String.self, forKey: .NIK)
-        self.DoB = try container.decode(Date.self, forKey: .DoB)
+//        self.DoB = try container.decode(Date.self, forKey: .DoB)
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+        let dateString = try container.decodeIfPresent(String.self, forKey: .DoB) ?? ""
+
+        if dateString != "" {
+            guard let date = dateFormatter.date(from: dateString) else {
+                throw DecodingError.dataCorruptedError(
+                    forKey: .DoB,
+                    in: container,
+                    debugDescription: "Date string does not match format expected by formatter."
+                )
+            }
+            self.DoB = date
+        }
+
         self.sex = try container.decode(SexType.self, forKey: .sex)
-        self.BPJS = try container.decodeIfPresent(Int.self, forKey: .BPJS)
-        self.resultExamination = try container.decodeIfPresent([Examination].self, forKey: .resultExamination)
+        self.BPJS = try container.decodeIfPresent(String.self, forKey: .BPJS)
+        self.resultExamination = try container.decodeIfPresent([String].self, forKey: .resultExamination)
     }
 }
