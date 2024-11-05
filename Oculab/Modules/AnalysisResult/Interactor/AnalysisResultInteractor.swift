@@ -20,9 +20,7 @@ class AnalysisResultInteractor {
     func fetchData(examId: String, completion: @escaping (Result<ExaminationResultData, NetworkErrorType>) -> Void) {
         NetworkHelper.shared
             .get(
-                urlString: "https://oculab-be.vercel.app/examination/get-examination-by-id/" +
-                    "b12ac121-d42d-4179-864b-154360bce28f"
-                    .lowercased())
+                urlString: "https://oculab-be.vercel.app/examination/get-examination-by-id/" + examId.lowercased())
         { (result: Result<
             APIResponse<Examination>,
             NetworkErrorType
@@ -37,8 +35,8 @@ class AnalysisResultInteractor {
                         fov: apiResponse.data.FOV ?? [],
                         confidenceLevelAggregated: 0.0,
                         systemGrading: GradingType(
-                            rawValue: (apiResponse.data.systemResult?.systemGrading)!.rawValue) ??
-                            .NEGATIVE,
+                            rawValue: apiResponse.data.systemResult?.systemGrading.rawValue ?? GradingType.NEGATIVE
+                                .rawValue) ?? .unknown,
                         bacteriaTotalCount: apiResponse.data.systemResult?.systemBacteriaTotalCount ?? 0)
 
                     print("hore")
@@ -55,11 +53,13 @@ class AnalysisResultInteractor {
     }
 
     func fetchFOVData(examId: String, completion: @escaping (Result<FOVGrouping, NetworkErrorType>) -> Void) {
+        print(
+            "https://oculab-be.vercel.app/fov/get-all-fov-by-examination-id/" +
+                examId.lowercased())
         NetworkHelper.shared
             .get(
                 urlString: "https://oculab-be.vercel.app/fov/get-all-fov-by-examination-id/" +
-                    "b12ac121-d42d-4179-864b-154360bce28f"
-                    .lowercased())
+                    examId.lowercased())
         { (result: Result<
             APIResponse<FOVGrouping>,
             NetworkErrorType
@@ -91,13 +91,21 @@ struct ExaminationResultData: Decodable {
 }
 
 struct FOVGrouping: Decodable {
-    var bta0: [FOVData]
-    var bta1to9: [FOVData]
-    var btaabove9: [FOVData]
+    var bta0: [FOVData] = []
+    var bta1to9: [FOVData] = []
+    var btaabove9: [FOVData] = []
 
     private enum CodingKeys: String, CodingKey {
         case bta0 = "BTA0"
         case bta1to9 = "BTA1TO9"
         case btaabove9 = "BTAABOVE9"
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        self.bta0 = try container.decodeIfPresent([FOVData].self, forKey: .bta0) ?? []
+        self.bta1to9 = try container.decodeIfPresent([FOVData].self, forKey: .bta1to9) ?? []
+        self.btaabove9 = try container.decodeIfPresent([FOVData].self, forKey: .btaabove9) ?? []
     }
 }

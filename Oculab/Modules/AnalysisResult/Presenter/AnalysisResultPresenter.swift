@@ -18,6 +18,10 @@ class AnalysisResultPresenter: ObservableObject {
     @Published var resultQuantity: Int = 0
     @Published var groupedFOVs: FOVGrouping?
 
+    func popToRoot() {
+        Router.shared.popToRoot()
+    }
+
     func fetchData(examinationId: String) {
         interactor?.fetchData(examId: examinationId) { [weak self] result in
             switch result {
