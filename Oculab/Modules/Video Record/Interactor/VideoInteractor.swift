@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 class VideoInteractor {
     func forwardVideotoBackend(
@@ -28,6 +29,13 @@ class VideoInteractor {
                 }
             }
         }
+    }
+
+    func getStitchedImage(
+        previousImage: CIImage,
+        currentImage: CIImage
+    ) -> UIImage {
+        return UIImage()
     }
 }
 
