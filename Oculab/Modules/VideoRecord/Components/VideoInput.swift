@@ -1,5 +1,5 @@
 //
-//  AppFileInput.swift
+//  VideoInput.swift
 //  Oculab
 //
 //  Created by Alifiyah Ariandri on 16/10/24.
@@ -8,7 +8,7 @@
 import AVKit
 import SwiftUI
 
-struct AppFileInput: View {
+struct VideoInput: View {
     let videoPresenter = VideoRecordPresenter.shared
     @EnvironmentObject var examPresenter: ExamDataPresenter
 
@@ -16,7 +16,6 @@ struct AppFileInput: View {
     var isRequired: Bool
     var isEmpty: Bool
 
-//    @State var selectedFileName: String = ""
     @Binding var selectedURL: URL?
 
     var body: some View {
@@ -41,11 +40,6 @@ struct AppFileInput: View {
                         examPresenter.newVideoRecord()
                     }
                 } else {
-                    // Display a preview for the video URL or an image placeholder if needed
-//                    Text("Video Selected: \(selectedURL!.lastPathComponent)") // Display the file name
-//                        .font(.caption)
-//                        .foregroundColor(AppColors.slate900)
-//                        .padding(2)
                     VideoPlayer(player: AVPlayer(url: selectedURL!))
                         .aspectRatio(contentMode: .fill)
                         .clipped()
@@ -76,26 +70,6 @@ struct AppFileInput: View {
     }
 
     private func previewVideo() {
-        // Implement preview functionality here
         print("Preview video at URL: \(selectedURL?.absoluteString ?? "No URL")")
     }
 }
-
-// #Preview {
-//    @State var fileName = "Instruction"
-//
-//    VStack {
-//        AppFileInput(
-//            title: "Upload Document",
-//            isRequired: true,
-//            isEmpty: true
-//        )
-//
-//        AppFileInput(
-//            title: "Profile Picture",
-//            isRequired: false,
-//            isEmpty: false,
-//            selectedFileName: fileName
-//        )
-//    }
-// }

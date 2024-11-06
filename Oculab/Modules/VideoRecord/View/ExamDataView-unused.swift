@@ -41,7 +41,7 @@
 //                            placeholder: "Contoh: 24/11/1/0123A",
 //                            text: $presenter.examData.examination.slideId
 //                        )
-//                        AppFileInput(
+//                        VideoInput(
 //                            title: "Gambar Sediaan",
 //                            isRequired: true,
 //                            isEmpty: false,

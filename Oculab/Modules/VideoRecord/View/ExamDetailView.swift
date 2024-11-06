@@ -53,7 +53,7 @@ struct ExamDetailView: View {
                             ], titleSize: AppTypography.s5)
                         }
 
-                        AppFileInput(
+                        VideoInput(
                             title: "Gambar Sediaan",
                             isRequired: true,
                             isEmpty: false,
