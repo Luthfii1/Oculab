@@ -8,13 +8,45 @@
 import SwiftUI
 
 struct HistoryView: View {
+    @ObservedObject private var homePresenter = HomePresenter()
+    @State var selectedDate = Date()
+
     var body: some View {
         NavigationView {
-            ScrollView(showsIndicators: false) {}
-                .navigationTitle("Riwayat")
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: Decimal.d16) {
+                    WeeklyCalendarView(selectedDate: $selectedDate)
+
+                    VStack(spacing: Decimal.d12) {
+                        ForEach(homePresenter.filteredExaminationByDate) { exam in
+                            Button {
+                                Router.shared.navigateTo(.examDetail(
+                                    examId: exam.id,
+                                    patientId: exam.patientId ?? ""
+                                ))
+                            } label: {
+                                HomeActivityComponent(
+                                    slideId: exam.slideId,
+                                    status: exam.statusExamination,
+                                    date: exam.datePlan,
+                                    patientName: exam.patientName,
+                                    patientDOB: exam.patientDob
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, Decimal.d20)
+            .navigationTitle("Riwayat")
         }
         .ignoresSafeArea()
-        .onAppear {}
+        .onAppear {
+            homePresenter.fetchData()
+        }
+        .onChange(of: selectedDate) {
+            homePresenter.filterLatestActivityByDate(date: selectedDate)
+        }
         .navigationBarBackButtonHidden(true)
     }
 }

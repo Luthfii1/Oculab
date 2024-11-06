@@ -56,11 +56,14 @@ class HomeInteractor {
                         dateFormatter.dateFormat = "dd MMMM yyyy"
 
                         let formattedDate = dateFormatter.string(from: exam.examinationPlanDate ?? Date())
+                        let formattedDate2 = dateFormatter.string(from: exam.examinationDate ?? Date())
+
                         return ExaminationCardData(
                             examinationId: exam._id.uuidString,
                             statusExamination: exam.statusExamination,
                             imagePreview: "",
                             datePlan: formattedDate,
+                            date: formattedDate,
                             slideId: exam.slideId,
                             patientName: exam.patientName ?? "",
                             patientDob: exam.patientDoB ?? "",

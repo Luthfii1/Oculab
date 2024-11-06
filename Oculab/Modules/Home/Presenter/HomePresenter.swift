@@ -13,8 +13,11 @@ class HomePresenter: ObservableObject {
 
     @Published var statisticExam: ExaminationStatistic = .init()
     @Published var selectedLatestActivity: LatestActivityType = .belumDimulai
+    @Published var selectedDate: Date = .init()
+
     @Published var latestExamination: [ExaminationCardData] = []
     @Published var filteredExamination: [ExaminationCardData] = []
+    @Published var filteredExaminationByDate: [ExaminationCardData] = []
 
     func getStatisticData() {
         interactor?.getStatisticExamination { result in
@@ -46,6 +49,19 @@ class HomePresenter: ObservableObject {
         print("Pressed: ", typeActivity.rawValue)
     }
 
+    func filterLatestActivityByDate(date: Date) {
+        selectedDate = date
+
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd MMMM yyyy"
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+
+        let selectedDateString = dateFormatter.string(from: selectedDate)
+
+        filteredExaminationByDate = latestExamination
+            .filter { $0.date == selectedDateString && $0.statusExamination == .FINISHED }
+    }
+
     func fetchData() {
         print("masuk")
         interactor?.getAllData { [weak self] result in
@@ -55,7 +71,6 @@ class HomePresenter: ObservableObject {
 
                 self?.filterLatestActivity(typeActivity: .belumDimulai)
 
-//                self?.filteredExamination = self?.latestExamination ?? []
             case let .failure(error):
                 print("error: ", error.localizedDescription)
             }
