@@ -1,5 +1,5 @@
 //
-//  SharedPresenter.swift
+//  HomeHistoryPresenter.swift
 //  Oculab
 //
 //  Created by Luthfi Misbachul Munir on 16/10/24.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-class SharedPresenter: ObservableObject {
+class HomeHistoryPresenter: ObservableObject {
     var view: HomeView?
     var interactor: HomeInteractor? = HomeInteractor()
 
@@ -18,10 +18,29 @@ class SharedPresenter: ObservableObject {
     @Published var filteredExamination: [ExaminationCardData] = []
     @Published var filteredExaminationByDate: [ExaminationCardData] = []
 
+    @Published var statisticExam: ExaminationStatistic = .init()
+
+    @Published var isAllExamsLoading: Bool = false
+    @Published var isStatisticLoading: Bool = false
+
+    func getStatisticData() {
+        isStatisticLoading = true
+        interactor?.getStatisticExamination { [weak self] result in
+            DispatchQueue.main.async {
+                self?.isStatisticLoading = false
+                switch result {
+                case let .success(data):
+                    self?.statisticExam = data
+                case let .failure(error):
+                    print("Error: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+
     func filterLatestActivity(typeActivity: LatestActivityType) {
         selectedLatestActivity = typeActivity
 
-        // Filter based on activity type
         switch typeActivity {
         case .belumDimulai:
             filteredExamination = latestExamination.filter { $0.statusExamination == .NOTSTARTED }
@@ -46,16 +65,18 @@ class SharedPresenter: ObservableObject {
     }
 
     func fetchData() {
-        print("masuk")
+        isAllExamsLoading = true
+
         interactor?.getAllData { [weak self] result in
-            switch result {
-            case let .success(examinations):
-                self?.latestExamination = examinations
-
-                self?.filterLatestActivity(typeActivity: .belumDimulai)
-
-            case let .failure(error):
-                print("error: ", error.localizedDescription)
+            DispatchQueue.main.async {
+                self?.isAllExamsLoading = false
+                switch result {
+                case let .success(examinations):
+                    self?.latestExamination = examinations
+                    self?.filterLatestActivity(typeActivity: .belumDimulai)
+                case let .failure(error):
+                    print("error: ", error.localizedDescription)
+                }
             }
         }
     }

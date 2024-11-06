@@ -17,7 +17,7 @@ struct ContentView: View {
                         Text("Pemeriksaan")
                     }
 
-                HistoryView()
+                HistoryView(selectedDate: Date())
                     .tabItem {
                         Image(systemName: "clock.arrow.circlepath")
                         Text("Riwayat")

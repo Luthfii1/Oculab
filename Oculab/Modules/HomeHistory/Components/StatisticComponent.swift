@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct StatisticComponent: View {
-    @EnvironmentObject var presenter: SharedPresenter
+    @EnvironmentObject var presenter: HomeHistoryPresenter
 
     var body: some View {
         VStack(alignment: .center, spacing: 16) {
@@ -30,16 +30,6 @@ struct StatisticComponent: View {
                     Text("dari 20 Tugas").font(AppTypography.p3).foregroundStyle(AppColors.slate300)
                 }
             }
-
-//            AppButton(
-//                title: "Pemeriksaan Baru",
-//                leftIcon: "doc.text.magnifyingglass",
-//                colorType: .primary,
-//                size: .large,
-//                cornerRadius: 8
-//            ) {
-//                presenter.newInputRecord()
-//            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
@@ -52,5 +42,5 @@ struct StatisticComponent: View {
 }
 
 #Preview {
-    StatisticComponent().environmentObject(SharedPresenter())
+    StatisticComponent().environmentObject(HomeHistoryPresenter())
 }

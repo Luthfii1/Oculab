@@ -85,7 +85,6 @@ struct WeeklyCalendarView: View {
 
                 .onAppear {
                     setupCurrentWeek()
-                    selectedDate = Date()
                 }
             }
 
@@ -110,7 +109,6 @@ struct WeeklyCalendarView: View {
                     .cornerRadius(12)
                     .shadow(radius: 8)
                     .onChange(of: selectedDate) { newDate in
-                        // Update the week when the date changes
                         currentWeek = getWeek(for: newDate)
                         withAnimation {
                             isDatePickerVisible = false
@@ -122,8 +120,6 @@ struct WeeklyCalendarView: View {
             }
         }
     }
-
-    // MARK: - Swipe Functions
 
     private func swipeLeft() {
         if let nextWeekDate = Calendar.current.date(byAdding: .day, value: 7, to: selectedDate) {
@@ -139,9 +135,8 @@ struct WeeklyCalendarView: View {
         }
     }
 
-    // MARK: - Helper Functions
-
     private func setupCurrentWeek() {
+        selectedDate = Date()
         currentWeek = getWeek(for: selectedDate)
     }
 
