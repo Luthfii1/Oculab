@@ -8,7 +8,7 @@
 import Foundation
 
 class User: Codable, Identifiable {
-    var _id: UUID
+    var _id: String
     var name: String
     var role: RolesType
     var token: String?
@@ -16,7 +16,7 @@ class User: Codable, Identifiable {
     var password: String?
 
     init(
-        _id: UUID = UUID(),
+        _id: String,
         name: String,
         role: RolesType,
         token: String? = nil,
@@ -42,7 +42,7 @@ class User: Codable, Identifiable {
 
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self._id = try container.decode(UUID.self, forKey: ._id)
+        self._id = try container.decode(String.self, forKey: ._id)
         self.name = try container.decode(String.self, forKey: .name)
         self.role = try container.decode(RolesType.self, forKey: .role)
         self.token = try container.decodeIfPresent(String.self, forKey: .token)

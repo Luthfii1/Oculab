@@ -23,7 +23,9 @@ class Examination: Decodable, Identifiable {
     var systemResult: SystemExamResult?
     var expertResult: ExpertExamResult?
 
-    var PIC: PICEntity?
+    var PIC: User?
+    var DPJP: User?
+
     var patientId: String?
     var patientName: String?
     var patientDoB: String?
@@ -42,7 +44,8 @@ class Examination: Decodable, Identifiable {
         statusExamination: StatusType,
         systemResult: SystemExamResult? = nil,
         expertResult: ExpertExamResult? = nil,
-        PIC: PICEntity? = nil,
+        PIC: User? = nil,
+        DPJP: User? = nil,
         patientName: String? = nil,
         patientId: String? = nil,
         patientDoB: String? = nil
@@ -62,6 +65,8 @@ class Examination: Decodable, Identifiable {
         self.systemResult = systemResult
         self.expertResult = expertResult
         self.PIC = PIC
+        self.DPJP = DPJP
+
         self.patientId = patientId
         self.patientName = patientName
         self.patientDoB = patientDoB
@@ -82,6 +87,7 @@ class Examination: Decodable, Identifiable {
         case systemResult
         case expertResult
         case PIC
+        case DPJP
         case examinationId
         case patientId
         case patientName
@@ -111,8 +117,6 @@ class Examination: Decodable, Identifiable {
         self.recordVideo = try container.decodeIfPresent(Data.self, forKey: .recordVideo)
         self.WSI = try container.decodeIfPresent(String.self, forKey: .WSI)
 
-//        self.examinationDate = try container.decode(Date.self, forKey: .examinationDate)
-        // Decode the examinationDate as a string and convert it to a Date using ISO8601 format
         let dateString = try container.decodeIfPresent(String.self, forKey: .examinationDate) ?? ""
 
         let dateFormatter = ISO8601DateFormatter()
@@ -148,21 +152,12 @@ class Examination: Decodable, Identifiable {
         self.systemResult = try container.decodeIfPresent(SystemExamResult.self, forKey: .systemResult)
         self.expertResult = try container.decodeIfPresent(ExpertExamResult.self, forKey: .expertResult)
 
-        self.PIC = try container.decodeIfPresent(PICEntity.self, forKey: .PIC)
+        self.PIC = try container.decodeIfPresent(User.self, forKey: .PIC)
+        self.DPJP = try container.decodeIfPresent(User.self, forKey: .DPJP)
+
         self.patientId = try container.decodeIfPresent(String.self, forKey: .patientId)
         self.patientName = try container.decodeIfPresent(String.self, forKey: .patientName)
 
         self.patientDoB = try container.decodeIfPresent(String.self, forKey: .patientDoB)
-
-//        if dobString != "" {
-//            guard let dob = dateFormatter.date(from: dobString) else {
-//                throw DecodingError.dataCorruptedError(
-//                    forKey: .patientDoB,
-//                    in: container,
-//                    debugDescription: "Date string does not match format expected by formatter."
-//                )
-//            }
-//            self.patientDoB = dob
-//        }
     }
 }
