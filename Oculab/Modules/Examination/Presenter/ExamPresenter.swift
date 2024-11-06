@@ -10,6 +10,8 @@ import SwiftUI
 class ExamDataPresenter: ObservableObject {
     let videoPresenter = VideoRecordPresenter.shared
 
+    @Published var isLoading: Bool = false
+
     @Published var recordVideo: URL?
 
     @Published var examDetailData: ExaminationDetailData = .init(
@@ -17,7 +19,8 @@ class ExamDataPresenter: ObservableObject {
         pic: "",
         slideId: "",
         examinationGoal: "",
-        type: ""
+        type: "",
+        dpjp: ""
     )
     @Published var patientDetailData: PatientDetailData = .init(
         patientId: "",
@@ -72,14 +75,21 @@ class ExamDataPresenter: ObservableObject {
     }
 
     func fetchData(examId: String, patientId: String) {
-        print("masukA")
-        interactor.getExamById(examId: examId) { [weak self] result in
-            switch result {
-            case let .success(examination):
-                self?.examDetailData = examination
+        isLoading = true
 
-            case let .failure(error):
-                print("error: ", error.localizedDescription)
+        print(isLoading)
+
+        interactor.getExamById(examId: examId) { [weak self] result in
+            DispatchQueue.main.async {
+                self?.isLoading = false
+
+                switch result {
+                case let .success(examination):
+                    self?.examDetailData = examination
+
+                case let .failure(error):
+                    print("error: ", error.localizedDescription)
+                }
             }
         }
 

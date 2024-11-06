@@ -33,7 +33,6 @@ class AnalysisResultPresenter: ObservableObject {
         }
 
         interactor?.fetchFOVData(examId: examinationId) { [weak self] result in
-            print("=================================")
             switch result {
             case let .success(fov):
                 self?.groupedFOVs = fov
