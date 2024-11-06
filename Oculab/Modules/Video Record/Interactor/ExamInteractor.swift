@@ -25,7 +25,7 @@ class ExamInteractor {
                 switch result {
                 case let .success(apiResponse):
                     let examinationDetail = ExaminationDetailData(
-                        examinationId: apiResponse.data._id.uuidString,
+                        examinationId: apiResponse.data._id,
                         pic: apiResponse.data.PIC?.name ?? "Unknown",
                         slideId: apiResponse.data.slideId,
                         examinationGoal: apiResponse.data.goal?.rawValue ?? "No goal specified",

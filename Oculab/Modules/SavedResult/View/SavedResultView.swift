@@ -8,114 +8,154 @@
 import SwiftUI
 
 struct SavedResultView: View {
+    var examId: String
+    var patientId: String
+
+    @StateObject var presenter = ExamDataPresenter(interactor: ExamInteractor())
+    @StateObject var resultPresenter = AnalysisResultPresenter()
+
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: Decimal.d24) {
-                ExtendableCard(
-                    icon: "person.fill",
-                    title: "Data Pasien",
-                    data: [
-                        (key: "Nama Pasien", value: "Alya Annisa Kirana"),
-                        (key: "NIK Pasien", value: "167012039484700"),
-                        (key: "Umur Pasien", value: "23 Tahun"),
-                        (key: "Jenis Kelamin", value: "Perempuan"),
-                        (key: "Nomor BPJS", value: "06L30077675"),
-                    ],
-                    titleSize: AppTypography.s5
-                )
+        NavigationView {
+            ScrollView {
+                Spacer().frame(height: Decimal.d24)
 
-                ExtendableCard(
-                    icon: "doc.text.magnifyingglass",
-                    title: "Detail Pemeriksaan",
-                    data: [
-                        (key: "Alasan Pemeriksaan", value: "Follow Up"),
-                        (key: "Jenis Sediaan", value: "Sewaktu"),
-                        (key: "ID Sediaan", value: "24/11/1/0123A"),
+                VStack(alignment: .leading, spacing: Decimal.d24) {
+                    ExtendableCard(
+                        icon: "person.fill",
+                        title: "Data Pasien",
+                        data: [
+                            (key: "Nama", value: presenter.patientDetailData.name),
+                            (key: "NIK", value: presenter.patientDetailData.nik),
+                            (key: "Tanggal Lahir", value: presenter.patientDetailData.dob),
+                            (key: "Jenis Kelamin", value: presenter.patientDetailData.sex),
+                            (key: "Nomor BPJS", value: presenter.patientDetailData.bpjs),
+                        ],
+                        titleSize: AppTypography.s5
+                    )
 
-                    ],
-                    titleSize: AppTypography.s6
-                )
+                    ExtendableCard(
+                        icon: "doc.text.magnifyingglass",
+                        title: "Detail Pemeriksaan",
+                        data: [
+                            (key: "ID Sediaan", value: presenter.examDetailData.slideId),
+                            (key: "Alasan Pemeriksaan", value: presenter.examDetailData.examinationGoal),
+                            (key: "Jenis Sediaan", value: presenter.examDetailData.type),
+                        ],
+                        titleSize: AppTypography.s6
+                    )
 
-                AppCard(icon: "photo", title: "Hasil Gambar", spacing: Decimal.d16) {
-                    VStack(alignment: .leading, spacing: Decimal.d16) {
-                        Text("Ketuk untuk lihat detail gambar")
-                            .font(AppTypography.p3)
-                            .foregroundStyle(AppColors.slate300)
+                    AppCard(icon: "photo", title: "Hasil Gambar", spacing: Decimal.d16) {
+                        VStack(alignment: .leading, spacing: Decimal.d16) {
+                            Text("Ketuk untuk lihat detail gambar")
+                                .font(AppTypography.p3)
+                                .foregroundStyle(AppColors.slate300)
 
-                        RoundedRectangle(cornerRadius: Decimal.d8)
-                            .foregroundStyle(AppColors.slate50)
-                            .frame(height: 200)
+                            RoundedRectangle(cornerRadius: Decimal.d8)
+                                .foregroundStyle(AppColors.slate50)
+                                .frame(height: 200)
 
-                        FolderCardComponent(
-                            title: .BTA0,
-                            numOfImage: 9
-                        )
-                        FolderCardComponent(
-                            title: .BTA1TO9,
-                            numOfImage: 9
-                        )
-                        FolderCardComponent(
-                            title: .BTAABOVE9,
-                            numOfImage: 9
-                        )
-                    }
-                }
+                            if resultPresenter.groupedFOVs?.bta0.isEmpty != true {
+                                Button {} label: {
+                                    FolderCardComponent(
+                                        title: .BTA0,
+                                        numOfImage: resultPresenter.groupedFOVs?.bta0.count ?? 0
+                                    )
+                                }
+                            }
 
-                AppCard(icon: "text.badge.checkmark", title: "Hasil Interpretasi", spacing: Decimal.d24) {
-                    VStack(alignment: .leading, spacing: Decimal.d8) {
-                        Text("Interpretasi Petugas")
-                            .font(AppTypography.s5)
-                            .foregroundColor(AppColors.slate300)
-                        GradingCardComponent(
-                            type: .SCANTY,
-                            confidenceLevel: .lowConfidence
-                        )
-                    }
+                            if resultPresenter.groupedFOVs?.bta1to9.isEmpty != true {
+                                Button {} label: {
+                                    FolderCardComponent(
+                                        title: .BTA1TO9,
+                                        numOfImage: resultPresenter.groupedFOVs?.bta1to9.count ?? 0
+                                    )
+                                }
+                            }
 
-                    VStack(alignment: .leading, spacing: Decimal.d8) {
-                        Text("Interpretasi Sistem")
-                            .font(AppTypography.s5)
-                            .foregroundColor(AppColors.slate300)
-                        HStack(alignment: .top) {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundColor(AppColors.orange500)
-
-                            Text("Interpretasi sistem bukan merupakan hasil akhir untuk pasien")
-                                .font(AppTypography.p4)
+                            if resultPresenter.groupedFOVs?.btaabove9.isEmpty != true {
+                                Button {} label: {
+                                    FolderCardComponent(
+                                        title: .BTAABOVE9,
+                                        numOfImage: resultPresenter.groupedFOVs?.btaabove9.count ?? 0
+                                    )
+                                }
+                            }
                         }
-                        GradingCardComponent(
-                            type: .SCANTY,
-                            confidenceLevel: .lowConfidence
-                        )
                     }
 
-                    VStack(alignment: .leading, spacing: Decimal.d16) {
-                        AppButton(
-                            title: "Lihat PDF",
-                            rightIcon: "doc.text",
-                            colorType: .secondary,
-                            size: .small,
-                            isEnabled: true
-                        ) {
-                            print("Lihat PDF Tapped")
+                    AppCard(icon: "text.badge.checkmark", title: "Hasil Interpretasi", spacing: Decimal.d24) {
+                        VStack(alignment: .leading, spacing: Decimal.d8) {
+                            Text("Interpretasi Petugas")
+                                .font(AppTypography.s5)
+                                .foregroundColor(AppColors.slate300)
+                            GradingCardComponent(
+                                type: .SCANTY,
+                                confidenceLevel: .lowConfidence
+                            )
                         }
 
-                        AppButton(
-                            title: "Laporkan ke SITB",
-                            rightIcon: "paperplane",
-                            size: .small,
-                            isEnabled: true
-                        ) {
-                            print("Lihat PDF Tapped")
+                        VStack(alignment: .leading, spacing: Decimal.d8) {
+                            Text("Interpretasi Sistem")
+                                .font(AppTypography.s5)
+                                .foregroundColor(AppColors.slate300)
+                            HStack(alignment: .top) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundColor(AppColors.orange500)
+
+                                Text("Interpretasi sistem bukan merupakan hasil akhir untuk pasien")
+                                    .font(AppTypography.p4)
+                            }
+                            GradingCardComponent(
+                                type: .SCANTY,
+                                confidenceLevel: .lowConfidence
+                            )
+                        }
+
+                        VStack(alignment: .leading, spacing: Decimal.d16) {
+                            AppButton(
+                                title: "Lihat PDF",
+                                rightIcon: "doc.text",
+                                colorType: .secondary,
+                                size: .small,
+                                isEnabled: true
+                            ) {
+                                print("Lihat PDF Tapped")
+                            }
+
+                            AppButton(
+                                title: "Laporkan ke SITB",
+                                rightIcon: "paperplane",
+                                size: .small,
+                                isEnabled: true
+                            ) {
+                                print("Lihat PDF Tapped")
+                            }
                         }
                     }
                 }
             }
-        }
-        .padding(.horizontal, Decimal.d16)
+            .padding(.horizontal, Decimal.d16)
+            .navigationTitle(examId)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+//                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        HStack {
+                            Image("back")
+                        }
+                    }
+                }
+            }
+            .onAppear {
+                presenter.fetchData(examId: examId, patientId: patientId)
+                resultPresenter.fetchData(examinationId: examId)
+            }
+        }.navigationBarBackButtonHidden(true)
     }
 }
 
 #Preview {
-    SavedResultView()
+    SavedResultView(examId: "6f4e5288-3dfd-4be4-8a2e-8c60f09f07e2", patientId: "d0c1a2b3-4f5e-6789-91ab-cdef12345678")
 }

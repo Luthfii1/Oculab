@@ -27,7 +27,7 @@ class AnalysisResultInteractor {
                 case let .success(apiResponse):
 
                     let examinationDetail = ExaminationResultData(
-                        examinationId: apiResponse.data._id.uuidString,
+                        examinationId: apiResponse.data._id,
                         imagePreview: apiResponse.data.imagePreview ?? "",
                         fov: apiResponse.data.FOV ?? [],
                         confidenceLevelAggregated: 0.0,

@@ -80,4 +80,16 @@ enum AppColors {
     static let red700 = Color("red-700")
     static let red800 = Color("red-800")
     static let red900 = Color("red-900")
+
+    // Green shades
+    static let green50 = Color("green-50")
+    static let green100 = Color("green-100")
+    static let green200 = Color("green-200")
+    static let green300 = Color("green-300")
+    static let green400 = Color("green-400")
+    static let green500 = Color("green-500")
+    static let green600 = Color("green-600")
+    static let green700 = Color("green-700")
+    static let green800 = Color("green-800")
+    static let green900 = Color("green-900")
 }

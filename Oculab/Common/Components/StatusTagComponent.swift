@@ -14,25 +14,35 @@ struct StatusTagComponent: View {
         switch type {
         case .INPROGRESS:
             VStack(alignment: .leading) {
-                Text(StatusType.INPROGRESS.rawValue)
-                    .foregroundStyle(AppColors.orange500)
+                HStack(spacing: Decimal.d8) {
+                    Image(systemName: "clock.fill").resizable()
+                        .frame(width: Decimal.d12 + Decimal.d6, height: Decimal.d12 + Decimal.d6)
+                        .foregroundStyle(AppColors.orange500)
+                    Text(StatusType.NEEDVALIDATION.rawValue)
+                        .foregroundStyle(AppColors.slate900)
+                }
             }
-            .font(AppTypography.s6)
+            .font(AppTypography.p4)
             .padding(.horizontal, Decimal.d8)
             .padding(.vertical, Decimal.d6)
             .background(AppColors.orange50)
-            .cornerRadius(Decimal.d4)
+            .cornerRadius(Decimal.d20)
 
         case .FINISHED:
             VStack(alignment: .leading) {
-                Text(StatusType.FINISHED.rawValue)
-                    .foregroundStyle(AppColors.blue500)
+                HStack(spacing: Decimal.d8) {
+                    Image(systemName: "checkmark.circle.fill").resizable()
+                        .frame(width: Decimal.d12 + Decimal.d6, height: Decimal.d12 + Decimal.d6)
+                        .foregroundStyle(AppColors.green500)
+                    Text(StatusType.FINISHED.rawValue)
+                        .foregroundStyle(AppColors.slate900)
+                }
             }
-            .font(AppTypography.s6)
+            .font(AppTypography.p4)
             .padding(.horizontal, Decimal.d8)
             .padding(.vertical, Decimal.d6)
-            .background(AppColors.blue50)
-            .cornerRadius(Decimal.d4)
+            .background(AppColors.green50)
+            .cornerRadius(Decimal.d20)
 
         case .NEEDVALIDATION:
             VStack(alignment: .leading) {
@@ -73,11 +83,25 @@ struct StatusTagComponent: View {
 }
 
 #Preview {
+    // case INPROGRESS = "Sedang dianalisa sistem"
+    // case NEEDVALIDATION = "Sedang Berlangsung"
+    // case NOTSTARTED = "Belum Dimulai"
+    // case FINISHED = "Selesai"
+    // case NONE = ""
+
     StatusTagComponent(
         type: .FINISHED
     )
 
     StatusTagComponent(
         type: .NOTSTARTED
+    )
+
+    StatusTagComponent(
+        type: .NEEDVALIDATION
+    )
+
+    StatusTagComponent(
+        type: .INPROGRESS
     )
 }

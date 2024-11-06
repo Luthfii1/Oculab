@@ -17,7 +17,7 @@ struct ContentView: View {
                         Text("Pemeriksaan")
                     }
 
-                PDFPageView()
+                HistoryView()
                     .tabItem {
                         Image(systemName: "clock.arrow.circlepath")
                         Text("Riwayat")
@@ -28,11 +28,6 @@ struct ContentView: View {
                         Image(systemName: "person.circle")
                         Text("Profil")
                     }
-//                AnalysisResultView()
-//                    .tabItem {
-//                        Image(systemName: "person.crop.circle.fill")
-//                        Text("Analyze")
-//                    }
             }
             .tint(AppColors.purple500)
         }
