@@ -34,21 +34,6 @@ class ExamDataPresenter: ObservableObject {
         self.interactor = interactor
     }
 
-//    func handleSubmit() {
-    ////        let goal = examData.goal == "Skrinning" ? "SCREENING" : "FOLLOWUP"
-    ////        let preparationType = examData.preparationType == "Pagi" ? "SPS" : "SP"
-//
-    ////        let examRequest = ExaminationRequest(
-    ////            examinationId: UUID().uuidString,
-    ////            goal: goal,
-    ////            preparationType: preparationType,
-    ////            slideId: idSediaan,
-    ////            recordVideo: ""
-    ////        )
-//
-//        interactor.submitExamination(examData: examData, completion: <#(Result<VideoForwardResponse, NetworkErrorType>) -> Void#>)
-//    }
-
     func handleSubmit() {
         if let fileURL = recordVideo {
             do {

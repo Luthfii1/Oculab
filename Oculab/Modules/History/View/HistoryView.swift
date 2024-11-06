@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HistoryView: View {
-    @ObservedObject private var homePresenter = HomePresenter()
+    @ObservedObject private var presenter = SharedPresenter()
     @State var selectedDate = Date()
 
     var body: some View {
@@ -18,11 +18,12 @@ struct HistoryView: View {
                     WeeklyCalendarView(selectedDate: $selectedDate)
 
                     VStack(spacing: Decimal.d12) {
-                        ForEach(homePresenter.filteredExaminationByDate) { exam in
+                        ForEach(presenter.filteredExaminationByDate) { exam in
                             Button {
-                                Router.shared.navigateTo(.examDetail(
+                                Router.shared.navigateTo(.savedResult(
                                     examId: exam.id,
                                     patientId: exam.patientId ?? ""
+
                                 ))
                             } label: {
                                 HomeActivityComponent(
@@ -42,10 +43,10 @@ struct HistoryView: View {
         }
         .ignoresSafeArea()
         .onAppear {
-            homePresenter.fetchData()
+            presenter.fetchData()
         }
         .onChange(of: selectedDate) {
-            homePresenter.filterLatestActivityByDate(date: selectedDate)
+            presenter.filterLatestActivityByDate(date: selectedDate)
         }
         .navigationBarBackButtonHidden(true)
     }

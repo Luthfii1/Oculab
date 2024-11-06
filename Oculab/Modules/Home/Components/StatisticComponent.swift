@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct StatisticComponent: View {
-    @EnvironmentObject var homePresenter: HomePresenter
+    @EnvironmentObject var presenter: SharedPresenter
 
     var body: some View {
         VStack(alignment: .center, spacing: 16) {
@@ -38,7 +38,7 @@ struct StatisticComponent: View {
 //                size: .large,
 //                cornerRadius: 8
 //            ) {
-//                homePresenter.newInputRecord()
+//                presenter.newInputRecord()
 //            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -52,5 +52,5 @@ struct StatisticComponent: View {
 }
 
 #Preview {
-    StatisticComponent().environmentObject(HomePresenter())
+    StatisticComponent().environmentObject(SharedPresenter())
 }

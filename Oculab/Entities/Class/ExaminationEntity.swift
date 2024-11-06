@@ -8,7 +8,7 @@
 import Foundation
 
 class Examination: Decodable, Identifiable {
-    var _id: UUID
+    var _id: String
     var goal: ExamGoalType?
     var preparationType: ExamPreparationType
     var slideId: String
@@ -29,7 +29,7 @@ class Examination: Decodable, Identifiable {
     var patientDoB: String?
 
     init(
-        _id: UUID = UUID(),
+        _id: String,
         goal: ExamGoalType?,
         preparationType: ExamPreparationType,
         slideId: String,
@@ -90,13 +90,19 @@ class Examination: Decodable, Identifiable {
 
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        if let _idString = try container.decodeIfPresent(String.self, forKey: ._id) ?? container.decodeIfPresent(
-            String.self,
-            forKey: .examinationId
-        ) {
-            self._id = UUID(uuidString: _idString) ?? UUID()
+
+        if let id = try? container.decode(String.self, forKey: ._id) {
+            self._id = id
+        } else if let examinationId = try? container.decode(String.self, forKey: .examinationId) {
+            self._id = examinationId
         } else {
-            self._id = UUID()
+            throw DecodingError.keyNotFound(
+                CodingKeys._id,
+                DecodingError.Context(
+                    codingPath: decoder.codingPath,
+                    debugDescription: "Neither _id nor examinationId found"
+                )
+            )
         }
 
         self.goal = try container.decodeIfPresent(ExamGoalType.self, forKey: .goal)

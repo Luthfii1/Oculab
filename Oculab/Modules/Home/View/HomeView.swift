@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct HomeView: View {
+    @ObservedObject private var presenter = SharedPresenter()
     @ObservedObject private var homePresenter = HomePresenter()
 
     var body: some View {
@@ -16,7 +17,7 @@ struct HomeView: View {
                 Spacer().frame(height: Decimal.d24)
                 VStack(alignment: .leading, spacing: 24) {
                     StatisticComponent()
-                        .environmentObject(homePresenter)
+                        .environmentObject(presenter)
 
                     VStack(alignment: .leading, spacing: 16) {
                         HStack(alignment: .center, spacing: 8) {
@@ -32,8 +33,8 @@ struct HomeView: View {
                             ForEach(LatestActivityType.allCases, id: \.self) { activityType in
                                 ButtonActivity(
                                     labelButton: activityType.rawValue,
-                                    isSelected: homePresenter.selectedLatestActivity == activityType,
-                                    action: { homePresenter.filterLatestActivity(typeActivity: activityType) }
+                                    isSelected: presenter.selectedLatestActivity == activityType,
+                                    action: { presenter.filterLatestActivity(typeActivity: activityType) }
                                 )
                             }
                             .padding(.horizontal, 1)
@@ -43,7 +44,7 @@ struct HomeView: View {
 //                            GridItem(.flexible(), spacing: 16),
 //                            GridItem(.flexible(), spacing: 16)
 //                        ], spacing: 16) {
-//                            ForEach(homePresenter.filteredExamination) { exam in
+//                            ForEach(presenter.filteredExamination) { exam in
 //                                HomeActivityComponent(
 //                                    slideId: exam.slideId,
 //                                    status: exam.statusExamination,
@@ -55,7 +56,7 @@ struct HomeView: View {
 //                        }
 
                         VStack(spacing: Decimal.d12) {
-                            ForEach(homePresenter.filteredExamination) { exam in
+                            ForEach(presenter.filteredExamination) { exam in
                                 Button {
                                     Router.shared.navigateTo(.examDetail(
                                         examId: exam.id,
@@ -82,8 +83,7 @@ struct HomeView: View {
         .ignoresSafeArea()
         .onAppear {
             homePresenter.getStatisticData()
-            homePresenter.fetchData()
-//            homePresenter.inputNewPatient()
+            presenter.fetchData()
         }
         .navigationBarBackButtonHidden(true)
     }
