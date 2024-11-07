@@ -8,6 +8,6 @@
 import Foundation
 
 class API {
-    static let BE: String = "https://oculab-be.vercel.app"
+    static let BE: String = "http://b4wgswckgks8488og484s8co.34.50.75.183.sslip.io"
     static let ML: String = "https://oculab-ml.vercel.app"
 }

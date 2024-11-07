@@ -36,6 +36,11 @@ targets:
           NSCameraUsageDescription: We would like to access your camera to record video
           NSMicrophoneUsageDescription: We would like to access your microphone to record video
           NSPhotoLibraryUsageDescription: We need access to save videos to your photo library.
+          NSAppTransportSecurity:
+            NSExceptionDomains:
+              "b4wgswckgks8488og484s8co.34.50.75.183.sslip.io":
+                NSIncludesSubdomains: true
+                NSExceptionAllowsInsecureHTTPLoads: true
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.Oculab.Oculab
       TARGETED_DEVICE_FAMILY: 1
