@@ -13,12 +13,6 @@ struct InputPatientData: View {
     @State var selectedPIC: String = ""
     @State var selectedPatient: String = ""
 
-//    @State var nik: String = ""
-//    @State var sex: String = ""
-//    @State var bpjs: String = ""
-//
-    @State var dob: Date = .init()
-
     @State var isAddingNewPatient: Bool = false
 
     var body: some View {
@@ -36,7 +30,8 @@ struct InputPatientData: View {
                             placeholder: "Pilih Petugas",
                             leftIcon: "person.fill",
                             choices: presenter.picName,
-                            selectedChoice: $selectedPIC, isAddingNewPatient: .constant(true)
+                            selectedChoice: $selectedPIC,
+                            isAddingNewPatient: .constant(true)
                         )
 
                         AppDropdown(
@@ -93,7 +88,9 @@ struct InputPatientData: View {
                                 title: "Isi Detail Sediaan",
                                 rightIcon: "arrow.forward",
                                 isEnabled: !(presenter.patient.NIK == "")
-                            ) {}
+                            ) {
+                                presenter.newExam(patientId: selectedPatient, picId: selectedPIC)
+                            }
 
                             Spacer()
                         }
@@ -123,6 +120,11 @@ struct InputPatientData: View {
             .onChange(of: selectedPatient) { newValue in
                 if !newValue.isEmpty {
                     presenter.getPatientById(patientId: newValue)
+                }
+            }
+            .onChange(of: selectedPIC) { newValue in
+                if !newValue.isEmpty {
+                    presenter.getUserById(userId: newValue)
                 }
             }
         }

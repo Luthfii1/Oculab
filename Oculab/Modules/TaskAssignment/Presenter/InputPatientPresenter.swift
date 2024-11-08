@@ -18,6 +18,8 @@ class InputPatientPresenter: ObservableObject {
     @Published var patientNameDoB: [(String, String)] = []
 
     @Published var patient: Patient = .init(_id: "", name: "", NIK: "", DoB: Date(), sex: .UNKNOWN)
+    @Published var pic: User = .init(_id: "", name: "", role: .ADMIN)
+
     @Published var examination: Examination = .init(
         _id: "",
         goal: nil,
@@ -68,7 +70,7 @@ class InputPatientPresenter: ObservableObject {
                 switch result {
                 case let .success(data):
                     for pic in data {
-                        self?.picName.append((pic.name, pic.name))
+                        self?.picName.append((pic.name, pic._id))
                     }
                 case let .failure(error):
                     print("Error: \(error.localizedDescription)")
@@ -115,5 +117,27 @@ class InputPatientPresenter: ObservableObject {
                 }
             }
         }
+    }
+
+    func getUserById(userId: String) {
+        isUserLoading = true
+
+        interactor?.getUserById(userId: userId) { [weak self] result in
+            DispatchQueue.main.async {
+                self?.isUserLoading = false
+
+                switch result {
+                case let .success(data):
+                    self?.pic = data
+
+                case let .failure(error):
+                    print(error)
+                }
+            }
+        }
+    }
+
+    func newExam(patientId: String, picId: String) {
+        Router.shared.navigateTo(.newExam(patientId: patientId, picId: picId))
     }
 }

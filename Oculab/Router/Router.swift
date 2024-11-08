@@ -20,6 +20,7 @@ class Router: ObservableObject {
         case instructionRecord
         case examDetail(examId: String, patientId: String)
         case savedResult(examId: String, patientId: String)
+        case newExam(patientId: String, picId: String)
     }
 
     @Published var path: NavigationPath = .init()
@@ -43,6 +44,8 @@ class Router: ObservableObject {
             ExamDetailView(examId: examId, patientId: patientId)
         case let .savedResult(examId, patientId):
             SavedResultView(examId: examId, patientId: patientId)
+        case let .newExam(patientId, picId):
+            InputExaminationData(selectedPIC: picId, selectedPatient: patientId)
         }
     }
 
