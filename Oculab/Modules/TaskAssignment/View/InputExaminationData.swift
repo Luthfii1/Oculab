@@ -23,7 +23,7 @@ struct InputExaminationData: View {
                 AppPopup(
                     image: "Confirm",
                     title: "Buat Tugas Pemeriksaan?",
-                    description: "Sediaan Pasien \(presenter.patient.name) akan diperiksa oleh \(presenter.patient.name)",
+                    description: "Sediaan Pasien \(presenter.patient.name) akan diperiksa oleh \(presenter.pic.name)",
                     buttons: [
                         AppButton(
                             title: "Buat Tugas",
@@ -134,13 +134,10 @@ struct InputExaminationData: View {
                 }
             }
             .onAppear {
-                presenter.getAllUser()
-                presenter.getAllPatient()
-            }
-            .onChange(of: selectedPatient) { newValue in
-                if !newValue.isEmpty {
-                    presenter.getPatientById(patientId: newValue)
-                }
+                presenter.getPatientById(patientId: selectedPatient)
+                presenter.getUserById(userId: selectedPIC)
+
+                print(presenter.patient.name)
             }
         }
     }

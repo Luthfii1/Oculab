@@ -128,6 +128,8 @@ class InputPatientPresenter: ObservableObject {
 
                 switch result {
                 case let .success(data):
+                    print("{}{}{}{}")
+                    print(data.name)
                     self?.pic = data
 
                 case let .failure(error):
