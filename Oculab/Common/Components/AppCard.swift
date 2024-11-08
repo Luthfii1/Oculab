@@ -12,6 +12,7 @@ struct AppCard<Content: View>: View {
     var title: String
     var spacing: CGFloat
     var isBorderDisabled: Bool
+    var isEnablingEdit: Bool
 
     var content: Content
 
@@ -20,6 +21,7 @@ struct AppCard<Content: View>: View {
         title: String,
         spacing: CGFloat,
         isBorderDisabled: Bool = false,
+        isEnablingEdit: Bool = false,
         @ViewBuilder content: () -> Content
     ) {
         self.icon = icon
@@ -27,6 +29,7 @@ struct AppCard<Content: View>: View {
         self.spacing = spacing
         self.isBorderDisabled = isBorderDisabled
         self.content = content()
+        self.isEnablingEdit = isEnablingEdit
     }
 
     var body: some View {
@@ -38,6 +41,14 @@ struct AppCard<Content: View>: View {
                 Text(title)
                     .padding(.leading, Decimal.d8)
                     .font(AppTypography.s4_1)
+                if isEnablingEdit {
+                    Spacer()
+                    HStack(spacing: Decimal.d12) {
+                        Image(systemName: "square.and.pencil")
+                        Text("Edit").font(AppTypography.s6)
+                    }
+                    .foregroundStyle(AppColors.purple500)
+                }
             }
 
             // Custom Content
