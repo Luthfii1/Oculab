@@ -12,7 +12,7 @@ struct AnalysisResultView: View {
 
     @StateObject private var presenter = AnalysisResultPresenter()
 
-    @State var selectedTBGrade: String? = nil
+    @State var selectedTBGrade: String = ""
     @State var numOfBTA: String = ""
     @State var inspectorNotes: String = ""
     @State private var currentStep: Int = 3
@@ -230,9 +230,8 @@ struct AnalysisResultView: View {
                                             isRequired: false,
                                             rightIcon: "chevron.down",
                                             isDisabled: false,
-                                            choices: GradingType.allCases.dropLast().map { $0.rawValue },
-                                            isExtended: true,
-                                            selectedChoice: $selectedTBGrade
+                                            choices: GradingType.allCases.dropLast().map { ($0.rawValue, $0.rawValue) },
+                                            selectedChoice: $selectedTBGrade, isAddingNewPatient: .constant(false)
                                         )
 
                                         if selectedTBGrade == GradingType.SCANTY.rawValue {

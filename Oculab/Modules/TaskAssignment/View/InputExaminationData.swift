@@ -1,0 +1,151 @@
+//
+//  InputExaminationData.swift
+//  Oculab
+//
+//  Created by Alifiyah Ariandri on 07/11/24.
+//
+
+import SwiftUI
+
+struct InputExaminationData: View {
+    @ObservedObject var presenter: InputPatientPresenter = .init()
+
+    @State var selectedPIC: String
+    @State var selectedPatient: String
+
+    @State var isAddingNewPatient: Bool = false
+
+    @State var isSubmitPopUpVisible: Bool = false
+
+    var body: some View {
+        NavigationView {
+            ZStack {
+                AppPopup(
+                    image: "Confirm",
+                    title: "Buat Tugas Pemeriksaan?",
+                    description: "Sediaan Pasien \(presenter.patient.name) akan diperiksa oleh \(presenter.patient.name)",
+                    buttons: [
+                        AppButton(
+                            title: "Buat Tugas",
+                            colorType: .primary,
+                            size: .large,
+                            isEnabled: true
+                        ) {
+//                            presenter.popToRoot()
+                        },
+
+                        AppButton(
+                            title: "Periksa Kembali",
+                            colorType: .tertiary,
+                            isEnabled: true
+                        ) {
+                            isSubmitPopUpVisible = false
+                            print("Kembali ke Pemeriksaan")
+                        }
+                    ],
+                    isVisible: $isSubmitPopUpVisible
+                )
+
+                VStack {
+                    ScrollView(showsIndicators: false) {
+                        VStack {
+                            Spacer().frame(height: Decimal.d24)
+
+                            AppStepper(stepTitles: ["Data Pasien", "Data Sediaan", "Hasil"], currentStep: 1)
+                            Spacer().frame(height: Decimal.d24)
+
+                            VStack(alignment: .leading, spacing: Decimal.d24) {
+                                AppRadioButton(
+                                    title: "Tujuan Pemeriksaan",
+                                    isRequired: true,
+                                    choices: ["Skrinning", "Follow Up"],
+                                    selectedChoice: $presenter.goalString
+                                )
+
+                                AppTextField(
+                                    title: "ID Sediaan 1",
+                                    placeholder: "Contoh: 24/11/1/0123A",
+                                    text: $presenter.examination.slideId
+                                )
+
+                                AppRadioButton(
+                                    title: "Jenis Sediaan 1",
+                                    isRequired: true,
+                                    choices: ["Pagi", "Sewaktu"],
+                                    selectedChoice: $presenter.typeString
+                                )
+
+                                AppTextField(
+                                    title: "ID Sediaan 2",
+                                    placeholder: "Contoh: 24/11/1/0123A",
+                                    text: $presenter.examination2.slideId
+                                )
+
+                                AppRadioButton(
+                                    title: "Jenis Sediaan 2",
+                                    isRequired: true,
+                                    choices: ["Pagi", "Sewaktu"],
+                                    selectedChoice: $presenter.typeString2
+                                )
+                            }
+
+                            .padding(.horizontal, Decimal.d20)
+                        }
+
+                        .navigationTitle("Pemeriksaan")
+                        .navigationBarTitleDisplayMode(.inline)
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarLeading) {
+                                Button(action: {
+                                    //                        presentationMode.wrappedValue.dismiss()
+                                }) {
+                                    HStack {
+                                        Image("Destroy")
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    HStack {
+                        AppButton(
+                            title: "Kembali",
+                            leftIcon: "arrow.left",
+                            colorType: .tertiary,
+                            isEnabled: true
+                        ) {
+                            print("Kembali Tapped")
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(width: UIScreen.main.bounds.width / 3.5)
+
+                        Spacer()
+                        AppButton(
+                            title: "Buat Tugas",
+                            rightIcon: "arrow.right",
+                            size: .large,
+                            isEnabled: true
+                        ) {
+                            isSubmitPopUpVisible = true
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .padding(.horizontal, Decimal.d20)
+                }
+            }
+            .onAppear {
+                presenter.getAllUser()
+                presenter.getAllPatient()
+            }
+            .onChange(of: selectedPatient) { newValue in
+                if !newValue.isEmpty {
+                    presenter.getPatientById(patientId: newValue)
+                }
+            }
+        }
+    }
+}
+
+#Preview {
+    InputExaminationData(selectedPIC: "", selectedPatient: "")
+}

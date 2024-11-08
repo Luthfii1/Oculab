@@ -23,7 +23,7 @@ struct ContentView: View {
                         Text("Riwayat")
                     }
 
-                PDFPageView()
+                InputPatientData()
                     .tabItem {
                         Image(systemName: "person.circle")
                         Text("Profil")

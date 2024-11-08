@@ -8,7 +8,7 @@
 import Foundation
 
 class Patient: Decodable, Identifiable {
-    var _id: UUID = .init()
+    var _id: String
     var name: String
     var NIK: String
     var DoB: Date?
@@ -17,7 +17,7 @@ class Patient: Decodable, Identifiable {
     var resultExamination: [String]?
 
     init(
-        _id: UUID,
+        _id: String,
         name: String,
         NIK: String,
         DoB: Date,
@@ -48,14 +48,15 @@ class Patient: Decodable, Identifiable {
     required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        if let _idString = try container.decodeIfPresent(String.self, forKey: ._id) ?? container.decodeIfPresent(
-            String.self,
-            forKey: .patientId
-        ) {
-            self._id = UUID(uuidString: _idString) ?? UUID()
-        } else {
-            self._id = UUID()
-        }
+//        if let _idString = try container.decodeIfPresent(String.self, forKey: ._id) ?? container.decodeIfPresent(
+//            String.self,
+//            forKey: .patientId
+//        ) {
+//            self._id = UUID(uuidString: _idString) ?? UUID()
+//        } else {
+//            self._id = String
+//        }
+        self._id = try container.decode(String.self, forKey: ._id)
 
         self.name = try container.decode(String.self, forKey: .name)
         self.NIK = try container.decode(String.self, forKey: .NIK)

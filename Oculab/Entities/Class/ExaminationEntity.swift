@@ -10,7 +10,7 @@ import Foundation
 class Examination: Decodable, Identifiable {
     var _id: String
     var goal: ExamGoalType?
-    var preparationType: ExamPreparationType
+    var preparationType: ExamPreparationType?
     var slideId: String
     var recordVideo: Data?
     var WSI: String?
@@ -33,7 +33,7 @@ class Examination: Decodable, Identifiable {
     init(
         _id: String,
         goal: ExamGoalType?,
-        preparationType: ExamPreparationType,
+        preparationType: ExamPreparationType?,
         slideId: String,
         recordVideo: Data?,
         WSI: String? = nil,
