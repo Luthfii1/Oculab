@@ -13,6 +13,9 @@ struct HomeActivityComponent: View {
     var date: String
     var patientName: String
     var patientDOB: String
+    var picName: String
+
+    var isLab: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: Decimal.d8) {
@@ -27,12 +30,17 @@ struct HomeActivityComponent: View {
                     .background(AppColors.purple50)
                     .foregroundStyle(AppColors.purple500)
                     .cornerRadius(Decimal.d8)
-                Text(slideId).font(AppTypography.s4_1).foregroundStyle(AppColors.slate900)
+                Text(isLab ? slideId : patientName + " (\(patientDOB))").font(AppTypography.s4_1)
+                    .foregroundStyle(AppColors.slate900)
+                    .multilineTextAlignment(.leading)
             }
-            HStack(spacing: Decimal.d4) {
-                Text(patientName)
-                Text("(\(patientDOB))")
-            }.font(AppTypography.p4).foregroundStyle(AppColors.slate900)
+
+            if isLab {
+                Text(patientName + " (\(patientDOB))").font(AppTypography.p4).foregroundStyle(AppColors.slate900)
+            } else {
+                Text("Petugas Pemeriksaan").font(AppTypography.s6).foregroundStyle(AppColors.slate300)
+                Text(picName).font(AppTypography.p2).foregroundStyle(AppColors.slate900)
+            }
         }
         .padding(Decimal.d12)
         .cornerRadius(Decimal.d12)
@@ -49,7 +57,9 @@ struct HomeActivityComponent: View {
         status: .INPROGRESS,
         date: "18 September 2024",
         patientName: "Muhammad Rasyad Caesarardhi",
-        patientDOB: "19/12/00"
+        patientDOB: "19/12/00",
+        picName: "Bachul",
+        isLab: false
     )
 
     HomeActivityComponent(
@@ -57,6 +67,8 @@ struct HomeActivityComponent: View {
         status: .NOTSTARTED,
         date: "18 September 2024",
         patientName: "Muhammad Rasyad Caesarardhi",
-        patientDOB: "19/12/00"
+        patientDOB: "19/12/00",
+        picName: "Bachul",
+        isLab: true
     )
 }

@@ -4,7 +4,7 @@
 //
 //  Created by Luthfi Misbachul Munir on 16/10/24.
 //
-
+//
 import SwiftUI
 
 struct HomeView: View {
@@ -15,7 +15,8 @@ struct HomeView: View {
             ScrollView(showsIndicators: false) {
                 Spacer().frame(height: Decimal.d24)
                 VStack(alignment: .leading, spacing: 24) {
-                    StatisticComponent()
+                    // TODO: SESUAIIN SAMA ROLE
+                    StatisticComponent(isLab: false)
                         .environmentObject(presenter)
 
                     VStack(alignment: .leading, spacing: 16) {
@@ -38,6 +39,9 @@ struct HomeView: View {
                             }
                             .padding(.horizontal, 1)
                         }
+
+                        // TODO: GANTI PAKE ROLE YANG SESUAI (klo lab gaada tombol)
+                        AppButton(title: "Pemeriksaan Baru", leftIcon: "doc.badge.plus") {}
 
                         if presenter.isAllExamsLoading {
                             Spacer().frame(height: Decimal.d24)
@@ -74,7 +78,11 @@ struct HomeView: View {
                                             status: exam.statusExamination,
                                             date: exam.datePlan,
                                             patientName: exam.patientName,
-                                            patientDOB: exam.patientDob
+                                            patientDOB: exam.patientDob,
+                                            picName: exam.picName,
+
+                                            // TODO: GANTI PAKE ROLE YANG SESUAI
+                                            isLab: false
                                         )
                                     }
                                 }
