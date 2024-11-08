@@ -137,7 +137,7 @@ class InputPatientPresenter: ObservableObject {
         }
     }
 
-    func newExam(patientId: String, picId: String) {
-        Router.shared.navigateTo(.newExam(patientId: patientId, picId: picId))
+    func newExam() {
+        Router.shared.navigateTo(.newExam(patientId: patient._id, picId: pic._id))
     }
 }
