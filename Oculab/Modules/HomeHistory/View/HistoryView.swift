@@ -48,7 +48,9 @@ struct HistoryView: View {
                                         status: exam.statusExamination,
                                         date: exam.datePlan,
                                         patientName: exam.patientName,
-                                        patientDOB: exam.patientDob
+                                        patientDOB: exam.patientDob,
+                                        picName: exam.picName,
+                                        isLab: true
                                     )
                                 }
                             }

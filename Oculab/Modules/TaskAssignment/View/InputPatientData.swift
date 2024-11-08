@@ -94,7 +94,7 @@ struct InputPatientData: View {
                     presenter.getUserById(userId: newValue)
                 }
             }
-        }
+        }.navigationBarBackButtonHidden(true)
     }
 }
 

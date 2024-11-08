@@ -20,4 +20,6 @@ struct ExaminationCardData: Decodable, Identifiable {
     var patientName: String
     var patientDob: String
     var patientId: String
+    var picName: String
+    var picId: String
 }

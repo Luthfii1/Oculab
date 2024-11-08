@@ -139,7 +139,7 @@ struct InputExaminationData: View {
 
                 print(presenter.patient.name)
             }
-        }
+        }.navigationBarBackButtonHidden(true)
     }
 }
 

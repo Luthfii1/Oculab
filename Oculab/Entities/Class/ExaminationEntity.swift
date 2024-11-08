@@ -30,6 +30,9 @@ class Examination: Decodable, Identifiable {
     var patientName: String?
     var patientDoB: String?
 
+    var picId: String?
+    var picName: String?
+
     init(
         _id: String,
         goal: ExamGoalType?,
@@ -48,7 +51,9 @@ class Examination: Decodable, Identifiable {
         DPJP: User? = nil,
         patientName: String? = nil,
         patientId: String? = nil,
-        patientDoB: String? = nil
+        patientDoB: String? = nil,
+        picId: String? = nil,
+        picName: String? = nil
 
     ) {
         self._id = _id
@@ -70,6 +75,9 @@ class Examination: Decodable, Identifiable {
         self.patientId = patientId
         self.patientName = patientName
         self.patientDoB = patientDoB
+
+        self.picId = picId
+        self.picName = picName
     }
 
     enum CodingKeys: String, CodingKey {
@@ -92,6 +100,8 @@ class Examination: Decodable, Identifiable {
         case patientId
         case patientName
         case patientDoB
+        case picId
+        case picName
     }
 
     required init(from decoder: Decoder) throws {
@@ -157,6 +167,9 @@ class Examination: Decodable, Identifiable {
 
         self.patientId = try container.decodeIfPresent(String.self, forKey: .patientId)
         self.patientName = try container.decodeIfPresent(String.self, forKey: .patientName)
+
+        self.picId = try container.decodeIfPresent(String.self, forKey: .picId)
+        self.picName = try container.decodeIfPresent(String.self, forKey: .picName)
 
         self.patientDoB = try container.decodeIfPresent(String.self, forKey: .patientDoB)
     }

@@ -50,7 +50,10 @@ class HomeInteractor {
                             slideId: exam.slideId,
                             patientName: exam.patientName ?? "",
                             patientDob: exam.patientDoB ?? "",
-                            patientId: exam.patientId ?? "")
+                            patientId: exam.patientId ?? "",
+                            picName: exam.picName ?? "",
+                            picId: exam.picId ?? ""
+                        )
                     }
                     completion(.success(examinationDataCard))
 
