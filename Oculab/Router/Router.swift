@@ -18,7 +18,6 @@ class Router: ObservableObject {
         case pdf
         case analysisResult(examinationId: String)
         case instructionRecord
-//        case newExam
         case examDetail(examId: String, patientId: String)
         case savedResult(examId: String, patientId: String)
     }

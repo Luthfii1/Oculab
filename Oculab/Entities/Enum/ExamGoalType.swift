@@ -8,6 +8,6 @@
 import Foundation
 
 enum ExamGoalType: String, Codable {
-    case SCREENING
-    case TREATMENT
+    case SCREENING = "Skrining"
+    case TREATMENT = "Follow Up"
 }

@@ -29,7 +29,7 @@ class ExamInteractor {
                         pic: apiResponse.data.PIC?.name ?? "Unknown",
                         slideId: apiResponse.data.slideId,
                         examinationGoal: apiResponse.data.goal?.rawValue ?? "No goal specified",
-                        type: apiResponse.data.preparationType.rawValue,
+                        type: apiResponse.data.preparationType?.rawValue ?? "No type specified",
                         dpjp: apiResponse.data.DPJP?.name ?? "Unknown"
                     )
 
@@ -59,7 +59,7 @@ class ExamInteractor {
                 switch result {
                 case let .success(apiResponse):
                     let patientDetail = PatientDetailData(
-                        patientId: apiResponse.data._id.uuidString,
+                        patientId: apiResponse.data._id,
                         name: apiResponse.data.name,
                         nik: apiResponse.data.NIK,
                         dob: apiResponse.data.DoB?.formattedString() ?? "",

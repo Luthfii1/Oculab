@@ -1,13 +1,13 @@
 //
-//  AppTextField.swift
+//  DateField.swift
 //  Oculab
 //
-//  Created by Alifiyah Ariandri on 14/10/24.
+//  Created by Alifiyah Ariandri on 07/11/24.
 //
 
 import SwiftUI
 
-struct AppTextField: View {
+struct DateField: View {
     var title: String
     var isRequired: Bool = false
     var placeholder: String = ""
@@ -17,7 +17,9 @@ struct AppTextField: View {
     var isError: Bool = false
     var isDisabled: Bool = false
     var isNumberOnly: Bool = false
-    @Binding var text: String
+    @Binding var date: Date
+
+    @State var isDatePickerVisible = false
 
     // Colors based on the state (error, disabled, normal)
     private var borderColor: Color {
@@ -26,7 +28,7 @@ struct AppTextField: View {
         } else if isDisabled {
             return AppColors.slate200
         } else {
-            return AppColors.slate300
+            return AppColors.slate100
         }
     }
 
@@ -72,17 +74,35 @@ struct AppTextField: View {
                         .padding(.leading, 16)
                 }
 
-                TextField(placeholder, text: $text)
-                    .keyboardType(isNumberOnly ? .numberPad : .default) // Conditionally set the keyboard type
-                    .disabled(isDisabled)
-                    .foregroundColor(textColor)
-                    .padding(.horizontal, 16)
-                    .onChange(of: text) { newValue in
-                        if isNumberOnly {
-                            // Only allow numbers if isNumberOnly is true
-                            text = newValue.filter { $0.isNumber }
+                Button {
+                    isDatePickerVisible.toggle()
+                } label: {
+                    VStack(alignment: .leading) {
+                        HStack {
+                            Text(
+                                Calendar.current.isDate(date, equalTo: Date(), toGranularity: .month) &&
+                                    Calendar.current.isDate(date, equalTo: Date(), toGranularity: .day) ?
+                                    placeholder :
+                                    date.formatted()
+                            )
+                            .foregroundColor(
+                                Calendar.current.isDate(
+                                    date,
+                                    equalTo: Date(),
+                                    toGranularity: .month
+                                ) &&
+                                    Calendar.current.isDate(date, equalTo: Date(), toGranularity: .day) ? AppColors
+                                    .slate100 : AppColors.slate900
+                            )
+                            .multilineTextAlignment(.leading)
+                            .foregroundStyle(AppColors.slate100)
+
+                            Spacer()
                         }
-                    }
+
+                    }.frame(maxWidth: .infinity)
+                        .padding(.horizontal, 16)
+                }
 
                 if let rightIcon = rightIcon {
                     Image(systemName: rightIcon)
@@ -99,6 +119,16 @@ struct AppTextField: View {
 
             Spacer().frame(height: 8)
 
+            if isDatePickerVisible {
+                DatePicker("Date of Birth", selection: $date, in: ...Date(), displayedComponents: .date)
+                    .datePickerStyle(.graphical)
+                    .padding()
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(borderColor, lineWidth: 1)
+                    )
+            }
+
             // Description or error message
             if let description = description {
                 Text(description)
@@ -111,47 +141,13 @@ struct AppTextField: View {
 
 #Preview {
     VStack(spacing: 20) {
-        AppTextField(
-            title: "Name",
-            isRequired: true,
-            placeholder: "Enter your name",
-            description: "This is a required field",
-            leftIcon: "person.fill",
-            rightIcon: "checkmark.circle",
-            isError: false,
-            isDisabled: false,
-            text: .constant("")
-        )
-
-        AppTextField(
-            title: "Email",
-            isRequired: false,
-            placeholder: "Enter your email",
-            description: "Invalid email address",
-            leftIcon: "envelope.fill",
-            rightIcon: "xmark.circle",
-            isError: true,
-            isDisabled: false,
-            text: .constant("invalid@domain")
-        )
-
-        AppTextField(
-            title: "Address",
-            isRequired: false,
-            placeholder: "Enter your address",
-            description: nil,
-            leftIcon: "house.fill",
-            isDisabled: true,
-            text: .constant("123 Main St")
-        )
-
-        AppTextField(
+        DateField(
             title: "Tanggal Lahir",
             isRequired: false,
             placeholder: "Pilih Tanggal",
             description: nil,
             rightIcon: "calendar",
-            text: .constant("123 Main St")
+            date: .constant(Date())
         )
     }
     .padding()

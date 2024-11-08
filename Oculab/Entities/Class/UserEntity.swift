@@ -12,7 +12,7 @@ class User: Codable, Identifiable {
     var name: String
     var role: RolesType
     var token: String?
-    var email: String
+    var email: String?
     var password: String?
 
     init(
@@ -20,7 +20,7 @@ class User: Codable, Identifiable {
         name: String,
         role: RolesType,
         token: String? = nil,
-        email: String,
+        email: String? = nil,
         password: String? = nil
     ) {
         self._id = _id
@@ -46,7 +46,7 @@ class User: Codable, Identifiable {
         self.name = try container.decode(String.self, forKey: .name)
         self.role = try container.decode(RolesType.self, forKey: .role)
         self.token = try container.decodeIfPresent(String.self, forKey: .token)
-        self.email = try container.decode(String.self, forKey: .email)
+        self.email = try container.decodeIfPresent(String.self, forKey: .email)
         self.password = try container.decodeIfPresent(String.self, forKey: .password)
     }
 
@@ -56,7 +56,7 @@ class User: Codable, Identifiable {
         try container.encode(name, forKey: .name)
         try container.encode(role, forKey: .role)
         try container.encodeIfPresent(token, forKey: .token)
-        try container.encode(email, forKey: .email)
+        try container.encodeIfPresent(email, forKey: .email)
         try container.encodeIfPresent(password, forKey: .password)
     }
 }

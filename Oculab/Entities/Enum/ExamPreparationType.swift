@@ -8,6 +8,6 @@
 import Foundation
 
 enum ExamPreparationType: String, Codable {
-    case SPS
-    case SP
+    case SPS = "Sewaktu"
+    case SP = "Pagi"
 }
