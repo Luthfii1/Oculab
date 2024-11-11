@@ -23,11 +23,12 @@ struct ContentView: View {
                         Text("Riwayat")
                     }
 
-                InputPatientData()
-                    .tabItem {
-                        Image(systemName: "person.circle")
-                        Text("Profil")
-                    }
+//                InputPatientData()
+//                    .tabItem {
+//                        Image(systemName: "person.circle")
+//                        Text("Profil")
+//                    }
+                PatientForm(isAddingNewPatient: true)
             }
             .tint(AppColors.purple500)
         }

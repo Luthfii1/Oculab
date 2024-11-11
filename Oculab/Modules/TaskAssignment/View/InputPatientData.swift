@@ -55,7 +55,7 @@ struct InputPatientData: View {
                             AppButton(
                                 title: "Isi Detail Sediaan",
                                 rightIcon: "arrow.forward",
-                                isEnabled: !(presenter.patient.NIK == "")
+                                isEnabled: !(presenter.patient.NIK == "" || presenter.patient.DoB == nil)
                             ) {
                                 presenter.newExam()
                             }
