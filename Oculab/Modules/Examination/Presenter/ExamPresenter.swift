@@ -103,6 +103,4 @@ class ExamDataPresenter: ObservableObject {
             }
         }
     }
-    
-    
 }

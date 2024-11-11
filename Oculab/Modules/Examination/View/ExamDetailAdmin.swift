@@ -38,7 +38,11 @@ struct ExamDetailAdmin: View {
                         dpjp: presenter.examDetailData.dpjp
                     )
 
-                    AppCard(icon: "doc.text.magnifyingglass", title: "Hasil Pemeriksaan Sediaan 1", spacing: Decimal.d16) {
+                    AppCard(
+                        icon: "doc.text.magnifyingglass",
+                        title: "Hasil Pemeriksaan Sediaan 1",
+                        spacing: Decimal.d16
+                    ) {
                         ExtendedCard(data: [
                             ("Interpretasi Petugas", ""),
                             ("ID Sediaan", ""),
@@ -47,7 +51,11 @@ struct ExamDetailAdmin: View {
                         ], titleSize: AppTypography.s5)
                     }
 
-                    AppCard(icon: "doc.text.magnifyingglass", title: "Hasil Pemeriksaan Sediaan 2", spacing: Decimal.d16) {
+                    AppCard(
+                        icon: "doc.text.magnifyingglass",
+                        title: "Hasil Pemeriksaan Sediaan 2",
+                        spacing: Decimal.d16
+                    ) {
                         ExtendedCard(data: [
                             ("Interpretasi Petugas", ""),
                             ("ID Sediaan", ""),

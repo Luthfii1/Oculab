@@ -11,12 +11,13 @@ struct AppTextField: View {
     var title: String
     var isRequired: Bool = false
     var placeholder: String = ""
-    var description: String? = nil
+    @State var description: String? = nil
     var leftIcon: String? = nil
     var rightIcon: String? = nil
-    var isError: Bool = false
+    @State var isError: Bool = false
     var isDisabled: Bool = false
     var isNumberOnly: Bool = false
+    var length: Int = 0
     @Binding var text: String
 
     // Colors based on the state (error, disabled, normal)
@@ -81,6 +82,16 @@ struct AppTextField: View {
                         if isNumberOnly {
                             // Only allow numbers if isNumberOnly is true
                             text = newValue.filter { $0.isNumber }
+                        }
+
+                        if length != 0 {
+                            if text.distance(from: text.startIndex, to: text.endIndex) != length {
+                                isError = true
+                                description = "\(title) harus \(length) karakter"
+                            } else {
+                                isError = false
+                                description = ""
+                            }
                         }
                     }
 

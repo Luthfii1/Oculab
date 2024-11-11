@@ -28,6 +28,8 @@ struct PatientFormField: View {
             title: "NIK",
             placeholder: "Contoh: 167012039484700",
             isDisabled: !isAddingNewPatient,
+            isNumberOnly: true,
+            length: 16,
             text: $presenter.patient.NIK
         )
 
@@ -53,11 +55,13 @@ struct PatientFormField: View {
 
         AppTextField(
             title: "Nomor BPJS (opsional)",
-            placeholder: "Contoh: 06L30077675",
+            placeholder: "Contoh: 1240630077675",
             isDisabled: !isAddingNewPatient,
+            isNumberOnly: true,
+            length: 13,
             text: Binding(
                 get: { presenter.patient.BPJS ?? "" },
-                set: { presenter.patient.BPJS = $0.isEmpty ? nil : $0 }
+                set: { presenter.patient.BPJS = $0.isEmpty ? "" : $0 }
             )
         )
     }

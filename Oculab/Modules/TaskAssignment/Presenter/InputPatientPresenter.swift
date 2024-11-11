@@ -140,6 +140,15 @@ class InputPatientPresenter: ObservableObject {
     }
 
     func newExam() {
+        addNewPatient()
+
         Router.shared.navigateTo(.newExam(patientId: patient._id, picId: pic._id))
+    }
+
+    func addNewPatient() {
+        print("MASUK SIH")
+        interactor?.addNewPatient(patient: patient) { [weak self] _ in
+            print("AAAAAAAAAAAAA")
+        }
     }
 }

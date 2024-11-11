@@ -12,6 +12,7 @@ class InputPatientInteractor {
     private let apiGetAllPatient = API.BE + "/patient/get-all-patients"
     let urlGetDataPatient = API.BE + "/patient/get-patient-by-id/"
     let urlGetDataUser = API.BE + "/user/get-user-data-by-id/"
+    let urlCreatePatient = API.BE + "/patient/create-new-patient/"
 
     func getAllUser(completion: @escaping (Result<[User], NetworkErrorType>) -> Void) {
         NetworkHelper.shared.get(urlString: apiGetAllUser) { (result: Result<
@@ -90,4 +91,31 @@ class InputPatientInteractor {
             }
         }
     }
+
+    func addNewPatient(
+        patient: Patient,
+        completion: @escaping (Result<APIResponse<Patient>, NetworkErrorType>) -> Void
+    ) {
+        NetworkHelper.shared.post(urlString: urlCreatePatient, body: patient) { (result: Result<
+            APIResponse<Patient>,
+            NetworkErrorType
+        >) in
+            DispatchQueue.main.async {
+                switch result {
+                case let .success(apiResponse):
+
+                    completion(.success(apiResponse))
+
+                case let .failure(error):
+                    completion(.failure(error))
+                    print(error)
+                }
+            }
+        }
+    }
+}
+
+struct ErrorMessage: Decodable {
+    var errorType: String
+    var description: String
 }

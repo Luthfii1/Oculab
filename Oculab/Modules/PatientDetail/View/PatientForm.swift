@@ -10,6 +10,8 @@ import SwiftUI
 struct PatientForm: View {
     var isAddingNewPatient: Bool
 
+    var presenter = InputPatientPresenter()
+
     var body: some View {
         NavigationView {
             VStack {
@@ -18,7 +20,7 @@ struct PatientForm: View {
                         PatientFormField(
                             isAddingNewPatient: isAddingNewPatient,
                             isAddingName: true,
-                            presenter: InputPatientPresenter()
+                            presenter: presenter
                         )
                     }
                 }
@@ -29,7 +31,9 @@ struct PatientForm: View {
                     title: isAddingNewPatient ? "Tambahkan Pasien Baru" : "Simpan Data Pasien",
                     leftIcon: isAddingNewPatient ? "plus" : "",
                     rightIcon: isAddingNewPatient ? "" : "checkmark"
-                ) {}
+                ) {
+                    presenter.addNewPatient()
+                }
             }
 
             .padding(.horizontal, Decimal.d20)
@@ -39,7 +43,7 @@ struct PatientForm: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
-                        //                        presentationMode.wrappedValue.dismiss()
+                        // TODO: ROUTING BACK
                     }) {
                         HStack {
                             Image("back")
