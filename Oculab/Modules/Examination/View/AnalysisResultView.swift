@@ -231,7 +231,7 @@ struct AnalysisResultView: View {
                                             rightIcon: "chevron.down",
                                             isDisabled: false,
                                             choices: GradingType.allCases.dropLast().map { ($0.rawValue, $0.rawValue) },
-                                            selectedChoice: $selectedTBGrade, isAddingNewPatient: .constant(false)
+                                            selectedChoice: $selectedTBGrade
                                         )
 
                                         if selectedTBGrade == GradingType.SCANTY.rawValue {

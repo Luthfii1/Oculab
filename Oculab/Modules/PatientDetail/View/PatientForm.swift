@@ -9,7 +9,6 @@ import SwiftUI
 
 struct PatientForm: View {
     var isAddingNewPatient: Bool
-
     var presenter = InputPatientPresenter()
 
     var body: some View {
@@ -18,7 +17,6 @@ struct PatientForm: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: Decimal.d24) {
                         PatientFormField(
-                            isAddingNewPatient: isAddingNewPatient,
                             isAddingName: true,
                             presenter: presenter
                         )

@@ -59,6 +59,7 @@ struct InputExaminationData: View {
                                     title: "Tujuan Pemeriksaan",
                                     isRequired: true,
                                     choices: ["Skrinning", "Follow Up"],
+                                    isDisabled: false,
                                     selectedChoice: $presenter.goalString
                                 )
 
@@ -72,6 +73,7 @@ struct InputExaminationData: View {
                                     title: "Jenis Sediaan 1",
                                     isRequired: true,
                                     choices: ["Pagi", "Sewaktu"],
+                                    isDisabled: false,
                                     selectedChoice: $presenter.typeString
                                 )
 
@@ -85,6 +87,7 @@ struct InputExaminationData: View {
                                     title: "Jenis Sediaan 2",
                                     isRequired: true,
                                     choices: ["Pagi", "Sewaktu"],
+                                    isDisabled: false,
                                     selectedChoice: $presenter.typeString2
                                 )
                             }

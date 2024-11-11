@@ -8,18 +8,21 @@
 import SwiftUI
 
 struct PatientFormField: View {
-    @State var isAddingNewPatient: Bool
     @State var isAddingName: Bool
+
+    @State var selectedSex: String = ""
+    @State var selectedDoB: Date = .init()
+    @State var BPJSnumber: String = ""
 
     @ObservedObject var presenter: InputPatientPresenter
 
     var body: some View {
-        if isAddingName {
+        if !presenter.patientFound {
             AppTextField(
                 title: "Nama",
                 placeholder: "Contoh: Alya Annisa Kirana",
                 leftIcon: "person.fill",
-                isDisabled: !isAddingNewPatient,
+                isDisabled: presenter.patientFound,
                 text: $presenter.patient.name
             )
         }
@@ -27,7 +30,7 @@ struct PatientFormField: View {
         AppTextField(
             title: "NIK",
             placeholder: "Contoh: 167012039484700",
-            isDisabled: !isAddingNewPatient,
+            isDisabled: presenter.patientFound,
             isNumberOnly: true,
             length: 16,
             text: $presenter.patient.NIK
@@ -37,36 +40,43 @@ struct PatientFormField: View {
             title: "Tanggal Lahir",
             placeholder: "Pilih Tanggal",
             rightIcon: "calendar",
-            isDisabled: !isAddingNewPatient,
-            date: Binding(
-                get: { presenter.patient.DoB ?? Date() },
-                set: { presenter.patient.DoB = $0 }
-            )
-        )
+            isDisabled: presenter.patientFound,
+            date: $selectedDoB
+        ).onChange(of: selectedDoB) {
+            presenter.patient.DoB = selectedDoB
+        }
 
         AppRadioButton(
             title: "Jenis Kelamin", isRequired: true,
             choices: ["Perempuan", "Laki-laki"],
-            selectedChoice: Binding(
-                get: { presenter.patient.sex.rawValue },
-                set: { presenter.patient.sex = SexType(rawValue: $0) ?? .MALE }
-            )
+            isDisabled: presenter.patientFound,
+            selectedChoice: $selectedSex
         )
+        .onChange(of: selectedSex) {
+            switch selectedSex {
+            case "Perempuan":
+                presenter.patient.sex = .FEMALE
+            case "Laki-laki":
+                presenter.patient.sex = .MALE
+            default:
+                presenter.patient.sex = .UNKNOWN
+            }
+        }
 
         AppTextField(
             title: "Nomor BPJS (opsional)",
             placeholder: "Contoh: 1240630077675",
-            isDisabled: !isAddingNewPatient,
+            isDisabled: presenter.patientFound,
             isNumberOnly: true,
             length: 13,
-            text: Binding(
-                get: { presenter.patient.BPJS ?? "" },
-                set: { presenter.patient.BPJS = $0.isEmpty ? "" : $0 }
-            )
-        )
+            text: $BPJSnumber
+
+        ).onChange(of: BPJSnumber) {
+            presenter.patient.BPJS = BPJSnumber
+        }
     }
 }
 
 #Preview {
-    PatientFormField(isAddingNewPatient: true, isAddingName: false, presenter: InputPatientPresenter())
+    PatientFormField(isAddingName: false, presenter: InputPatientPresenter())
 }

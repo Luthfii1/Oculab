@@ -94,7 +94,7 @@ class InputPatientInteractor {
 
     func addNewPatient(
         patient: Patient,
-        completion: @escaping (Result<APIResponse<Patient>, NetworkErrorType>) -> Void
+        completion: @escaping (Result<Patient, NetworkErrorType>) -> Void
     ) {
         NetworkHelper.shared.post(urlString: urlCreatePatient, body: patient) { (result: Result<
             APIResponse<Patient>,
@@ -104,11 +104,10 @@ class InputPatientInteractor {
                 switch result {
                 case let .success(apiResponse):
 
-                    completion(.success(apiResponse))
+                    completion(.success(apiResponse.data))
 
                 case let .failure(error):
                     completion(.failure(error))
-                    print(error)
                 }
             }
         }
