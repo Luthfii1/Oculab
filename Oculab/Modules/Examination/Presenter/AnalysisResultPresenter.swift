@@ -13,10 +13,18 @@ class AnalysisResultPresenter: ObservableObject {
 
     @Published var examinationResult: ExaminationResultData?
     @Published var errorMessage: String?
-
     @Published var confidenceLevel: ConfidenceLevel = .unpredicted
     @Published var resultQuantity: Int = 0
     @Published var groupedFOVs: FOVGrouping?
+
+    // MARK: State for view
+
+    @Published var selectedTBGrade: String = ""
+    @Published var numOfBTA: String = ""
+    @Published var inspectorNotes: String = ""
+    @Published private var currentStep: Int = 3
+    @Published var isVerifPopUpVisible = false
+    @Published var isLeavePopUpVisible = false
 
     func popToRoot() {
         Router.shared.popToRoot()

@@ -114,7 +114,7 @@ class InputPatientPresenter: ObservableObject {
                     self?.patient = data
                     self?.patientFound = true
 
-                case let .failure(error):
+                case .failure:
                     self?.patient = .init(_id: "", name: "", NIK: "", DoB: Date(), sex: .MALE)
                     self?.patientFound = false
                 }

@@ -39,8 +39,7 @@ struct HistoryView: View {
                                 Button {
                                     Router.shared.navigateTo(.savedResult(
                                         examId: exam.id,
-                                        patientId: exam.patientId ?? ""
-
+                                        patientId: exam.patientId
                                     ))
                                 } label: {
                                     HomeActivityComponent(

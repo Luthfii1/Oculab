@@ -48,15 +48,12 @@ class NetworkHelper {
             return
         }
 
-        // Print the data as a JSON string for debugging
-        debugResponse(data: data)
+//        // Print the data as a JSON string for debugging
+//        debugResponse(data: data)
 
         // Decode the response to determine success or error
         do {
-            print("here")
-            print(T.Type.self)
             let response = try JSONDecoder().decode(APIResponse<T>.self, from: data)
-            print("success decoding")
             completion(.success(response))
         } catch {
             if let errorResponse = try? JSONDecoder().decode(APIResponse<ApiErrorData>.self, from: data) {
