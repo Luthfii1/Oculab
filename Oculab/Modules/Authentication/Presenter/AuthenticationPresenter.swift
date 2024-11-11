@@ -24,6 +24,7 @@ class AuthenticationPresenter: ObservableObject {
     @Published var email: String = ""
     @Published var password: String = ""
     @Published var buttonText: String = "Login"
+    @Published var isKeyboardVisible: Bool = false
 
     func isFilled() -> Bool {
         return !email.isEmpty && !password.isEmpty && !isLoading
@@ -36,7 +37,14 @@ class AuthenticationPresenter: ObservableObject {
             DispatchQueue.main.async {
                 switch result {
                 case let .success(data):
-                    print(data)
+                    UserDefaults.standard.set(data.accessToken, forKey: UserDefaultType.accessToken.rawValue)
+                    UserDefaults.standard.set(data.refreshToken, forKey: UserDefaultType.refreshToken.rawValue)
+                    UserDefaults.standard.set(true, forKey: UserDefaultType.isUserLoggedIn.rawValue)
+                    UserDefaults.standard.set(data.userId, forKey: UserDefaultType.userId.rawValue)
+
+                    print(
+                        "success login: \(String(describing: UserDefaults.standard.string(forKey: UserDefaultType.isUserLoggedIn.rawValue)))"
+                    )
                 case let .failure(error):
                     print("Error description: \(error.description)")
                     print("Error type: \(error.errorType)")
@@ -45,5 +53,11 @@ class AuthenticationPresenter: ObservableObject {
                 self.isLoading = false
             }
         })
+    }
+
+    func logoutAccount() {
+        for userDefault in UserDefaultType.allCases {
+            UserDefaults.standard.removeObject(forKey: userDefault.rawValue)
+        }
     }
 }

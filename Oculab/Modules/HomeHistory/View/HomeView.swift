@@ -9,11 +9,18 @@ import SwiftUI
 
 struct HomeView: View {
     @ObservedObject private var presenter = HomeHistoryPresenter()
+    @ObservedObject private var authentication = AuthenticationPresenter()
 
     var body: some View {
         NavigationView {
             ScrollView(showsIndicators: false) {
                 Spacer().frame(height: Decimal.d24)
+
+                AppButton(title: "Log out account", leftIcon: "door.left.hand.open") {
+                    authentication.logoutAccount()
+                }
+                .padding(.horizontal)
+
                 VStack(alignment: .leading, spacing: 24) {
                     // TODO: SESUAIIN SAMA ROLE
                     StatisticComponent(isLab: false)

@@ -108,7 +108,7 @@ struct WeeklyCalendarView: View {
                     .background(Color.white)
                     .cornerRadius(12)
                     .shadow(radius: 8)
-                    .onChange(of: selectedDate) { newDate in
+                    .onChange(of: selectedDate) { _, newDate in
                         currentWeek = getWeek(for: newDate)
                         withAnimation {
                             isDatePickerVisible = false
@@ -173,6 +173,6 @@ struct WeeklyCalendarView: View {
 }
 
 #Preview {
-    @State var selectedDate = Date()
+    @Previewable @State var selectedDate = Date()
     WeeklyCalendarView(selectedDate: $selectedDate)
 }

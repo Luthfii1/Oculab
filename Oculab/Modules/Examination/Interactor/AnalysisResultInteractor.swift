@@ -96,4 +96,12 @@ struct FOVGrouping: Decodable {
         self.bta1to9 = try container.decodeIfPresent([FOVData].self, forKey: .bta1to9) ?? []
         self.btaabove9 = try container.decodeIfPresent([FOVData].self, forKey: .btaabove9) ?? []
     }
+
+    var groupedData: [(title: FOVType, data: [FOVData])] {
+        return [
+            (.BTA0, bta0),
+            (.BTA1TO9, bta1to9),
+            (.BTAABOVE9, btaabove9)
+        ]
+    }
 }
