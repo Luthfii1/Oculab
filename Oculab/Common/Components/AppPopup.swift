@@ -69,7 +69,7 @@ struct AppPopup: View {
 }
 
 #Preview {
-    @State var isVisible = true
+    @Previewable @State var isVisible = true
 
     VStack {
         Button("Show Popup") {

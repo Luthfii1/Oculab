@@ -11,12 +11,15 @@ extension NetworkHelper {
     func update<T: Encodable, U: Decodable>(
         urlString: String,
         body: T,
-        completion: @escaping (Result<U, NetworkErrorType>) -> Void
+        completion: @escaping (Result<APIResponse<U>, APIResponse<ApiErrorData>>) -> Void
     ) {
         guard let jsonData = try? JSONEncoder().encode(body),
               let request = createRequest(urlString: urlString, httpMethod: "PUT", body: jsonData)
         else {
-            completion(.failure(.invalidURL))
+            completion(.failure(createErrorSystem(
+                errorType: "InvalidRequest",
+                errorMessage: "Error encoding request body"
+            )))
             return
         }
 

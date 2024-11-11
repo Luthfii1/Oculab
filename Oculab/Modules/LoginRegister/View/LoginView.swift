@@ -8,50 +8,73 @@
 import SwiftUI
 
 struct LoginView: View {
-    @State var username: String = ""
-    @State var password: String = ""
+    @ObservedObject var authPresenter = AuthenticationPresenter()
 
     var body: some View {
         VStack {
-            Image("LoginImage")
+            Image(.login)
+                .resizable()
+                .scaledToFit()
 
             VStack {
-                Text("Revolusi Deteksi Bakteri dengan Teknologi AI").font(AppTypography.h1)
+                Text("Revolusi Deteksi Bakteri dengan Teknologi AI")
+                    .font(AppTypography.h1)
+                    .foregroundStyle(AppColors.slate900)
+                    .multilineTextAlignment(.center)
 
-                VStack {
+                VStack(spacing: 8) {
                     AppTextField(
-                        title: "Username",
-                        placeholder: "Contoh: indrikla24",
-                        description: "Dapatkan akun Anda dari admin faskes",
-                        text: $username
+                        title: "email",
+                        placeholder: "Contoh: indrikla24@gmail.com",
+                        text: $authPresenter.email
                     )
 
                     AppTextField(
                         title: "Kata Sandi",
                         placeholder: "Masukkan Kata Sandi",
                         rightIcon: "eye",
-                        text: $password
+                        text: $authPresenter.password
                     )
                 }
+                .padding(.horizontal)
+                .padding(.top, 12)
 
-                VStack {
+                VStack(alignment: .center, spacing: 16) {
                     AppButton(
-                        title: "Masuk",
+                        title: authPresenter.buttonText,
                         colorType: .primary,
-                        size: .large
-                    ) {}
+                        size: .large,
+                        isEnabled: authPresenter.isFilled()
+                    ) {
+                        authPresenter.login()
+                    }
 
-                    HStack {
-                        Text("Faskes belum terdaftar?").font(AppTypography.p3)
+                    HStack(alignment: .center, spacing: 12) {
+                        Spacer()
+
+                        Text("Faskes belum terdaftar?")
+                            .font(AppTypography.p3)
+                            .foregroundStyle(AppColors.slate900)
+
                         AppButton(
                             title: "Daftarkan Faskes",
                             colorType: .tertiary,
                             size: .large
-                        ) {}
+                        ) {
+                            print("Daftar faskess button")
+                        }
+
+                        Spacer()
                     }
                 }
+                .padding(.horizontal)
+                .padding(.top, 18)
             }
+            .padding(.top, 24)
+
+            Spacer()
         }
+        .ignoresSafeArea()
     }
 }
 

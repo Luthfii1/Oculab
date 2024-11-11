@@ -18,8 +18,8 @@ class Router: ObservableObject {
         case pdf
         case analysisResult(examinationId: String)
         case instructionRecord
-//        case newExam
         case examDetail(examId: String, patientId: String)
+        case userAccessPin(title: String, description: String)
     }
 
     @Published var path: NavigationPath = .init()
@@ -37,10 +37,10 @@ class Router: ObservableObject {
             AnalysisResultView(examinationId: examinationId)
         case .instructionRecord:
             InstructionRecordView()
-//        case .newExam:
-//            ExamDataView()
-        case let .examDetail(examId, patientId): // Corrected to use `let examId`
+        case let .examDetail(examId, patientId):
             ExamDetailView(examId: examId, patientId: patientId)
+        case let .userAccessPin(title, description):
+            UserAccessPin(title: title, description: description)
         }
     }
 

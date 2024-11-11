@@ -59,7 +59,7 @@ struct AppTextBox: View {
                     .padding(.vertical, 12)
                     .background(Color.clear) // Ensure TextEditor itself has no background
                     .cornerRadius(12)
-                    .onChange(of: internalText) { newValue in
+                    .onChange(of: internalText) { _, newValue in
                         text = newValue // Sync with external text binding
                     }
                     .overlay(
