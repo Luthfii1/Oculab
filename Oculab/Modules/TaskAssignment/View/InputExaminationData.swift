@@ -12,6 +12,9 @@ struct InputExaminationData: View {
 
     @State var selectedPIC: String
     @State var selectedPatient: String
+    @State var goalString: String = ""
+    @State var typeString: String = ""
+    @State var typeString2: String = ""
 
     @State var isAddingNewPatient: Bool = false
 
@@ -31,6 +34,7 @@ struct InputExaminationData: View {
                             size: .large,
                             isEnabled: true
                         ) {
+                            presenter.submitExamination()
 //                            presenter.popToRoot()
                         },
 
@@ -60,8 +64,17 @@ struct InputExaminationData: View {
                                     isRequired: true,
                                     choices: ["Skrinning", "Follow Up"],
                                     isDisabled: false,
-                                    selectedChoice: $presenter.goalString
-                                )
+                                    selectedChoice: $goalString
+                                ).onChange(of: goalString) {
+                                    switch goalString {
+                                    case "Skrining":
+                                        presenter.examination.goal = .SCREENING
+                                    case "Follow Up":
+                                        presenter.examination.goal = .SCREENING
+                                    default:
+                                        presenter.examination.goal = .SCREENING
+                                    }
+                                }
 
                                 AppTextField(
                                     title: "ID Sediaan 1",
@@ -74,8 +87,17 @@ struct InputExaminationData: View {
                                     isRequired: true,
                                     choices: ["Pagi", "Sewaktu"],
                                     isDisabled: false,
-                                    selectedChoice: $presenter.typeString
-                                )
+                                    selectedChoice: $typeString
+                                ).onChange(of: typeString) {
+                                    switch typeString {
+                                    case "Pagi":
+                                        presenter.examination.preparationType = .SP
+                                    case "Sewaktu":
+                                        presenter.examination.preparationType = .SPS
+                                    default:
+                                        presenter.examination.preparationType = .SPS
+                                    }
+                                }
 
                                 AppTextField(
                                     title: "ID Sediaan 2",
@@ -88,8 +110,17 @@ struct InputExaminationData: View {
                                     isRequired: true,
                                     choices: ["Pagi", "Sewaktu"],
                                     isDisabled: false,
-                                    selectedChoice: $presenter.typeString2
-                                )
+                                    selectedChoice: $typeString2
+                                ).onChange(of: typeString2) {
+                                    switch typeString2 {
+                                    case "Pagi":
+                                        presenter.examination.preparationType = .SP
+                                    case "Sewaktu":
+                                        presenter.examination.preparationType = .SPS
+                                    default:
+                                        presenter.examination.preparationType = .SPS
+                                    }
+                                }
                             }
 
                             .padding(.horizontal, Decimal.d20)
@@ -138,6 +169,8 @@ struct InputExaminationData: View {
             }
             .onAppear {
                 presenter.getPatientById(patientId: selectedPatient)
+                print(selectedPatient)
+                print(presenter.patient.name)
                 presenter.getUserById(userId: selectedPIC)
 
                 print(presenter.patient.name)

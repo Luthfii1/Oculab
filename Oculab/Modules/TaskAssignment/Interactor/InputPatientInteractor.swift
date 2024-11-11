@@ -13,6 +13,7 @@ class InputPatientInteractor {
     let urlGetDataPatient = API.BE + "/patient/get-patient-by-id/"
     let urlGetDataUser = API.BE + "/user/get-user-data-by-id/"
     let urlCreatePatient = API.BE + "/patient/create-new-patient/"
+    let urlCreateExam = API.BE + "/exam/create-examination/"
 
     func getAllUser(completion: @escaping (Result<[User], NetworkErrorType>) -> Void) {
         NetworkHelper.shared.get(urlString: apiGetAllUser) { (result: Result<
@@ -98,6 +99,27 @@ class InputPatientInteractor {
     ) {
         NetworkHelper.shared.post(urlString: urlCreatePatient, body: patient) { (result: Result<
             APIResponse<Patient>,
+            NetworkErrorType
+        >) in
+            DispatchQueue.main.async {
+                switch result {
+                case let .success(apiResponse):
+
+                    completion(.success(apiResponse.data))
+
+                case let .failure(error):
+                    completion(.failure(error))
+                }
+            }
+        }
+    }
+
+    func addNewExamination(
+        patientId: String,
+        examination: Examination, completion: @escaping (Result<ErrorMessage, NetworkErrorType>) -> Void
+    ) {
+        NetworkHelper.shared.post(urlString: urlCreateExam + patientId, body: patientId) { (result: Result<
+            APIResponse<ErrorMessage>,
             NetworkErrorType
         >) in
             DispatchQueue.main.async {

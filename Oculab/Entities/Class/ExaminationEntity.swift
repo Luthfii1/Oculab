@@ -33,6 +33,8 @@ class Examination: Decodable, Identifiable {
     var picId: String?
     var picName: String?
 
+    var dpjpId: String?
+
     init(
         _id: String,
         goal: ExamGoalType?,
@@ -53,6 +55,8 @@ class Examination: Decodable, Identifiable {
         patientId: String? = nil,
         patientDoB: String? = nil,
         picId: String? = nil,
+        dpjpId: String? = nil,
+
         picName: String? = nil
 
     ) {
@@ -75,6 +79,8 @@ class Examination: Decodable, Identifiable {
         self.patientId = patientId
         self.patientName = patientName
         self.patientDoB = patientDoB
+
+        self.dpjpId = dpjpId
 
         self.picId = picId
         self.picName = picName
@@ -102,6 +108,7 @@ class Examination: Decodable, Identifiable {
         case patientDoB
         case picId
         case picName
+        case dpjpId
     }
 
     required init(from decoder: Decoder) throws {
@@ -172,5 +179,33 @@ class Examination: Decodable, Identifiable {
         self.picName = try container.decodeIfPresent(String.self, forKey: .picName)
 
         self.patientDoB = try container.decodeIfPresent(String.self, forKey: .patientDoB)
+
+        self.dpjpId = try container.decodeIfPresent(String.self, forKey: .dpjpId)
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(_id, forKey: ._id)
+        try container.encode(goal, forKey: .goal)
+        try container.encode(preparationType, forKey: .preparationType)
+        try container.encode(slideId, forKey: .slideId)
+
+        if let examinationDate = examinationDate {
+            let dateFormatter = ISO8601DateFormatter()
+            dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            let dateString = dateFormatter.string(from: examinationDate)
+            try container.encode(dateString, forKey: .examinationDate)
+        }
+
+        if let examinationPlanDate = examinationPlanDate {
+            let dateFormatter = ISO8601DateFormatter()
+            dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            let dateString = dateFormatter.string(from: examinationPlanDate)
+            try container.encode(dateString, forKey: .examinationPlanDate)
+        }
+
+        try container.encode(picId, forKey: .PIC)
+        try container.encode(dpjpId, forKey: .DPJP)
     }
 }

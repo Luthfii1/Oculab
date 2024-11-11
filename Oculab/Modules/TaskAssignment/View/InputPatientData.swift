@@ -54,7 +54,7 @@ struct InputPatientData: View {
                                 rightIcon: "arrow.forward",
                                 isEnabled: !(presenter.patient.NIK == "" || presenter.patient.DoB == nil)
                             ) {
-                                if isAddingNewPatient {
+                                if !presenter.patientFound {
                                     presenter.addNewPatient()
                                 }
                                 presenter.newExam()
