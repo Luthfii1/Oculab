@@ -13,11 +13,18 @@ struct LoginView: View {
     var body: some View {
         NavigationView {
             VStack {
-                Image(.login)
-                    .resizable()
-                    .scaledToFit()
+                if !authPresenter.isKeyboardVisible {
+                    Image(.login)
+                        .resizable()
+                        .scaledToFit()
+                        .transition(.opacity)
+                }
 
                 VStack {
+                    if authPresenter.isKeyboardVisible {
+                        Spacer()
+                    }
+
                     Text("Revolusi Deteksi Bakteri dengan Teknologi AI")
                         .font(AppTypography.h1)
                         .foregroundStyle(AppColors.slate900)
@@ -62,7 +69,7 @@ struct LoginView: View {
                                 colorType: .tertiary,
                                 size: .large
                             ) {
-                                print("Daftar faskess button")
+                                print("Daftar faskes button")
                             }
 
                             Spacer()
@@ -70,8 +77,13 @@ struct LoginView: View {
                     }
                     .padding(.horizontal)
                     .padding(.top, 18)
+
+                    if authPresenter.isKeyboardVisible {
+                        Spacer()
+                    }
                 }
                 .padding(.top, 24)
+                .adaptsToKeyboard(isKeyboardVisible: $authPresenter.isKeyboardVisible)
 
                 Spacer()
             }

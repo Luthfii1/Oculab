@@ -24,6 +24,7 @@ class AuthenticationPresenter: ObservableObject {
     @Published var email: String = ""
     @Published var password: String = ""
     @Published var buttonText: String = "Login"
+    @Published var isKeyboardVisible: Bool = false
 
     func isFilled() -> Bool {
         return !email.isEmpty && !password.isEmpty && !isLoading
