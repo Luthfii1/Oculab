@@ -20,6 +20,8 @@ class InputPatientPresenter: ObservableObject {
     @Published var patient: Patient = .init(_id: "", name: "", NIK: "", DoB: Date(), sex: .UNKNOWN)
     @Published var pic: User = .init(_id: "", name: "", role: .ADMIN)
 
+    @Published var patientFound: Bool = false
+
     @Published var examination: Examination = .init(
         _id: "",
         goal: nil,
@@ -110,10 +112,11 @@ class InputPatientPresenter: ObservableObject {
                 switch result {
                 case let .success(data):
                     self?.patient = data
+                    self?.patientFound = true
 
                 case let .failure(error):
                     self?.patient = .init(_id: "", name: "", NIK: "", DoB: Date(), sex: .MALE)
-                    print("Add new patient")
+                    self?.patientFound = false
                 }
             }
         }
@@ -140,15 +143,20 @@ class InputPatientPresenter: ObservableObject {
     }
 
     func newExam() {
-        addNewPatient()
-
         Router.shared.navigateTo(.newExam(patientId: patient._id, picId: pic._id))
     }
 
     func addNewPatient() {
-        print("MASUK SIH")
-        interactor?.addNewPatient(patient: patient) { [weak self] _ in
-            print("AAAAAAAAAAAAA")
+        interactor?.addNewPatient(patient: patient) { [weak self] result in
+            switch result {
+            case let .success(data):
+                self?.patient = data
+                print(data)
+
+            case let .failure(error):
+                print(error)
+                print("Add new patient")
+            }
         }
     }
 }

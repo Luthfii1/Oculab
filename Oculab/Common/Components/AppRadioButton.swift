@@ -11,6 +11,7 @@ struct AppRadioButton: View {
     var title: String
     var isRequired: Bool
     var choices: [String]
+    var isDisabled: Bool
     @Binding var selectedChoice: String
 
     var body: some View {
@@ -34,28 +35,48 @@ struct AppRadioButton: View {
                         .frame(width: 16, height: 16)
                         .foregroundColor(selectedChoice == choice ? AppColors.purple600 : .gray)
                         .onTapGesture {
-                            selectedChoice = choice
+                            if !isDisabled {
+                                selectedChoice = choice
+                            }
                         }
                         .padding(2)
 
                     Text(choice)
                         .font(AppTypography.p2)
-                        .foregroundColor(AppColors.slate900)
+                        .foregroundColor(isDisabled ? .gray : AppColors.slate900)
                         .onTapGesture {
-                            selectedChoice = choice
+                            if !isDisabled {
+                                selectedChoice = choice
+                            }
                         }
                 }
             }
         }
+        .opacity(isDisabled ? 0.6 : 1.0) // Optional: dim appearance when disabled
     }
 }
 
-// #Preview {
-//    VStack(alignment: .leading) {
-//        AppRadioButton(
-//            title: "Gender",
-//            isRequired: true,
-//            choices: ["Male", "Female", "Other"]
-//        )
-//    }
-// }
+struct AppRadioButtonPreview: View {
+    @State private var sex = ""
+    @State private var isDisabled = false
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            AppRadioButton(
+                title: "Gender",
+                isRequired: true,
+                choices: ["Male", "Female", "Other"],
+                isDisabled: isDisabled,
+                selectedChoice: $sex
+            )
+            .padding()
+
+            Toggle("Disable Radio Buttons", isOn: $isDisabled)
+                .padding()
+        }
+    }
+}
+
+#Preview {
+    AppRadioButtonPreview()
+}

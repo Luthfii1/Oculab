@@ -21,7 +21,6 @@ struct AppDropdown: View {
     @State private var isDropdownOpen: Bool = false
     @State private var searchText: String = "" // New state for search text
     @State var isEnablingAdding: Bool = false
-    @Binding var isAddingNewPatient: Bool
 
     // Computed property to filter choices based on search text
     private var filteredChoices: [(display: String, value: String)] {
@@ -109,7 +108,6 @@ struct AppDropdown: View {
                 VStack(alignment: .leading) {
                     if isEnablingAdding {
                         Button {
-                            isAddingNewPatient = true
                             isDropdownOpen = false
                             selectedChoice = searchText
                         } label: {
@@ -181,8 +179,7 @@ struct AppDropdown: View {
             isDisabled: false,
             choices: [("Option 1", "value1"), ("Option 2", "value2"), ("Option 3", "value3"), ("Option 4", "value4")],
             description: "Please select an option from the dropdown",
-            selectedChoice: .constant(""),
-            isAddingNewPatient: .constant(true)
+            selectedChoice: .constant("")
         )
     }
     .padding()

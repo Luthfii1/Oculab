@@ -30,8 +30,7 @@ struct InputPatientData: View {
                             placeholder: "Pilih Petugas",
                             leftIcon: "person.fill",
                             choices: presenter.picName,
-                            selectedChoice: $selectedPIC,
-                            isAddingNewPatient: .constant(true)
+                            selectedChoice: $selectedPIC
                         )
 
                         AppDropdown(
@@ -42,14 +41,12 @@ struct InputPatientData: View {
                             choices: presenter.patientNameDoB,
                             description: "Pilih atau masukkan data pasien baru",
                             selectedChoice: $selectedPatient,
-                            isEnablingAdding: true,
-                            isAddingNewPatient: $isAddingNewPatient
+                            isEnablingAdding: true
                         )
 
                         if selectedPatient != "" {
                             PatientFormField(
-                                isAddingNewPatient: isAddingNewPatient,
-                                isAddingName: false,
+                                isAddingName: presenter.patientFound,
                                 presenter: presenter
                             )
                             AppButton(
@@ -57,6 +54,9 @@ struct InputPatientData: View {
                                 rightIcon: "arrow.forward",
                                 isEnabled: !(presenter.patient.NIK == "" || presenter.patient.DoB == nil)
                             ) {
+                                if isAddingNewPatient {
+                                    presenter.addNewPatient()
+                                }
                                 presenter.newExam()
                             }
                             Spacer()
@@ -85,9 +85,8 @@ struct InputPatientData: View {
                 presenter.getAllPatient()
             }
             .onChange(of: selectedPatient) { newValue in
-                if !newValue.isEmpty {
-                    presenter.getPatientById(patientId: newValue)
-                }
+                print(selectedPatient)
+                presenter.getPatientById(patientId: newValue)
             }
             .onChange(of: selectedPIC) { newValue in
                 if !newValue.isEmpty {
