@@ -8,9 +8,9 @@
 import Foundation
 
 class Examination: Decodable, Identifiable {
-    var _id: UUID
+    var _id: String
     var goal: ExamGoalType?
-    var preparationType: ExamPreparationType
+    var preparationType: ExamPreparationType?
     var slideId: String
     var recordVideo: Data?
     var WSI: String?
@@ -23,15 +23,20 @@ class Examination: Decodable, Identifiable {
     var systemResult: SystemExamResult?
     var expertResult: ExpertExamResult?
 
-    var PIC: PICEntity?
+    var PIC: User?
+    var DPJP: User?
+
     var patientId: String?
     var patientName: String?
     var patientDoB: String?
 
+    var picId: String?
+    var picName: String?
+
     init(
-        _id: UUID = UUID(),
+        _id: String,
         goal: ExamGoalType?,
-        preparationType: ExamPreparationType,
+        preparationType: ExamPreparationType?,
         slideId: String,
         recordVideo: Data?,
         WSI: String? = nil,
@@ -42,10 +47,13 @@ class Examination: Decodable, Identifiable {
         statusExamination: StatusType,
         systemResult: SystemExamResult? = nil,
         expertResult: ExpertExamResult? = nil,
-        PIC: PICEntity? = nil,
+        PIC: User? = nil,
+        DPJP: User? = nil,
         patientName: String? = nil,
         patientId: String? = nil,
-        patientDoB: String? = nil
+        patientDoB: String? = nil,
+        picId: String? = nil,
+        picName: String? = nil
 
     ) {
         self._id = _id
@@ -62,9 +70,14 @@ class Examination: Decodable, Identifiable {
         self.systemResult = systemResult
         self.expertResult = expertResult
         self.PIC = PIC
+        self.DPJP = DPJP
+
         self.patientId = patientId
         self.patientName = patientName
         self.patientDoB = patientDoB
+
+        self.picId = picId
+        self.picName = picName
     }
 
     enum CodingKeys: String, CodingKey {
@@ -82,21 +95,30 @@ class Examination: Decodable, Identifiable {
         case systemResult
         case expertResult
         case PIC
+        case DPJP
         case examinationId
         case patientId
         case patientName
         case patientDoB
+        case picId
+        case picName
     }
 
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        if let _idString = try container.decodeIfPresent(String.self, forKey: ._id) ?? container.decodeIfPresent(
-            String.self,
-            forKey: .examinationId
-        ) {
-            self._id = UUID(uuidString: _idString) ?? UUID()
+
+        if let id = try? container.decode(String.self, forKey: ._id) {
+            self._id = id
+        } else if let examinationId = try? container.decode(String.self, forKey: .examinationId) {
+            self._id = examinationId
         } else {
-            self._id = UUID()
+            throw DecodingError.keyNotFound(
+                CodingKeys._id,
+                DecodingError.Context(
+                    codingPath: decoder.codingPath,
+                    debugDescription: "Neither _id nor examinationId found"
+                )
+            )
         }
 
         self.goal = try container.decodeIfPresent(ExamGoalType.self, forKey: .goal)
@@ -105,8 +127,6 @@ class Examination: Decodable, Identifiable {
         self.recordVideo = try container.decodeIfPresent(Data.self, forKey: .recordVideo)
         self.WSI = try container.decodeIfPresent(String.self, forKey: .WSI)
 
-//        self.examinationDate = try container.decode(Date.self, forKey: .examinationDate)
-        // Decode the examinationDate as a string and convert it to a Date using ISO8601 format
         let dateString = try container.decodeIfPresent(String.self, forKey: .examinationDate) ?? ""
 
         let dateFormatter = ISO8601DateFormatter()
@@ -142,21 +162,15 @@ class Examination: Decodable, Identifiable {
         self.systemResult = try container.decodeIfPresent(SystemExamResult.self, forKey: .systemResult)
         self.expertResult = try container.decodeIfPresent(ExpertExamResult.self, forKey: .expertResult)
 
-        self.PIC = try container.decodeIfPresent(PICEntity.self, forKey: .PIC)
+        self.PIC = try container.decodeIfPresent(User.self, forKey: .PIC)
+        self.DPJP = try container.decodeIfPresent(User.self, forKey: .DPJP)
+
         self.patientId = try container.decodeIfPresent(String.self, forKey: .patientId)
         self.patientName = try container.decodeIfPresent(String.self, forKey: .patientName)
 
-        self.patientDoB = try container.decodeIfPresent(String.self, forKey: .patientDoB)
+        self.picId = try container.decodeIfPresent(String.self, forKey: .picId)
+        self.picName = try container.decodeIfPresent(String.self, forKey: .picName)
 
-//        if dobString != "" {
-//            guard let dob = dateFormatter.date(from: dobString) else {
-//                throw DecodingError.dataCorruptedError(
-//                    forKey: .patientDoB,
-//                    in: container,
-//                    debugDescription: "Date string does not match format expected by formatter."
-//                )
-//            }
-//            self.patientDoB = dob
-//        }
+        self.patientDoB = try container.decodeIfPresent(String.self, forKey: .patientDoB)
     }
 }

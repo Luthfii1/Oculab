@@ -14,12 +14,18 @@ struct AppDropdown: View {
     var leftIcon: String? = nil // SF Symbol or custom icon name
     var rightIcon: String? = "chevron.down" // Default right icon
     var isDisabled: Bool = false
-    var choices: [String] // List of dropdown choices
-    var isExtended: Bool = false // If true, allows multi-line choices display
+    var choices: [(display: String, value: String)] // List of dropdown choices with display and value
     var description: String? = nil // Description or additional info
-    @Binding var selectedChoice: String?
+    @Binding var selectedChoice: String
 
     @State private var isDropdownOpen: Bool = false
+    @State private var searchText: String = "" // New state for search text
+    @State var isEnablingAdding: Bool = false
+
+    // Computed property to filter choices based on search text
+    private var filteredChoices: [(display: String, value: String)] {
+        choices.filter { $0.display.localizedCaseInsensitiveContains(searchText) || searchText.isEmpty }
+    }
 
     // Colors based on the state (disabled or normal)
     private var textColor: Color {
@@ -54,28 +60,39 @@ struct AppDropdown: View {
                 if !isDisabled {
                     withAnimation {
                         isDropdownOpen.toggle()
+                        searchText = "" // Reset search when dropdown is opened
                     }
                 }
             }) {
-                HStack {
-                    // Left icon
-                    if let leftIcon = leftIcon {
-                        Image(systemName: leftIcon)
-                            .foregroundColor(AppColors.purple700)
+                HStack(spacing: Decimal.d4) {
+                    HStack(alignment: .center) { // Set alignment here
+                        if let leftIcon = leftIcon {
+                            Image(systemName: leftIcon)
+                                .foregroundColor(AppColors.purple700)
+                        }
+
+                        TextField(placeholder, text: $searchText, onEditingChanged: { editing in
+                            if editing {
+                                isDropdownOpen = true
+                            }
+                        })
+                        .foregroundColor(textColor)
+                        .disabled(isDisabled)
+                        .padding(.horizontal, Decimal.d8)
+                        .multilineTextAlignment(.leading)
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
-                    // Placeholder or selected choice
-                    Text(selectedChoice ?? placeholder)
-                        .foregroundColor(selectedChoice == nil ? AppColors.slate100 : textColor)
-                        .padding(.horizontal, 8)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                    // Right icon
                     if let rightIcon = rightIcon {
                         Image(systemName: rightIcon)
                             .foregroundColor(textColor)
                     }
                 }
+                .onChange(of: selectedChoice) {
+                    // Update search text based on selected choice display value
+                    searchText = choices.first(where: { $0.value == selectedChoice })?.display ?? ""
+                }
+
                 .padding()
                 .background(backgroundColor)
                 .cornerRadius(12)
@@ -86,22 +103,48 @@ struct AppDropdown: View {
             }
             .disabled(isDisabled)
 
-            // Dropdown choices (visible when the dropdown is open)
+            // Dropdown choices (visible when the dropdown is open and filtered by search)
             if isDropdownOpen {
                 VStack(alignment: .leading) {
-                    ForEach(choices, id: \.self) { choice in
-                        Button(action: {
-                            selectedChoice = choice
+                    if isEnablingAdding {
+                        Button {
                             isDropdownOpen = false
-                        }) {
-                            Text(choice)
-                                .foregroundColor(textColor)
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                            selectedChoice = searchText
+                        } label: {
+                            HStack {
+                                Text("Tambahkan").font(AppTypography.p2).foregroundStyle(AppColors.purple500)
+                                    .bold()
+                                Text("\"\(searchText)\"").foregroundStyle(AppColors.slate900)
+
+                            }.padding(.top, 8)
+                        }
+                    }
+
+                    ScrollView {
+                        if filteredChoices.isEmpty {
+                            Text("Tidak ada data yang sesuai")
+                                .foregroundColor(AppColors.slate100)
+                                .frame(maxWidth: .infinity, alignment: .center)
                                 .padding(.top, 8)
+
+                        } else {
+                            ForEach(filteredChoices, id: \.value) { choice in
+                                Button(action: {
+                                    selectedChoice = choice.value
+                                    searchText = choice.display
+                                    isDropdownOpen = false
+                                }) {
+                                    Text(choice.display)
+                                        .foregroundColor(textColor)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.top, 8)
+                                        .multilineTextAlignment(.leading)
+                                }
+                            }
                         }
                     }
                 }
-                .frame(maxHeight: isExtended ? .infinity : 150) // Adjustable height based on isExtended
+                .frame(maxHeight: 150)
                 .padding(.bottom, 12)
                 .padding(.top, 4)
                 .padding(.horizontal, 16)
@@ -134,43 +177,9 @@ struct AppDropdown: View {
             leftIcon: "list.bullet",
             rightIcon: "chevron.down",
             isDisabled: false,
-            choices: ["Option 1", "Option 2", "Option 3", "Option 4"],
-            isExtended: false,
+            choices: [("Option 1", "value1"), ("Option 2", "value2"), ("Option 3", "value3"), ("Option 4", "value4")],
             description: "Please select an option from the dropdown",
-            selectedChoice: .constant("Option 1")
-        )
-
-        AppDropdown(
-            title: "Disabled Dropdown",
-            placeholder: "Disabled",
-            isRequired: false,
-            leftIcon: "lock.fill",
-            rightIcon: "chevron.down",
-            isDisabled: true,
-            choices: ["Option A", "Option B"],
-            isExtended: false,
-            description: "This dropdown is disabled",
-            selectedChoice: .constant("Option A")
-        )
-
-        AppDropdown(
-            title: "Extended Dropdown",
-            placeholder: "Choose something...",
-            isRequired: true,
-            leftIcon: "arrow.down.to.line.alt",
-            rightIcon: "chevron.up",
-            isDisabled: false,
-            choices: [
-                "Extended Option 1",
-                "Extended Option 2",
-                "Extended Option 3",
-                "Extended Option 4",
-                "Extended Option 5",
-                "Extended Option 6"
-            ],
-            isExtended: true,
-            description: "This dropdown allows more options to be visible.",
-            selectedChoice: .constant("Extended Option 6")
+            selectedChoice: .constant("")
         )
     }
     .padding()

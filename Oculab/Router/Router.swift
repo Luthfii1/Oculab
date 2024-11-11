@@ -19,6 +19,8 @@ class Router: ObservableObject {
         case analysisResult(examinationId: String)
         case instructionRecord
         case examDetail(examId: String, patientId: String)
+        case savedResult(examId: String, patientId: String)
+        case newExam(patientId: String, picId: String)
         case userAccessPin(title: String, description: String)
     }
 
@@ -39,6 +41,10 @@ class Router: ObservableObject {
             InstructionRecordView()
         case let .examDetail(examId, patientId):
             ExamDetailView(examId: examId, patientId: patientId)
+        case let .savedResult(examId, patientId):
+            SavedResultView(examId: examId, patientId: patientId)
+        case let .newExam(patientId, picId):
+            InputExaminationData(selectedPIC: picId, selectedPatient: patientId)
         case let .userAccessPin(title, description):
             UserAccessPin(title: title, description: description)
         }

@@ -7,8 +7,8 @@
 
 import Foundation
 
-class Patient: Decodable, Identifiable {
-    var _id: UUID = .init()
+class Patient: Encodable, Decodable, Identifiable {
+    var _id: String
     var name: String
     var NIK: String
     var DoB: Date?
@@ -17,7 +17,7 @@ class Patient: Decodable, Identifiable {
     var resultExamination: [String]?
 
     init(
-        _id: UUID,
+        _id: String,
         name: String,
         NIK: String,
         DoB: Date,
@@ -48,21 +48,12 @@ class Patient: Decodable, Identifiable {
     required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        if let _idString = try container.decodeIfPresent(String.self, forKey: ._id) ?? container.decodeIfPresent(
-            String.self,
-            forKey: .patientId
-        ) {
-            self._id = UUID(uuidString: _idString) ?? UUID()
-        } else {
-            self._id = UUID()
-        }
-
+        self._id = try container.decode(String.self, forKey: ._id)
         self.name = try container.decode(String.self, forKey: .name)
         self.NIK = try container.decode(String.self, forKey: .NIK)
-//        self.DoB = try container.decode(Date.self, forKey: .DoB)
+
         let dateFormatter = ISO8601DateFormatter()
         dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-
         let dateString = try container.decodeIfPresent(String.self, forKey: .DoB) ?? ""
 
         if dateString != "" {
@@ -79,5 +70,24 @@ class Patient: Decodable, Identifiable {
         self.sex = try container.decode(SexType.self, forKey: .sex)
         self.BPJS = try container.decodeIfPresent(String.self, forKey: .BPJS)
         self.resultExamination = try container.decodeIfPresent([String].self, forKey: .resultExamination)
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(UUID().uuidString, forKey: ._id)
+        try container.encode(name, forKey: .name)
+        try container.encode(NIK, forKey: .NIK)
+
+        if let DoB = DoB {
+            let dateFormatter = ISO8601DateFormatter()
+            dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            let dateString = dateFormatter.string(from: DoB)
+            try container.encode(dateString, forKey: .DoB)
+        }
+
+        try container.encode(sex, forKey: .sex)
+        try container.encodeIfPresent(BPJS, forKey: .BPJS)
+        try container.encodeIfPresent(resultExamination, forKey: .resultExamination)
     }
 }

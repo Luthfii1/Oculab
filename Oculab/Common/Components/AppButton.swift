@@ -310,5 +310,29 @@ struct AppButton: View, Identifiable {
         ) {
             print("Neutral Button Tapped")
         }
+
+        HStack {
+            AppButton(
+                title: "Primary Enabled",
+                leftIcon: "person.fill", // Optional left icon
+                rightIcon: "chevron.right", // Optional right icon
+                colorType: .primary, // Primary button type
+                size: .large,
+                isEnabled: true
+            ) {
+                print("Primary Button Tapped")
+            }
+
+            AppButton(
+                title: "Primary Enabled",
+                leftIcon: "person.fill", // Optional left icon
+                rightIcon: "chevron.right", // Optional right icon
+                colorType: .primary, // Primary button type
+                size: .large,
+                isEnabled: true
+            ) {
+                print("Primary Button Tapped")
+            }
+        }
     }
 }

@@ -10,4 +10,5 @@ import Foundation
 enum SexType: String, Codable {
     case MALE
     case FEMALE
+    case UNKNOWN
 }

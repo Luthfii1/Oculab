@@ -11,12 +11,13 @@ struct AppTextField: View {
     var title: String
     var isRequired: Bool = false
     var placeholder: String = ""
-    var description: String? = nil
+    @State var description: String? = nil
     var leftIcon: String? = nil
     var rightIcon: String? = nil
-    var isError: Bool = false
+    @State var isError: Bool = false
     var isDisabled: Bool = false
     var isNumberOnly: Bool = false
+    var length: Int = 0
     @Binding var text: String
     @State private var isPasswordVisible: Bool = false
     // Computed property to check if the field should be a password input
@@ -181,6 +182,15 @@ struct AppTextField: View {
             description: nil,
             leftIcon: "house.fill",
             isDisabled: true,
+            text: .constant("123 Main St")
+        )
+
+        AppTextField(
+            title: "Tanggal Lahir",
+            isRequired: false,
+            placeholder: "Pilih Tanggal",
+            description: nil,
+            rightIcon: "calendar",
             text: .constant("123 Main St")
         )
     }
