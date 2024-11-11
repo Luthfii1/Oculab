@@ -11,15 +11,14 @@ class ExamInteractor {
     let urlString = API.BE + "/examination/create-examination/2t3g4837-13da-4335-97c1-dd5e7eaba549"
     let urlGetData = API.BE + "/examination/get-examination-by-id/"
     let urlGetDataPatient = API.BE + "/patient/get-patient-by-id/"
-
     let urlForwardVideo = API.BE + "/examination/forward-video-to-ml/"
 
-    func getExamById(examId: String, completion: @escaping (Result<ExaminationDetailData, NetworkErrorType>) -> Void) {
+    func getExamById(examId: String, completion: @escaping (Result<ExaminationDetailData, ApiErrorData>) -> Void) {
         print(urlGetData + examId.lowercased())
 
         NetworkHelper.shared.get(urlString: urlGetData + examId.lowercased()) { (result: Result<
             APIResponse<Examination>,
-            NetworkErrorType
+            APIResponse<ApiErrorData>
         >) in
             DispatchQueue.main.async {
                 switch result {
@@ -38,7 +37,7 @@ class ExamInteractor {
                     completion(.success(examinationDetail))
 
                 case let .failure(error):
-                    completion(.failure(error))
+                    completion(.failure(error.data))
                     print(error)
                 }
             }
@@ -47,13 +46,13 @@ class ExamInteractor {
 
     func getPatientById(
         patientId: String,
-        completion: @escaping (Result<PatientDetailData, NetworkErrorType>) -> Void
+        completion: @escaping (Result<PatientDetailData, ApiErrorData>) -> Void
     ) {
         print(urlGetDataPatient + patientId.lowercased())
 
         NetworkHelper.shared.get(urlString: urlGetDataPatient + patientId.lowercased()) { (result: Result<
             APIResponse<Patient>,
-            NetworkErrorType
+            APIResponse<ApiErrorData>
         >) in
             DispatchQueue.main.async {
                 switch result {
@@ -70,7 +69,7 @@ class ExamInteractor {
                     completion(.success(patientDetail))
 
                 case let .failure(error):
-                    completion(.failure(error))
+                    completion(.failure(error.data))
                     print(error)
                 }
             }
@@ -81,7 +80,7 @@ class ExamInteractor {
         examVideo: Data,
         examinationId: String,
         patientId: String,
-        completion: @escaping (Result<Response, NetworkErrorType>) -> Void
+        completion: @escaping (Result<APIResponse<Response>, APIResponse<ApiErrorData>>) -> Void
     ) {
         let urlString = urlForwardVideo + patientId.lowercased() + "/\(examinationId.lowercased())"
         print(urlString)
@@ -95,7 +94,10 @@ class ExamInteractor {
             parameters: parameters,
             boundary: boundary
         ) else {
-            completion(.failure(.invalidURL))
+            completion(.failure(NetworkHelper.shared.createErrorSystem(
+                errorType: "REQUEST_ERROR",
+                errorMessage: "Error creating request for uploading video"
+            )))
             return
         }
 
