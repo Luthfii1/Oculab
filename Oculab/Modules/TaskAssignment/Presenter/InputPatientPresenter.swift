@@ -17,13 +17,19 @@ class InputPatientPresenter: ObservableObject {
     @Published var picName: [(String, String)] = []
     @Published var patientNameDoB: [(String, String)] = []
 
-    @Published var patient: Patient = .init(_id: "", name: "", NIK: "", DoB: Date(), sex: .UNKNOWN)
+    @Published var patient: Patient = .init(
+        _id: UUID().uuidString.lowercased(),
+        name: "",
+        NIK: "",
+        DoB: Date(),
+        sex: .UNKNOWN
+    )
     @Published var pic: User = .init(_id: "", name: "", role: .ADMIN)
 
     @Published var patientFound: Bool = false
 
     @Published var examination: Examination = .init(
-        _id: "",
+        _id: UUID().uuidString.lowercased(),
         goal: nil,
         preparationType: nil,
         slideId: "",
@@ -34,7 +40,7 @@ class InputPatientPresenter: ObservableObject {
     )
 
     @Published var examination2: Examination = .init(
-        _id: "",
+        _id: UUID().uuidString.lowercased(),
         goal: nil,
         preparationType: nil,
         slideId: "",
@@ -43,26 +49,6 @@ class InputPatientPresenter: ObservableObject {
         examinationPlanDate: Date(),
         statusExamination: .NOTSTARTED
     )
-
-    var goalString: String {
-        get { examination.goal?.rawValue ?? "" }
-        set { examination.goal = ExamGoalType(rawValue: newValue) }
-    }
-
-    var goalString2: String {
-        get { examination.goal?.rawValue ?? "" }
-        set { examination.goal = ExamGoalType(rawValue: newValue) }
-    }
-
-    var typeString: String {
-        get { examination.preparationType?.rawValue ?? "" }
-        set { examination.preparationType = ExamPreparationType(rawValue: newValue) }
-    }
-
-    var typeString2: String {
-        get { examination.preparationType?.rawValue ?? "" }
-        set { examination.preparationType = ExamPreparationType(rawValue: newValue) }
-    }
 
     func getAllUser() {
         isUserLoading = true
@@ -114,8 +100,14 @@ class InputPatientPresenter: ObservableObject {
                     self?.patient = data
                     self?.patientFound = true
 
-                case .failure:
-                    self?.patient = .init(_id: "", name: "", NIK: "", DoB: Date(), sex: .MALE)
+                case let .failure(error):
+                    self?.patient = .init(
+                        _id: UUID().uuidString.lowercased(),
+                        name: "",
+                        NIK: "",
+                        DoB: Date(),
+                        sex: .MALE
+                    )
                     self?.patientFound = false
                 }
             }
@@ -143,20 +135,138 @@ class InputPatientPresenter: ObservableObject {
     }
 
     func newExam() {
-        Router.shared.navigateTo(.newExam(patientId: patient._id, picId: pic._id))
+        if !patientFound {
+            addNewPatient { [weak self] success in
+                if success {
+                    self?.navigateToNewExam()
+                } else {
+                    print("Failed to add new patient.")
+                }
+            }
+        } else {
+            navigateToNewExam()
+        }
     }
 
-    func addNewPatient() {
+    func addNewPatient(completion: @escaping (Bool) -> Void) {
+        print(patient._id)
+        print(patient.name)
+        print(patient.BPJS)
+        print(patient.NIK)
+        print(patient.DoB)
+
         interactor?.addNewPatient(patient: patient) { [weak self] result in
             switch result {
             case let .success(data):
                 self?.patient = data
                 print(data)
+                completion(true) // Indicate success to the caller
 
             case let .failure(error):
                 print(error)
                 print("Add new patient")
+                completion(false) // Indicate failure to the caller
             }
+        }
+    }
+
+    private func navigateToNewExam() {
+        Router.shared.navigateTo(.newExam(patientId: patient._id, picId: pic._id))
+    }
+
+    func submitExamination() {
+        var examReq = ExaminationRequest(
+            _id: examination._id,
+            goal: examination.goal,
+            preparationType: examination.preparationType,
+            slideId: examination.slideId,
+            examinationDate: examination.examinationDate,
+            PIC: pic._id,
+            DPJP: pic._id,
+            examinationPlanDate: examination.examinationPlanDate
+        )
+
+        var examReq2 = ExaminationRequest(
+            _id: examination2._id,
+            goal: examination2.goal,
+            preparationType: examination2.preparationType,
+            slideId: examination2.slideId,
+            examinationDate: examination2.examinationDate,
+            PIC: pic._id,
+            DPJP: pic._id,
+            examinationPlanDate: examination2.examinationPlanDate
+        )
+
+        interactor?.addNewExamination(
+            patientId: patient._id,
+            examination: examReq
+        ) { [weak self] result in
+            switch result {
+            case let .success(data):
+                print(data)
+
+            case let .failure(error):
+                print(error)
+            }
+        }
+
+        interactor?.addNewExamination(patientId: patient._id, examination: examReq2) { [weak self] result in
+            switch result {
+            case let .success(data):
+                print(data)
+
+            case let .failure(error):
+                print(error)
+            }
+        }
+
+        Router.shared.navigateTo(.home)
+    }
+}
+
+struct ExaminationRequest: Encodable {
+    var _id: String?
+    var goal: ExamGoalType?
+    var preparationType: ExamPreparationType?
+    var slideId: String?
+    var examinationDate: Date?
+    var PIC: String?
+    var DPJP: String?
+    var examinationPlanDate: Date?
+
+    enum CodingKeys: CodingKey {
+        case _id
+        case goal
+        case preparationType
+        case slideId
+        case examinationDate
+        case PIC
+        case DPJP
+        case examinationPlanDate
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(_id, forKey: ._id)
+        try container.encode(goal, forKey: .goal)
+        try container.encode(preparationType, forKey: .preparationType)
+        try container.encode(slideId, forKey: .slideId)
+        try container.encode(PIC, forKey: .PIC)
+        try container.encode(DPJP, forKey: .DPJP)
+
+        if let examinationDate = examinationDate {
+            let dateFormatter = ISO8601DateFormatter()
+            dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            let dateString = dateFormatter.string(from: examinationDate)
+            try container.encode(dateString, forKey: .examinationDate)
+        }
+
+        if let examinationPlanDate = examinationPlanDate {
+            let dateFormatter = ISO8601DateFormatter()
+            dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            let dateString = dateFormatter.string(from: examinationPlanDate)
+            try container.encode(dateString, forKey: .examinationPlanDate)
         }
     }
 }

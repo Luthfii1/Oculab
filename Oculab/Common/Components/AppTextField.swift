@@ -19,11 +19,6 @@ struct AppTextField: View {
     var isNumberOnly: Bool = false
     var length: Int = 0
     @Binding var text: String
-    @State private var isPasswordVisible: Bool = false
-    // Computed property to check if the field should be a password input
-    private var isPasswordInput: Bool {
-        rightIcon == "eye"
-    }
 
     // Colors based on the state (error, disabled, normal)
     private var borderColor: Color {
@@ -74,63 +69,39 @@ struct AppTextField: View {
             HStack {
                 if let leftIcon = leftIcon {
                     Image(systemName: leftIcon)
-                        .foregroundColor(iconColor)
+                        .foregroundColor(iconColor) // Icon color based on state
                         .padding(.leading, 16)
                 }
 
-                // Conditionally show TextField or SecureField
-                if isPasswordInput {
-                    if isPasswordVisible {
-                        TextField(placeholder, text: $text)
-                            .keyboardType(isNumberOnly ? .numberPad : .default)
-                            .disabled(isDisabled)
-                            .foregroundColor(textColor)
-                            .padding(.horizontal, 16)
-                            .onChange(of: text) { _, newValue in
-                                if isNumberOnly {
-                                    text = newValue.filter { $0.isNumber }
-                                }
-                            }
-                    } else {
-                        SecureField(placeholder, text: $text)
-                            .keyboardType(isNumberOnly ? .numberPad : .default)
-                            .disabled(isDisabled)
-                            .foregroundColor(textColor)
-                            .padding(.horizontal, 16)
-                            .onChange(of: text) { _, newValue in
-                                if isNumberOnly {
-                                    text = newValue.filter { $0.isNumber }
-                                }
-                            }
-                    }
-                } else {
-                    TextField(placeholder, text: $text)
-                        .keyboardType(isNumberOnly ? .numberPad : .default)
-                        .disabled(isDisabled)
-                        .foregroundColor(textColor)
-                        .padding(.horizontal, 16)
-                        .onChange(of: text) { _, newValue in
-                            if isNumberOnly {
-                                text = newValue.filter { $0.isNumber }
+                TextField(placeholder, text: $text)
+                    .keyboardType(isNumberOnly ? .numberPad : .default) // Conditionally set the keyboard type
+                    .disabled(isDisabled)
+                    .foregroundColor(textColor)
+                    .padding(.horizontal, 16)
+                    .onChange(of: text) { newValue in
+                        if isNumberOnly {
+                            // Only allow numbers if isNumberOnly is true
+                            text = newValue.filter { $0.isNumber }
+                        }
+
+                        if length != 0 {
+                            if text.distance(from: text.startIndex, to: text.endIndex) != length {
+                                isError = true
+                                description = "\(title) harus \(length) karakter"
+                            } else {
+                                isError = false
+                                description = ""
                             }
                         }
-                }
-
-                if rightIcon == "eye" {
-                    Button(action: {
-                        isPasswordVisible.toggle()
-                    }) {
-                        Image(systemName: isPasswordVisible ? "eye.slash" : "eye")
-                            .foregroundColor(iconColor)
-                            .padding(.trailing, 12)
                     }
-                } else if let rightIcon = rightIcon {
+
+                if let rightIcon = rightIcon {
                     Image(systemName: rightIcon)
-                        .foregroundColor(iconColor)
-                        .padding(.trailing, 12)
+                        .foregroundColor(iconColor) // Icon color based on state
+                        .padding(.trailing, Decimal.d12)
                 }
             }
-            .padding(.vertical, 12)
+            .padding(.vertical, Decimal.d12)
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(borderColor, lineWidth: 1)

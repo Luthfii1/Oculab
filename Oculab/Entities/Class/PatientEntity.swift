@@ -75,7 +75,7 @@ class Patient: Encodable, Decodable, Identifiable {
     func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
-        try container.encode(UUID().uuidString, forKey: ._id)
+        try container.encode(_id, forKey: ._id)
         try container.encode(name, forKey: .name)
         try container.encode(NIK, forKey: .NIK)
 

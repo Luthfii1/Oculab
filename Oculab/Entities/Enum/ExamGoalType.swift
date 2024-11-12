@@ -8,8 +8,8 @@
 import Foundation
 
 enum ExamGoalType: String, Codable {
-    case SCREENING = "Skrining"
-    case TREATMENT = "Follow Up"
+    case SCREENING
+    case TREATMENT
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
