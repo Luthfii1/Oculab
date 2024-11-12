@@ -12,7 +12,7 @@ struct AppButton: View, Identifiable {
         case large, small
     }
 
-    enum ButtonColorType {
+    enum ButtonColorType: Equatable {
         case primary, secondary, tertiary
         case destructive(DestructiveType)
         case neutral(NeutralType)
@@ -162,6 +162,11 @@ struct AppButton: View, Identifiable {
         }
     }
 
+    // Tertiary button doesnt have infinite width frame
+    private var frameWidth: CGFloat? {
+        colorType == .tertiary ? nil : .infinity
+    }
+
     var body: some View {
         Button(action: {
             if isEnabled {
@@ -184,7 +189,7 @@ struct AppButton: View, Identifiable {
                 }
             }
             .padding(.vertical, vPadding) // Use dynamic vertical padding
-            .frame(maxWidth: .infinity, minHeight: buttonHeight)
+            .frame(maxWidth: frameWidth, minHeight: buttonHeight)
             .background(backgroundColor)
             .cornerRadius(cornerRadius)
             .opacity(isEnabled ? 1 : 0.5) // Dims the button when disabled

@@ -11,7 +11,7 @@ extension NetworkHelper {
     func delete<T: Encodable, U: Decodable>(
         urlString: String,
         body: T?,
-        completion: @escaping (Result<U, NetworkErrorType>) -> Void
+        completion: @escaping (Result<APIResponse<U>, APIResponse<ApiErrorData>>) -> Void
     ) {
         var jsonData: Data?
         if let body = body {
@@ -19,7 +19,7 @@ extension NetworkHelper {
         }
 
         guard let request = createRequest(urlString: urlString, httpMethod: "DELETE", body: jsonData) else {
-            completion(.failure(.invalidURL))
+            completion(.failure(createErrorSystem(errorType: "InvalidRequest", errorMessage: "Error creating request")))
             return
         }
 

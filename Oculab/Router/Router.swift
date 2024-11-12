@@ -21,6 +21,8 @@ class Router: ObservableObject {
         case examDetail(examId: String, patientId: String)
         case savedResult(examId: String, patientId: String)
         case newExam(patientId: String, picId: String)
+        case userAccessPin(title: String, description: String)
+        case login
     }
 
     @Published var path: NavigationPath = .init()
@@ -38,14 +40,16 @@ class Router: ObservableObject {
             AnalysisResultView(examinationId: examinationId)
         case .instructionRecord:
             InstructionRecordView()
-//        case .newExam:
-//            ExamDataView()
-        case let .examDetail(examId, patientId): // Corrected to use `let examId`
+        case let .examDetail(examId, patientId):
             ExamDetailView(examId: examId, patientId: patientId)
         case let .savedResult(examId, patientId):
             SavedResultView(examId: examId, patientId: patientId)
         case let .newExam(patientId, picId):
             InputExaminationData(selectedPIC: picId, selectedPatient: patientId)
+        case let .userAccessPin(title, description):
+            UserAccessPin(title: title, description: description)
+        case .login:
+            LoginView()
         }
     }
 

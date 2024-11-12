@@ -18,7 +18,7 @@ class Examination: Decodable, Identifiable {
     var examinationPlanDate: Date?
 
     var FOV: [FOVData]?
-    var imagePreview: String?
+    var imagePreview: String? = "https://is3.cloudhost.id/oculab-fov/oculab-fov"
     var statusExamination: StatusType
     var systemResult: SystemExamResult?
     var expertResult: ExpertExamResult?

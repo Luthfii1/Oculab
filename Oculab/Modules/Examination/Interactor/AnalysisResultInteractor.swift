@@ -14,18 +14,17 @@ class AnalysisResultInteractor {
         return URL(string: examinationURL + examinationId.lowercased())
     }
 
-    func fetchData(examId: String, completion: @escaping (Result<ExaminationResultData, NetworkErrorType>) -> Void) {
+    func fetchData(examId: String, completion: @escaping (Result<ExaminationResultData, ApiErrorData>) -> Void) {
         NetworkHelper.shared
             .get(
                 urlString: "https://oculab-be.vercel.app/examination/get-examination-by-id/" + examId.lowercased())
         { (result: Result<
             APIResponse<Examination>,
-            NetworkErrorType
+            APIResponse<ApiErrorData>
         >) in
             DispatchQueue.main.async {
                 switch result {
                 case let .success(apiResponse):
-
                     let examinationDetail = ExaminationResultData(
                         examinationId: apiResponse.data._id,
                         imagePreview: apiResponse.data.imagePreview ?? "",
@@ -33,23 +32,19 @@ class AnalysisResultInteractor {
                         confidenceLevelAggregated: 0.0,
                         systemGrading: GradingType(
                             rawValue: apiResponse.data.systemResult?.systemGrading.rawValue ?? GradingType.NEGATIVE
-                                .rawValue) ?? .unknown,
+                                .rawValue) ??
+                            .unknown,
                         bacteriaTotalCount: apiResponse.data.systemResult?.systemBacteriaTotalCount ?? 0)
 
-                    print("hore")
-                    print(examinationDetail)
-
                     completion(.success(examinationDetail))
-
                 case let .failure(error):
-                    completion(.failure(error))
-                    print(error)
+                    completion(.failure(error.data))
                 }
             }
         }
     }
 
-    func fetchFOVData(examId: String, completion: @escaping (Result<FOVGrouping, NetworkErrorType>) -> Void) {
+    func fetchFOVData(examId: String, completion: @escaping (Result<FOVGrouping, ApiErrorData>) -> Void) {
         print(
             "https://oculab-be.vercel.app/fov/get-all-fov-by-examination-id/" +
                 examId.lowercased())
@@ -59,19 +54,15 @@ class AnalysisResultInteractor {
                     examId.lowercased())
         { (result: Result<
             APIResponse<FOVGrouping>,
-            NetworkErrorType
+            APIResponse<ApiErrorData>
         >) in
             DispatchQueue.main.async {
                 switch result {
                 case let .success(apiResponse):
-
-                    print(apiResponse.data)
-
                     completion(.success(apiResponse.data))
 
                 case let .failure(error):
-                    completion(.failure(error))
-                    print(error)
+                    completion(.failure(error.data))
                 }
             }
         }
@@ -104,5 +95,13 @@ struct FOVGrouping: Decodable {
         self.bta0 = try container.decodeIfPresent([FOVData].self, forKey: .bta0) ?? []
         self.bta1to9 = try container.decodeIfPresent([FOVData].self, forKey: .bta1to9) ?? []
         self.btaabove9 = try container.decodeIfPresent([FOVData].self, forKey: .btaabove9) ?? []
+    }
+
+    var groupedData: [(title: FOVType, data: [FOVData])] {
+        return [
+            (.BTA0, bta0),
+            (.BTA1TO9, bta1to9),
+            (.BTAABOVE9, btaabove9)
+        ]
     }
 }

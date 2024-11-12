@@ -9,59 +9,65 @@ import Foundation
 
 class NetworkHelper {
     static let shared = NetworkHelper()
-
     private init() {}
 
+    // Function to create the basic request
     func createRequest(urlString: String, httpMethod: String, body: Data?) -> URLRequest? {
         guard let url = URL(string: urlString) else { return nil }
-
         var request = URLRequest(url: url)
         request.httpMethod = httpMethod
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = body
-
         return request
     }
 
+    // Function to handle the response
     func handleResponse<T: Decodable>(
         _ data: Data?,
         _ response: URLResponse?,
         _ error: Error?,
-        completion: @escaping (Result<T, NetworkErrorType>) -> Void
+        completion: @escaping (Result<APIResponse<T>, APIResponse<ApiErrorData>>) -> Void
     ) {
+        // Handle request error
         if let error = error {
-            completion(.failure(.requestFailed(error)))
+            let errorResponse = createErrorSystem(
+                errorType: "HANDLE_REQUEST_ERROR",
+                errorMessage: "Error when handle request: \(error.localizedDescription)"
+            )
+            completion(.failure(errorResponse))
             return
         }
 
+        // Ensure data exists
         guard let data = data else {
-            completion(.failure(.noData))
+            let errorResponse = createErrorSystem(
+                errorType: "DATA_NOT_FOUND",
+                errorMessage: "Error when handle response: Data not found"
+            )
+            completion(.failure(errorResponse))
             return
         }
 
-        if let httpResponse = response as? HTTPURLResponse {
-            if (400...499).contains(httpResponse.statusCode) {
-                switch httpResponse.statusCode {
-                case 401:
-                    completion(.failure(.unauthorized))
-                case 403:
-                    completion(.failure(.forbidden))
-                default:
-                    completion(.failure(.serverError(httpResponse.statusCode)))
-                }
-                return
-            }
-        }
+//        // Print the data as a JSON string for debugging
+//        debugResponse(data: data)
 
+        // Decode the response to determine success or error
         do {
-            let decodedData = try JSONDecoder().decode(T.self, from: data)
-            completion(.success(decodedData))
+            let response = try JSONDecoder().decode(APIResponse<T>.self, from: data)
+            completion(.success(response))
         } catch {
-            print("Decode error: \(error.localizedDescription)") // Print the error message
-            completion(.failure(.decodingError(error)))
+            if let errorResponse = try? JSONDecoder().decode(APIResponse<ApiErrorData>.self, from: data) {
+                completion(.failure(errorResponse))
+            } else {
+                completion(.failure(createErrorSystem(
+                    errorType: "DECODING_ERROR",
+                    errorMessage: "Error when decoding response: \(error.localizedDescription)"
+                )))
+            }
         }
     }
 
+    // Function to create a multipart request
     func createMultipartRequest(
         urlString: String,
         httpMethod: String,
@@ -69,12 +75,10 @@ class NetworkHelper {
         boundary: String
     ) -> URLRequest? {
         guard let url = URL(string: urlString) else { return nil }
-
         var request = URLRequest(url: url)
         request.httpMethod = httpMethod
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
 
-        // Construct the multipart body
         var body = Data()
         for (key, value) in parameters {
             body.append("--\(boundary)\r\n".data(using: .utf8)!)
@@ -91,7 +95,28 @@ class NetworkHelper {
 
         request.httpBody = body
         request.setValue(String(body.count), forHTTPHeaderField: "Content-Length")
-
         return request
+    }
+
+    // Function to create errorSystem from FE
+    func createErrorSystem(errorType: String, errorMessage: String) -> APIResponse<ApiErrorData> {
+        let apiErrorData = ApiErrorData(errorType: errorType, description: errorMessage)
+
+        let apiResponse = APIResponse<ApiErrorData>(
+            status: "error",
+            code: -1,
+            message: errorMessage,
+            data: apiErrorData
+        )
+        return apiResponse
+    }
+
+    // Function to debug response
+    func debugResponse(data: Data) {
+        if let jsonString = String(data: data, encoding: .utf8) {
+            print("Response data: \(jsonString)") // For debugging
+        } else {
+            print("Failed to convert data to string.")
+        }
     }
 }

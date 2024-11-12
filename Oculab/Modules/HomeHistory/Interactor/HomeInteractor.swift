@@ -11,26 +11,26 @@ class HomeInteractor {
     private let apiURL = API.BE + "/examination/get-number-of-examinations"
     private let apiGetAllData = API.BE + "/examination/get-all-examinations"
 
-    func getStatisticExamination(completion: @escaping (Result<ExaminationStatistic, NetworkErrorType>) -> Void) {
+    func getStatisticExamination(completion: @escaping (Result<ExaminationStatistic, ApiErrorData>) -> Void) {
         NetworkHelper.shared.get(urlString: API.BE + "/examination/get-number-of-examinations") { (result: Result<
             APIResponse<ExaminationStatistic>,
-            NetworkErrorType
+            APIResponse<ApiErrorData>
         >) in
             DispatchQueue.main.async {
                 switch result {
                 case let .success(apiResponse):
                     completion(.success(apiResponse.data))
                 case let .failure(error):
-                    completion(.failure(error))
+                    completion(.failure(error.data))
                 }
             }
         }
     }
 
-    func getAllData(completion: @escaping (Result<[ExaminationCardData], NetworkErrorType>) -> Void) {
+    func getAllData(completion: @escaping (Result<[ExaminationCardData], ApiErrorData>) -> Void) {
         NetworkHelper.shared.get(urlString: apiGetAllData) { (result: Result<
             APIResponse<[Examination]>,
-            NetworkErrorType
+            APIResponse<ApiErrorData>
         >) in
             DispatchQueue.main.async {
                 switch result {
@@ -58,7 +58,7 @@ class HomeInteractor {
                     completion(.success(examinationDataCard))
 
                 case let .failure(error):
-                    completion(.failure(error))
+                    completion(.failure(error.data))
                     print(error)
                 }
             }

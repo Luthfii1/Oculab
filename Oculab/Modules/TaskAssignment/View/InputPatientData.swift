@@ -84,11 +84,11 @@ struct InputPatientData: View {
                 presenter.getAllUser()
                 presenter.getAllPatient()
             }
-            .onChange(of: selectedPatient) { newValue in
+            .onChange(of: selectedPatient) { _, newValue in
                 print(selectedPatient)
                 presenter.getPatientById(patientId: newValue)
             }
-            .onChange(of: selectedPIC) { newValue in
+            .onChange(of: selectedPIC) { _, newValue in
                 if !newValue.isEmpty {
                     presenter.getUserById(userId: newValue)
                 }

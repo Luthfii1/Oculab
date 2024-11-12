@@ -15,33 +15,33 @@ class InputPatientInteractor {
     let urlCreatePatient = API.BE + "/patient/create-new-patient/"
     let urlCreateExam = API.BE + "/examination/create-examination/"
 
-    func getAllUser(completion: @escaping (Result<[User], NetworkErrorType>) -> Void) {
+    func getAllUser(completion: @escaping (Result<[User], ApiErrorData>) -> Void) {
         NetworkHelper.shared.get(urlString: apiGetAllUser) { (result: Result<
             APIResponse<[User]>,
-            NetworkErrorType
+            APIResponse<ApiErrorData>
         >) in
             DispatchQueue.main.async {
                 switch result {
                 case let .success(apiResponse):
                     completion(.success(apiResponse.data))
                 case let .failure(error):
-                    completion(.failure(error))
+                    completion(.failure(error.data))
                 }
             }
         }
     }
 
-    func getAllPatient(completion: @escaping (Result<[Patient], NetworkErrorType>) -> Void) {
+    func getAllPatient(completion: @escaping (Result<[Patient], ApiErrorData>) -> Void) {
         NetworkHelper.shared.get(urlString: apiGetAllPatient) { (result: Result<
             APIResponse<[Patient]>,
-            NetworkErrorType
+            APIResponse<ApiErrorData>
         >) in
             DispatchQueue.main.async {
                 switch result {
                 case let .success(apiResponse):
                     completion(.success(apiResponse.data))
                 case let .failure(error):
-                    completion(.failure(error))
+                    completion(.failure(error.data))
                 }
             }
         }
@@ -49,23 +49,21 @@ class InputPatientInteractor {
 
     func getPatientById(
         patientId: String,
-        completion: @escaping (Result<Patient, NetworkErrorType>) -> Void
+        completion: @escaping (Result<Patient, ApiErrorData>) -> Void
     ) {
         print(urlGetDataPatient + patientId.lowercased())
 
         NetworkHelper.shared.get(urlString: urlGetDataPatient + patientId.lowercased()) { (result: Result<
             APIResponse<Patient>,
-            NetworkErrorType
+            APIResponse<ApiErrorData>
         >) in
             DispatchQueue.main.async {
                 switch result {
                 case let .success(apiResponse):
-
                     completion(.success(apiResponse.data))
 
                 case let .failure(error):
-                    completion(.failure(error))
-                    print(error)
+                    completion(.failure(error.data))
                 }
             }
         }
@@ -73,21 +71,19 @@ class InputPatientInteractor {
 
     func getUserById(
         userId: String,
-        completion: @escaping (Result<User, NetworkErrorType>) -> Void
+        completion: @escaping (Result<User, ApiErrorData>) -> Void
     ) {
         NetworkHelper.shared.get(urlString: urlGetDataUser + userId.lowercased()) { (result: Result<
             APIResponse<User>,
-            NetworkErrorType
+            APIResponse<ApiErrorData>
         >) in
             DispatchQueue.main.async {
                 switch result {
                 case let .success(apiResponse):
-
                     completion(.success(apiResponse.data))
 
                 case let .failure(error):
-                    completion(.failure(error))
-                    print(error)
+                    completion(.failure(error.data))
                 }
             }
         }
@@ -95,11 +91,10 @@ class InputPatientInteractor {
 
     func addNewPatient(
         patient: Patient,
-        completion: @escaping (Result<Patient, NetworkErrorType>) -> Void
+        completion: @escaping (Result<Patient, ApiErrorData>) -> Void
     ) {
         NetworkHelper.shared.post(urlString: urlCreatePatient, body: patient) { (result: Result<
-            APIResponse<Patient>,
-            NetworkErrorType
+            APIResponse<Patient>, APIResponse<ApiErrorData>
         >) in
             DispatchQueue.main.async {
                 switch result {
@@ -108,7 +103,7 @@ class InputPatientInteractor {
                     completion(.success(apiResponse.data))
 
                 case let .failure(error):
-                    completion(.failure(error))
+                    completion(.failure(error.data))
                 }
             }
         }

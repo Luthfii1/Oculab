@@ -10,10 +10,10 @@ import Foundation
 extension NetworkHelper {
     func get<T: Decodable>(
         urlString: String,
-        completion: @escaping (Result<T, NetworkErrorType>) -> Void
+        completion: @escaping (Result<APIResponse<T>, APIResponse<ApiErrorData>>) -> Void
     ) {
         guard let request = createRequest(urlString: urlString, httpMethod: "GET", body: nil) else {
-            completion(.failure(.invalidURL))
+            completion(.failure(createErrorSystem(errorType: "InvalidRequest", errorMessage: "Error creating request")))
             return
         }
 

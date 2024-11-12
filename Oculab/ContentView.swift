@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        RouterView {
+        NavigationView {
             TabView {
                 HomeView()
                     .tabItem {
@@ -30,7 +30,7 @@ struct ContentView: View {
             }
             .tint(AppColors.purple500)
         }
-        .environmentObject(Router.shared)
+        .navigationBarBackButtonHidden(true)
     }
 }
 

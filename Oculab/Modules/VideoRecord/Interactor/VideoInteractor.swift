@@ -12,20 +12,20 @@ class VideoInteractor {
     func forwardVideotoBackend(
         examinationId: String,
         video: VideoForward,
-        completion: @escaping (Result<VideoForwardResponse, NetworkErrorType>) -> Void
+        completion: @escaping (Result<VideoForwardResponse, ApiErrorData>) -> Void
     ) {
         let urlString = API.BE + "/examination/forward-video-to-ml/"
 
         NetworkHelper.shared.post(urlString: urlString, body: video) { (result: Result<
             APIResponse<VideoForwardResponse>,
-            NetworkErrorType
+            APIResponse<ApiErrorData>
         >) in
             DispatchQueue.main.async {
                 switch result {
                 case let .success(apiResponse):
                     completion(.success(apiResponse.data))
                 case let .failure(error):
-                    completion(.failure(error))
+                    completion(.failure(error.data))
                 }
             }
         }

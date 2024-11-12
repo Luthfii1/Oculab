@@ -140,3 +140,15 @@ class DummyJSON {
     }
     """
 }
+
+let errorJSON = """
+{
+    "status": "error",
+    "code": 400,
+    "message": "Patient not found",
+    "data": {
+        "errorType": "VALIDATION_ERROR",
+        "description": "No patient found with the provided patient ID."
+    }
+}
+""".data(using: .utf8)!

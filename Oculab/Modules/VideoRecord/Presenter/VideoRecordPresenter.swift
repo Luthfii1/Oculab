@@ -71,35 +71,30 @@ AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelega
     }
 
     func setUp() {
-        do {
-            session.beginConfiguration()
+        session.beginConfiguration()
 
-            guard let cameraDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
-                  let videoInput = try? AVCaptureDeviceInput(device: cameraDevice),
-                  let audioDevice = AVCaptureDevice.default(for: .audio),
-                  let audioInput = try? AVCaptureDeviceInput(device: audioDevice)
-            else {
-                print("Error setting up camera inputs")
-                return
-            }
-
-            if session.canAddInput(videoInput) { session.addInput(videoInput) }
-            if session.canAddInput(audioInput) { session.addInput(audioInput) }
-
-            // Set up the movie output
-            if session.canAddOutput(output) { session.addOutput(output) }
-
-            // Set up the video data output for frame extraction
-            videoDataOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "videoFrameQueue"))
-            if session.canAddOutput(videoDataOutput) { session.addOutput(videoDataOutput) }
-
-            session.commitConfiguration()
-
-            session.startRunning()
-
-        } catch {
-            print("Error configuring session: \(error.localizedDescription)")
+        guard let cameraDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
+              let videoInput = try? AVCaptureDeviceInput(device: cameraDevice),
+              let audioDevice = AVCaptureDevice.default(for: .audio),
+              let audioInput = try? AVCaptureDeviceInput(device: audioDevice)
+        else {
+            print("Error setting up camera inputs")
+            return
         }
+
+        if session.canAddInput(videoInput) { session.addInput(videoInput) }
+        if session.canAddInput(audioInput) { session.addInput(audioInput) }
+
+        // Set up the movie output
+        if session.canAddOutput(output) { session.addOutput(output) }
+
+        // Set up the video data output for frame extraction
+        videoDataOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "videoFrameQueue"))
+        if session.canAddOutput(videoDataOutput) { session.addOutput(videoDataOutput) }
+
+        session.commitConfiguration()
+
+        session.startRunning()
     }
 
     func startRecording() {
