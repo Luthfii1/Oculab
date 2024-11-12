@@ -50,4 +50,17 @@ class AnalysisResultPresenter: ObservableObject {
             }
         }
     }
+
+    func navigateToAlbum(fovGroup: FOVType) {
+        Router.shared.navigateTo(.photoAlbum(fovGroup: fovGroup, examId: examinationResult?.examinationId ?? ""))
+    }
+
+    func navigateToDetailed(fovData: FOVData, order: Int, total: Int) {
+        Router.shared.navigateTo(.detailedPhoto(
+            slideId: examinationResult?.slideId ?? "",
+            fovData: fovData,
+            order: order,
+            total: total
+        ))
+    }
 }

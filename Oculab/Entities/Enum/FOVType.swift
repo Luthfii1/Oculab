@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum FOVType: String, Codable {
+enum FOVType: String, Hashable, Codable {
     case BTA0 = "0 BTA"
     case BTA1TO9 = "1-9 BTA"
     case BTAABOVE9 = "≥ 10 BTA"
