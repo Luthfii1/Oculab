@@ -8,8 +8,8 @@
 import Foundation
 
 enum ExamPreparationType: String, Codable {
-    case SPS = "Sewaktu"
-    case SP = "Pagi"
+    case SPS
+    case SP
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
