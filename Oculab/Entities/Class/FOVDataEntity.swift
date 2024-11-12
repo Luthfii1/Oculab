@@ -7,7 +7,15 @@
 
 import Foundation
 
-class FOVData: Codable, Identifiable {
+class FOVData: Hashable, Equatable, Codable, Identifiable {
+    static func == (lhs: FOVData, rhs: FOVData) -> Bool {
+        lhs._id == rhs._id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(_id)
+    }
+
     var _id: UUID
     var image: String
     var type: FOVType

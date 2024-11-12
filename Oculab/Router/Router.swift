@@ -23,6 +23,8 @@ class Router: ObservableObject {
         case newExam(patientId: String, picId: String)
         case userAccessPin(title: String, description: String)
         case login
+        case photoAlbum(fovGroup: FOVType, examId: String)
+        case detailedPhoto(slideId: String, fovData: FOVData, order: Int, total: Int)
     }
 
     @Published var path: NavigationPath = .init()
@@ -50,6 +52,10 @@ class Router: ObservableObject {
             UserAccessPin(title: title, description: description)
         case .login:
             LoginView()
+        case let .photoAlbum(fovGroup, examId):
+            FOVAlbum(fovGroup: fovGroup, examId: examId)
+        case let .detailedPhoto(slideId, fovData, order, total):
+            FOVDetail(slideId: slideId, fovData: fovData, order: order, total: total)
         }
     }
 

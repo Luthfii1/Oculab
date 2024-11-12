@@ -9,7 +9,7 @@ import Foundation
 
 class AnalysisResultInteractor {
     private func createURL(with examinationId: String) -> URL? {
-        let examinationURL = "https://oculab-be.vercel.app/examination/get-examination-by-id/"
+        let examinationURL = API.BE + "/examination/get-examination-by-id/"
         print(examinationURL + examinationId.lowercased())
         return URL(string: examinationURL + examinationId.lowercased())
     }
@@ -17,7 +17,7 @@ class AnalysisResultInteractor {
     func fetchData(examId: String, completion: @escaping (Result<ExaminationResultData, ApiErrorData>) -> Void) {
         NetworkHelper.shared
             .get(
-                urlString: "https://oculab-be.vercel.app/examination/get-examination-by-id/" + examId.lowercased())
+                urlString: API.BE + "/examination/get-examination-by-id/" + examId.lowercased())
         { (result: Result<
             APIResponse<Examination>,
             APIResponse<ApiErrorData>
@@ -27,7 +27,9 @@ class AnalysisResultInteractor {
                 case let .success(apiResponse):
                     let examinationDetail = ExaminationResultData(
                         examinationId: apiResponse.data._id,
+                        slideId: apiResponse.data.slideId,
                         imagePreview: apiResponse.data.imagePreview ?? "",
+
                         fov: apiResponse.data.FOV ?? [],
                         confidenceLevelAggregated: 0.0,
                         systemGrading: GradingType(
@@ -46,11 +48,11 @@ class AnalysisResultInteractor {
 
     func fetchFOVData(examId: String, completion: @escaping (Result<FOVGrouping, ApiErrorData>) -> Void) {
         print(
-            "https://oculab-be.vercel.app/fov/get-all-fov-by-examination-id/" +
+            API.BE + "/fov/get-all-fov-by-examination-id/" +
                 examId.lowercased())
         NetworkHelper.shared
             .get(
-                urlString: "https://oculab-be.vercel.app/fov/get-all-fov-by-examination-id/" +
+                urlString: API.BE + "/fov/get-all-fov-by-examination-id/" +
                     examId.lowercased())
         { (result: Result<
             APIResponse<FOVGrouping>,
@@ -71,6 +73,7 @@ class AnalysisResultInteractor {
 
 struct ExaminationResultData: Decodable {
     var examinationId: String
+    var slideId: String
     var imagePreview: String
     var fov: [FOVData]
     var confidenceLevelAggregated: Double
@@ -97,11 +100,15 @@ struct FOVGrouping: Decodable {
         self.btaabove9 = try container.decodeIfPresent([FOVData].self, forKey: .btaabove9) ?? []
     }
 
-    var groupedData: [(title: FOVType, data: [FOVData])] {
-        return [
-            (.BTA0, bta0),
-            (.BTA1TO9, bta1to9),
-            (.BTAABOVE9, btaabove9)
-        ]
-    }
+//    var groupedData: [[FOVData]] {
+//        return [bta0, bta1to9, btaabove9]
+//    }
+
+//    var groupedData: [(title: FOVType, data: [FOVData])] {
+//        return [
+//            (.BTA0, bta0),
+//            (.BTA1TO9, bta1to9),
+//            (.BTAABOVE9, btaabove9)
+//        ]
+//    }
 }
