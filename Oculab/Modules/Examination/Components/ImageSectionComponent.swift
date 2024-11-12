@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-import SwiftUI
-
 struct ImageSectionComponent: View {
     @ObservedObject var presenter: AnalysisResultPresenter
     var examination: ExaminationResultData
@@ -51,15 +49,39 @@ struct ImageSectionComponent: View {
             }
             .cornerRadius(Decimal.d8)
 
-            ForEach(presenter.groupedFOVs?.groupedData ?? [], id: \.title) { group in
+            if !(presenter.groupedFOVs?.bta0.isEmpty ?? true) {
+                // Checking if the `data` array within each group is not empty
+                Button {
+                    presenter.navigateToAlbum(fovGroup: .BTA0)
+                } label: {
+                    FolderCardComponent(
+                        title: .BTA0,
+                        numOfImage: presenter.groupedFOVs?.bta0.count ?? 0
+                    )
+                }
+            }
 
-                if !group.data.isEmpty {
-                    Button {} label: {
-                        FolderCardComponent(
-                            title: group.title,
-                            numOfImage: group.data.count
-                        )
-                    }
+            if !(presenter.groupedFOVs?.bta1to9.isEmpty ?? true) {
+                // Checking if the `data` array within each group is not empty
+                Button {
+                    presenter.navigateToAlbum(fovGroup: .BTA1TO9)
+                } label: {
+                    FolderCardComponent(
+                        title: .BTA1TO9,
+                        numOfImage: presenter.groupedFOVs?.bta1to9.count ?? 0
+                    )
+                }
+            }
+
+            if !(presenter.groupedFOVs?.btaabove9.isEmpty ?? true) {
+                // Checking if the `data` array within each group is not empty
+                Button {
+                    presenter.navigateToAlbum(fovGroup: .BTAABOVE9)
+                } label: {
+                    FolderCardComponent(
+                        title: .BTAABOVE9,
+                        numOfImage: presenter.groupedFOVs?.btaabove9.count ?? 0
+                    )
                 }
             }
         }
