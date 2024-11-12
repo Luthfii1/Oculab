@@ -81,16 +81,22 @@ struct InputPatientData: View {
                 }
             }
             .onAppear {
-                presenter.getAllUser()
-                presenter.getAllPatient()
+                Task {
+                    await presenter.getAllUser()
+                    await presenter.getAllPatient()
+                }
             }
             .onChange(of: selectedPatient) { _, newValue in
-                print(selectedPatient)
-                presenter.getPatientById(patientId: newValue)
+                Task {
+                    print(selectedPatient)
+                    await presenter.getPatientById(patientId: newValue)
+                }
             }
             .onChange(of: selectedPIC) { _, newValue in
                 if !newValue.isEmpty {
-                    presenter.getUserById(userId: newValue)
+                    Task {
+                        await presenter.getUserById(userId: newValue)
+                    }
                 }
             }
         }.navigationBarBackButtonHidden(true)

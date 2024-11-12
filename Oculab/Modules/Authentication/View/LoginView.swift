@@ -54,7 +54,9 @@ struct LoginView: View {
                             size: .large,
                             isEnabled: authPresenter.isFilled()
                         ) {
-                            authPresenter.login()
+                            Task {
+                                await authPresenter.login()
+                            }
                         }
 
                         HStack(alignment: .center, spacing: 12) {

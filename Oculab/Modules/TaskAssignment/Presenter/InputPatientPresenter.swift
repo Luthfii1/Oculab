@@ -50,132 +50,158 @@ class InputPatientPresenter: ObservableObject {
         statusExamination: .NOTSTARTED
     )
 
-    func getAllUser() {
+    @MainActor
+    func getAllUser() async {
         isUserLoading = true
-        interactor?.getAllUser { [weak self] result in
-            DispatchQueue.main.async {
-                self?.isUserLoading = false
-                switch result {
-                case let .success(data):
-                    for pic in data {
-                        self?.picName.append((pic.name, pic._id))
-                    }
-                case let .failure(error):
-                    print("Error: \(error.localizedDescription)")
+        defer { isUserLoading = false }
+
+        do {
+            let response = try await interactor?.getAllUser()
+            if let data = response {
+                for pic in data {
+                    picName.append((pic.name, pic._id))
                 }
+            }
+        } catch {
+            // Handle error
+            if let apiError = error as? APIResponse<ApiErrorData> {
+                print("Error description: \(apiError.data.description)")
+                print("Error type: \(apiError.data.errorType)")
+            } else {
+                print("Error: \(error.localizedDescription)")
             }
         }
     }
 
-    func getAllPatient() {
+    @MainActor
+    func getAllPatient() async {
         isPatientLoading = true
-        interactor?.getAllPatient { [weak self] result in
-            DispatchQueue.main.async {
-                self?.isPatientLoading = false
-                switch result {
-                case let .success(data):
-                    let dateFormatter = DateFormatter()
-                    dateFormatter.dateFormat = "dd/MM/yyyy"
+        defer {
+            isPatientLoading = false
+        }
 
-                    for patient in data {
-                        let formattedDoB = patient.DoB.map { dateFormatter.string(from: $0) } ?? ""
-                        self?.patientNameDoB.append((patient.name + " (\(formattedDoB))", patient._id))
-                    }
-                case let .failure(error):
-                    print("Error: \(error.localizedDescription)")
+        do {
+            let response = try await interactor?.getAllPatient()
+
+            if let response {
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "dd/MM/yyyy"
+
+                for patient in response {
+                    let formattedDoB = patient.DoB.map { dateFormatter.string(from: $0) } ?? ""
+                    patientNameDoB.append((patient.name + " (\(formattedDoB))", patient._id))
                 }
+            }
+        } catch {
+            // Handle error
+            if let apiError = error as? APIResponse<ApiErrorData> {
+                print("Error description: \(apiError.data.description)")
+                print("Error type: \(apiError.data.errorType)")
+            } else {
+                print("Error: \(error.localizedDescription)")
             }
         }
     }
 
-    func getPatientById(patientId: String) {
+    @MainActor
+    func getPatientById(patientId: String) async {
         isPatientLoading = true
+        defer {
+            isPatientLoading = false
+        }
 
-        interactor?.getPatientById(patientId: patientId) { [weak self] result in
-            DispatchQueue.main.async {
-                self?.isPatientLoading = false
+        do {
+            let response = try await interactor?.getPatientById(patientId: patientId)
 
-                switch result {
-                case let .success(data):
-                    self?.patient = data
-                    self?.patientFound = true
-
-                case let .failure(error):
-                    self?.patient = .init(
-                        _id: UUID().uuidString.lowercased(),
-                        name: "",
-                        NIK: "",
-                        DoB: Date(),
-                        sex: .MALE
-                    )
-                    self?.patientFound = false
-                }
+            if let patient = response {
+                self.patient = patient
+                patientFound = true
+            }
+        } catch {
+            // Handle error
+            if let apiError = error as? APIResponse<ApiErrorData> {
+                print("Error description: \(apiError.data.description)")
+                print("Error type: \(apiError.data.errorType)")
+            } else {
+                print("Error: \(error.localizedDescription)")
             }
         }
     }
 
-    func getUserById(userId: String) {
+    @MainActor
+    func getUserById(userId: String) async {
         isUserLoading = true
+        defer {
+            isUserLoading = false
+        }
 
-        interactor?.getUserById(userId: userId) { [weak self] result in
-            DispatchQueue.main.async {
-                self?.isUserLoading = false
+        do {
+            let response = try await interactor?.getUserById(userId: userId)
 
-                switch result {
-                case let .success(data):
-                    print("{}{}{}{}")
-                    print(data.name)
-                    self?.pic = data
-
-                case let .failure(error):
-                    print(error)
-                }
+            if let user = response {
+                pic = user
+            }
+        } catch {
+            // Handle error
+            if let apiError = error as? APIResponse<ApiErrorData> {
+                print("Error description: \(apiError.data.description)")
+                print("Error type: \(apiError.data.errorType)")
+            } else {
+                print("Error: \(error.localizedDescription)")
             }
         }
     }
 
+    @MainActor
     func newExam() {
-        if !patientFound {
-            addNewPatient { [weak self] success in
+        Task {
+            if !patientFound {
+                let success = await addNewPatient()
                 if success {
-                    self?.navigateToNewExam()
+                    navigateToNewExam()
                 } else {
                     print("Failed to add new patient.")
                 }
+            } else {
+                navigateToNewExam()
             }
-        } else {
-            navigateToNewExam()
         }
     }
 
-    func addNewPatient(completion: @escaping (Bool) -> Void) {
+    @MainActor
+    func addNewPatient() async -> Bool {
         print(patient._id)
         print(patient.name)
-        print(patient.BPJS)
+        print(patient.BPJS ?? "no data BPJS")
         print(patient.NIK)
-        print(patient.DoB)
+        print(patient.DoB ?? "no data DoB")
 
-        interactor?.addNewPatient(patient: patient) { [weak self] result in
-            switch result {
-            case let .success(data):
-                self?.patient = data
-                print(data)
-                completion(true) // Indicate success to the caller
+        do {
+            let response = try await interactor?.addNewPatient(patient: patient)
 
-            case let .failure(error):
-                print(error)
-                print("Add new patient")
-                completion(false) // Indicate failure to the caller
+            if let response {
+                patient = response
+                return true
+            }
+        } catch {
+            // Handle error
+            if let apiError = error as? APIResponse<ApiErrorData> {
+                print("Error description: \(apiError.data.description)")
+                print("Error type: \(apiError.data.errorType)")
+            } else {
+                print("Error: \(error.localizedDescription)")
             }
         }
+        return false
     }
 
     private func navigateToNewExam() {
         Router.shared.navigateTo(.newExam(patientId: patient._id, picId: pic._id))
     }
 
-    func submitExamination() {
-        var examReq = ExaminationRequest(
+    @MainActor
+    func submitExamination() async {
+        let examReq = ExaminationRequest(
             _id: examination._id,
             goal: examination.goal,
             preparationType: examination.preparationType,
@@ -186,7 +212,7 @@ class InputPatientPresenter: ObservableObject {
             examinationPlanDate: examination.examinationPlanDate
         )
 
-        var examReq2 = ExaminationRequest(
+        let examReq2 = ExaminationRequest(
             _id: examination2._id,
             goal: examination2.goal,
             preparationType: examination2.preparationType,
@@ -197,30 +223,23 @@ class InputPatientPresenter: ObservableObject {
             examinationPlanDate: examination2.examinationPlanDate
         )
 
-        interactor?.addNewExamination(
-            patientId: patient._id,
-            examination: examReq
-        ) { [weak self] result in
-            switch result {
-            case let .success(data):
-                print(data)
+        do {
+            let response1 = try await interactor?.addNewExamination(patientId: patient._id, examination: examReq)
+            let response2 = try await interactor?.addNewExamination(patientId: patient._id, examination: examReq2)
 
-            case let .failure(error):
-                print(error)
+            if (response1 != nil) && (response2 != nil) {
+                print("Examination added successfully")
+                Router.shared.navigateTo(.home)
+            }
+        } catch {
+            // Handle error
+            if let apiError = error as? APIResponse<ApiErrorData> {
+                print("Error description: \(apiError.data.description)")
+                print("Error type: \(apiError.data.errorType)")
+            } else {
+                print("Error: \(error.localizedDescription)")
             }
         }
-
-        interactor?.addNewExamination(patientId: patient._id, examination: examReq2) { [weak self] result in
-            switch result {
-            case let .success(data):
-                print(data)
-
-            case let .failure(error):
-                print(error)
-            }
-        }
-
-        Router.shared.navigateTo(.home)
     }
 }
 

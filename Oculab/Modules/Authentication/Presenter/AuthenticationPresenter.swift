@@ -30,31 +30,42 @@ class AuthenticationPresenter: ObservableObject {
         return !email.isEmpty && !password.isEmpty && !isLoading
     }
 
-    func login() {
+    @MainActor
+    func login() async {
         isLoading = true
+        defer { isLoading = false }
 
-        interactor?.login(email: email, password: password, completion: { result in
-            DispatchQueue.main.async {
-                switch result {
-                case let .success(data):
-                    UserDefaults.standard.set(data.accessToken, forKey: UserDefaultType.accessToken.rawValue)
-                    UserDefaults.standard.set(data.refreshToken, forKey: UserDefaultType.refreshToken.rawValue)
-                    UserDefaults.standard.set(true, forKey: UserDefaultType.isUserLoggedIn.rawValue)
-                    UserDefaults.standard.set(data.userId, forKey: UserDefaultType.userId.rawValue)
-
-                    print(
-                        "success login: \(String(describing: UserDefaults.standard.string(forKey: UserDefaultType.isUserLoggedIn.rawValue)))"
-                    )
-                case let .failure(error):
-                    print("Error description: \(error.description)")
-                    print("Error type: \(error.errorType)")
-                }
-
-                self.isLoading = false
+        do {
+            let loginData = try await interactor?.login(email: email, password: password)
+            if let data = loginData {
+                print("Success login with id: \(data.userId)")
             }
-        })
+
+            let accountData = try await interactor?.getAccountById()
+            if let data = accountData {
+                print("Success get account: \(data.role)")
+            }
+
+        } catch {
+            // Handle error
+            switch error {
+            case let NetworkError.apiError(apiResponse):
+//                        errorMessage = apiResponse.data.description
+                print("Error type: \(apiResponse.data.errorType)")
+                print("Error description: \(apiResponse.data.description)")
+
+            case let NetworkError.networkError(message):
+//                        errorMessage = message
+                print("Network error: \(message)")
+
+            default:
+//                        errorMessage = error.localizedDescription
+                print("Unknown error: \(error.localizedDescription)")
+            }
+        }
     }
 
+    @MainActor
     func logoutAccount() {
         for userDefault in UserDefaultType.allCases {
             UserDefaults.standard.removeObject(forKey: userDefault.rawValue)

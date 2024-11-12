@@ -8,23 +8,18 @@
 import Foundation
 
 extension NetworkHelper {
-    func post<T: Encodable, U: Decodable>(
-        urlString: String,
-        body: T,
-        completion: @escaping (Result<APIResponse<U>, APIResponse<ApiErrorData>>) -> Void
-    ) {
+    func post<T: Encodable, U: Decodable>(urlString: String, body: T) async throws -> APIResponse<U> {
         guard let jsonData = try? JSONEncoder().encode(body),
               let request = createRequest(urlString: urlString, httpMethod: "POST", body: jsonData)
         else {
-            completion(.failure(createErrorSystem(
-                errorType: "InvalidRequest",
-                errorMessage: "Error encoding request body"
-            )))
-            return
+            throw NSError(
+                domain: "InvalidRequest",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "Error encoding request body"]
+            )
         }
 
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            self.handleResponse(data, response, error, completion: completion)
-        }.resume()
+        let (data, response) = try await URLSession.shared.data(for: request)
+        return try handleAsyncResponse(data: data, response: response)
     }
 }

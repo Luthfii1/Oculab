@@ -82,8 +82,10 @@ struct ExamDetailView: View {
                         isEnabled: presenter.recordVideo != nil
 
                     ) {
-                        presenter.handleSubmit()
-                        presenter.analysisResult(examinationId: presenter.examDetailData.examinationId)
+                        Task {
+                            await presenter.handleSubmit()
+                            presenter.navigateToAnalysisResult(examinationId: presenter.examDetailData.examinationId)
+                        }
                     }
 
                 }.padding(.horizontal, Decimal.d20)
@@ -104,8 +106,10 @@ struct ExamDetailView: View {
 
         }.navigationBarBackButtonHidden(true)
             .onAppear {
-                presenter.fetchData(examId: examId, patientId: patientId)
-                print(presenter.isLoading)
+                Task {
+                    await presenter.fetchData(examId: examId, patientId: patientId)
+                    print(presenter.isLoading)
+                }
             }
             .onChange(of: videoRecordPresenter.previewURL) {
                 presenter.recordVideo = videoRecordPresenter.previewURL

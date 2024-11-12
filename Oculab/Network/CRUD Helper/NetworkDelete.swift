@@ -8,23 +8,31 @@
 import Foundation
 
 extension NetworkHelper {
-    func delete<T: Encodable, U: Decodable>(
-        urlString: String,
-        body: T?,
-        completion: @escaping (Result<APIResponse<U>, APIResponse<ApiErrorData>>) -> Void
-    ) {
+    func delete<T: Encodable, U: Decodable>(urlString: String, body: T? = nil) async throws -> APIResponse<U> {
         var jsonData: Data?
         if let body = body {
-            jsonData = try? JSONEncoder().encode(body)
+            do {
+                jsonData = try JSONEncoder().encode(body)
+            } catch {
+                throw NSError(
+                    domain: "EncodingError",
+                    code: -1,
+                    userInfo: [
+                        NSLocalizedDescriptionKey: "Error encoding request body: \(error.localizedDescription)"
+                    ]
+                )
+            }
         }
 
         guard let request = createRequest(urlString: urlString, httpMethod: "DELETE", body: jsonData) else {
-            completion(.failure(createErrorSystem(errorType: "InvalidRequest", errorMessage: "Error creating request")))
-            return
+            throw NSError(
+                domain: "InvalidRequest",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "Error creating request"]
+            )
         }
 
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            self.handleResponse(data, response, error, completion: completion)
-        }.resume()
+        let (data, response) = try await URLSession.shared.data(for: request)
+        return try handleAsyncResponse(data: data, response: response)
     }
 }

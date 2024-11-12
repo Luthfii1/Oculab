@@ -37,25 +37,20 @@ class ExamDataPresenter: ObservableObject {
         self.interactor = interactor
     }
 
-    func handleSubmit() {
+    @MainActor
+    func handleSubmit() async {
         if let fileURL = recordVideo {
             do {
                 let videoData = try Data(contentsOf: fileURL)
                 print("Video data loaded successfully with size: \(videoData.count) bytes")
 
-                interactor.submitExamination(
+                let response = try await interactor.submitExamination(
                     examVideo: videoData,
                     examinationId: examDetailData.examinationId,
                     patientId: patientDetailData.patientId
-                ) { result in
-                    switch result {
-                    case let .success(response):
-                        print("Examination submitted successfully with response: \(response)")
-                    case let .failure(error):
-                        print("Failed to submit examination: \(error)")
-                    }
-                }
+                )
 
+                print("Examination submitted successfully with response: \(response)")
             } catch {
                 print("Error loading video data: \(error)")
             }
@@ -70,36 +65,29 @@ class ExamDataPresenter: ObservableObject {
         Router.shared.navigateTo(.videoRecord)
     }
 
-    func analysisResult(examinationId: String) {
+    func navigateToAnalysisResult(examinationId: String) {
         Router.shared.navigateTo(.analysisResult(examinationId: examinationId))
     }
 
-    func fetchData(examId: String, patientId: String) {
+    @MainActor
+    func fetchData(examId: String, patientId: String) async {
         isLoading = true
+        defer { isLoading = false }
 
-        print(isLoading)
+        do {
+            let examinationResponse = try await interactor.getExamById(examId: examId)
+            let patientResponse = try await interactor.getPatientById(patientId: patientId)
 
-        interactor.getExamById(examId: examId) { [weak self] result in
-            DispatchQueue.main.async {
-                self?.isLoading = false
+            examDetailData = examinationResponse
+            patientDetailData = patientResponse
 
-                switch result {
-                case let .success(examination):
-                    self?.examDetailData = examination
-
-                case let .failure(error):
-                    print("error: ", error.localizedDescription)
-                }
-            }
-        }
-
-        interactor.getPatientById(patientId: patientId) { [weak self] result in
-            switch result {
-            case let .success(patient):
-                self?.patientDetailData = patient
-
-            case let .failure(error):
-                print("error: ", error.localizedDescription)
+        } catch {
+            // Handle error
+            if let apiError = error as? APIResponse<ApiErrorData> {
+                print("Error description: \(apiError.data.description)")
+                print("Error type: \(apiError.data.errorType)")
+            } else {
+                print("Error: \(error.localizedDescription)")
             }
         }
     }

@@ -30,23 +30,25 @@ class AnalysisResultPresenter: ObservableObject {
         Router.shared.popToRoot()
     }
 
-    func fetchData(examinationId: String) {
-        interactor?.fetchData(examId: examinationId) { [weak self] result in
-            switch result {
-            case let .success(examination):
-                self?.examinationResult = examination
-            case let .failure(error):
-                print("error: ", error.localizedDescription)
+    @MainActor
+    func fetchData(examinationId: String) async {
+        do {
+            let result = try await interactor?.fetchData(examId: examinationId)
+            if let result {
+                examinationResult = result
             }
-        }
 
-        interactor?.fetchFOVData(examId: examinationId) { [weak self] result in
-            switch result {
-            case let .success(fov):
-                self?.groupedFOVs = fov
-                print(self?.groupedFOVs)
-            case let .failure(error):
-                print("error: ", error.localizedDescription)
+            let groupedFOVs = try await interactor?.fetchFOVData(examId: examinationId)
+            if let groupedFOVs {
+                self.groupedFOVs = groupedFOVs
+            }
+        } catch {
+            // Handle error
+            if let apiError = error as? APIResponse<ApiErrorData> {
+                print("Error description: \(apiError.data.description)")
+                print("Error type: \(apiError.data.errorType)")
+            } else {
+                print("Error: \(error.localizedDescription)")
             }
         }
     }

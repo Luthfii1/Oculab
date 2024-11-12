@@ -14,58 +14,29 @@ class AnalysisResultInteractor {
         return URL(string: examinationURL + examinationId.lowercased())
     }
 
-    func fetchData(examId: String, completion: @escaping (Result<ExaminationResultData, ApiErrorData>) -> Void) {
-        NetworkHelper.shared
-            .get(
-                urlString: "https://oculab-be.vercel.app/examination/get-examination-by-id/" + examId.lowercased())
-        { (result: Result<
-            APIResponse<Examination>,
-            APIResponse<ApiErrorData>
-        >) in
-            DispatchQueue.main.async {
-                switch result {
-                case let .success(apiResponse):
-                    let examinationDetail = ExaminationResultData(
-                        examinationId: apiResponse.data._id,
-                        imagePreview: apiResponse.data.imagePreview ?? "",
-                        fov: apiResponse.data.FOV ?? [],
-                        confidenceLevelAggregated: 0.0,
-                        systemGrading: GradingType(
-                            rawValue: apiResponse.data.systemResult?.systemGrading.rawValue ?? GradingType.NEGATIVE
-                                .rawValue) ??
-                            .unknown,
-                        bacteriaTotalCount: apiResponse.data.systemResult?.systemBacteriaTotalCount ?? 0)
+    func fetchData(examId: String) async throws -> ExaminationResultData {
+        let response: APIResponse<Examination> = try await NetworkHelper.shared
+            .get(urlString: "https://oculab-be.vercel.app/examination/get-examination-by-id/" + examId.lowercased())
 
-                    completion(.success(examinationDetail))
-                case let .failure(error):
-                    completion(.failure(error.data))
-                }
-            }
-        }
+        let examinationDetail = ExaminationResultData(
+            examinationId: response.data._id,
+            imagePreview: response.data.imagePreview ?? "",
+            fov: response.data.FOV ?? [],
+            confidenceLevelAggregated: 0.0,
+            systemGrading: GradingType(
+                rawValue: response.data.systemResult?.systemGrading.rawValue ?? GradingType.NEGATIVE
+                    .rawValue) ??
+                .unknown,
+            bacteriaTotalCount: response.data.systemResult?.systemBacteriaTotalCount ?? 0)
+
+        return examinationDetail
     }
 
-    func fetchFOVData(examId: String, completion: @escaping (Result<FOVGrouping, ApiErrorData>) -> Void) {
-        print(
-            "https://oculab-be.vercel.app/fov/get-all-fov-by-examination-id/" +
+    func fetchFOVData(examId: String) async throws -> FOVGrouping {
+        let response: APIResponse<FOVGrouping> = try await NetworkHelper.shared.get(
+            urlString: "https://oculab-be.vercel.app/fov/get-all-fov-by-examination-id/" +
                 examId.lowercased())
-        NetworkHelper.shared
-            .get(
-                urlString: "https://oculab-be.vercel.app/fov/get-all-fov-by-examination-id/" +
-                    examId.lowercased())
-        { (result: Result<
-            APIResponse<FOVGrouping>,
-            APIResponse<ApiErrorData>
-        >) in
-            DispatchQueue.main.async {
-                switch result {
-                case let .success(apiResponse):
-                    completion(.success(apiResponse.data))
-
-                case let .failure(error):
-                    completion(.failure(error.data))
-                }
-            }
-        }
+        return response.data
     }
 }
 

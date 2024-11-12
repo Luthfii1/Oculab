@@ -149,8 +149,10 @@ struct SavedResultView: View {
                 }
             }
             .onAppear {
-                presenter.fetchData(examId: examId, patientId: patientId)
-                resultPresenter.fetchData(examinationId: examId)
+                Task {
+                    await presenter.fetchData(examId: examId, patientId: patientId)
+                    await resultPresenter.fetchData(examinationId: examId)
+                }
             }
         }.navigationBarBackButtonHidden(true)
     }
