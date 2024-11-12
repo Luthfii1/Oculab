@@ -45,7 +45,7 @@ class HomeHistoryPresenter: ObservableObject {
         case .belumDimulai:
             filteredExamination = latestExamination.filter { $0.statusExamination == .NOTSTARTED }
         case .belumDisimpulkan:
-            filteredExamination = latestExamination.filter { $0.statusExamination == .INPROGRESS }
+            filteredExamination = latestExamination.filter { $0.statusExamination == .NEEDVALIDATION }
         }
 
         print("Pressed: ", typeActivity.rawValue)

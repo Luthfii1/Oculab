@@ -10,7 +10,7 @@ import SwiftUI
 import SwiftUI
 
 struct ImageSectionComponent: View {
-    var presenter: AnalysisResultPresenter
+    @ObservedObject var presenter: AnalysisResultPresenter
     var examination: ExaminationResultData
 
     var body: some View {
@@ -52,6 +52,7 @@ struct ImageSectionComponent: View {
             .cornerRadius(Decimal.d8)
 
             ForEach(presenter.groupedFOVs?.groupedData ?? [], id: \.title) { group in
+
                 if !group.data.isEmpty {
                     Button {
                         print("title: \(group.title) pressed")

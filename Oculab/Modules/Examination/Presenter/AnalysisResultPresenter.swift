@@ -44,6 +44,7 @@ class AnalysisResultPresenter: ObservableObject {
             switch result {
             case let .success(fov):
                 self?.groupedFOVs = fov
+                print(self?.groupedFOVs)
             case let .failure(error):
                 print("error: ", error.localizedDescription)
             }
