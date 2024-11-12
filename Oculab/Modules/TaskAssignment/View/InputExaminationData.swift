@@ -14,6 +14,7 @@ struct InputExaminationData: View {
     @State var selectedPatient: String
     @State var goalString: String = ""
     @State var typeString: String = ""
+
     @State var typeString2: String = ""
 
     @State var isAddingNewPatient: Bool = false
@@ -69,10 +70,15 @@ struct InputExaminationData: View {
                                     switch goalString {
                                     case "Skrining":
                                         presenter.examination.goal = .SCREENING
+                                        presenter.examination2.goal = .SCREENING
+
                                     case "Follow Up":
-                                        presenter.examination.goal = .SCREENING
+                                        presenter.examination.goal = .TREATMENT
+                                        presenter.examination2.goal = .TREATMENT
+
                                     default:
                                         presenter.examination.goal = .SCREENING
+                                        presenter.examination2.goal = .SCREENING
                                     }
                                 }
 
@@ -114,11 +120,11 @@ struct InputExaminationData: View {
                                 ).onChange(of: typeString2) {
                                     switch typeString2 {
                                     case "Pagi":
-                                        presenter.examination.preparationType = .SP
+                                        presenter.examination2.preparationType = .SP
                                     case "Sewaktu":
-                                        presenter.examination.preparationType = .SPS
+                                        presenter.examination2.preparationType = .SPS
                                     default:
-                                        presenter.examination.preparationType = .SPS
+                                        presenter.examination2.preparationType = .SPS
                                     }
                                 }
                             }

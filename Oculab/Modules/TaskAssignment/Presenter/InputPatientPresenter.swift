@@ -50,21 +50,6 @@ class InputPatientPresenter: ObservableObject {
         statusExamination: .NOTSTARTED
     )
 
-    var goalString2: String {
-        get { examination.goal?.rawValue ?? "" }
-        set { examination.goal = ExamGoalType(rawValue: newValue) }
-    }
-
-    var typeString: String {
-        get { examination.preparationType?.rawValue ?? "" }
-        set { examination.preparationType = ExamPreparationType(rawValue: newValue) }
-    }
-
-    var typeString2: String {
-        get { examination.preparationType?.rawValue ?? "" }
-        set { examination.preparationType = ExamPreparationType(rawValue: newValue) }
-    }
-
     func getAllUser() {
         isUserLoading = true
         interactor?.getAllUser { [weak self] result in
@@ -223,15 +208,22 @@ class InputPatientPresenter: ObservableObject {
             examinationPlanDate: examination2.examinationPlanDate
         )
 
+        do {
+            let jsonData = try encoder.encode(examReq2)
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+                print("Encoded JSON:\n\(jsonString)")
+            }
+        } catch {
+            print("Failed to encode ExaminationRequest: \(error)")
+        }
+
         interactor?.addNewExamination(patientId: patient._id, examination: examReq2) { [weak self] result in
             switch result {
             case let .success(data):
-                //                self?.examination2 = data
                 print(data)
 
             case let .failure(error):
                 print(error)
-                print(result)
             }
         }
     }

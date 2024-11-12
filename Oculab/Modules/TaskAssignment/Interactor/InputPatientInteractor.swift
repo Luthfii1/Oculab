@@ -111,12 +111,12 @@ class InputPatientInteractor {
 
     func addNewExamination(
         patientId: String,
-        examination: ExaminationRequest, completion: @escaping (Result<Examination, NetworkErrorType>) -> Void
+        examination: ExaminationRequest, completion: @escaping (Result<Examination, ApiErrorData>) -> Void
     ) {
         print(urlCreateExam + patientId)
         NetworkHelper.shared.post(urlString: urlCreateExam + patientId, body: examination) { (result: Result<
             APIResponse<Examination>,
-            NetworkErrorType
+            APIResponse<ApiErrorData>
         >) in
             DispatchQueue.main.async {
                 switch result {
@@ -125,8 +125,7 @@ class InputPatientInteractor {
                     completion(.success(apiResponse.data))
 
                 case let .failure(error):
-                    print("ERRORRRRRR")
-                    completion(.failure(error))
+                    completion(.failure(error.data))
                 }
             }
         }
