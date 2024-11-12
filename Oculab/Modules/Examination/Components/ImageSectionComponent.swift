@@ -54,9 +54,7 @@ struct ImageSectionComponent: View {
             ForEach(presenter.groupedFOVs?.groupedData ?? [], id: \.title) { group in
 
                 if !group.data.isEmpty {
-                    Button {
-                        print("title: \(group.title) pressed")
-                    } label: {
+                    Button {} label: {
                         FolderCardComponent(
                             title: group.title,
                             numOfImage: group.data.count

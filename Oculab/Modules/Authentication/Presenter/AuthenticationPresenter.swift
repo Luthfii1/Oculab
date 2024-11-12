@@ -44,22 +44,27 @@ class AuthenticationPresenter: ObservableObject {
             let accountData = try await interactor?.getAccountById()
             if let data = accountData {
                 print("Success get account: \(data.role)")
+
+                if data.accessPin != nil {
+                    print("No access pin, redirect to setup screen")
+                    Router.shared.navigateTo(.userAccessPin(
+                        title: "Atur PIN",
+                        description: "Atur PIN untuk kemudahan login di sesi berikutnya"
+                    ))
+                }
             }
 
         } catch {
             // Handle error
             switch error {
             case let NetworkError.apiError(apiResponse):
-//                        errorMessage = apiResponse.data.description
                 print("Error type: \(apiResponse.data.errorType)")
                 print("Error description: \(apiResponse.data.description)")
 
             case let NetworkError.networkError(message):
-//                        errorMessage = message
                 print("Network error: \(message)")
 
             default:
-//                        errorMessage = error.localizedDescription
                 print("Unknown error: \(error.localizedDescription)")
             }
         }

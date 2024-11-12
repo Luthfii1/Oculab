@@ -83,11 +83,16 @@ class ExamDataPresenter: ObservableObject {
 
         } catch {
             // Handle error
-            if let apiError = error as? APIResponse<ApiErrorData> {
-                print("Error description: \(apiError.data.description)")
-                print("Error type: \(apiError.data.errorType)")
-            } else {
-                print("Error: \(error.localizedDescription)")
+            switch error {
+            case let NetworkError.apiError(apiResponse):
+                print("Error type: \(apiResponse.data.errorType)")
+                print("Error description: \(apiResponse.data.description)")
+
+            case let NetworkError.networkError(message):
+                print("Network error: \(message)")
+
+            default:
+                print("Unknown error: \(error.localizedDescription)")
             }
         }
     }

@@ -13,6 +13,7 @@ struct AdaptsToKeyboard: ViewModifier {
     @Binding var isKeyboardVisible: Bool
     @State private var currentHeight: CGFloat = 0
 
+    @MainActor
     func body(content: Content) -> some View {
         GeometryReader { geometry in
             content
@@ -52,6 +53,7 @@ struct AdaptsToKeyboard: ViewModifier {
 }
 
 extension View {
+    @MainActor
     func adaptsToKeyboard(isKeyboardVisible: Binding<Bool>) -> some View {
         modifier(AdaptsToKeyboard(isKeyboardVisible: isKeyboardVisible))
     }

@@ -14,6 +14,7 @@ class User: Codable, Identifiable {
     var token: String?
     var email: String?
     var password: String?
+    var accessPin: String?
 
     init(
         _id: String,
@@ -21,7 +22,8 @@ class User: Codable, Identifiable {
         role: RolesType,
         token: String? = nil,
         email: String? = nil,
-        password: String? = nil
+        password: String? = nil,
+        accessPin: String? = nil
     ) {
         self._id = _id
         self.name = name
@@ -29,6 +31,7 @@ class User: Codable, Identifiable {
         self.token = token
         self.email = email
         self.password = password
+        self.accessPin = accessPin
     }
 
     enum CodingKeys: CodingKey {
@@ -38,6 +41,7 @@ class User: Codable, Identifiable {
         case token
         case email
         case password
+        case accessPin
     }
 
     required init(from decoder: Decoder) throws {
@@ -48,6 +52,7 @@ class User: Codable, Identifiable {
         self.token = try container.decodeIfPresent(String.self, forKey: .token)
         self.email = try container.decodeIfPresent(String.self, forKey: .email)
         self.password = try container.decodeIfPresent(String.self, forKey: .password)
+        self.accessPin = try container.decodeIfPresent(String.self, forKey: .accessPin)
     }
 
     func encode(to encoder: Encoder) throws {
@@ -58,5 +63,6 @@ class User: Codable, Identifiable {
         try container.encodeIfPresent(token, forKey: .token)
         try container.encodeIfPresent(email, forKey: .email)
         try container.encodeIfPresent(password, forKey: .password)
+        try container.encodeIfPresent(accessPin, forKey: .accessPin)
     }
 }
