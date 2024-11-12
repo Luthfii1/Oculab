@@ -21,49 +21,25 @@ class NetworkHelper {
         return request
     }
 
-    // Function to handle the response
-    func handleResponse<T: Decodable>(
-        _ data: Data?,
-        _ response: URLResponse?,
-        _ error: Error?,
-        completion: @escaping (Result<APIResponse<T>, APIResponse<ApiErrorData>>) -> Void
-    ) {
-        // Handle request error
-        if let error = error {
-            let errorResponse = createErrorSystem(
-                errorType: "HANDLE_REQUEST_ERROR",
-                errorMessage: "Error when handle request: \(error.localizedDescription)"
-            )
-            completion(.failure(errorResponse))
-            return
+    func handleAsyncResponse<T: Decodable>(data: Data, response: URLResponse) throws -> APIResponse<T> {
+        guard response is HTTPURLResponse else {
+            throw NetworkError.networkError("Invalid response type")
         }
 
-        // Ensure data exists
-        guard let data = data else {
-            let errorResponse = createErrorSystem(
-                errorType: "DATA_NOT_FOUND",
-                errorMessage: "Error when handle response: Data not found"
-            )
-            completion(.failure(errorResponse))
-            return
-        }
-
-//        // Print the data as a JSON string for debugging
-//        debugResponse(data: data)
-
-        // Decode the response to determine success or error
         do {
-            let response = try JSONDecoder().decode(APIResponse<T>.self, from: data)
-            completion(.success(response))
-        } catch {
-            if let errorResponse = try? JSONDecoder().decode(APIResponse<ApiErrorData>.self, from: data) {
-                completion(.failure(errorResponse))
-            } else {
-                completion(.failure(createErrorSystem(
-                    errorType: "DECODING_ERROR",
-                    errorMessage: "Error when decoding response: \(error.localizedDescription)"
-                )))
+            let decodedResponse = try JSONDecoder().decode(APIResponse<T>.self, from: data)
+            if decodedResponse.status == StatusResponseType.ERROR.rawValue {
+                // If the API returns an error response, decode it as an error
+                if let errorResponse = try? JSONDecoder().decode(APIResponse<ApiErrorData>.self, from: data) {
+                    throw NetworkError.apiError(errorResponse)
+                }
             }
+            return decodedResponse
+        } catch {
+            if let decodedError = try? JSONDecoder().decode(APIResponse<ApiErrorData>.self, from: data) {
+                throw NetworkError.apiError(decodedError)
+            }
+            throw NetworkError.networkError("Decoding error: \(error.localizedDescription)")
         }
     }
 

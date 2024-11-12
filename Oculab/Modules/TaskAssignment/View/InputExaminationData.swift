@@ -35,7 +35,9 @@ struct InputExaminationData: View {
                             size: .large,
                             isEnabled: true
                         ) {
-                            presenter.submitExamination()
+                            Task {
+                                await presenter.submitExamination()
+                            }
                         },
 
                         AppButton(
@@ -173,12 +175,14 @@ struct InputExaminationData: View {
                 }
             }
             .onAppear {
-                presenter.getPatientById(patientId: selectedPatient)
-                print(selectedPatient)
-                print(presenter.patient.name)
-                presenter.getUserById(userId: selectedPIC)
+                Task {
+                    await presenter.getPatientById(patientId: selectedPatient)
+                    print(selectedPatient)
+                    print(presenter.patient.name)
+                    await presenter.getUserById(userId: selectedPIC)
 
-                print(presenter.patient.name)
+                    print(presenter.patient.name)
+                }
             }
         }.navigationBarBackButtonHidden(true)
     }

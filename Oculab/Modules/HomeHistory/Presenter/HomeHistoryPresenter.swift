@@ -23,22 +23,30 @@ class HomeHistoryPresenter: ObservableObject {
     @Published var isAllExamsLoading: Bool = false
     @Published var isStatisticLoading: Bool = false
 
-    func getStatisticData() {
+    @MainActor
+    func getStatisticData() async {
         isStatisticLoading = true
-        interactor?.getStatisticExamination { [weak self] result in
-            DispatchQueue.main.async {
-                self?.isStatisticLoading = false
-                switch result {
-                case let .success(data):
-                    self?.statisticExam = data
-                case let .failure(error):
-                    print("Error: \(error.localizedDescription)")
-                }
+        defer { isStatisticLoading = false }
+
+        do {
+            let data = try await interactor?.getStatisticExamination()
+
+            if let data {
+                statisticExam = data
+            }
+        } catch {
+            // Handle error
+            if let apiError = error as? APIResponse<ApiErrorData> {
+                print("Error description: \(apiError.data.description)")
+                print("Error type: \(apiError.data.errorType)")
+            } else {
+                print("Error: \(error.localizedDescription)")
             }
         }
     }
 
-    func filterLatestActivity(typeActivity: LatestActivityType) {
+    @MainActor
+    func filterLatestActivity(typeActivity: LatestActivityType) async {
         selectedLatestActivity = typeActivity
 
         switch typeActivity {
@@ -64,19 +72,25 @@ class HomeHistoryPresenter: ObservableObject {
             .filter { $0.date == selectedDateString && $0.statusExamination == .FINISHED }
     }
 
-    func fetchData() {
+    @MainActor
+    func fetchData() async {
         isAllExamsLoading = true
+        defer { isAllExamsLoading = false }
 
-        interactor?.getAllData { [weak self] result in
-            DispatchQueue.main.async {
-                self?.isAllExamsLoading = false
-                switch result {
-                case let .success(examinations):
-                    self?.latestExamination = examinations
-                    self?.filterLatestActivity(typeActivity: .belumDimulai)
-                case let .failure(error):
-                    print("error: ", error.localizedDescription)
-                }
+        do {
+            let response = try await interactor?.getAllData()
+
+            if let response {
+                latestExamination = response
+                await filterLatestActivity(typeActivity: .belumDimulai)
+            }
+        } catch {
+            // Handle error
+            if let apiError = error as? APIResponse<ApiErrorData> {
+                print("Error description: \(apiError.data.description)")
+                print("Error type: \(apiError.data.errorType)")
+            } else {
+                print("Error: \(error.localizedDescription)")
             }
         }
     }

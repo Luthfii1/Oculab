@@ -41,7 +41,11 @@ struct HomeView: View {
                                 ButtonActivity(
                                     labelButton: activityType.rawValue,
                                     isSelected: presenter.selectedLatestActivity == activityType,
-                                    action: { presenter.filterLatestActivity(typeActivity: activityType) }
+                                    action: {
+                                        Task {
+                                            await presenter.filterLatestActivity(typeActivity: activityType)
+                                        }
+                                    }
                                 )
                             }
                             .padding(.horizontal, 1)
@@ -104,8 +108,10 @@ struct HomeView: View {
         }
         .ignoresSafeArea()
         .onAppear {
-            presenter.getStatisticData()
-            presenter.fetchData()
+            Task {
+                await presenter.getStatisticData()
+                await presenter.fetchData()
+            }
         }
         .navigationBarBackButtonHidden(true)
     }

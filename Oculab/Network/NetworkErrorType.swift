@@ -72,3 +72,8 @@ enum NetworkErrorType: Error, LocalizedError, Decodable {
         }
     }
 }
+
+enum NetworkError: Error {
+    case apiError(APIResponse<ApiErrorData>)
+    case networkError(String)
+}

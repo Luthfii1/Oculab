@@ -8,6 +8,7 @@
 import Combine
 import SwiftUI
 
+@MainActor
 struct AdaptsToKeyboard: ViewModifier {
     @Binding var isKeyboardVisible: Bool
     @State private var currentHeight: CGFloat = 0

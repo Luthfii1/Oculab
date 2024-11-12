@@ -10,11 +10,6 @@ import Foundation
 import Photos
 import SwiftUI
 
-import AVFoundation
-import Photos
-import SwiftUI
-import UIKit
-
 class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate,
 AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelegate {
     static let shared = VideoRecordPresenter(interactor: VideoInteractor())

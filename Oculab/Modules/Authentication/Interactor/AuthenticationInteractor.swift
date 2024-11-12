@@ -21,24 +21,33 @@ struct LoginResponse: Codable {
 class AuthenticationInteractor: ObservableObject {
     private let apiAuthenticationService = API.BE + "/user"
 
-    func login(
-        email: String,
-        password: String,
-        completion: @escaping (Result<LoginResponse, ApiErrorData>) -> Void
-    ) {
-        NetworkHelper.shared.post(
+    func login(email: String, password: String) async throws -> LoginResponse {
+        let response: APIResponse<LoginResponse> = try await NetworkHelper.shared.post(
             urlString: apiAuthenticationService + "/login",
             body: UserBody(email: email, password: password)
-        ) { (result: Result<APIResponse<LoginResponse>, APIResponse<ApiErrorData>>) in
-            DispatchQueue.main.async {
-                switch result {
-                case let .success(response):
-                    completion(.success(response.data))
+        )
 
-                case let .failure(error):
-                    completion(.failure(error.data))
-                }
-            }
+        // Store user data
+        UserDefaults.standard.set(response.data.accessToken, forKey: UserDefaultType.accessToken.rawValue)
+        UserDefaults.standard.set(response.data.refreshToken, forKey: UserDefaultType.refreshToken.rawValue)
+        UserDefaults.standard.set(true, forKey: UserDefaultType.isUserLoggedIn.rawValue)
+        UserDefaults.standard.set(response.data.userId, forKey: UserDefaultType.userId.rawValue)
+
+        return response.data
+    }
+
+    func getAccountById() async throws -> User {
+        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
+            throw NSError(
+                domain: "UserIdNotFound",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "User ID not found"]
+            )
         }
+
+        let response: APIResponse<User> = try await NetworkHelper.shared.get(
+            urlString: apiAuthenticationService + "/get-user-data-by-id/\(userId)"
+        )
+        return response.data
     }
 }

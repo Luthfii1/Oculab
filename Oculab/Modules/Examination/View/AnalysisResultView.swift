@@ -57,7 +57,9 @@ struct AnalysisResultView: View {
                     }
                 }
                 .onAppear {
-                    presenter.fetchData(examinationId: examinationId)
+                    Task {
+                        await presenter.fetchData(examinationId: examinationId)
+                    }
                 }
 
                 Spacer()

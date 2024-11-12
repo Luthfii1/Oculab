@@ -62,7 +62,9 @@ struct HistoryView: View {
         }
         .ignoresSafeArea()
         .onAppear {
-            presenter.fetchData()
+            Task {
+                await presenter.fetchData()
+            }
         }
         .onChange(of: selectedDate) {
             presenter.filterLatestActivityByDate(date: selectedDate)

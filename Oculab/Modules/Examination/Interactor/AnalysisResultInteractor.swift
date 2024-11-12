@@ -14,18 +14,11 @@ class AnalysisResultInteractor {
         return URL(string: examinationURL + examinationId.lowercased())
     }
 
-    func fetchData(examId: String, completion: @escaping (Result<ExaminationResultData, ApiErrorData>) -> Void) {
-        NetworkHelper.shared
-            .get(
-                urlString: API.BE + "/examination/get-examination-by-id/" + examId.lowercased())
-        { (result: Result<
-            APIResponse<Examination>,
-            APIResponse<ApiErrorData>
-        >) in
-            DispatchQueue.main.async {
-                switch result {
-                case let .success(apiResponse):
-                    let examinationDetail = ExaminationResultData(
+    func fetchData(examId: String) async throws -> ExaminationResultData {
+        let response: APIResponse<Examination> = try await NetworkHelper.shared
+            .get(urlString: "https://oculab-be.vercel.app/examination/get-examination-by-id/" + examId.lowercased())
+
+        let examinationDetail = ExaminationResultData(
                         examinationId: apiResponse.data._id,
                         slideId: apiResponse.data.slideId,
                         imagePreview: apiResponse.data.imagePreview ?? "",
@@ -38,36 +31,14 @@ class AnalysisResultInteractor {
                             .unknown,
                         bacteriaTotalCount: apiResponse.data.systemResult?.systemBacteriaTotalCount ?? 0)
 
-                    completion(.success(examinationDetail))
-                case let .failure(error):
-                    completion(.failure(error.data))
-                }
-            }
-        }
+        return examinationDetail
     }
 
-    func fetchFOVData(examId: String, completion: @escaping (Result<FOVGrouping, ApiErrorData>) -> Void) {
-        print(
-            API.BE + "/fov/get-all-fov-by-examination-id/" +
-                examId.lowercased())
-        NetworkHelper.shared
-            .get(
-                urlString: API.BE + "/fov/get-all-fov-by-examination-id/" +
+    func fetchFOVData(examId: String) async throws -> FOVGrouping {
+        let response: APIResponse<FOVGrouping> = try await NetworkHelper.shared.get(
+            urlString: API.BE + "/fov/get-all-fov-by-examination-id/" +
                     examId.lowercased())
-        { (result: Result<
-            APIResponse<FOVGrouping>,
-            APIResponse<ApiErrorData>
-        >) in
-            DispatchQueue.main.async {
-                switch result {
-                case let .success(apiResponse):
-                    completion(.success(apiResponse.data))
-
-                case let .failure(error):
-                    completion(.failure(error.data))
-                }
-            }
-        }
+        return response.data
     }
 }
 
@@ -99,16 +70,4 @@ struct FOVGrouping: Decodable {
         self.bta1to9 = try container.decodeIfPresent([FOVData].self, forKey: .bta1to9) ?? []
         self.btaabove9 = try container.decodeIfPresent([FOVData].self, forKey: .btaabove9) ?? []
     }
-
-//    var groupedData: [[FOVData]] {
-//        return [bta0, bta1to9, btaabove9]
-//    }
-
-//    var groupedData: [(title: FOVType, data: [FOVData])] {
-//        return [
-//            (.BTA0, bta0),
-//            (.BTA1TO9, bta1to9),
-//            (.BTAABOVE9, btaabove9)
-//        ]
-//    }
 }

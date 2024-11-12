@@ -11,24 +11,15 @@ import UIKit
 class VideoInteractor {
     func forwardVideotoBackend(
         examinationId: String,
-        video: VideoForward,
-        completion: @escaping (Result<VideoForwardResponse, ApiErrorData>) -> Void
-    ) {
+        video: VideoForward
+    ) async throws -> VideoForwardResponse {
         let urlString = API.BE + "/examination/forward-video-to-ml/"
 
-        NetworkHelper.shared.post(urlString: urlString, body: video) { (result: Result<
-            APIResponse<VideoForwardResponse>,
-            APIResponse<ApiErrorData>
-        >) in
-            DispatchQueue.main.async {
-                switch result {
-                case let .success(apiResponse):
-                    completion(.success(apiResponse.data))
-                case let .failure(error):
-                    completion(.failure(error.data))
-                }
-            }
-        }
+        let response: APIResponse<VideoForwardResponse> = try await NetworkHelper.shared.post(
+            urlString: urlString,
+            body: video
+        )
+        return response.data
     }
 
     func getStitchedImage(

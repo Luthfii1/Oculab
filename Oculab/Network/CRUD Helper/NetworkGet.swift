@@ -8,17 +8,16 @@
 import Foundation
 
 extension NetworkHelper {
-    func get<T: Decodable>(
-        urlString: String,
-        completion: @escaping (Result<APIResponse<T>, APIResponse<ApiErrorData>>) -> Void
-    ) {
+    func get<T: Decodable>(urlString: String) async throws -> APIResponse<T> {
         guard let request = createRequest(urlString: urlString, httpMethod: "GET", body: nil) else {
-            completion(.failure(createErrorSystem(errorType: "InvalidRequest", errorMessage: "Error creating request")))
-            return
+            throw NSError(
+                domain: "InvalidRequest",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "Error creating request"]
+            )
         }
 
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            self.handleResponse(data, response, error, completion: completion)
-        }.resume()
+        let (data, response) = try await URLSession.shared.data(for: request)
+        return try handleAsyncResponse(data: data, response: response)
     }
 }
