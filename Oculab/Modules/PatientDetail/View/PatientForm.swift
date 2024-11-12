@@ -30,7 +30,7 @@ struct PatientForm: View {
                     leftIcon: isAddingNewPatient ? "plus" : "",
                     rightIcon: isAddingNewPatient ? "" : "checkmark"
                 ) {
-                    presenter.addNewPatient()
+                    presenter.addNewPatient { _ in }
                 }
             }
 

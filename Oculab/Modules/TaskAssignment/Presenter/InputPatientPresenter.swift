@@ -135,10 +135,20 @@ class InputPatientPresenter: ObservableObject {
     }
 
     func newExam() {
-        Router.shared.navigateTo(.newExam(patientId: patient._id, picId: pic._id))
+        if !patientFound {
+            addNewPatient { [weak self] success in
+                if success {
+                    self?.navigateToNewExam()
+                } else {
+                    print("Failed to add new patient.")
+                }
+            }
+        } else {
+            navigateToNewExam()
+        }
     }
 
-    func addNewPatient() {
+    func addNewPatient(completion: @escaping (Bool) -> Void) {
         print(patient._id)
         print(patient.name)
         print(patient.BPJS)
@@ -150,12 +160,18 @@ class InputPatientPresenter: ObservableObject {
             case let .success(data):
                 self?.patient = data
                 print(data)
+                completion(true) // Indicate success to the caller
 
             case let .failure(error):
                 print(error)
                 print("Add new patient")
+                completion(false) // Indicate failure to the caller
             }
         }
+    }
+
+    private func navigateToNewExam() {
+        Router.shared.navigateTo(.newExam(patientId: patient._id, picId: pic._id))
     }
 
     func submitExamination() {
@@ -170,33 +186,6 @@ class InputPatientPresenter: ObservableObject {
             examinationPlanDate: examination.examinationPlanDate
         )
 
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = .prettyPrinted // To make the JSON more readable
-
-        do {
-            let jsonData = try encoder.encode(examReq)
-            if let jsonString = String(data: jsonData, encoding: .utf8) {
-                print("Encoded JSON:\n\(jsonString)")
-            }
-        } catch {
-            print("Failed to encode ExaminationRequest: \(error)")
-        }
-
-        interactor?.addNewExamination(
-            patientId: patient._id,
-            examination: examReq
-
-        ) { [weak self] result in
-            switch result {
-            case let .success(data):
-                print(data)
-
-            case let .failure(error):
-                print(error)
-                print(result)
-            }
-        }
-
         var examReq2 = ExaminationRequest(
             _id: examination2._id,
             goal: examination2.goal,
@@ -208,13 +197,17 @@ class InputPatientPresenter: ObservableObject {
             examinationPlanDate: examination2.examinationPlanDate
         )
 
-        do {
-            let jsonData = try encoder.encode(examReq2)
-            if let jsonString = String(data: jsonData, encoding: .utf8) {
-                print("Encoded JSON:\n\(jsonString)")
+        interactor?.addNewExamination(
+            patientId: patient._id,
+            examination: examReq
+        ) { [weak self] result in
+            switch result {
+            case let .success(data):
+                print(data)
+
+            case let .failure(error):
+                print(error)
             }
-        } catch {
-            print("Failed to encode ExaminationRequest: \(error)")
         }
 
         interactor?.addNewExamination(patientId: patient._id, examination: examReq2) { [weak self] result in
@@ -226,6 +219,8 @@ class InputPatientPresenter: ObservableObject {
                 print(error)
             }
         }
+
+        Router.shared.navigateTo(.home)
     }
 }
 

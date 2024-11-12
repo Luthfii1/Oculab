@@ -36,7 +36,6 @@ struct InputExaminationData: View {
                             isEnabled: true
                         ) {
                             presenter.submitExamination()
-//                            presenter.popToRoot()
                         },
 
                         AppButton(
