@@ -12,4 +12,5 @@ enum UserDefaultType: String, CaseIterable {
     case refreshToken
     case isUserLoggedIn
     case userId
+    case accessPin
 }

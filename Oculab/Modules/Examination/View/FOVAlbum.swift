@@ -74,7 +74,9 @@ struct FOVAlbum: View {
                 }
             }
             .onAppear {
-                presenter.fetchData(examinationId: examId)
+                Task {
+                    await presenter.fetchData(examinationId: examId)
+                }
             }
         }
         .navigationBarBackButtonHidden()

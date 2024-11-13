@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LoginView: View {
-    @ObservedObject var authPresenter = AuthenticationPresenter()
+    @EnvironmentObject var authPresenter: AuthenticationPresenter
 
     var body: some View {
         NavigationView {
@@ -52,14 +52,14 @@ struct LoginView: View {
                             title: authPresenter.buttonText,
                             colorType: .primary,
                             size: .large,
-                            isEnabled: authPresenter.isFilled()
+                            isEnabled: authPresenter.isFilled
                         ) {
                             Task {
                                 await authPresenter.login()
                             }
                         }
 
-                        HStack(alignment: .center, spacing: 12) {
+                        HStack {
                             Spacer()
 
                             Text("Faskes belum terdaftar?")
@@ -97,4 +97,5 @@ struct LoginView: View {
 
 #Preview {
     LoginView()
+        .environmentObject(AuthenticationPresenter())
 }
