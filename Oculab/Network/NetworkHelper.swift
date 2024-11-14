@@ -26,9 +26,6 @@ class NetworkHelper {
             throw NetworkError.networkError("Invalid response type")
         }
 
-//        debug response
-//        debugResponse(data: data)
-
         do {
             let decodedResponse = try JSONDecoder().decode(APIResponse<T>.self, from: data)
             if decodedResponse.status == StatusResponseType.ERROR.rawValue {

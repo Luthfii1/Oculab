@@ -21,7 +21,7 @@ class Router: ObservableObject {
         case examDetail(examId: String, patientId: String)
         case savedResult(examId: String, patientId: String)
         case newExam(patientId: String, picId: String)
-        case userAccessPin(state: PinMode)
+        case userAccessPin(title: String, description: String)
         case login
         case photoAlbum(fovGroup: FOVType, examId: String)
         case detailedPhoto(slideId: String, fovData: FOVData, order: Int, total: Int)
@@ -48,12 +48,10 @@ class Router: ObservableObject {
             SavedResultView(examId: examId, patientId: patientId)
         case let .newExam(patientId, picId):
             InputExaminationData(selectedPIC: picId, selectedPatient: patientId)
-        case let .userAccessPin(state):
-            UserAccessPin(state: state)
-                .environmentObject(DependencyInjection.shared.createAuthPresenter())
+        case let .userAccessPin(title, description):
+            UserAccessPin(title: title, description: description)
         case .login:
             LoginView()
-                .environmentObject(DependencyInjection.shared.createAuthPresenter())
         case let .photoAlbum(fovGroup, examId):
             FOVAlbum(fovGroup: fovGroup, examId: examId)
         case let .detailedPhoto(slideId, fovData, order, total):

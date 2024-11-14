@@ -87,21 +87,21 @@ struct ExamDetailView: View {
                             presenter.navigateToAnalysisResult(examinationId: presenter.examDetailData.examinationId)
                         }
                     }
-                }
-                .padding(.horizontal, Decimal.d20)
-                .navigationTitle("Pemeriksaan Baru")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        Button(action: {
-                            presentationMode.wrappedValue.dismiss()
-                        }) {
-                            HStack {
-                                Image("back")
+
+                }.padding(.horizontal, Decimal.d20)
+                    .navigationTitle("Pemeriksaan Baru")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button(action: {
+                                presentationMode.wrappedValue.dismiss()
+                            }) {
+                                HStack {
+                                    Image("back")
+                                }
                             }
                         }
                     }
-                }
             }
 
         }.navigationBarBackButtonHidden(true)

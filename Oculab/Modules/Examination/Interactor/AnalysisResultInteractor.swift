@@ -19,17 +19,17 @@ class AnalysisResultInteractor {
             .get(urlString: "https://oculab-be.vercel.app/examination/get-examination-by-id/" + examId.lowercased())
 
         let examinationDetail = ExaminationResultData(
-            examinationId: response.data._id,
-            slideId: response.data.slideId,
-            imagePreview: response.data.imagePreview ?? "",
+                        examinationId: apiResponse.data._id,
+                        slideId: apiResponse.data.slideId,
+                        imagePreview: apiResponse.data.imagePreview ?? "",
 
-            fov: response.data.FOV ?? [],
-            confidenceLevelAggregated: 0.0,
-            systemGrading: GradingType(
-                rawValue: response.data.systemResult?.systemGrading.rawValue ?? GradingType.NEGATIVE
-                    .rawValue) ??
-                .unknown,
-            bacteriaTotalCount: response.data.systemResult?.systemBacteriaTotalCount ?? 0)
+                        fov: apiResponse.data.FOV ?? [],
+                        confidenceLevelAggregated: 0.0,
+                        systemGrading: GradingType(
+                            rawValue: apiResponse.data.systemResult?.systemGrading.rawValue ?? GradingType.NEGATIVE
+                                .rawValue) ??
+                            .unknown,
+                        bacteriaTotalCount: apiResponse.data.systemResult?.systemBacteriaTotalCount ?? 0)
 
         return examinationDetail
     }
@@ -37,7 +37,7 @@ class AnalysisResultInteractor {
     func fetchFOVData(examId: String) async throws -> FOVGrouping {
         let response: APIResponse<FOVGrouping> = try await NetworkHelper.shared.get(
             urlString: API.BE + "/fov/get-all-fov-by-examination-id/" +
-                examId.lowercased())
+                    examId.lowercased())
         return response.data
     }
 }

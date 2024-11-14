@@ -64,6 +64,19 @@ struct PinNumpadComponent: View {
                 }
             }
         }
+
+        if isOpeningApp != nil {
+            HStack(alignment: .center, spacing: 12) {
+                Text("Lupa PIN?")
+                    .font(AppTypography.p3)
+                    .foregroundStyle(AppColors.slate900)
+
+                Text("Gunakan Password")
+                    .font(AppTypography.s5)
+                    .foregroundStyle(AppColors.purple500)
+            }
+            .padding(.top, 64)
+        }
     }
 
     // Handle button press actions
