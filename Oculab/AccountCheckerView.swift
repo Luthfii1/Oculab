@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AccountCheckerView: View {
     @AppStorage(UserDefaultType.isUserLoggedIn.rawValue) var isUserLoggedIn: Bool = false
-    @StateObject private var securityPresenter = AuthenticationPresenter()
+    @EnvironmentObject var dependencyInjection: DependencyInjection
     @State private var isSplashScreenVisible = true
 
     var body: some View {
@@ -19,10 +19,10 @@ struct AccountCheckerView: View {
             } else {
                 if isUserLoggedIn {
                     ContentView()
-                        .environmentObject(securityPresenter)
+                        .environmentObject(dependencyInjection.createAuthPresenter())
                 } else {
                     LoginView()
-                        .environmentObject(securityPresenter)
+                        .environmentObject(dependencyInjection.createAuthPresenter())
                 }
             }
         }

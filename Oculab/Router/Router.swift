@@ -50,10 +50,10 @@ class Router: ObservableObject {
             InputExaminationData(selectedPIC: picId, selectedPatient: patientId)
         case let .userAccessPin(state):
             UserAccessPin(state: state)
-                .environmentObject(AuthenticationPresenter.shared)
+                .environmentObject(DependencyInjection.shared.createAuthPresenter())
         case .login:
             LoginView()
-                .environmentObject(AuthenticationPresenter.shared)
+                .environmentObject(DependencyInjection.shared.createAuthPresenter())
         case let .photoAlbum(fovGroup, examId):
             FOVAlbum(fovGroup: fovGroup, examId: examId)
         case let .detailedPhoto(slideId, fovData, order, total):

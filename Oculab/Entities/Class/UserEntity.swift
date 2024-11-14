@@ -6,7 +6,9 @@
 //
 
 import Foundation
+import SwiftData
 
+@Model
 class User: Codable, Identifiable {
     var _id: String
     var name: String

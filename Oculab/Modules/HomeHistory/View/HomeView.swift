@@ -9,7 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     @ObservedObject private var presenter = HomeHistoryPresenter()
-    @ObservedObject private var authentication = AuthenticationPresenter()
+    @EnvironmentObject private var authentication: AuthenticationPresenter
 
     var body: some View {
         NavigationView {

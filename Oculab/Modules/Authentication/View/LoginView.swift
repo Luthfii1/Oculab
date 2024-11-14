@@ -8,64 +8,55 @@
 import SwiftUI
 
 struct LoginView: View {
-    @EnvironmentObject var authPresenter: AuthenticationPresenter
-
+    @EnvironmentObject var presenter: AuthenticationPresenter
     var body: some View {
         NavigationView {
             VStack {
-                if !authPresenter.isKeyboardVisible {
+                if !presenter.isKeyboardVisible {
                     Image(.login)
                         .resizable()
                         .scaledToFit()
                         .transition(.opacity)
                 }
-
                 VStack {
-                    if authPresenter.isKeyboardVisible {
+                    if presenter.isKeyboardVisible {
                         Spacer()
                     }
-
                     Text("Revolusi Deteksi Bakteri dengan Teknologi AI")
                         .font(AppTypography.h1)
                         .foregroundStyle(AppColors.slate900)
                         .multilineTextAlignment(.center)
-
                     VStack(spacing: 8) {
                         AppTextField(
                             title: "Email",
                             placeholder: "Contoh: indrikla24@gmail.com",
-                            text: $authPresenter.email
+                            text: $presenter.email
                         )
-
                         AppTextField(
                             title: "Kata Sandi",
                             placeholder: "Masukkan Kata Sandi",
                             rightIcon: "eye",
-                            text: $authPresenter.password
+                            text: $presenter.password
                         )
                     }
                     .padding(.horizontal)
                     .padding(.top, 12)
-
                     VStack(alignment: .center, spacing: 16) {
                         AppButton(
-                            title: authPresenter.buttonText,
+                            title: presenter.buttonText,
                             colorType: .primary,
                             size: .large,
-                            isEnabled: authPresenter.isFilled
+                            isEnabled: presenter.isFilled
                         ) {
                             Task {
-                                await authPresenter.login()
+                                await presenter.login()
                             }
                         }
-
                         HStack {
                             Spacer()
-
                             Text("Faskes belum terdaftar?")
                                 .font(AppTypography.p3)
                                 .foregroundStyle(AppColors.slate900)
-
                             AppButton(
                                 title: "Daftarkan Faskes",
                                 colorType: .tertiary,
@@ -73,20 +64,17 @@ struct LoginView: View {
                             ) {
                                 print("Daftar faskes button")
                             }
-
                             Spacer()
                         }
                     }
                     .padding(.horizontal)
                     .padding(.top, 18)
-
-                    if authPresenter.isKeyboardVisible {
+                    if presenter.isKeyboardVisible {
                         Spacer()
                     }
                 }
                 .padding(.top, 24)
-                .adaptsToKeyboard(isKeyboardVisible: $authPresenter.isKeyboardVisible)
-
+                .adaptsToKeyboard(isKeyboardVisible: $presenter.isKeyboardVisible)
                 Spacer()
             }
             .ignoresSafeArea()
@@ -97,5 +85,5 @@ struct LoginView: View {
 
 #Preview {
     LoginView()
-        .environmentObject(AuthenticationPresenter())
+        .environmentObject(DependencyInjection.shared.createAuthPresenter())
 }
