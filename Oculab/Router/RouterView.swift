@@ -21,7 +21,7 @@ struct RouterView<Content: View>: View {
             content
                 .navigationDestination(for: Router.Route.self) { route in
                     router.view(for: route)
-                }.navigationBarBackButtonHidden(true)
+                }
         }
     }
 }

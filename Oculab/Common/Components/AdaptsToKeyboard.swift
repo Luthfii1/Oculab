@@ -12,7 +12,6 @@ import SwiftUI
 struct AdaptsToKeyboard: ViewModifier {
     @Binding var isKeyboardVisible: Bool
     @State private var currentHeight: CGFloat = 0
-
     @MainActor
     func body(content: Content) -> some View {
         GeometryReader { geometry in
@@ -37,7 +36,6 @@ struct AdaptsToKeyboard: ViewModifier {
                         return rect.height - geometry.safeAreaInsets.bottom
                     }
                     .subscribe(Subscribers.Assign(object: self, keyPath: \.currentHeight))
-
                     NotificationCenter.Publisher(
                         center: NotificationCenter.default,
                         name: UIResponder.keyboardWillHideNotification

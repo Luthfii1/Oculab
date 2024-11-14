@@ -9,6 +9,8 @@ import SwiftUI
 
 struct AccountCheckerView: View {
     @AppStorage(UserDefaultType.isUserLoggedIn.rawValue) var isUserLoggedIn: Bool = false
+//    @EnvironmentObject var dependencyInjection: DependencyInjection
+    @EnvironmentObject var authPresenter: AuthenticationPresenter
     @State private var isSplashScreenVisible = true
 
     var body: some View {
@@ -17,9 +19,16 @@ struct AccountCheckerView: View {
                 SplashScreenView()
             } else {
                 if isUserLoggedIn {
-                    ContentView()
+                    if authPresenter.isPinAuthorized {
+                        ContentView()
+                            .environmentObject(authPresenter)
+                    } else {
+                        UserAccessPin(state: .authenticate)
+                            .environmentObject(authPresenter)
+                    }
                 } else {
                     LoginView()
+                        .environmentObject(authPresenter)
                 }
             }
         }
@@ -29,6 +38,9 @@ struct AccountCheckerView: View {
                     isSplashScreenVisible = false
                 }
             }
+            Task {
+                await authPresenter.getAccountById()
+            }
         }
         .environmentObject(Router.shared)
     }
@@ -36,4 +48,5 @@ struct AccountCheckerView: View {
 
 #Preview {
     AccountCheckerView()
+        .environmentObject(DependencyInjection.shared.createAuthPresenter())
 }
