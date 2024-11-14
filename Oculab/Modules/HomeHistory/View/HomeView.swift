@@ -22,8 +22,7 @@ struct HomeView: View {
                 .padding(.horizontal)
 
                 VStack(alignment: .leading, spacing: 24) {
-                    // TODO: SESUAIIN SAMA ROLE
-                    StatisticComponent(isLab: false)
+                    StatisticComponent(isLab: authentication.user?.role == .LAB)
                         .environmentObject(presenter)
 
                     VStack(alignment: .leading, spacing: 16) {
@@ -51,8 +50,9 @@ struct HomeView: View {
                             .padding(.horizontal, 1)
                         }
 
-                        // TODO: GANTI PAKE ROLE YANG SESUAI (klo lab gaada tombol)
-                        AppButton(title: "Pemeriksaan Baru", leftIcon: "doc.badge.plus") {}
+                        if authentication.user?.role == .ADMIN {
+                            AppButton(title: "Pemeriksaan Baru", leftIcon: "doc.badge.plus") {}
+                        }
 
                         if presenter.isAllExamsLoading {
                             Spacer().frame(height: Decimal.d24)
@@ -91,9 +91,7 @@ struct HomeView: View {
                                             patientName: exam.patientName,
                                             patientDOB: exam.patientDob,
                                             picName: exam.picName,
-
-                                            // TODO: GANTI PAKE ROLE YANG SESUAI
-                                            isLab: false
+                                            isLab: authentication.user?.role == .LAB
                                         )
                                     }
                                 }
