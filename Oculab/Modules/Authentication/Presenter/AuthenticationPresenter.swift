@@ -28,6 +28,7 @@ class AuthenticationPresenter: ObservableObject {
     @Published var isOpeningApp = false
     @Published var user: User?
     @Published var state: PinMode = .authenticate
+    @Published var isPinAuthorized: Bool = false
 
     init(interactor: AuthenticationInteractor) {
         self.interactor = interactor
@@ -38,7 +39,8 @@ class AuthenticationPresenter: ObservableObject {
     }
 
     func isValidPin() async -> Bool {
-        await interactor.getUserLocalData()?.accessPin == inputPin
+        print("accessPin: \(await interactor.getUserLocalData()?.accessPin ?? "empty")")
+        return await interactor.getUserLocalData()?.accessPin == inputPin
     }
 
     func confirmedPin() -> Bool {
@@ -85,6 +87,7 @@ class AuthenticationPresenter: ObservableObject {
             secondPin = pin
             if confirmedPin() {
                 setPassword()
+                isPinAuthorized = true
                 print("PIN set successfully")
             } else {
                 print("PINs do not match. Try again.")
@@ -93,6 +96,7 @@ class AuthenticationPresenter: ObservableObject {
         case .authenticate:
             Task {
                 if await self.isValidPin() {
+                    isPinAuthorized = true
                     print("Authentication successful")
                     Router.shared.popToRoot()
                 } else {
@@ -104,14 +108,8 @@ class AuthenticationPresenter: ObservableObject {
     }
 
     @MainActor
-    func login() async {
-        isLoading = true
-        defer { isLoading = false }
-
+    func getAccountById() async {
         do {
-            let loginResponse = try await interactor.login(email: email, password: password)
-            print("Success login with id: \(loginResponse.userId)")
-
             let getAccountResponse = try await interactor.getAccountById()
             user = getAccountResponse
 
@@ -128,6 +126,29 @@ class AuthenticationPresenter: ObservableObject {
                 state = .authenticate
                 Router.shared.navigateTo(.userAccessPin(state: .authenticate))
             }
+        } catch {
+            // Handle error
+            switch error {
+            case let NetworkError.apiError(apiResponse):
+                print("Error type: \(apiResponse.data.errorType)")
+                print("Error description: \(apiResponse.data.description)")
+
+            case let NetworkError.networkError(message):
+                print("Network error: \(message)")
+
+            default:
+                print("Unknown error: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    @MainActor
+    func login() async {
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            let loginResponse = try await interactor.login(email: email, password: password)
         } catch {
             // Handle error
             switch error {

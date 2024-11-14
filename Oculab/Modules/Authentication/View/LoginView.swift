@@ -50,6 +50,7 @@ struct LoginView: View {
                         ) {
                             Task {
                                 await presenter.login()
+                                await presenter.getAccountById()
                             }
                         }
                         HStack {

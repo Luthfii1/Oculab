@@ -24,7 +24,8 @@ struct OculabApp: App {
     var body: some Scene {
         WindowGroup {
             AccountCheckerView()
-                .environmentObject(DependencyInjection.shared)
+//                .environmentObject(DependencyInjection.shared)
+                    .environmentObject(DependencyInjection.shared.createAuthPresenter())
         }
         .modelContainer(container)
     }
