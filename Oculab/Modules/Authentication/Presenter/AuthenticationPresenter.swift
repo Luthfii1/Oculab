@@ -26,7 +26,7 @@ class AuthenticationPresenter: ObservableObject {
     @Published var firstPin = ""
     @Published var secondPin = ""
     @Published var isOpeningApp = false
-    @Published var user: User?
+    @Published var user: User = .init()
     @Published var state: PinMode = .authenticate
     @Published var isPinAuthorized: Bool = false
 
@@ -46,7 +46,7 @@ class AuthenticationPresenter: ObservableObject {
     func confirmedPin() -> Bool {
         if firstPin == secondPin {
             Task {
-                self.user?.accessPin = self.secondPin
+                self.user.accessPin = self.secondPin
                 await self.updateAccount()
             }
         }
@@ -148,7 +148,7 @@ class AuthenticationPresenter: ObservableObject {
         defer { isLoading = false }
 
         do {
-            let loginResponse = try await interactor.login(email: email, password: password)
+            _ = try await interactor.login(email: email, password: password)
         } catch {
             // Handle error
             switch error {
@@ -175,9 +175,9 @@ class AuthenticationPresenter: ObservableObject {
     @MainActor
     func updateAccount() async {
         do {
-            print("name updated: \(String(describing: user?.name))")
-            guard let userUpdate = user else { return print("No data of user") }
-            let response = try await interactor.updateUserById(user: userUpdate)
+            print("name updated: \(String(describing: user.name))")
+//            guard let userUpdate = user else { return print("No data of user") }
+            let response = try await interactor.updateUserById(user: user)
 
             user = response
             Router.shared.popToRoot()

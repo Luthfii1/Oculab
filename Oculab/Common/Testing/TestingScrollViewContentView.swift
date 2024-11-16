@@ -21,6 +21,7 @@ struct TestingScrollViewContentView: View {
             ExtendableCard(
                 icon: "person.fill",
                 title: "Data Pasien",
+                isExtendable: true,
                 data: [
                     (key: "Nama Pasien", value: "Alya Annisa Kirana"),
                     (key: "NIK Pasien", value: "167012039484700"),
@@ -33,6 +34,7 @@ struct TestingScrollViewContentView: View {
             ExtendableCard(
                 icon: "person.fill",
                 title: "Data Pasien",
+                isExtendable: true,
                 data: [
                     (key: "Nama Pasien", value: "Alya Annisa Kirana"),
                     (key: "NIK Pasien", value: "167012039484700"),

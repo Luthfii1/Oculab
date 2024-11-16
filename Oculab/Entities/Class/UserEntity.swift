@@ -17,15 +17,17 @@ class User: Codable, Identifiable {
     var email: String?
     var password: String?
     var accessPin: String?
+    var isFaceIdEnabled: Bool = false
 
     init(
-        _id: String,
-        name: String,
-        role: RolesType,
+        _id: String = UUID().uuidString,
+        name: String = "No name",
+        role: RolesType = .ADMIN,
         token: String? = nil,
-        email: String? = nil,
+        email: String? = "noName@example.com",
         password: String? = nil,
-        accessPin: String? = nil
+        accessPin: String? = "8888",
+        isFaceIdEnabled: Bool = false
     ) {
         self._id = _id
         self.name = name
@@ -34,6 +36,7 @@ class User: Codable, Identifiable {
         self.email = email
         self.password = password
         self.accessPin = accessPin
+        self.isFaceIdEnabled = isFaceIdEnabled
     }
 
     enum CodingKeys: CodingKey {

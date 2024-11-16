@@ -23,6 +23,7 @@ struct ExamDetailAdmin: View {
                     ExtendableCard(
                         icon: "person.fill",
                         title: "Data Pasien",
+                        isExtendable: true,
                         data: [
                             (key: "Nama", value: presenter.patientDetailData.name),
                             (key: "NIK", value: presenter.patientDetailData.nik),

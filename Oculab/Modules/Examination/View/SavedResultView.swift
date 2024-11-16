@@ -23,6 +23,7 @@ struct SavedResultView: View {
                     ExtendableCard(
                         icon: "person.fill",
                         title: "Data Pasien",
+                        isExtendable: true,
                         data: [
                             (key: "Nama", value: presenter.patientDetailData.name),
                             (key: "NIK", value: presenter.patientDetailData.nik),
@@ -36,6 +37,7 @@ struct SavedResultView: View {
                     ExtendableCard(
                         icon: "doc.text.magnifyingglass",
                         title: "Detail Pemeriksaan",
+                        isExtendable: true,
                         data: [
                             (key: "ID Sediaan", value: presenter.examDetailData.slideId),
                             (key: "Alasan Pemeriksaan", value: presenter.examDetailData.examinationGoal),
