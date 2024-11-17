@@ -16,10 +16,8 @@ struct PatientForm: View {
             VStack {
                 ScrollView {
                     VStack(alignment: .leading, spacing: Decimal.d24) {
-                        PatientFormField(
-                            isAddingName: true,
-                            presenter: presenter
-                        )
+                        PatientFormField()
+                            .environmentObject(presenter)
                     }
                 }
 

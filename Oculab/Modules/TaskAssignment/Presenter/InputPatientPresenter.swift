@@ -11,6 +11,15 @@ import SwiftUI
 class InputPatientPresenter: ObservableObject {
     var interactor: InputPatientInteractor? = InputPatientInteractor()
 
+    @Published var selectedPIC: String = ""
+    @Published var selectedPatient: String = ""
+    @Published var isAddingNewPatient: Bool = false
+
+    @Published var isAddingName: Bool = false
+    @Published var selectedSex: String = ""
+    @Published var selectedDoB: Date = .init()
+    @Published var BPJSnumber: String = ""
+
     @Published var isUserLoading = false
     @Published var isPatientLoading = false
 

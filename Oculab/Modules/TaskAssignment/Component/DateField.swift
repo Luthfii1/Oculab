@@ -83,7 +83,7 @@ struct DateField: View {
                                 Calendar.current.isDate(date, equalTo: Date(), toGranularity: .month) &&
                                     Calendar.current.isDate(date, equalTo: Date(), toGranularity: .day) ?
                                     placeholder :
-                                    date.formatted()
+                                    date.formattedDDMMYYYY()
                             )
                             .foregroundColor(
                                 Calendar.current.isDate(

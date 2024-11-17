@@ -7,76 +7,84 @@
 
 import SwiftUI
 
+enum FormField {
+    case search
+    case nik
+    case bpjs
+}
+
 struct PatientFormField: View {
-    @State var isAddingName: Bool
-
-    @State var selectedSex: String = ""
-    @State var selectedDoB: Date = .init()
-    @State var BPJSnumber: String = ""
-
-    @ObservedObject var presenter: InputPatientPresenter
+    @EnvironmentObject var presenter: InputPatientPresenter
+    @FocusState var focusedField: FormField?
 
     var body: some View {
-        if !presenter.patientFound {
+        VStack(alignment: .leading, spacing: 24) {
             AppTextField(
-                title: "Nama",
-                placeholder: "Contoh: Alya Annisa Kirana",
-                leftIcon: "person.fill",
+                title: "NIK",
+                isRequired: true,
+                placeholder: "Contoh: 167012039484700",
                 isDisabled: presenter.patientFound,
-                text: $presenter.patient.name
+                isNumberOnly: true,
+                length: 16,
+                text: $presenter.patient.NIK
             )
-        }
+            .focused($focusedField, equals: .nik)
 
-        AppTextField(
-            title: "NIK",
-            placeholder: "Contoh: 167012039484700",
-            isDisabled: presenter.patientFound,
-            isNumberOnly: true,
-            length: 16,
-            text: $presenter.patient.NIK
-        )
+            DateField(
+                title: "Tanggal Lahir",
+                isRequired: true,
+                placeholder: "Pilih Tanggal",
+                rightIcon: "calendar",
+                isDisabled: presenter.patientFound,
+                date: $presenter.selectedDoB
+            )
+            .onChange(of: presenter.selectedDoB) {
+                presenter.patient.DoB = presenter.selectedDoB
+            }
 
-        DateField(
-            title: "Tanggal Lahir",
-            placeholder: "Pilih Tanggal",
-            rightIcon: "calendar",
-            isDisabled: presenter.patientFound,
-            date: $selectedDoB
-        ).onChange(of: selectedDoB) {
-            presenter.patient.DoB = selectedDoB
-        }
+            AppRadioButton(
+                title: "Jenis Kelamin",
+                isRequired: true,
+                choices: ["Perempuan", "Laki-laki"],
+                isDisabled: presenter.patientFound,
+                selectedChoice: $presenter.selectedSex
+            )
+            .onChange(of: presenter.selectedSex) {
+                switch presenter.selectedSex {
+                case "Perempuan":
+                    presenter.patient.sex = .FEMALE
+                case "Laki-laki":
+                    presenter.patient.sex = .MALE
+                default:
+                    presenter.patient.sex = .UNKNOWN
+                }
+            }
 
-        AppRadioButton(
-            title: "Jenis Kelamin", isRequired: true,
-            choices: ["Perempuan", "Laki-laki"],
-            isDisabled: presenter.patientFound,
-            selectedChoice: $selectedSex
-        )
-        .onChange(of: selectedSex) {
-            switch selectedSex {
-            case "Perempuan":
-                presenter.patient.sex = .FEMALE
-            case "Laki-laki":
-                presenter.patient.sex = .MALE
-            default:
-                presenter.patient.sex = .UNKNOWN
+            AppTextField(
+                title: "Nomor BPJS (opsional)",
+                placeholder: "Contoh: 1240630077675",
+                isDisabled: presenter.patientFound,
+                isNumberOnly: true,
+                length: 13,
+                text: $presenter.BPJSnumber
+            )
+            .focused($focusedField, equals: .bpjs)
+            .onChange(of: presenter.BPJSnumber) {
+                presenter.patient.BPJS = presenter.BPJSnumber
             }
         }
-
-        AppTextField(
-            title: "Nomor BPJS (opsional)",
-            placeholder: "Contoh: 1240630077675",
-            isDisabled: presenter.patientFound,
-            isNumberOnly: true,
-            length: 13,
-            text: $BPJSnumber
-
-        ).onChange(of: BPJSnumber) {
-            presenter.patient.BPJS = BPJSnumber
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("Selesai") {
+                    focusedField = nil
+                }
+            }
         }
     }
 }
 
 #Preview {
-    PatientFormField(isAddingName: false, presenter: InputPatientPresenter())
+    PatientFormField()
+        .environmentObject(InputPatientPresenter())
 }

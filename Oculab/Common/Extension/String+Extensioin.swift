@@ -22,4 +22,18 @@ extension String {
             return "Invalid Date"
         }
     }
+
+    func toFormattedDateYYYY() -> String {
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+        let displayFormatter = DateFormatter()
+        displayFormatter.dateFormat = "dd/MM/yyyy"
+
+        if let date = isoFormatter.date(from: self) {
+            return displayFormatter.string(from: date)
+        } else {
+            return "Invalid Date"
+        }
+    }
 }
