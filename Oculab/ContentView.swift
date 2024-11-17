@@ -11,12 +11,9 @@ struct ContentView: View {
     @EnvironmentObject var dependencyInjection: DependencyInjection
 
     var body: some View {
-//        NavigationView {
         TabView {
-//            NavigationView {
             HomeView()
                 .environmentObject(DependencyInjection.shared.createAuthPresenter())
-//            }
                 .tabItem {
                     Image(systemName: "rectangle.split.2x2.fill")
                     Text("Pemeriksaan")
@@ -28,17 +25,20 @@ struct ContentView: View {
                     Text("Riwayat")
                 }
 
-            InputPatientData().tabItem {
-                Image(systemName: "person.circle")
-                Text("Profil")
-            }
+            ProfileView()
+                .environmentObject(DependencyInjection.shared.createAuthPresenter())
+                .environmentObject(DependencyInjection.shared.createProfilePresenter())
+                .tabItem {
+                    Image(systemName: "person.circle")
+                    Text("Profil")
+                }
         }
         .tint(AppColors.purple500)
-//        }
         .navigationBarBackButtonHidden(true)
     }
 }
 
 #Preview {
     ContentView()
+        .environmentObject(DependencyInjection.shared)
 }

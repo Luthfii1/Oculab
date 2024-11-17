@@ -25,6 +25,8 @@ class Router: ObservableObject {
         case login
         case photoAlbum(fovGroup: FOVType, examId: String)
         case detailedPhoto(slideId: String, fovData: FOVData, order: Int, total: Int)
+        case profile
+        case editPassword
     }
 
     @Published var path: NavigationPath = .init()
@@ -58,6 +60,12 @@ class Router: ObservableObject {
             FOVAlbum(fovGroup: fovGroup, examId: examId)
         case let .detailedPhoto(slideId, fovData, order, total):
             FOVDetail(slideId: slideId, fovData: fovData, order: order, total: total)
+        case .profile:
+            ProfileView()
+                .environmentObject(DependencyInjection.shared.createProfilePresenter())
+        case .editPassword:
+            EditPasswordView()
+                .environmentObject(DependencyInjection.shared.createProfilePresenter())
         }
     }
 

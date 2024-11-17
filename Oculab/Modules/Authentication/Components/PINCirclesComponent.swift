@@ -14,7 +14,7 @@ struct PINCirclesComponent: View {
         HStack(spacing: 24) {
             ForEach(0..<4) { index in
                 Circle()
-                    .strokeBorder(AppColors.purple500, lineWidth: 2)
+                    .strokeBorder(securityPresenter.pinColor, lineWidth: 2)
                     .frame(width: 32, height: 32)
                     .background(
                         Circle()

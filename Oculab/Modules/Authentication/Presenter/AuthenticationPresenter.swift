@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 enum PinMode {
-    case create, revalidate, authenticate
+    case create, revalidate, authenticate, changePIN
 }
 
 class AuthenticationPresenter: ObservableObject {
@@ -18,36 +18,85 @@ class AuthenticationPresenter: ObservableObject {
         didSet { buttonText = isLoading ? "Loading..." : "Login" }
     }
 
+    @Published var isError: Bool = false {
+        didSet {
+            textColor = isError ? AppColors.red500 : AppColors.slate900
+            pinColor = isError ? AppColors.red500 : AppColors.purple500
+
+            if isError {
+                descriptionPIN = "PIN tidak sesuai, silahkan coba lagi"
+            } else {
+                setDescriptionPIN()
+            }
+        }
+    }
+
+    @Published var textColor: Color = AppColors.slate900
+    @Published var pinColor: Color = AppColors.purple500
     @Published var email = ""
     @Published var password = ""
     @Published var buttonText = "Login"
     @Published var isKeyboardVisible = false
-    @Published var inputPin = ""
+    @Published var inputPin = "" {
+        didSet {
+            if !inputPin.isEmpty {
+                isError = false
+            }
+        }
+    }
+
     @Published var firstPin = ""
     @Published var secondPin = ""
     @Published var isOpeningApp = false
-    @Published var user: User?
-    @Published var state: PinMode = .authenticate
+    @Published var user: User = .init()
+    @Published var state: PinMode = .authenticate {
+        didSet {
+            setDescriptionPIN()
+        }
+    }
+
     @Published var isPinAuthorized: Bool = false
+    @Published var descriptionPIN: String = ""
 
     init(interactor: AuthenticationInteractor) {
         self.interactor = interactor
+        setDescriptionPIN()
     }
 
     func setPassword() {
         UserDefaults.standard.set(secondPin, forKey: UserDefaultType.accessPin.rawValue)
     }
 
+    @MainActor
     func isValidPin() async -> Bool {
-        print("accessPin: \(await interactor.getUserLocalData()?.accessPin ?? "empty")")
-        return await interactor.getUserLocalData()?.accessPin == inputPin
+        if await interactor.getUserLocalData()?.accessPin != inputPin {
+            isError = true
+            return false
+        }
+        isError = false
+        return true
+    }
+
+    func setDescriptionPIN() {
+        if !isError {
+            switch state {
+            case .create:
+                descriptionPIN = "Atur PIN untuk kemudahan login di sesi berikutnya"
+            case .revalidate:
+                descriptionPIN = "Masukkan PIN kembali untuk konfirmasi"
+            case .authenticate:
+                descriptionPIN = "Masukkan PIN untuk mengakses aplikasi"
+            case .changePIN:
+                descriptionPIN = "Masukkan PIN Anda saat ini"
+            }
+        }
     }
 
     func confirmedPin() -> Bool {
         if firstPin == secondPin {
             Task {
-                self.user?.accessPin = self.secondPin
-                await self.updateAccount()
+                self.user.accessPin = self.secondPin
+                await self.updateAccount(updateUser: self.user)
             }
         }
         return firstPin == secondPin
@@ -62,14 +111,7 @@ class AuthenticationPresenter: ObservableObject {
         case .create: return "Atur PIN"
         case .revalidate: return "Konfirmasi PIN"
         case .authenticate: return "Masukkan PIN"
-        }
-    }
-
-    var description: String {
-        switch state {
-        case .create: return "Atur PIN untuk kemudahan login di sesi berikutnya"
-        case .revalidate: return "Masukkan PIN kembali untuk konfirmasi"
-        case .authenticate: return "Masukkan PIN untuk mengakses aplikasi"
+        case .changePIN: return "PIN Saat Ini"
         }
     }
 
@@ -83,6 +125,7 @@ class AuthenticationPresenter: ObservableObject {
             inputPin = ""
             state = .revalidate
             Router.shared.navigateTo(.userAccessPin(state: .revalidate))
+
         case .revalidate:
             secondPin = pin
             if confirmedPin() {
@@ -90,9 +133,10 @@ class AuthenticationPresenter: ObservableObject {
                 isPinAuthorized = true
                 print("PIN set successfully")
             } else {
-                print("PINs do not match. Try again.")
+                isError = true
                 inputPin = ""
             }
+
         case .authenticate:
             Task {
                 if await self.isValidPin() {
@@ -100,8 +144,18 @@ class AuthenticationPresenter: ObservableObject {
                     print("Authentication successful")
                     Router.shared.popToRoot()
                 } else {
-                    print("Invalid PIN. Try again.")
-                    self.inputPin = ""
+                    inputPin = ""
+                }
+            }
+
+        case .changePIN:
+            Task {
+                if await self.isValidPin() {
+                    inputPin = ""
+                    state = .create
+                    Router.shared.navigateTo(.userAccessPin(state: .create))
+                } else {
+                    inputPin = ""
                 }
             }
         }
@@ -148,7 +202,7 @@ class AuthenticationPresenter: ObservableObject {
         defer { isLoading = false }
 
         do {
-            let loginResponse = try await interactor.login(email: email, password: password)
+            _ = try await interactor.login(email: email, password: password)
         } catch {
             // Handle error
             switch error {
@@ -166,18 +220,9 @@ class AuthenticationPresenter: ObservableObject {
     }
 
     @MainActor
-    func logoutAccount() {
-        for item in UserDefaultType.allCases {
-            UserDefaults.standard.removeObject(forKey: item.rawValue)
-        }
-    }
-
-    @MainActor
-    func updateAccount() async {
+    func updateAccount(updateUser: User) async {
         do {
-            print("name updated: \(String(describing: user?.name))")
-            guard let userUpdate = user else { return print("No data of user") }
-            let response = try await interactor.updateUserById(user: userUpdate)
+            let response = try await interactor.updateUserById(user: updateUser)
 
             user = response
             Router.shared.popToRoot()

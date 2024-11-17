@@ -36,6 +36,7 @@ struct AppButton: View, Identifiable {
     var size: ButtonSize = .large
     var cornerRadius: CGFloat = 8
     var isEnabled: Bool = true
+    var titleColor: Color? = nil
     var action: () -> Void
 
     // Button background and foreground color based on color type, enabled state, and pressed state
@@ -180,14 +181,19 @@ struct AppButton: View, Identifiable {
                 }
 
                 Text(title)
-                    .foregroundColor(foregroundColor)
+                    .foregroundColor(titleColor ?? foregroundColor)
                     .font(buttonFont)
+
+                if leftIcon != nil && rightIcon != nil {
+                    Spacer()
+                }
 
                 if let rightIcon = rightIcon {
                     Image(systemName: rightIcon)
                         .foregroundColor(foregroundColor)
                 }
             }
+            .padding(.horizontal, 16)
             .padding(.vertical, vPadding) // Use dynamic vertical padding
             .frame(maxWidth: frameWidth, minHeight: buttonHeight)
             .background(backgroundColor)

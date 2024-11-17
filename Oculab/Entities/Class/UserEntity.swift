@@ -17,15 +17,19 @@ class User: Codable, Identifiable {
     var email: String?
     var password: String?
     var accessPin: String?
+    var previousPassword: String?
+    var isFaceIdEnabled: Bool = false
 
     init(
-        _id: String,
-        name: String,
-        role: RolesType,
+        _id: String = UUID().uuidString,
+        name: String = "No name",
+        role: RolesType = .ADMIN,
         token: String? = nil,
-        email: String? = nil,
+        email: String? = "noName@example.com",
         password: String? = nil,
-        accessPin: String? = nil
+        previousPassword: String? = nil,
+        accessPin: String? = "8888",
+        isFaceIdEnabled: Bool = false
     ) {
         self._id = _id
         self.name = name
@@ -33,7 +37,9 @@ class User: Codable, Identifiable {
         self.token = token
         self.email = email
         self.password = password
+        self.previousPassword = previousPassword
         self.accessPin = accessPin
+        self.isFaceIdEnabled = isFaceIdEnabled
     }
 
     enum CodingKeys: CodingKey {
@@ -44,6 +50,7 @@ class User: Codable, Identifiable {
         case email
         case password
         case accessPin
+        case previousPassword
     }
 
     required init(from decoder: Decoder) throws {
@@ -55,6 +62,7 @@ class User: Codable, Identifiable {
         self.email = try container.decodeIfPresent(String.self, forKey: .email)
         self.password = try container.decodeIfPresent(String.self, forKey: .password)
         self.accessPin = try container.decodeIfPresent(String.self, forKey: .accessPin)
+        self.previousPassword = try container.decodeIfPresent(String.self, forKey: .previousPassword)
     }
 
     func encode(to encoder: Encoder) throws {
@@ -66,5 +74,6 @@ class User: Codable, Identifiable {
         try container.encodeIfPresent(email, forKey: .email)
         try container.encodeIfPresent(password, forKey: .password)
         try container.encodeIfPresent(accessPin, forKey: .accessPin)
+        try container.encodeIfPresent(previousPassword, forKey: .previousPassword)
     }
 }

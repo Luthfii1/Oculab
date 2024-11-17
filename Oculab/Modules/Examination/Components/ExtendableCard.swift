@@ -10,12 +10,13 @@ import SwiftUI
 struct ExtendableCard: View {
     var icon: String
     var title: String
+    var isExtendable: Bool
     @State private var isExtended = false
     var data: [(key: String, value: String)]
     var titleSize: Font
+    var titleCard: String?
 
     var body: some View {
-//        VStack {
         VStack(alignment: .leading) {
             HStack {
                 Image(systemName: icon)
@@ -24,10 +25,26 @@ struct ExtendableCard: View {
                     .padding(.leading, Decimal.d8)
                 Spacer()
 
-                Image(systemName: isExtended ? "chevron.up" : "chevron.down")
+                // Show chevron only if isExtendable is true
+                if isExtendable {
+                    Image(systemName: isExtended ? "chevron.up" : "chevron.down")
+                        .onTapGesture {
+                            withAnimation {
+                                isExtended.toggle()
+                            }
+                        }
+                }
             }
 
-            if isExtended {
+            // Show content only if isExtendable is true and isExtended is true
+            if isExtendable && isExtended {
+                ExtendedCard(data: data, titleSize: titleSize)
+            } else if !isExtendable {
+                Text(titleCard ?? "Unknown")
+                    .font(AppTypography.h3)
+                    .foregroundStyle(AppColors.slate900)
+                    .padding(.top, 16)
+
                 ExtendedCard(data: data, titleSize: titleSize)
             }
         }
@@ -42,13 +59,12 @@ struct ExtendableCard: View {
                 .stroke(AppColors.slate100)
         )
         .onTapGesture {
-            withAnimation {
-                isExtended.toggle()
+            if isExtendable {
+                withAnimation {
+                    isExtended.toggle()
+                }
             }
         }
-
-//            Spacer()
-//        }
     }
 }
 
@@ -74,16 +90,36 @@ struct ExtendedCard: View {
 }
 
 #Preview {
-    ExtendableCard(
-        icon: "person.fill",
-        title: "Data Pasien",
-        data: [
-            (key: "Nama Pasien", value: "Alya Annisa Kirana"),
-            (key: "NIK Pasien", value: "167012039484700"),
-            (key: "Umur Pasien", value: "23 Tahun"),
-            (key: "Jenis Kelamin", value: "Perempuan"),
-            (key: "Nomor BPJS", value: "06L30077675")
-        ],
-        titleSize: AppTypography.s5
-    )
+    VStack(spacing: 20) {
+        // Example of an extendable card
+        ExtendableCard(
+            icon: "person.fill",
+            title: "Data Pasien (Extendable)",
+            isExtendable: true,
+            data: [
+                (key: "Nama Pasien", value: "Alya Annisa Kirana"),
+                (key: "NIK Pasien", value: "167012039484700"),
+                (key: "Umur Pasien", value: "23 Tahun"),
+                (key: "Jenis Kelamin", value: "Perempuan"),
+                (key: "Nomor BPJS", value: "06L30077675")
+            ],
+            titleSize: AppTypography.s4_1
+        )
+
+        // Example of a non-extendable card
+        ExtendableCard(
+            icon: "person.fill",
+            title: "Data Pasien (Non-Extendable)",
+            isExtendable: false,
+            data: [
+                (key: "Nama Pasien", value: "Alya Annisa Kirana"),
+                (key: "NIK Pasien", value: "167012039484700"),
+                (key: "Umur Pasien", value: "23 Tahun"),
+                (key: "Jenis Kelamin", value: "Perempuan"),
+                (key: "Nomor BPJS", value: "06L30077675")
+            ],
+            titleSize: AppTypography.s4_1
+        )
+    }
+    .padding()
 }

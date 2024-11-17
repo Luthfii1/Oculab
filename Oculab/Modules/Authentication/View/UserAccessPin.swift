@@ -15,9 +15,9 @@ struct UserAccessPin: View {
         NavigationView {
             VStack(spacing: 0) {
                 VStack(spacing: 0) {
-                    Text(securityPresenter.description)
+                    Text(securityPresenter.descriptionPIN)
                         .font(AppTypography.p2)
-                        .foregroundStyle(AppColors.slate900)
+                        .foregroundStyle(securityPresenter.textColor)
                         .multilineTextAlignment(.center)
                         .padding(.top, 24)
                         .padding(.horizontal, 20)
@@ -43,7 +43,7 @@ struct UserAccessPin: View {
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle(securityPresenter.title)
             .toolbar {
-                if state == .revalidate {
+                if state == .revalidate || state == .changePIN {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: {
                             Router.shared.navigateBack()
