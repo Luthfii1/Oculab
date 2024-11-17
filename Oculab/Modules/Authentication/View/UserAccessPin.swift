@@ -43,7 +43,7 @@ struct UserAccessPin: View {
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle(securityPresenter.title)
             .toolbar {
-                if state == .revalidate {
+                if state == .revalidate || state == .changePIN {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: {
                             Router.shared.navigateBack()

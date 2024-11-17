@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 enum PinMode {
-    case create, revalidate, authenticate
+    case create, revalidate, authenticate, changePIN
 }
 
 class AuthenticationPresenter: ObservableObject {
@@ -31,8 +31,8 @@ class AuthenticationPresenter: ObservableObject {
         }
     }
 
-    @Published var textColor: Color = AppColors.purple500
-    @Published var pinColor: Color = AppColors.slate900
+    @Published var textColor: Color = AppColors.slate900
+    @Published var pinColor: Color = AppColors.purple500
     @Published var email = ""
     @Published var password = ""
     @Published var buttonText = "Login"
@@ -86,6 +86,8 @@ class AuthenticationPresenter: ObservableObject {
                 descriptionPIN = "Masukkan PIN kembali untuk konfirmasi"
             case .authenticate:
                 descriptionPIN = "Masukkan PIN untuk mengakses aplikasi"
+            case .changePIN:
+                descriptionPIN = "Masukkan PIN Anda saat ini"
             }
         }
     }
@@ -109,6 +111,7 @@ class AuthenticationPresenter: ObservableObject {
         case .create: return "Atur PIN"
         case .revalidate: return "Konfirmasi PIN"
         case .authenticate: return "Masukkan PIN"
+        case .changePIN: return "PIN Saat Ini"
         }
     }
 
@@ -140,6 +143,17 @@ class AuthenticationPresenter: ObservableObject {
                     isPinAuthorized = true
                     print("Authentication successful")
                     Router.shared.popToRoot()
+                } else {
+                    inputPin = ""
+                }
+            }
+
+        case .changePIN:
+            Task {
+                if await self.isValidPin() {
+                    inputPin = ""
+                    state = .create
+                    Router.shared.navigateTo(.userAccessPin(state: .create))
                 } else {
                     inputPin = ""
                 }

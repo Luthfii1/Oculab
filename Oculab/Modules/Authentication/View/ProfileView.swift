@@ -52,7 +52,7 @@ struct ProfileView: View {
                         colorType: .tertiary,
                         titleColor: AppColors.slate900
                     ) {
-                        print("button atur PIN")
+                        profilePresenter.navigateTo(.userAccessPin(state: .changePIN))
                     }
                     .padding(.vertical, Decimal.d16)
                     .background(.white)
