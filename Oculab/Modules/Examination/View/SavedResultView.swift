@@ -16,7 +16,7 @@ struct SavedResultView: View {
 
     var body: some View {
         NavigationView {
-            ScrollView {
+            ScrollView(showsIndicators: false) {
                 Spacer().frame(height: Decimal.d24)
 
                 VStack(alignment: .leading, spacing: Decimal.d24) {
@@ -142,7 +142,7 @@ struct SavedResultView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
-//                        presentationMode.wrappedValue.dismiss()
+                        Router.shared.navigateBack()
                     }) {
                         HStack {
                             Image("back")

@@ -8,9 +8,7 @@
 import SwiftUI
 
 struct ConfirmationPopups: View {
-    @Binding var isVerifPopUpVisible: Bool
-    @Binding var isLeavePopUpVisible: Bool
-    var presenter: AnalysisResultPresenter
+    @EnvironmentObject var presenter: AnalysisResultPresenter
 
     var body: some View {
         VStack {
@@ -23,10 +21,10 @@ struct ConfirmationPopups: View {
                         presenter.popToRoot()
                     },
                     AppButton(title: "Periksa Kembali", colorType: .destructive(.secondary)) {
-                        isLeavePopUpVisible = false
+                        presenter.isLeavePopUpVisible = false
                     }
                 ],
-                isVisible: $isLeavePopUpVisible
+                isVisible: $presenter.isLeavePopUpVisible
             )
 
             AppPopup(
@@ -38,19 +36,16 @@ struct ConfirmationPopups: View {
                         print("Simpan Tapped")
                     },
                     AppButton(title: "Periksa Kembali", colorType: .tertiary) {
-                        isVerifPopUpVisible = false
+                        presenter.isVerifPopUpVisible = false
                     }
                 ],
-                isVisible: $isVerifPopUpVisible
+                isVisible: $presenter.isVerifPopUpVisible
             )
         }
     }
 }
 
 #Preview {
-    ConfirmationPopups(
-        isVerifPopUpVisible: .constant(false),
-        isLeavePopUpVisible: .constant(true),
-        presenter: AnalysisResultPresenter()
-    )
+    ConfirmationPopups()
+        .environmentObject(AnalysisResultPresenter())
 }

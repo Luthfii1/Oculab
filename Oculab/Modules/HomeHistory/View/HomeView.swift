@@ -84,7 +84,7 @@ struct HomeView: View {
                                             status: exam.statusExamination,
                                             date: exam.datePlan,
                                             patientName: exam.patientName,
-                                            patientDOB: exam.patientDob,
+                                            patientDOB: exam.patientDob.toFormattedDate(),
                                             picName: exam.picName,
                                             isLab: authentication.user.role == .LAB
                                         )
