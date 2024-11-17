@@ -12,7 +12,12 @@ class InputPatientPresenter: ObservableObject {
     var interactor: InputPatientInteractor? = InputPatientInteractor()
 
     @Published var selectedPIC: String = ""
-    @Published var selectedPatient: String = ""
+    @Published var selectedPatient: String = "" {
+        didSet {
+            print("patient: \(selectedPatient)")
+        }
+    }
+
     @Published var isAddingNewPatient: Bool = false
 
     @Published var isAddingName: Bool = false
@@ -35,7 +40,26 @@ class InputPatientPresenter: ObservableObject {
     )
     @Published var pic: User = .init(_id: "", name: "", role: .ADMIN)
 
-    @Published var patientFound: Bool = false
+    @Published var patientFound: Bool = false {
+        didSet {
+            if patientFound {
+                print("dob: \(String(describing: patient.DoB))")
+                print("sex: \(patient.sex)")
+                print("bpjs: \(String(describing: patient.BPJS))")
+                selectedDoB = patient.DoB ?? Date()
+                if patient.sex == .MALE {
+                    selectedSex = "Laki-laki"
+                } else if patient.sex == .FEMALE {
+                    selectedSex = "Perempuan"
+                }
+                if patient.BPJS != nil {
+                    BPJSnumber = String(describing: patient.BPJS)
+                } else {
+                    BPJSnumber = "Doesn't have BPJS"
+                }
+            }
+        }
+    }
 
     @Published var examination: Examination = .init(
         _id: UUID().uuidString.lowercased(),
@@ -122,6 +146,20 @@ class InputPatientPresenter: ObservableObject {
         }
     }
 
+    func clearForm() {
+        patientFound = false
+        patient = Patient(
+            _id: UUID().uuidString.lowercased(),
+            name: "",
+            NIK: "",
+            DoB: Date(),
+            sex: .UNKNOWN
+        )
+        selectedDoB = Date()
+        selectedSex = ""
+        BPJSnumber = ""
+    }
+
     @MainActor
     func getPatientById(patientId: String) async {
         isPatientLoading = true
@@ -137,6 +175,7 @@ class InputPatientPresenter: ObservableObject {
                 patientFound = true
             }
         } catch {
+            clearForm()
             // Handle error
             switch error {
             case let NetworkError.apiError(apiResponse):
@@ -192,6 +231,7 @@ class InputPatientPresenter: ObservableObject {
                     print("Failed to add new patient.")
                 }
             } else {
+                print("here")
                 navigateToNewExam()
             }
         }
@@ -206,6 +246,7 @@ class InputPatientPresenter: ObservableObject {
         print(patient.DoB ?? "no data DoB")
 
         do {
+            patient.name = selectedPatient
             let response = try await interactor?.addNewPatient(patient: patient)
 
             if let response {

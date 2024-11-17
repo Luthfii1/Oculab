@@ -15,12 +15,7 @@ class HomeHistoryPresenter: ObservableObject {
     @Published var selectedDate: Date = .init()
 
     @Published var latestExamination: [ExaminationCardData] = []
-    @Published var filteredExamination: [ExaminationCardData] = [] {
-        didSet {
-            print("filtered: \(filteredExamination)")
-        }
-    }
-
+    @Published var filteredExamination: [ExaminationCardData] = []
     @Published var filteredExaminationByDate: [ExaminationCardData] = []
 
     @Published var statisticExam: ExaminationStatistic = .init()

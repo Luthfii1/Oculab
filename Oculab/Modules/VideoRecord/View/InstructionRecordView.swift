@@ -9,7 +9,6 @@ import SwiftUI
 
 struct InstructionRecordView: View {
     let videoRecordPresenter = VideoRecordPresenter.shared
-    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         NavigationView {
@@ -62,7 +61,7 @@ struct InstructionRecordView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
-                        presentationMode.wrappedValue.dismiss()
+                        Router.shared.navigateBack()
                     }) {
                         HStack {
                             Image("back")

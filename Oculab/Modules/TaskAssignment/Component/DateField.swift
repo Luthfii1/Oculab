@@ -75,7 +75,9 @@ struct DateField: View {
                 }
 
                 Button {
-                    isDatePickerVisible.toggle()
+                    if !isDisabled {
+                        isDatePickerVisible.toggle()
+                    }
                 } label: {
                     VStack(alignment: .leading) {
                         HStack {
@@ -95,7 +97,7 @@ struct DateField: View {
                                     .slate100 : AppColors.slate900
                             )
                             .multilineTextAlignment(.leading)
-                            .foregroundStyle(AppColors.slate100)
+                            .foregroundStyle(textColor)
 
                             Spacer()
                         }
