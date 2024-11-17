@@ -20,7 +20,6 @@ struct AppTextField: View {
     var length: Int = 0
     @Binding var text: String
     @State private var isPasswordVisible: Bool = false
-    // Computed property to check if the field should be a password input
     private var isPasswordInput: Bool {
         rightIcon == "eye"
     }
@@ -144,6 +143,7 @@ struct AppTextField: View {
                 Text(description)
                     .font(AppTypography.p3)
                     .foregroundColor(isError ? AppColors.red500 : AppColors.slate600)
+                    .multilineTextAlignment(.leading)
             }
         }
     }

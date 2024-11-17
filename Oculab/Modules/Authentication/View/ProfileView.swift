@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct ProfileView: View {
-    @EnvironmentObject private var authPresenter: AuthenticationPresenter
+//    @EnvironmentObject private var authPresenter: AuthenticationPresenter
+    @EnvironmentObject private var profilePresenter: ProfilePresenter
 
     var body: some View {
         NavigationView {
@@ -19,12 +20,12 @@ struct ProfileView: View {
                         title: "Informasi Akun",
                         isExtendable: false,
                         data: [
-                            (key: "Username", value: authPresenter.user.name),
-                            (key: "Role", value: authPresenter.user.role.rawValue),
+                            (key: "Username", value: profilePresenter.user.name),
+                            (key: "Role", value: profilePresenter.user.role.rawValue),
                             (key: "Jabatan Pekerjaan", value: "Ahli Teknologi Laboratorium Medik"),
                         ],
                         titleSize: AppTypography.s4_1,
-                        titleCard: authPresenter.user.name
+                        titleCard: profilePresenter.user.name
                     )
 
                     AppButton(
@@ -34,7 +35,7 @@ struct ProfileView: View {
                         colorType: .tertiary,
                         titleColor: AppColors.slate900
                     ) {
-                        print("button atur kata ssandi")
+                        profilePresenter.navigateTo(.editPassword)
                     }
                     .padding(.vertical, Decimal.d16)
                     .background(.white)
@@ -64,7 +65,7 @@ struct ProfileView: View {
                     HStack {
                         Image(systemName: "faceid")
                             .foregroundColor(AppColors.purple500)
-                        Toggle("Face ID", isOn: $authPresenter.user.isFaceIdEnabled)
+                        Toggle("Face ID", isOn: $profilePresenter.user.isFaceIdEnabled)
                             .toggleStyle(SwitchToggleStyle(tint: AppColors.purple500))
                             .font(AppTypography.s5)
                     }
@@ -95,7 +96,7 @@ struct ProfileView: View {
                     )
 
                     AppButton(title: "Keluar", rightIcon: "door.right.hand.open", colorType: .destructive(.secondary)) {
-                        print("Keluar button")
+                        profilePresenter.logout()
                     }
 
                     Spacer()
@@ -104,10 +105,14 @@ struct ProfileView: View {
             }
             .navigationTitle("Profile")
         }
+//        .onAppear {
+//            profilePresenter.setUser()
+//        }
     }
 }
 
 #Preview {
     ProfileView()
-        .environmentObject(DependencyInjection.shared.createAuthPresenter())
+//        .environmentObject(DependencyInjection.shared.createAuthPresenter())
+            .environmentObject(DependencyInjection.shared.createProfilePresenter())
 }

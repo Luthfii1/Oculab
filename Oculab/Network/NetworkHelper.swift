@@ -27,7 +27,7 @@ class NetworkHelper {
         }
 
 //        debug response
-//        debugResponse(data: data)
+        debugResponse(data: data)
 
         do {
             let decodedResponse = try JSONDecoder().decode(APIResponse<T>.self, from: data)

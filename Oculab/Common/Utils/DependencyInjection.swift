@@ -18,6 +18,8 @@ class DependencyInjection: ObservableObject {
         self.modelContext = modelContext
     }
 
+    // MARK: Create Auth Presenter
+
     private var authenticationPresenterInstance: AuthenticationPresenter?
     lazy var authenticationInteractor: AuthenticationInteractor = .init(modelContext: modelContext!)
     func createAuthPresenter() -> AuthenticationPresenter {
@@ -27,5 +29,12 @@ class DependencyInjection: ObservableObject {
         let new = AuthenticationPresenter(interactor: authenticationInteractor)
         authenticationPresenterInstance = new
         return new
+    }
+
+    // MARK: Create Profile Presenter
+
+    lazy var profileInteractor: ProfileInteractor = .init()
+    func createProfilePresenter() -> ProfilePresenter {
+        return ProfilePresenter(interactor: profileInteractor, authInteractor: authenticationInteractor)
     }
 }

@@ -15,9 +15,9 @@ struct UserAccessPin: View {
         NavigationView {
             VStack(spacing: 0) {
                 VStack(spacing: 0) {
-                    Text(securityPresenter.description)
+                    Text(securityPresenter.descriptionPIN)
                         .font(AppTypography.p2)
-                        .foregroundStyle(AppColors.slate900)
+                        .foregroundStyle(securityPresenter.textColor)
                         .multilineTextAlignment(.center)
                         .padding(.top, 24)
                         .padding(.horizontal, 20)

@@ -16,11 +16,6 @@ struct HomeView: View {
             ScrollView(showsIndicators: false) {
                 Spacer().frame(height: Decimal.d24)
 
-                AppButton(title: "Log out account", leftIcon: "door.left.hand.open") {
-                    authentication.logoutAccount()
-                }
-                .padding(.horizontal)
-
                 VStack(alignment: .leading, spacing: 24) {
                     StatisticComponent(isLab: authentication.user.role == .LAB)
                         .environmentObject(presenter)

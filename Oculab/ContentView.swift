@@ -13,7 +13,7 @@ struct ContentView: View {
     var body: some View {
         TabView {
             HomeView()
-                .environmentObject(dependencyInjection.createAuthPresenter())
+                .environmentObject(DependencyInjection.shared.createAuthPresenter())
                 .tabItem {
                     Image(systemName: "rectangle.split.2x2.fill")
                     Text("Pemeriksaan")
@@ -26,7 +26,8 @@ struct ContentView: View {
                 }
 
             ProfileView()
-                .environmentObject(dependencyInjection.createAuthPresenter())
+                .environmentObject(DependencyInjection.shared.createAuthPresenter())
+                .environmentObject(DependencyInjection.shared.createProfilePresenter())
                 .tabItem {
                     Image(systemName: "person.circle")
                     Text("Profil")
