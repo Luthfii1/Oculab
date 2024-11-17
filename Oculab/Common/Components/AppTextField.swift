@@ -20,6 +20,8 @@ struct AppTextField: View {
     var length: Int = 0
     @Binding var text: String
     @State private var isPasswordVisible: Bool = false
+    @FocusState private var isFocused: Bool
+
     private var isPasswordInput: Bool {
         rightIcon == "eye"
     }
@@ -85,9 +87,13 @@ struct AppTextField: View {
                             .disabled(isDisabled)
                             .foregroundColor(textColor)
                             .padding(.horizontal, 16)
+                            .focused($isFocused)
                             .onChange(of: text) { _, newValue in
                                 if isNumberOnly {
                                     text = newValue.filter { $0.isNumber }
+                                }
+                                if length > 0 && newValue.count > length {
+                                    text = String(newValue.prefix(length))
                                 }
                             }
                     } else {
@@ -96,9 +102,13 @@ struct AppTextField: View {
                             .disabled(isDisabled)
                             .foregroundColor(textColor)
                             .padding(.horizontal, 16)
+                            .focused($isFocused)
                             .onChange(of: text) { _, newValue in
                                 if isNumberOnly {
                                     text = newValue.filter { $0.isNumber }
+                                }
+                                if length > 0 && newValue.count > length {
+                                    text = String(newValue.prefix(length))
                                 }
                             }
                     }
@@ -108,9 +118,13 @@ struct AppTextField: View {
                         .disabled(isDisabled)
                         .foregroundColor(textColor)
                         .padding(.horizontal, 16)
+                        .focused($isFocused)
                         .onChange(of: text) { _, newValue in
                             if isNumberOnly {
                                 text = newValue.filter { $0.isNumber }
+                            }
+                            if length > 0 && newValue.count > length {
+                                text = String(newValue.prefix(length))
                             }
                         }
                 }

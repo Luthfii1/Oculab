@@ -75,7 +75,9 @@ struct DateField: View {
                 }
 
                 Button {
-                    isDatePickerVisible.toggle()
+                    if !isDisabled {
+                        isDatePickerVisible.toggle()
+                    }
                 } label: {
                     VStack(alignment: .leading) {
                         HStack {
@@ -83,7 +85,7 @@ struct DateField: View {
                                 Calendar.current.isDate(date, equalTo: Date(), toGranularity: .month) &&
                                     Calendar.current.isDate(date, equalTo: Date(), toGranularity: .day) ?
                                     placeholder :
-                                    date.formatted()
+                                    date.formattedDDMMYYYY()
                             )
                             .foregroundColor(
                                 Calendar.current.isDate(
@@ -95,7 +97,7 @@ struct DateField: View {
                                     .slate100 : AppColors.slate900
                             )
                             .multilineTextAlignment(.leading)
-                            .foregroundStyle(AppColors.slate100)
+                            .foregroundStyle(textColor)
 
                             Spacer()
                         }

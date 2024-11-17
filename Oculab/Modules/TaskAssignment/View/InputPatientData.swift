@@ -9,30 +9,27 @@ import SwiftUI
 
 struct InputPatientData: View {
     @ObservedObject var presenter = InputPatientPresenter()
-
-    @State var selectedPIC: String = ""
-    @State var selectedPatient: String = ""
-
-    @State var isAddingNewPatient: Bool = false
+    @FocusState private var focusedField: FormField?
 
     var body: some View {
         NavigationView {
             ScrollView(showsIndicators: false) {
                 VStack {
                     Spacer().frame(height: Decimal.d24)
-
                     AppStepper(stepTitles: ["Data Pasien", "Data Sediaan", "Hasil"], currentStep: 0)
                     Spacer().frame(height: Decimal.d24)
 
                     VStack(alignment: .leading, spacing: Decimal.d24) {
+                        // PIC Dropdown
                         AppDropdown(
                             title: "Petugas Pemeriksaan",
                             placeholder: "Pilih Petugas",
                             leftIcon: "person.fill",
                             choices: presenter.picName,
-                            selectedChoice: $selectedPIC
+                            selectedChoice: $presenter.selectedPIC
                         )
 
+                        // Patient Search Dropdown
                         AppDropdown(
                             title: "Nama",
                             placeholder: "Cari nama pasien",
@@ -40,38 +37,35 @@ struct InputPatientData: View {
                             rightIcon: "",
                             choices: presenter.patientNameDoB,
                             description: "Pilih atau masukkan data pasien baru",
-                            selectedChoice: $selectedPatient,
+                            selectedChoice: $presenter.selectedPatient,
                             isEnablingAdding: true
                         )
+                        .focused($focusedField, equals: .search)
 
-                        if selectedPatient != "" {
-                            PatientFormField(
-                                isAddingName: presenter.patientFound,
-                                presenter: presenter
-                            )
+                        if presenter.selectedPatient != "" {
+                            PatientFormField(focusedField: _focusedField)
+                                .environmentObject(presenter)
+
                             AppButton(
                                 title: "Isi Detail Sediaan",
                                 rightIcon: "arrow.forward",
                                 isEnabled: !(presenter.patient.NIK == "" || presenter.patient.DoB == nil)
                             ) {
-//                                if !presenter.patientFound {
-//                                    presenter.addNewPatient()
-//                                }
                                 presenter.newExam()
                             }
+
                             Spacer()
                         }
                     }
-
                     .padding(.horizontal, Decimal.d20)
                 }
-
                 .navigationTitle("Pemeriksaan")
                 .navigationBarTitleDisplayMode(.inline)
+                .navigationBarBackButtonHidden(true)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: {
-                            //                        presentationMode.wrappedValue.dismiss()
+                            Router.shared.navigateBack()
                         }) {
                             HStack {
                                 Image("Destroy")
@@ -86,20 +80,21 @@ struct InputPatientData: View {
                     await presenter.getAllPatient()
                 }
             }
-            .onChange(of: selectedPatient) { _, newValue in
+            .onChange(of: presenter.selectedPatient) { _, newValue in
                 Task {
-                    print(selectedPatient)
+                    print(presenter.selectedPatient)
                     await presenter.getPatientById(patientId: newValue)
                 }
             }
-            .onChange(of: selectedPIC) { _, newValue in
+            .onChange(of: presenter.selectedPIC) { _, newValue in
                 if !newValue.isEmpty {
                     Task {
                         await presenter.getUserById(userId: newValue)
                     }
                 }
             }
-        }.navigationBarBackButtonHidden(true)
+        }
+        .navigationBarBackButtonHidden()
     }
 }
 

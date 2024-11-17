@@ -13,7 +13,7 @@ struct ExamDetailView: View {
 
     @StateObject private var videoRecordPresenter = VideoRecordPresenter.shared
     @StateObject var presenter = ExamDataPresenter(interactor: ExamInteractor())
-    @Environment(\.presentationMode) var presentationMode
+//    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         NavigationView {
@@ -94,7 +94,7 @@ struct ExamDetailView: View {
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: {
-                            presentationMode.wrappedValue.dismiss()
+                            Router.shared.navigateBack()
                         }) {
                             HStack {
                                 Image("back")

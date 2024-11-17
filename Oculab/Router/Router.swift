@@ -19,6 +19,7 @@ class Router: ObservableObject {
         case analysisResult(examinationId: String)
         case instructionRecord
         case examDetail(examId: String, patientId: String)
+        case examDetailAdmin(examId: String, patientId: String)
         case savedResult(examId: String, patientId: String)
         case newExam(patientId: String, picId: String)
         case userAccessPin(state: PinMode)
@@ -27,6 +28,7 @@ class Router: ObservableObject {
         case detailedPhoto(slideId: String, fovData: FOVData, order: Int, total: Int)
         case profile
         case editPassword
+        case inputPatientData
     }
 
     @Published var path: NavigationPath = .init()
@@ -46,6 +48,8 @@ class Router: ObservableObject {
             InstructionRecordView()
         case let .examDetail(examId, patientId):
             ExamDetailView(examId: examId, patientId: patientId)
+        case let .examDetailAdmin(examId: examId, patientId: patientId):
+            ExamDetailAdmin(examId: examId, patientId: patientId)
         case let .savedResult(examId, patientId):
             SavedResultView(examId: examId, patientId: patientId)
         case let .newExam(patientId, picId):
@@ -66,6 +70,8 @@ class Router: ObservableObject {
         case .editPassword:
             EditPasswordView()
                 .environmentObject(DependencyInjection.shared.createProfilePresenter())
+        case .inputPatientData:
+            InputPatientData()
         }
     }
 

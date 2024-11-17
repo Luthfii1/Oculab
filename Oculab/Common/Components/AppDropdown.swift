@@ -90,7 +90,7 @@ struct AppDropdown: View {
                 }
                 .onChange(of: selectedChoice) {
                     // Update search text based on selected choice display value
-                    searchText = choices.first(where: { $0.value == selectedChoice })?.display ?? ""
+                    searchText = choices.first(where: { $0.value == selectedChoice })?.display ?? selectedChoice
                 }
 
                 .padding()

@@ -138,7 +138,7 @@ struct InputExaminationData: View {
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
                                 Button(action: {
-                                    //                        presentationMode.wrappedValue.dismiss()
+                                    Router.shared.popToRoot()
                                 }) {
                                     HStack {
                                         Image("Destroy")
@@ -155,7 +155,7 @@ struct InputExaminationData: View {
                             colorType: .tertiary,
                             isEnabled: true
                         ) {
-                            print("Kembali Tapped")
+                            Router.shared.navigateBack()
                         }
                         .frame(maxWidth: .infinity)
                         .frame(width: UIScreen.main.bounds.width / 3.5)

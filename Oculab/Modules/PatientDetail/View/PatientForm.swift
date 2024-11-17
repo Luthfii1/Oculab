@@ -16,10 +16,8 @@ struct PatientForm: View {
             VStack {
                 ScrollView {
                     VStack(alignment: .leading, spacing: Decimal.d24) {
-                        PatientFormField(
-                            isAddingName: true,
-                            presenter: presenter
-                        )
+                        PatientFormField()
+                            .environmentObject(presenter)
                     }
                 }
 
@@ -43,7 +41,7 @@ struct PatientForm: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
-                        // TODO: ROUTING BACK
+                        Router.shared.navigateBack()
                     }) {
                         HStack {
                             Image("back")

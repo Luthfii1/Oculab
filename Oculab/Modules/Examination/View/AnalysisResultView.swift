@@ -13,14 +13,8 @@ struct AnalysisResultView: View {
     @StateObject private var presenter = AnalysisResultPresenter()
 
     var body: some View {
-        ZStack {
-            ConfirmationPopups(
-                isVerifPopUpVisible: $presenter.isVerifPopUpVisible,
-                isLeavePopUpVisible: $presenter.isLeavePopUpVisible,
-                presenter: presenter
-            )
-
-            NavigationView {
+        NavigationView {
+            ZStack {
                 VStack {
                     HeaderViewComponent(isLeavePopUpVisible: $presenter.isLeavePopUpVisible)
 
@@ -63,9 +57,12 @@ struct AnalysisResultView: View {
                 }
 
                 Spacer()
+
+                ConfirmationPopups()
+                    .environmentObject(presenter)
             }
-            .navigationBarHidden(true)
         }
+        .navigationBarHidden(true)
     }
 }
 

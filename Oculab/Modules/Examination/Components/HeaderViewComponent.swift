@@ -14,6 +14,7 @@ struct HeaderViewComponent: View {
         HStack {
             Button(action: {
                 isLeavePopUpVisible = true
+                print("pressed: \(isLeavePopUpVisible)  ")
             }) {
                 ZStack {
                     Circle()
