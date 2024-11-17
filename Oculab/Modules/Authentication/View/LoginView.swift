@@ -29,13 +29,18 @@ struct LoginView: View {
                     VStack(spacing: 8) {
                         AppTextField(
                             title: "Email",
+                            isRequired: true,
                             placeholder: "Contoh: indrikla24@gmail.com",
+                            isError: presenter.isError,
                             text: $presenter.email
                         )
                         AppTextField(
                             title: "Kata Sandi",
+                            isRequired: true,
                             placeholder: "Masukkan Kata Sandi",
+                            description: presenter.description,
                             rightIcon: "eye",
+                            isError: presenter.isError,
                             text: $presenter.password
                         )
                     }

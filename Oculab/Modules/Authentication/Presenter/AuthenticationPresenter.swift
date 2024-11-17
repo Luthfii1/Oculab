@@ -20,16 +20,16 @@ class AuthenticationPresenter: ObservableObject {
 
     @Published var isError: Bool = false {
         didSet {
+            print("isError changed to: \(isError)")
+            if !isError {
+                description = ""
+            }
             textColor = isError ? AppColors.red500 : AppColors.slate900
             pinColor = isError ? AppColors.red500 : AppColors.purple500
-
-            if isError {
-                descriptionPIN = "PIN tidak sesuai, silahkan coba lagi"
-            } else {
-                setDescriptionPIN()
-            }
         }
     }
+
+    @Published var description: String = ""
 
     @Published var textColor: Color = AppColors.slate900
     @Published var pinColor: Color = AppColors.purple500
@@ -203,18 +203,15 @@ class AuthenticationPresenter: ObservableObject {
 
         do {
             _ = try await interactor.login(email: email, password: password)
+            handleErrorState(isError: false)
         } catch {
-            // Handle error
             switch error {
             case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-
+                handleErrorState(isError: true, errorDescription: apiResponse.data.description)
             case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-
+                handleErrorState(isError: true, errorDescription: "Network error: \(message)")
             default:
-                print("Unknown error: \(error.localizedDescription)")
+                handleErrorState(isError: true, errorDescription: "Unknown error: \(error.localizedDescription)")
             }
         }
     }
@@ -239,6 +236,15 @@ class AuthenticationPresenter: ObservableObject {
             default:
                 print("Unknown error: \(error.localizedDescription)")
             }
+        }
+    }
+
+    private func handleErrorState(isError: Bool, errorDescription: String? = nil) {
+        DispatchQueue.main.async {
+            if isError, let errorDescription = errorDescription {
+                self.description = errorDescription
+            }
+            self.isError = isError
         }
     }
 }

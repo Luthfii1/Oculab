@@ -11,10 +11,10 @@ struct AppTextField: View {
     var title: String
     var isRequired: Bool = false
     var placeholder: String = ""
-    @State var description: String? = nil
+    var description: String? = nil
     var leftIcon: String? = nil
     var rightIcon: String? = nil
-    @State var isError: Bool = false
+    var isError: Bool = false
     var isDisabled: Bool = false
     var isNumberOnly: Bool = false
     var length: Int = 0
@@ -89,12 +89,7 @@ struct AppTextField: View {
                             .padding(.horizontal, 16)
                             .focused($isFocused)
                             .onChange(of: text) { _, newValue in
-                                if isNumberOnly {
-                                    text = newValue.filter { $0.isNumber }
-                                }
-                                if length > 0 && newValue.count > length {
-                                    text = String(newValue.prefix(length))
-                                }
+                                handleTextChange(newValue)
                             }
                     } else {
                         SecureField(placeholder, text: $text)
@@ -104,12 +99,7 @@ struct AppTextField: View {
                             .padding(.horizontal, 16)
                             .focused($isFocused)
                             .onChange(of: text) { _, newValue in
-                                if isNumberOnly {
-                                    text = newValue.filter { $0.isNumber }
-                                }
-                                if length > 0 && newValue.count > length {
-                                    text = String(newValue.prefix(length))
-                                }
+                                handleTextChange(newValue)
                             }
                     }
                 } else {
@@ -120,12 +110,7 @@ struct AppTextField: View {
                         .padding(.horizontal, 16)
                         .focused($isFocused)
                         .onChange(of: text) { _, newValue in
-                            if isNumberOnly {
-                                text = newValue.filter { $0.isNumber }
-                            }
-                            if length > 0 && newValue.count > length {
-                                text = String(newValue.prefix(length))
-                            }
+                            handleTextChange(newValue)
                         }
                 }
 
@@ -159,6 +144,19 @@ struct AppTextField: View {
                     .foregroundColor(isError ? AppColors.red500 : AppColors.slate600)
                     .multilineTextAlignment(.leading)
             }
+        }
+    }
+
+    private func handleTextChange(_ newValue: String) {
+        var updatedValue = newValue
+        if isNumberOnly {
+            updatedValue = newValue.filter { $0.isNumber }
+        }
+        if length > 0 && updatedValue.count > length {
+            updatedValue = String(updatedValue.prefix(length))
+        }
+        if updatedValue != newValue {
+            text = updatedValue
         }
     }
 }
