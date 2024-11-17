@@ -43,7 +43,7 @@ struct PatientForm: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
-                        // TODO: ROUTING BACK
+                        Router.shared.navigateBack()
                     }) {
                         HStack {
                             Image("back")

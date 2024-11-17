@@ -93,7 +93,7 @@ struct ExamDetailAdmin: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
-//                        presentationMode.wrappedValue.dismiss()
+                        Router.shared.navigateBack()
                     }) {
                         HStack {
                             Image("back")

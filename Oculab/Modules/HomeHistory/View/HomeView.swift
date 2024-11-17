@@ -46,7 +46,9 @@ struct HomeView: View {
                         }
 
                         if authentication.user.role == .ADMIN {
-                            AppButton(title: "Pemeriksaan Baru", leftIcon: "doc.badge.plus") {}
+                            AppButton(title: "Pemeriksaan Baru", leftIcon: "doc.badge.plus") {
+                                Router.shared.navigateTo(.inputPatientData)
+                            }
                         }
 
                         if presenter.isAllExamsLoading {
@@ -69,15 +71,21 @@ struct HomeView: View {
                             VStack(spacing: Decimal.d12) {
                                 ForEach(presenter.filteredExamination) { exam in
                                     Button {
-                                        if exam.statusExamination == .NOTSTARTED {
-                                            Router.shared.navigateTo(.examDetail(
+                                        if authentication.user.role == .ADMIN {
+                                            Router.shared.navigateTo(.examDetailAdmin(
                                                 examId: exam.id,
                                                 patientId: exam.patientId
                                             ))
                                         } else {
-                                            Router.shared.navigateTo(.analysisResult(examinationId: exam.id))
+                                            if exam.statusExamination == .NOTSTARTED {
+                                                Router.shared.navigateTo(.examDetail(
+                                                    examId: exam.id,
+                                                    patientId: exam.patientId
+                                                ))
+                                            } else {
+                                                Router.shared.navigateTo(.analysisResult(examinationId: exam.id))
+                                            }
                                         }
-
                                     } label: {
                                         HomeActivityComponent(
                                             slideId: exam.slideId,

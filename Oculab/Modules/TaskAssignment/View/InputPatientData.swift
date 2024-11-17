@@ -12,7 +12,6 @@ struct InputPatientData: View {
 
     @State var selectedPIC: String = ""
     @State var selectedPatient: String = ""
-
     @State var isAddingNewPatient: Bool = false
 
     var body: some View {
@@ -71,7 +70,7 @@ struct InputPatientData: View {
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: {
-                            //                        presentationMode.wrappedValue.dismiss()
+                            Router.shared.navigateBack()
                         }) {
                             HStack {
                                 Image("Destroy")
