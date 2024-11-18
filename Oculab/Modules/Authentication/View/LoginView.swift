@@ -85,6 +85,9 @@ struct LoginView: View {
             }
             .ignoresSafeArea()
         }
+        .onAppear {
+            presenter.clearInput()
+        }
         .navigationBarBackButtonHidden()
     }
 }

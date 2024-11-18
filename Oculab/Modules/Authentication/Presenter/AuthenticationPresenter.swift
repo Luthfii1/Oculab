@@ -216,6 +216,12 @@ class AuthenticationPresenter: ObservableObject {
         }
     }
 
+    func clearInput() {
+        email = ""
+        password = ""
+        isError = false
+    }
+
     private func handleErrorState(isError: Bool, errorData: ApiErrorData? = nil) {
         DispatchQueue.main.async {
             if isError, let errorData = errorData {
