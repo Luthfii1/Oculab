@@ -15,6 +15,7 @@ class ProfilePresenter: ObservableObject {
     @Published var oldPassword: String = "" {
         didSet {
             validatePasswords()
+            isOldPasswordError = false
         }
     }
 
@@ -32,8 +33,16 @@ class ProfilePresenter: ObservableObject {
 
     @Published var buttonText: String = "Simpan Perubahan"
     @Published var isError: Bool = false
+    @Published var isOldPasswordError: Bool = false {
+        didSet {
+            isOldPasswordError == true ? (descriptionOldPassword = "Password lama tidak cocok") :
+                (descriptionOldPassword = "")
+        }
+    }
+
     @Published var descriptionPasswordConfirm: String =
         "Pastikan password konfirmasi cocok dengan password yang Anda masukkan sebelumnya"
+    @Published var descriptionOldPassword: String = ""
     @Published var isLoading = false {
         didSet {
             buttonText = isLoading ? "Loading..." : "Simpan Perubahan"
@@ -110,6 +119,27 @@ class ProfilePresenter: ObservableObject {
         updateUser.password = confirmPassword
         updateUser.previousPassword = oldPassword
 
-        await authPresenter.updateAccount(updateUser: updateUser)
+        do {
+            let response = try await authInteractor.updateUserById(user: updateUser)
+
+            user = response
+            Router.shared.popToRoot()
+        } catch {
+            isOldPasswordError = true
+            switch error {
+            case let NetworkError.apiError(apiResponse):
+                print("Error type: \(apiResponse.data.errorType)")
+                print("Error description: \(apiResponse.data.description)")
+                descriptionOldPassword = apiResponse.data.description
+
+            case let NetworkError.networkError(message):
+                print("Network error: \(message)")
+                descriptionOldPassword = message
+
+            default:
+                print("Unknown error: \(error.localizedDescription)")
+                descriptionOldPassword = error.localizedDescription
+            }
+        }
     }
 }

@@ -138,7 +138,7 @@ struct AppTextField: View {
             Spacer().frame(height: 8)
 
             // Description or error message
-            if let description = description {
+            if let description = description, description != "" {
                 Text(description)
                     .font(AppTypography.p3)
                     .foregroundColor(isError ? AppColors.red500 : AppColors.slate600)
