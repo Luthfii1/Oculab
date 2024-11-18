@@ -56,11 +56,14 @@ struct UserAccessPin: View {
                 }
             }
             .onChange(of: securityPresenter.inputPin) { _, newValue in
-                securityPresenter.handlePinInput(newValue)
+                Task {
+                    await securityPresenter.handlePinInput(newValue)
+                }
             }
             .onAppear {
                 securityPresenter.state = state
                 securityPresenter.inputPin.removeAll()
+                securityPresenter.isError = false
             }
         }
         .hideBackButton()
