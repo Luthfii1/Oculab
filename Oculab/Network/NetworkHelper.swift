@@ -26,7 +26,7 @@ class NetworkHelper {
             throw NetworkError.networkError("Invalid response type")
         }
 
-        ////        debug response
+//        //        debug response
 //        debugResponse(data: data)
 
         do {

@@ -63,9 +63,12 @@ struct FOVDetail: View {
                 }
 
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {}) {
+                    Button(action: {
+                        Router.shared.navigateBack()
+                    }) {
                         HStack {
                             Image("back")
+                                .foregroundStyle(AppColors.slate0)
                         }
                     }
                 }

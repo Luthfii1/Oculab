@@ -51,7 +51,7 @@ class ExamInteractor {
         examinationId: String,
         patientId: String
     ) async throws -> APIResponse<Response> {
-        let urlString = urlForwardVideo + patientId.lowercased() + "/\(examinationId.lowercased())"
+        let urlString = urlForwardVideo + "\(examinationId.lowercased())"
         let parameters = ["video": examVideo]
 
         return try await NetworkHelper.shared.multipart(
@@ -80,7 +80,5 @@ struct PatientDetailData {
 }
 
 struct Response: Decodable {
-    var message: String?
-    var data: String?
-    var error: String?
+    var statusML: String
 }
