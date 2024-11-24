@@ -21,18 +21,13 @@ struct VideoRecordView: View {
                             .environmentObject(videoRecordPresenter)
 
                         // ADD HERE
-                        VStack {
-                            if let progressImage = videoRecordPresenter.stitchedImage {
-                                Image(uiImage: progressImage)
-                                    .resizable()
-                                    .frame(width: 300, height: 300)
-                                    .background(Color.black.opacity(0.5))
-                                    .cornerRadius(8)
-                                    .shadow(radius: 10)
-                                    .rotationEffect(.degrees(90))
-                                Spacer()
-                            }
-                        }
+//                        VStack {
+//                            ZStack {
+//                                VideoPlayerView()
+//                                    .frame(width: 150, height: 100)
+//                                    .position(x: UIScreen.main.bounds.width - 120, y: 60) // Adjust position
+//                            }
+//                        }
                     }
 
                 } else {
@@ -42,16 +37,14 @@ struct VideoRecordView: View {
                         .ignoresSafeArea()
 
                     // ADD HERE
-                    VStack {
-                        if let progressImage = videoRecordPresenter.stitchedImage {
-                            Image(uiImage: progressImage)
-                                .resizable()
-                                .frame(width: 300, height: 300)
-                                .background(Color.black.opacity(0.5))
-                                .cornerRadius(8)
-                                .shadow(radius: 10)
-                                .rotationEffect(.degrees(90))
-                            Spacer()
+                    if videoRecordPresenter.isRecording {
+                        VStack {
+                            ZStack {
+                                VideoPlayerView()
+                                    .frame(width: 187, height: 111)
+                                    .border(Color.white, width: 2)
+                                    .position(x: UIScreen.main.bounds.width - 120, y: 60) // Adjust position
+                            }
                         }
                     }
                 }

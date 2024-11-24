@@ -26,6 +26,7 @@ struct OculabApp: App {
 //            InputPatientData()
             AccountCheckerView()
                 .environmentObject(DependencyInjection.shared.createAuthPresenter())
+//            VideoPlayerView()
         }
         .modelContainer(container)
     }
