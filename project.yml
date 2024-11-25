@@ -1,11 +1,22 @@
 name: Oculab
+
+options:
+  bundleIdPrefix: com.Oculab
+  findCarthageFrameworks: TRUE
+  
 settings:
   MARKETING_VERSION: "1.0"
   CURRENT_PROJECT_VERSION: 1
   DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM_ID}
-options:
-  bundleIdPrefix: com.Oculab
-  resolvePackagesAutomatically: true
+  
+packages:
+#  SwiftPM:
+#    url: https://github.com/apple/swift-package-manager
+#    branch: swift-5.10.1-RELEASE
+  Alamofire:
+    url: https://github.com/Alamofire/Alamofire
+    from: 5.9.1
+  
 targets:
   Oculab:
     type: application
@@ -16,13 +27,39 @@ targets:
     info:
         path: Oculab/Info.plist
         properties:
+          CFBundleDisplayName: Oculab
+          LSApplicationCategoryType: public.app-category.medical
           UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+          UILaunchScreen:
+            UIImageName: ""
+          UIAppFonts: [Inter-Bold.ttf, Inter-Regular.ttf, Inter-SemiBold.ttf]
+          NSCameraUsageDescription: We would like to access your camera to record video
+          NSMicrophoneUsageDescription: We would like to access your microphone to record video
+          NSPhotoLibraryUsageDescription: We need access to save videos to your photo library.
+          NSAppTransportSecurity:
+            NSExceptionDomains:
+              "b4wgswckgks8488og484s8co.34.50.75.183.sslip.io":
+                NSIncludesSubdomains: true
+                NSExceptionAllowsInsecureHTTPLoads: true
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.Oculab.Oculab
       TARGETED_DEVICE_FAMILY: 1
       DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM_ID}
       ENABLE_TESTABILITY: YES
-    dependencies: [] # Add dependencies here if needed
+    dependencies:
+      - package: Alamofire
+#      - package: SwiftPM
+    postCompileScripts:
+      - script: |
+          export PATH="$PATH:/opt/homebrew/bin"
+          if which swiftformat >/dev/null; then
+            swiftformat .
+          else
+            echo "warning: Swiftformat not installed"
+          fi
+        name: SwiftFormat
+        showEnvVars: true
+        basedOnDependencyAnalysis: false
   OculabTests:
     type: bundle.unit-test
     supportedDestinations: [iOS]
@@ -40,11 +77,6 @@ targets:
       PRODUCT_BUNDLE_IDENTIFIER: com.Oculab.OculabTests
       DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM_ID}
       ENABLE_TESTABILITY: YES
-
-#  MyFramework:
-#    type: framework
-#    platform: iOS
-#    sources: [MyFramework]
     
 schemes:
   Oculab:

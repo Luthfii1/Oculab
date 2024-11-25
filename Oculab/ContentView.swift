@@ -8,17 +8,37 @@
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject var dependencyInjection: DependencyInjection
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        TabView {
+            HomeView()
+                .environmentObject(DependencyInjection.shared.createAuthPresenter())
+                .tabItem {
+                    Image(systemName: "rectangle.split.2x2.fill")
+                    Text("Pemeriksaan")
+                }
+
+            HistoryView(selectedDate: Date())
+                .tabItem {
+                    Image(systemName: "clock.arrow.circlepath")
+                    Text("Riwayat")
+                }
+
+            ProfileView()
+                .environmentObject(DependencyInjection.shared.createAuthPresenter())
+                .environmentObject(DependencyInjection.shared.createProfilePresenter())
+                .tabItem {
+                    Image(systemName: "person.circle")
+                    Text("Profil")
+                }
         }
-        .padding()
+        .tint(AppColors.purple500)
+        .navigationBarBackButtonHidden(true)
     }
 }
 
 #Preview {
     ContentView()
+        .environmentObject(DependencyInjection.shared)
 }
