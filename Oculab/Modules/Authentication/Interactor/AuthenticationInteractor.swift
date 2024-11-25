@@ -84,6 +84,10 @@ class AuthenticationInteractor: ObservableObject {
         return await getUserSwiftData()
     }
 
+    func updateUserLocalData(user: User) async {
+        await updateUserSwiftData(data: user)
+    }
+
     private func insertUserSwiftData(data: User) async {
         modelContext.insert(data)
 

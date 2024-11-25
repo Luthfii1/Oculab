@@ -66,7 +66,9 @@ struct FOVAlbum: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {}) {
+                    Button(action: {
+                        Router.shared.navigateBack()
+                    }) {
                         HStack {
                             Image("back")
                         }
