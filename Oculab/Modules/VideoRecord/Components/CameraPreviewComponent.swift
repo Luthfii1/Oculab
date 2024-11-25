@@ -6,6 +6,7 @@
 //
 
 import AVFoundation
+import AVKit
 import SwiftUI
 
 struct CameraPreviewComponent: UIViewRepresentable {
@@ -39,4 +40,36 @@ struct CameraPreviewComponent: UIViewRepresentable {
             previewLayer.frame = uiView.bounds
         }
     }
+}
+
+struct VideoPlayerView: View {
+    @State private var player = AVPlayer()
+
+    var body: some View {
+        VideoPlayer(player: player)
+            .edgesIgnoringSafeArea(.all)
+            .navigationBarBackButtonHidden()
+            .onAppear {
+                let url = URL(string: "https://is3.cloudhost.id/oculab-fov/DummyStitch.mp4")!
+
+                player = AVPlayer(url: url)
+                player.play()
+            }
+            .onDisappear {
+                player.pause()
+            }
+    }
+}
+
+struct CustomVideoPlayerView: UIViewControllerRepresentable {
+    let player: AVPlayer
+
+    func makeUIViewController(context: Context) -> AVPlayerViewController {
+        let controller = AVPlayerViewController()
+        controller.player = player
+        controller.showsPlaybackControls = false // Hide controls
+        return controller
+    }
+
+    func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {}
 }
