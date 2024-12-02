@@ -36,8 +36,6 @@ struct ConfirmationPopups: View {
                     AppButton(title: "Simpan", colorType: .primary) {
                         Task {
                             await presenter.submitExpertResult(examinationId: examinationId)
-                            presenter.isVerifPopUpVisible = false
-                            Router.shared.popToRoot()
                         }
                     },
                     AppButton(title: "Periksa Kembali", colorType: .tertiary) {

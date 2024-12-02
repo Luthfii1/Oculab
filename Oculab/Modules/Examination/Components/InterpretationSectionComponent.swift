@@ -8,6 +8,8 @@
 import SwiftUI
 
 enum AnalysisFocusField {
+    case grading
+    case countBta
     case notes
 }
 
@@ -42,6 +44,7 @@ struct InterpretationSectionComponent: View {
                 choices: GradingType.allCases.dropLast().map { ($0.rawValue, $0.rawValue) },
                 selectedChoice: $presenter.selectedTBGrade
             )
+            .focused($focusedField, equals: .grading)
 
             if presenter.selectedTBGrade == GradingType.SCANTY.rawValue {
                 AppTextField(
@@ -50,6 +53,7 @@ struct InterpretationSectionComponent: View {
                     isNumberOnly: true,
                     text: $presenter.numOfBTA
                 )
+                .focused($focusedField, equals: .countBta)
             }
 
             AppTextBox(
@@ -71,7 +75,6 @@ struct InterpretationSectionComponent: View {
                 }()
             ) {
                 presenter.isVerifPopUpVisible = true
-                print("Primary Button Tapped")
             }
         }
         .toolbar {

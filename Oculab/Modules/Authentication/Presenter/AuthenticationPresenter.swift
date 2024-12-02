@@ -76,8 +76,6 @@ class AuthenticationPresenter: ObservableObject {
 
     @MainActor
     func isValidPin() async -> Bool {
-        print("local data: \(await interactor.getUserLocalData()?.accessPin ?? "")")
-        print("input pin: \(inputPin)")
         if await interactor.getUserLocalData()?.accessPin != inputPin {
             isError = true
             return false
@@ -104,7 +102,6 @@ class AuthenticationPresenter: ObservableObject {
                 user.accessPin = secondPin
                 await updateAccount(updateUser: user)
                 isPinAuthorized = true
-                print("PIN set successfully")
             } else {
                 isError = true
                 inputPin = ""
@@ -114,7 +111,6 @@ class AuthenticationPresenter: ObservableObject {
             Task {
                 if await self.isValidPin() {
                     isPinAuthorized = true
-                    print("Authentication successful")
                     Router.shared.popToRoot()
                 } else {
                     inputPin = ""

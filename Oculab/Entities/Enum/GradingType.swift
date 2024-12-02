@@ -8,8 +8,8 @@
 import Foundation
 
 enum GradingType: String, Codable, CaseIterable {
-    case NEGATIVE = "Negative"
-    case SCANTY = "Scanty"
+    case NEGATIVE
+    case SCANTY
     case Plus1 = "Positive 1+"
     case Plus2 = "Positive 2+"
     case Plus3 = "Positive 3+"

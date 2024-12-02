@@ -37,7 +37,7 @@ class AnalysisResultPresenter: ObservableObject {
                 throw NetworkError.networkError("Error: Invalid TB Grade")
             }
 
-            let result = try await interactor?.submitExpertResult(
+            _ = try await interactor?.submitExpertResult(
                 examId: examinationId,
                 expertResult: ExpertExamResult(
                     finalGrading: validGrading,
@@ -45,6 +45,9 @@ class AnalysisResultPresenter: ObservableObject {
                     notes: inspectorNotes
                 )
             )
+
+            isVerifPopUpVisible = false
+            Router.shared.popToRoot()
         } catch {
             // Handle error
             switch error {
