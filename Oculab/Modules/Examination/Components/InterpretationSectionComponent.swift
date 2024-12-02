@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+enum AnalysisFocusField {
+    case notes
+}
+
 struct InterpretationSectionComponent: View {
     var examination: ExaminationResultData
     var presenter: AnalysisResultPresenter
@@ -14,6 +18,7 @@ struct InterpretationSectionComponent: View {
     @Binding var numOfBTA: String
     @Binding var inspectorNotes: String
     @Binding var isVerifPopUpVisible: Bool
+    @FocusState var focusedField: AnalysisFocusField?
 
     var body: some View {
         VStack(alignment: .leading, spacing: Decimal.d24) {
@@ -56,6 +61,7 @@ struct InterpretationSectionComponent: View {
                 placeholder: "Contoh: Hanya terdapat 20 bakteri dari 60 lapangan pandang yang terkumpul",
                 text: $inspectorNotes
             )
+            .focused($focusedField, equals: .notes)
 
             AppButton(
                 title: "Simpan Hasil Pemeriksaan",
@@ -70,6 +76,14 @@ struct InterpretationSectionComponent: View {
             ) {
                 isVerifPopUpVisible = true
                 print("Primary Button Tapped")
+            }
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("Selesai") {
+                    focusedField = nil
+                }
             }
         }
         .padding()
