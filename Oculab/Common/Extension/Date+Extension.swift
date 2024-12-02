@@ -32,4 +32,10 @@ extension Date {
         formatter.dateFormat = "dd/MM/yyyy"
         return formatter.string(from: self)
     }
+
+    func formattedDayMonthYear() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd MMM yyyy"
+        return formatter.string(from: self)
+    }
 }

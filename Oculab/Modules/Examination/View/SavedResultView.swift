@@ -137,7 +137,7 @@ struct SavedResultView: View {
                 }
             }
             .padding(.horizontal, Decimal.d16)
-            .navigationTitle(examId)
+            .navigationTitle(presenter.examDetailData.slideId)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

@@ -95,7 +95,6 @@ class ExamDataPresenter: ObservableObject {
 
             examDetailData = examinationResponse
             patientDetailData = patientResponse
-
         } catch {
             // Handle error
             switch error {
