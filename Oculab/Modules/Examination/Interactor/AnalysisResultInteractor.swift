@@ -14,6 +14,14 @@ class AnalysisResultInteractor {
         return URL(string: examinationURL + examinationId.lowercased())
     }
 
+    func submitExpertResult(examId: String, expertResult: ExpertExamResult) async throws -> ExpertExamResult {
+        let response: APIResponse<ExpertExamResult> = try await NetworkHelper.shared.post(
+            urlString: API.BE + "/expertResult/post-expert-result/" + examId,
+            body: expertResult)
+
+        return response.data
+    }
+
     func fetchData(examId: String) async throws -> ExaminationResultData {
         let response: APIResponse<Examination> = try await NetworkHelper.shared
             .get(urlString: "https://oculab-be.vercel.app/examination/get-examination-by-id/" + examId.lowercased())

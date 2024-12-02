@@ -13,7 +13,7 @@ enum GradingType: String, Codable, CaseIterable {
     case Plus1 = "Positive 1+"
     case Plus2 = "Positive 2+"
     case Plus3 = "Positive 3+"
-    case unknown
+    case unknown = "Unknown"
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()

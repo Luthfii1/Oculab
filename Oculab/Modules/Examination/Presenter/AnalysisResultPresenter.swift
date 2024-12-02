@@ -31,6 +31,37 @@ class AnalysisResultPresenter: ObservableObject {
     }
 
     @MainActor
+    func submitExpertResult(examinationId: String) async {
+        do {
+            guard let validGrading = GradingType(rawValue: selectedTBGrade) else {
+                throw NetworkError.networkError("Error: Invalid TB Grade")
+            }
+
+            let result = try await interactor?.submitExpertResult(
+                examId: examinationId,
+                expertResult: ExpertExamResult(
+                    finalGrading: validGrading,
+                    bacteriaTotalCount: Int(numOfBTA),
+                    notes: inspectorNotes
+                )
+            )
+        } catch {
+            // Handle error
+            switch error {
+            case let NetworkError.apiError(apiResponse):
+                print("Error type: \(apiResponse.data.errorType)")
+                print("Error description: \(apiResponse.data.description)")
+
+            case let NetworkError.networkError(message):
+                print("Network error: \(message)")
+
+            default:
+                print("Unknown error: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    @MainActor
     func fetchData(examinationId: String) async {
         do {
             let result = try await interactor?.fetchData(examId: examinationId)

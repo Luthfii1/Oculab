@@ -12,12 +12,8 @@ enum AnalysisFocusField {
 }
 
 struct InterpretationSectionComponent: View {
+    @EnvironmentObject var presenter: AnalysisResultPresenter
     var examination: ExaminationResultData
-    var presenter: AnalysisResultPresenter
-    @Binding var selectedTBGrade: String
-    @Binding var numOfBTA: String
-    @Binding var inspectorNotes: String
-    @Binding var isVerifPopUpVisible: Bool
     @FocusState var focusedField: AnalysisFocusField?
 
     var body: some View {
@@ -44,22 +40,22 @@ struct InterpretationSectionComponent: View {
                 isRequired: false,
                 rightIcon: "chevron.down",
                 choices: GradingType.allCases.dropLast().map { ($0.rawValue, $0.rawValue) },
-                selectedChoice: $selectedTBGrade
+                selectedChoice: $presenter.selectedTBGrade
             )
 
-            if selectedTBGrade == GradingType.SCANTY.rawValue {
+            if presenter.selectedTBGrade == GradingType.SCANTY.rawValue {
                 AppTextField(
                     title: "Jumlah BTA",
                     placeholder: "Contoh: 8",
                     isNumberOnly: true,
-                    text: $numOfBTA
+                    text: $presenter.numOfBTA
                 )
             }
 
             AppTextBox(
                 title: "Catatan Petugas",
                 placeholder: "Contoh: Hanya terdapat 20 bakteri dari 60 lapangan pandang yang terkumpul",
-                text: $inspectorNotes
+                text: $presenter.inspectorNotes
             )
             .focused($focusedField, equals: .notes)
 
@@ -67,14 +63,14 @@ struct InterpretationSectionComponent: View {
                 title: "Simpan Hasil Pemeriksaan",
                 rightIcon: "checkmark",
                 isEnabled: {
-                    if selectedTBGrade == GradingType.SCANTY.rawValue {
-                        return !numOfBTA.isEmpty && Int(numOfBTA) != nil
+                    if presenter.selectedTBGrade == GradingType.SCANTY.rawValue {
+                        return !presenter.numOfBTA.isEmpty && Int(presenter.numOfBTA) != nil
                     } else {
-                        return selectedTBGrade != ""
+                        return presenter.selectedTBGrade != ""
                     }
                 }()
             ) {
-                isVerifPopUpVisible = true
+                presenter.isVerifPopUpVisible = true
                 print("Primary Button Tapped")
             }
         }
@@ -93,7 +89,3 @@ struct InterpretationSectionComponent: View {
         .padding(.horizontal, Decimal.d20)
     }
 }
-
-// #Preview {
-//    InterpretationSectionComponent()
-// }
