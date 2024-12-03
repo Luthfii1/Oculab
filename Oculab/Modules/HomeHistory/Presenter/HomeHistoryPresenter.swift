@@ -58,7 +58,8 @@ class HomeHistoryPresenter: ObservableObject {
         case .belumDimulai:
             filteredExamination = latestExamination.filter { $0.statusExamination == .NOTSTARTED }
         case .belumDisimpulkan:
-            filteredExamination = latestExamination.filter { $0.statusExamination == .NEEDVALIDATION }
+            filteredExamination = latestExamination
+                .filter { $0.statusExamination == .NEEDVALIDATION || $0.statusExamination == .INPROGRESS }
         }
     }
 

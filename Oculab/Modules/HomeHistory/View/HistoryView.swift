@@ -28,7 +28,8 @@ struct HistoryView: View {
                     } else if presenter.filteredExaminationByDate.isEmpty {
                         VStack(alignment: .center) {
                             Image("Empty")
-                            Text("Tidak ada pemeriksaan diselesaikan pada \(selectedDate)").font(AppTypography.p3)
+                            Text("Tidak ada pemeriksaan diselesaikan pada \(formatDate(selectedDate))")
+                                .font(AppTypography.p3)
                                 .foregroundStyle(AppColors.slate300)
                                 .frame(maxWidth: 254)
                                 .multilineTextAlignment(.center)
@@ -47,7 +48,7 @@ struct HistoryView: View {
                                         status: exam.statusExamination,
                                         date: exam.datePlan,
                                         patientName: exam.patientName,
-                                        patientDOB: exam.patientDob,
+                                        patientDOB: exam.patientDob.toFormattedDate(),
                                         picName: exam.picName,
                                         isLab: true
                                     )
@@ -70,6 +71,13 @@ struct HistoryView: View {
             presenter.filterLatestActivityByDate(date: selectedDate)
         }
         .navigationBarBackButtonHidden(true)
+    }
+
+    private func formatDate(_ date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "id_ID") // Bahasa Indonesia
+        dateFormatter.dateFormat = "dd MMMM yyyy"
+        return dateFormatter.string(from: date)
     }
 }
 
