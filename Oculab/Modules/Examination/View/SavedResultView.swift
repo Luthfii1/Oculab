@@ -57,7 +57,9 @@ struct SavedResultView: View {
                                 .frame(height: 200)
 
                             if resultPresenter.groupedFOVs?.bta0.isEmpty != true {
-                                Button {} label: {
+                                Button {
+                                    resultPresenter.navigateToAlbum(fovGroup: .BTA0)
+                                } label: {
                                     FolderCardComponent(
                                         title: .BTA0,
                                         numOfImage: resultPresenter.groupedFOVs?.bta0.count ?? 0
@@ -66,7 +68,9 @@ struct SavedResultView: View {
                             }
 
                             if resultPresenter.groupedFOVs?.bta1to9.isEmpty != true {
-                                Button {} label: {
+                                Button {
+                                    resultPresenter.navigateToAlbum(fovGroup: .BTA1TO9)
+                                } label: {
                                     FolderCardComponent(
                                         title: .BTA1TO9,
                                         numOfImage: resultPresenter.groupedFOVs?.bta1to9.count ?? 0
@@ -75,7 +79,9 @@ struct SavedResultView: View {
                             }
 
                             if resultPresenter.groupedFOVs?.btaabove9.isEmpty != true {
-                                Button {} label: {
+                                Button {
+                                    resultPresenter.navigateToAlbum(fovGroup: .BTAABOVE9)
+                                } label: {
                                     FolderCardComponent(
                                         title: .BTAABOVE9,
                                         numOfImage: resultPresenter.groupedFOVs?.btaabove9.count ?? 0
