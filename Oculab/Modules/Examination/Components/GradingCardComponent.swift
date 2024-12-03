@@ -12,6 +12,7 @@ struct GradingCardComponent: View {
     var confidenceLevel: ConfidenceLevel = .unpredicted
     var n: Int = 0
     var isExpert: Bool = false
+    var expertNote: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: Decimal.d8) {
@@ -24,6 +25,7 @@ struct GradingCardComponent: View {
                         Image("robot")
                         Spacer().frame(width: 4)
                         Text("\(confidenceLevel.rawValue) confidence level")
+                            .font(AppTypography.p4)
                             .foregroundColor(AppColors.slate300)
 
                         Spacer()
@@ -34,8 +36,14 @@ struct GradingCardComponent: View {
                     }
                 }
             }
-            Text(type.description(withValues: n))
-                .font(AppTypography.p3)
+
+            if isExpert {
+                Text(expertNote ?? "")
+                    .font(AppTypography.p3)
+            } else {
+                Text(type.description(withValues: n))
+                    .font(AppTypography.p3)
+            }
         }
         .padding(Decimal.d12)
         .frame(maxWidth: .infinity, alignment: .topLeading)
