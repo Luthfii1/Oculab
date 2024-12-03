@@ -12,6 +12,9 @@ struct InformationPage: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: Decimal.d24) {
+                    Rectangle()
+                        .frame(width: 0, height: 0)
+
                     AppCard(icon: "info.circle", title: "Standar Penilaian", spacing: Decimal.d16) {
                         VStack(alignment: .leading, spacing: Decimal.d16) {
                             Text("Sistem ini menghitung bakteri sesuai rekomendasi WHO dan standar IUALTD")
@@ -94,6 +97,7 @@ struct InformationPage: View {
                 }
             }
         }
+        .navigationBarBackButtonHidden()
     }
 }
 
