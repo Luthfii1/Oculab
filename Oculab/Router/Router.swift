@@ -29,6 +29,7 @@ class Router: ObservableObject {
         case profile
         case editPassword
         case inputPatientData
+        case informationInterpretation
     }
 
     @Published var path: NavigationPath = .init()
@@ -72,6 +73,8 @@ class Router: ObservableObject {
                 .environmentObject(DependencyInjection.shared.createProfilePresenter())
         case .inputPatientData:
             InputPatientData()
+        case .informationInterpretation:
+            InformationPage()
         }
     }
 
