@@ -30,6 +30,7 @@ class Router: ObservableObject {
         case editPassword
         case inputPatientData
         case informationInterpretation
+        case kebijakanPrivasi
     }
 
     @Published var path: NavigationPath = .init()
@@ -75,6 +76,8 @@ class Router: ObservableObject {
             InputPatientData()
         case .informationInterpretation:
             InformationPage()
+        case .kebijakanPrivasi:
+            KebijakanPrivasiView()
         }
     }
 

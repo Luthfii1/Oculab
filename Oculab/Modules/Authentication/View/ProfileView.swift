@@ -85,7 +85,7 @@ struct ProfileView: View {
                         colorType: .tertiary,
                         titleColor: AppColors.slate900
                     ) {
-                        print("button Kebijakan privasi")
+                        Router.shared.navigateTo(.kebijakanPrivasi)
                     }
                     .padding(.vertical, Decimal.d16)
                     .background(.white)
@@ -105,14 +105,10 @@ struct ProfileView: View {
             }
             .navigationTitle("Profile")
         }
-//        .onAppear {
-//            profilePresenter.setUser()
-//        }
     }
 }
 
 #Preview {
     ProfileView()
-//        .environmentObject(DependencyInjection.shared.createAuthPresenter())
             .environmentObject(DependencyInjection.shared.createProfilePresenter())
 }

@@ -30,7 +30,6 @@ struct GradingCardComponent: View {
 
                         Spacer()
                         Button(action: {
-                            print("button tapped")
                             Router.shared.navigateTo(.informationInterpretation)
                         }) {
                             Image(systemName: "info.circle")
