@@ -85,14 +85,20 @@ struct SavedResultView: View {
                         }
                     }
 
-                    AppCard(icon: "text.badge.checkmark", title: "Hasil Interpretasi", spacing: Decimal.d24) {
+                    AppCard(
+                        icon: "text.badge.checkmark",
+                        title: "Hasil Interpretasi",
+                        spacing: Decimal.d24,
+                        isGrading: .FINISHED
+                    ) {
                         VStack(alignment: .leading, spacing: Decimal.d8) {
                             Text("Interpretasi Petugas")
                                 .font(AppTypography.s5)
                                 .foregroundColor(AppColors.slate300)
                             GradingCardComponent(
-                                type: .SCANTY,
-                                confidenceLevel: .lowConfidence
+                                type: resultPresenter.examinationResult?.expertGrading ?? .unknown,
+                                confidenceLevel: .lowConfidence,
+                                isExpert: true
                             )
                         }
 
@@ -108,7 +114,7 @@ struct SavedResultView: View {
                                     .font(AppTypography.p4)
                             }
                             GradingCardComponent(
-                                type: .SCANTY,
+                                type: resultPresenter.examinationResult?.systemGrading ?? .unknown,
                                 confidenceLevel: .lowConfidence
                             )
                         }
@@ -137,7 +143,7 @@ struct SavedResultView: View {
                 }
             }
             .padding(.horizontal, Decimal.d16)
-            .navigationTitle(examId)
+            .navigationTitle(presenter.examDetailData.slideId)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

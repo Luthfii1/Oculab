@@ -14,6 +14,14 @@ class AnalysisResultInteractor {
         return URL(string: examinationURL + examinationId.lowercased())
     }
 
+    func submitExpertResult(examId: String, expertResult: ExpertExamResult) async throws -> ExpertExamResult {
+        let response: APIResponse<ExpertExamResult> = try await NetworkHelper.shared.post(
+            urlString: API.BE + "/expertResult/post-expert-result/" + examId,
+            body: expertResult)
+
+        return response.data
+    }
+
     func fetchData(examId: String) async throws -> ExaminationResultData {
         let response: APIResponse<Examination> = try await NetworkHelper.shared
             .get(urlString: "https://oculab-be.vercel.app/examination/get-examination-by-id/" + examId.lowercased())
@@ -29,6 +37,9 @@ class AnalysisResultInteractor {
                 rawValue: response.data.systemResult?.systemGrading.rawValue ?? GradingType.NEGATIVE
                     .rawValue) ??
                 .unknown,
+            expertGrading: GradingType(
+                rawValue: response.data.expertResult?.finalGrading.rawValue ?? GradingType.NEGATIVE
+                    .rawValue) ?? .unknown,
             bacteriaTotalCount: response.data.systemResult?.systemBacteriaTotalCount ?? 0)
 
         return examinationDetail
@@ -49,6 +60,7 @@ struct ExaminationResultData: Decodable {
     var fov: [FOVData]
     var confidenceLevelAggregated: Double
     var systemGrading: GradingType
+    var expertGrading: GradingType?
     var bacteriaTotalCount: Int
 }
 

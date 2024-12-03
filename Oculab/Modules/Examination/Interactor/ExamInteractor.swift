@@ -40,7 +40,7 @@ class ExamInteractor {
             patientId: response.data._id,
             name: response.data.name,
             nik: response.data.NIK,
-            dob: response.data.DoB?.formattedString() ?? "",
+            dob: response.data.DoB?.formattedDayMonthYear() ?? "",
             sex: response.data.sex.rawValue,
             bpjs: response.data.BPJS ?? ""
         )

@@ -76,11 +76,10 @@ struct ExamDetailView: View {
                     }
 
                     AppButton(
-                        title: "Mulai Analisis",
+                        title: presenter.buttonTitle,
                         rightIcon: "arrow.right",
                         size: .large,
-                        isEnabled: presenter.recordVideo != nil
-
+                        isEnabled: presenter.buttonEnabled()
                     ) {
                         Task {
                             await presenter.handleSubmit()

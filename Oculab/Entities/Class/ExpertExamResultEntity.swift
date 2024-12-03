@@ -11,10 +11,10 @@ class ExpertExamResult: Codable, Identifiable {
     var _id: String
     var finalGrading: GradingType
     var bacteriaTotalCount: Int?
-    var notes: String
+    var notes: String?
 
     init(
-        _id: String,
+        _id: String = UUID().uuidString.lowercased(),
         finalGrading: GradingType,
         bacteriaTotalCount: Int? = nil,
         notes: String

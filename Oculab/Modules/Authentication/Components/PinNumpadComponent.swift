@@ -24,7 +24,6 @@ struct PinNumpadComponent: View {
                     ForEach(row, id: \.self) { item in
                         Button(action: {
                             handleInput(item)
-                            print("pin", pin)
                         }) {
                             switch item {
                             case "!":

@@ -105,6 +105,12 @@ struct HomeView: View {
                 .padding(.horizontal, 20)
                 .padding(.bottom, 20)
             }
+            .refreshable {
+                Task {
+                    await presenter.getStatisticData()
+                    await presenter.fetchData()
+                }
+            }
             .navigationTitle("Tugas Pemeriksaan")
         }
         .ignoresSafeArea()

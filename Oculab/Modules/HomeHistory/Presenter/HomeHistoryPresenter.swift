@@ -85,7 +85,7 @@ class HomeHistoryPresenter: ObservableObject {
 
             if let response {
                 latestExamination = response
-                await filterLatestActivity(typeActivity: .belumDimulai)
+                await filterLatestActivity(typeActivity: selectedLatestActivity)
             }
         } catch {
             // Handle error
