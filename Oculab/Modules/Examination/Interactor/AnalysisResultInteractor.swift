@@ -37,6 +37,9 @@ class AnalysisResultInteractor {
                 rawValue: response.data.systemResult?.systemGrading.rawValue ?? GradingType.NEGATIVE
                     .rawValue) ??
                 .unknown,
+            expertGrading: GradingType(
+                rawValue: response.data.expertResult?.finalGrading.rawValue ?? GradingType.NEGATIVE
+                    .rawValue) ?? .unknown,
             bacteriaTotalCount: response.data.systemResult?.systemBacteriaTotalCount ?? 0)
 
         return examinationDetail
@@ -57,6 +60,7 @@ struct ExaminationResultData: Decodable {
     var fov: [FOVData]
     var confidenceLevelAggregated: Double
     var systemGrading: GradingType
+    var expertGrading: GradingType?
     var bacteriaTotalCount: Int
 }
 

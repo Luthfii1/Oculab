@@ -91,8 +91,9 @@ struct SavedResultView: View {
                                 .font(AppTypography.s5)
                                 .foregroundColor(AppColors.slate300)
                             GradingCardComponent(
-                                type: .SCANTY,
-                                confidenceLevel: .lowConfidence
+                                type: resultPresenter.examinationResult?.expertGrading ?? .unknown,
+                                confidenceLevel: .lowConfidence,
+                                isExpert: true
                             )
                         }
 
@@ -108,7 +109,7 @@ struct SavedResultView: View {
                                     .font(AppTypography.p4)
                             }
                             GradingCardComponent(
-                                type: .SCANTY,
+                                type: resultPresenter.examinationResult?.systemGrading ?? .unknown,
                                 confidenceLevel: .lowConfidence
                             )
                         }
