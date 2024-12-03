@@ -98,7 +98,8 @@ struct SavedResultView: View {
                             GradingCardComponent(
                                 type: resultPresenter.examinationResult?.expertGrading ?? .unknown,
                                 confidenceLevel: .lowConfidence,
-                                isExpert: true
+                                isExpert: true,
+                                expertNote: resultPresenter.examinationResult?.expertNote
                             )
                         }
 
@@ -113,10 +114,47 @@ struct SavedResultView: View {
                                 Text("Interpretasi sistem bukan merupakan hasil akhir untuk pasien")
                                     .font(AppTypography.p4)
                             }
-                            GradingCardComponent(
-                                type: resultPresenter.examinationResult?.systemGrading ?? .unknown,
-                                confidenceLevel: .lowConfidence
-                            )
+
+                            if resultPresenter.examinationResult?.systemGrading == .NEGATIVE {
+                                GradingCardComponent(
+                                    type: resultPresenter.examinationResult?.systemGrading ?? .unknown,
+                                    confidenceLevel: ConfidenceLevel
+                                        .classify(
+                                            aggregatedConfidence: resultPresenter.examinationResult?
+                                                .confidenceLevelAggregated ?? 0.0
+                                        )
+                                )
+                            } else if resultPresenter.examinationResult?.systemGrading == .Plus2 {
+                                GradingCardComponent(
+                                    type: resultPresenter.examinationResult?.systemGrading ?? .unknown,
+                                    confidenceLevel: ConfidenceLevel
+                                        .classify(
+                                            aggregatedConfidence: resultPresenter.examinationResult?
+                                                .confidenceLevelAggregated ?? 0.0
+                                        ),
+                                    n: resultPresenter.groupedFOVs?.bta1to9.count ?? 0
+                                )
+                            } else if resultPresenter.examinationResult?.systemGrading == .Plus3 {
+                                GradingCardComponent(
+                                    type: resultPresenter.examinationResult?.systemGrading ?? .unknown,
+                                    confidenceLevel: ConfidenceLevel
+                                        .classify(
+                                            aggregatedConfidence: resultPresenter.examinationResult?
+                                                .confidenceLevelAggregated ?? 0.0
+                                        ),
+                                    n: resultPresenter.groupedFOVs?.btaabove9.count ?? 0
+                                )
+                            } else {
+                                GradingCardComponent(
+                                    type: resultPresenter.examinationResult?.systemGrading ?? .unknown,
+                                    confidenceLevel: ConfidenceLevel
+                                        .classify(
+                                            aggregatedConfidence: resultPresenter.examinationResult?
+                                                .confidenceLevelAggregated ?? 0.0
+                                        ),
+                                    n: resultPresenter.examinationResult?.bacteriaTotalCount ?? 0
+                                )
+                            }
                         }
 
                         VStack(alignment: .leading, spacing: Decimal.d16) {
