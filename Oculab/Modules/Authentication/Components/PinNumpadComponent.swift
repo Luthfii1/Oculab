@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct PinNumpadComponent: View {
+    @EnvironmentObject var authPresenter: AuthenticationPresenter
     @Binding var pin: String
     @State var isOpeningApp: Bool? = false
     private let numbers = [
@@ -67,9 +68,33 @@ struct PinNumpadComponent: View {
 
     // Handle button press actions
     private func handleInput(_ input: String) {
+        authPresenter.isError = false
+        authPresenter.setDescriptionPIN()
+
         switch input {
         case "!":
-            print("nothing")
+            print("face id pressed")
+            pin.removeAll()
+
+            // Only attempt Face ID if it's enabled and available
+            if authPresenter.isFaceIdEnabled && authPresenter.isFaceIdAvailable {
+                print("face id is available")
+                Task {
+                    await authPresenter.authenticateWithFaceID()
+                }
+            } else {
+                print("error here")
+                // Provide specific error feedback
+                if !authPresenter.isFaceIdAvailable {
+                    print("face id is not available")
+                    authPresenter.isError = true
+                    authPresenter.descriptionPIN = "Perangkat Anda tidak mendukung Face ID"
+                } else if !authPresenter.isFaceIdEnabled {
+                    print("face id is not enabled")
+                    authPresenter.isError = true
+                    authPresenter.descriptionPIN = "Face ID belum diaktifkan. Silakan aktifkan di Pengaturan Profil"
+                }
+            }
         case "delete.left.fill":
             if !pin.isEmpty {
                 pin.removeLast()
@@ -84,4 +109,5 @@ struct PinNumpadComponent: View {
 
 #Preview {
     PinNumpadComponent(pin: .constant("12"))
+        .environmentObject(DependencyInjection.shared.createAuthPresenter())
 }

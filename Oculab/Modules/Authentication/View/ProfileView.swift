@@ -5,10 +5,11 @@
 //  Created by Luthfi Misbachul Munir on 14/11/24.
 //
 
+import LocalAuthentication
 import SwiftUI
 
 struct ProfileView: View {
-//    @EnvironmentObject private var authPresenter: AuthenticationPresenter
+    @EnvironmentObject private var authPresenter: AuthenticationPresenter
     @EnvironmentObject private var profilePresenter: ProfilePresenter
 
     var body: some View {
@@ -65,9 +66,12 @@ struct ProfileView: View {
                     HStack {
                         Image(systemName: "faceid")
                             .foregroundColor(AppColors.purple500)
-                        Toggle("Face ID", isOn: $profilePresenter.user.isFaceIdEnabled)
-                            .toggleStyle(SwitchToggleStyle(tint: AppColors.purple500))
-                            .font(AppTypography.s5)
+                        Toggle("Face ID", isOn: Binding(
+                            get: { authPresenter.isFaceIdEnabled },
+                            set: { authPresenter.updateFaceIdPreference($0) }
+                        ))
+                        .toggleStyle(SwitchToggleStyle(tint: AppColors.purple500))
+                        .font(AppTypography.s5)
                     }
                     .padding(.vertical, Decimal.d16)
                     .padding(.horizontal, 16)
@@ -110,5 +114,6 @@ struct ProfileView: View {
 
 #Preview {
     ProfileView()
-            .environmentObject(DependencyInjection.shared.createProfilePresenter())
+        .environmentObject(DependencyInjection.shared.createProfilePresenter())
+        .environmentObject(DependencyInjection.shared.createAuthPresenter())
 }
