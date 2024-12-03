@@ -46,7 +46,7 @@ struct HistoryView: View {
                                     HomeActivityComponent(
                                         slideId: exam.slideId,
                                         status: exam.statusExamination,
-                                        date: exam.datePlan,
+                                        date: exam.date,
                                         patientName: exam.patientName,
                                         patientDOB: exam.patientDob.toFormattedDate(),
                                         picName: exam.picName,
@@ -65,6 +65,7 @@ struct HistoryView: View {
         .onAppear {
             Task {
                 await presenter.fetchData()
+                presenter.filterLatestActivityByDate(date: selectedDate)
             }
         }
         .onChange(of: selectedDate) {
