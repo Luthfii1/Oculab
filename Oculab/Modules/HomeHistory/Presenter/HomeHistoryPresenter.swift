@@ -19,6 +19,7 @@ class HomeHistoryPresenter: ObservableObject {
     @Published var filteredExaminationByDate: [ExaminationCardData] = []
 
     @Published var statisticExam: ExaminationStatistic = .init()
+    @Published var progress: CGFloat = 0.0
 
     @Published var isAllExamsLoading: Bool = false
     @Published var isStatisticLoading: Bool = false
@@ -33,6 +34,16 @@ class HomeHistoryPresenter: ObservableObject {
 
             if let data {
                 statisticExam = data
+            }
+
+            if statisticExam.totalFinished + statisticExam.totalNotFinished > 0 {
+                progress = CGFloat(
+                    Double(statisticExam.totalFinished) /
+                        Double(statisticExam.totalFinished + statisticExam.totalNotFinished)
+                )
+
+            } else if statisticExam.totalFinished != 0 && statisticExam.totalNotFinished == 0 {
+                progress = 1.0
             }
         } catch {
             // Handle error
@@ -58,7 +69,8 @@ class HomeHistoryPresenter: ObservableObject {
         case .belumDimulai:
             filteredExamination = latestExamination.filter { $0.statusExamination == .NOTSTARTED }
         case .belumDisimpulkan:
-            filteredExamination = latestExamination.filter { $0.statusExamination == .NEEDVALIDATION }
+            filteredExamination = latestExamination
+                .filter { $0.statusExamination == .NEEDVALIDATION || $0.statusExamination == .INPROGRESS }
         }
     }
 
@@ -87,6 +99,7 @@ class HomeHistoryPresenter: ObservableObject {
                 latestExamination = response
                 await filterLatestActivity(typeActivity: selectedLatestActivity)
             }
+
         } catch {
             // Handle error
             switch error {

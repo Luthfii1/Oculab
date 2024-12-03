@@ -59,9 +59,15 @@ struct WeeklyCalendarView: View {
 
                             Text("\(getDayOfMonth(date: date))")
                                 .font(AppTypography.p2)
-                                .foregroundColor(date == selectedDate ? AppColors.slate0 : AppColors.slate900)
+                                .foregroundColor(
+                                    isSameDay(date1: date, date2: selectedDate) ? AppColors
+                                        .slate0 : AppColors.slate900
+                                )
                                 .padding(Decimal.d8)
-                                .background(Circle().fill(date == selectedDate ? AppColors.pink400 : .clear))
+                                .background(
+                                    Circle()
+                                        .fill(isSameDay(date1: date, date2: selectedDate) ? AppColors.pink400 : .clear)
+                                )
                                 .frame(width: 40)
                         }
                         .padding(.vertical, Decimal.d6)
@@ -169,6 +175,11 @@ struct WeeklyCalendarView: View {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMMM yyyy"
         return dateFormatter.string(from: date)
+    }
+
+    private func isSameDay(date1: Date, date2: Date) -> Bool {
+        let calendar = Calendar.current
+        return calendar.isDate(date1, inSameDayAs: date2)
     }
 }
 

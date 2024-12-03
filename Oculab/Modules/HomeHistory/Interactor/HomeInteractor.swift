@@ -10,7 +10,7 @@ import Foundation
 class HomeInteractor {
     private let examinationURL = API.BE + "/examination"
     private let apiURL = API.BE + "/examination/get-number-of-examinations"
-    private let apiGetAllData = API.BE + "/examination/get-all-examinations"
+    private let apiGetAllData = API.BE + "/examination/get-all-examinations/"
 
     func getStatisticExamination() async throws -> ExaminationStatistic {
         guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
@@ -28,7 +28,16 @@ class HomeInteractor {
     }
 
     func getAllData() async throws -> [ExaminationCardData] {
-        let response: APIResponse<[Examination]> = try await NetworkHelper.shared.get(urlString: apiGetAllData)
+        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
+            throw NSError(
+                domain: "UserIDNotFound",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "User ID not found"]
+            )
+        }
+
+        let response: APIResponse<[Examination]> = try await NetworkHelper.shared
+            .get(urlString: apiGetAllData + userId)
 
         let examinationDataCard = response.data.map { exam -> ExaminationCardData in
             let dateFormatter = DateFormatter()
