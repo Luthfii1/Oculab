@@ -85,7 +85,12 @@ struct SavedResultView: View {
                         }
                     }
 
-                    AppCard(icon: "text.badge.checkmark", title: "Hasil Interpretasi", spacing: Decimal.d24) {
+                    AppCard(
+                        icon: "text.badge.checkmark",
+                        title: "Hasil Interpretasi",
+                        spacing: Decimal.d24,
+                        isGrading: .FINISHED
+                    ) {
                         VStack(alignment: .leading, spacing: Decimal.d8) {
                             Text("Interpretasi Petugas")
                                 .font(AppTypography.s5)

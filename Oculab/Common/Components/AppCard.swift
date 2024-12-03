@@ -13,7 +13,7 @@ struct AppCard<Content: View>: View {
     var spacing: CGFloat
     var isBorderDisabled: Bool
     var isEnablingEdit: Bool
-
+    var isGrading: StatusType?
     var content: Content
 
     init(
@@ -22,12 +22,14 @@ struct AppCard<Content: View>: View {
         spacing: CGFloat,
         isBorderDisabled: Bool = false,
         isEnablingEdit: Bool = false,
+        isGrading: StatusType? = nil,
         @ViewBuilder content: () -> Content
     ) {
         self.icon = icon
         self.title = title
         self.spacing = spacing
         self.isBorderDisabled = isBorderDisabled
+        self.isGrading = isGrading
         self.content = content()
         self.isEnablingEdit = isEnablingEdit
     }
@@ -41,6 +43,12 @@ struct AppCard<Content: View>: View {
                 Text(title)
                     .padding(.leading, Decimal.d8)
                     .font(AppTypography.s4_1)
+
+                if let isGrading = isGrading {
+                    Spacer()
+                    StatusTagComponent(type: isGrading)
+                }
+
                 if isEnablingEdit {
                     Spacer()
                     HStack(spacing: Decimal.d12) {
