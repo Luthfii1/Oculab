@@ -46,7 +46,7 @@ struct HistoryView: View {
                                     HomeActivityComponent(
                                         slideId: exam.slideId,
                                         status: exam.statusExamination,
-                                        date: exam.datePlan,
+                                        date: exam.date,
                                         patientName: exam.patientName,
                                         patientDOB: exam.patientDob.toFormattedDate(),
                                         picName: exam.picName,
