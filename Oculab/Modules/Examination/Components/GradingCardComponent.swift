@@ -29,7 +29,10 @@ struct GradingCardComponent: View {
                             .foregroundColor(AppColors.slate300)
 
                         Spacer()
-                        Button(action: {}) {
+                        Button(action: {
+                            print("button tapped")
+                            Router.shared.navigateTo(.informationInterpretation)
+                        }) {
                             Image(systemName: "info.circle")
                                 .foregroundColor(AppColors.purple500)
                         }
