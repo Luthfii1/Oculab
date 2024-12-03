@@ -22,6 +22,8 @@
 	<string>1</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.medical</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>We would like to access your face ID to unlock our App</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>

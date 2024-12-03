@@ -13,4 +13,5 @@ enum UserDefaultType: String, CaseIterable {
     case isUserLoggedIn
     case userId
     case accessPin
+    case isFaceIdEnabled
 }

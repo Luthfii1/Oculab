@@ -32,6 +32,7 @@ struct UserAccessPin: View {
                         pin: $securityPresenter.inputPin,
                         isOpeningApp: state == .authenticate
                     )
+                    .environmentObject(securityPresenter)
 
                     Spacer()
 
@@ -64,6 +65,7 @@ struct UserAccessPin: View {
                 securityPresenter.state = state
                 securityPresenter.inputPin.removeAll()
                 securityPresenter.isError = false
+                securityPresenter.checkFaceIDAvailability()
             }
         }
         .hideBackButton()
