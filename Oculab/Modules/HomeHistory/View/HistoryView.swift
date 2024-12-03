@@ -65,6 +65,7 @@ struct HistoryView: View {
         .onAppear {
             Task {
                 await presenter.fetchData()
+                presenter.filterLatestActivityByDate(date: selectedDate)
             }
         }
         .onChange(of: selectedDate) {
