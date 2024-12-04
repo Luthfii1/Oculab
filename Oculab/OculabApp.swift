@@ -25,6 +25,7 @@ struct OculabApp: App {
         WindowGroup {
             AccountCheckerView()
                 .environmentObject(DependencyInjection.shared.createAuthPresenter())
+                .colorScheme(.light)
         }
         .modelContainer(container)
     }
