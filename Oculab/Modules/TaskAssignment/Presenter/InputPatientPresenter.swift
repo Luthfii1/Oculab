@@ -298,9 +298,35 @@ class InputPatientPresenter: ObservableObject {
             examinationPlanDate: examination2.examinationPlanDate
         )
 
+        print("""
+        req 1:
+        - ID: \(String(describing: examReq._id))
+        - Goal: \(String(describing: examReq.goal))
+        - Preparation Type: \(String(describing: examReq.preparationType))
+        - Slide ID: \(String(describing: examReq.slideId))
+        - Examination Date: \(String(describing: examReq.examinationDate))
+        - PIC: \(String(describing: examReq.PIC))
+        - DPJP: \(String(describing: examReq.DPJP))
+        - Examination Plan Date: \(String(describing: examReq.examinationPlanDate))
+        """)
+
+        print("""
+        req 2:
+        - ID: \(String(describing: examReq2._id))
+        - Goal: \(String(describing: examReq2.goal))
+        - Preparation Type: \(String(describing: examReq2.preparationType))
+        - Slide ID: \(String(describing: examReq2.slideId))
+        - Examination Date: \(String(describing: examReq2.examinationDate))
+        - PIC: \(String(describing: examReq2.PIC))
+        - DPJP: \(String(describing: examReq2.DPJP))
+        - Examination Plan Date: \(String(describing: examReq2.examinationPlanDate))
+        """)
+
         do {
             let response1 = try await interactor?.addNewExamination(patientId: patient._id, examination: examReq)
             let response2 = try await interactor?.addNewExamination(patientId: patient._id, examination: examReq2)
+            print("response1: \(String(describing: response1))")
+            print("response2: \(String(describing: response2))")
 
             if (response1 != nil) && (response2 != nil) {
                 print("Examination added successfully")
