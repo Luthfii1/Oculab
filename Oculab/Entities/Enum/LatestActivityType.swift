@@ -11,5 +11,5 @@ enum LatestActivityType: String, CaseIterable {
 //    case semua = "Semua"
     case belumDimulai = "Belum Dimulai"
 
-    case belumDisimpulkan = "Belum Disimpulkan"
+    case belumDisimpulkan = "Sedang Berlangsung"
 }
