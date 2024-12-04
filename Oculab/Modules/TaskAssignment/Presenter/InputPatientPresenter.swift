@@ -19,6 +19,8 @@ class InputPatientPresenter: ObservableObject {
     }
 
     @Published var isAddingNewPatient: Bool = false
+    @Published var isError: Bool = false
+    @Published var errorMessage: String = ""
 
     @Published var isAddingName: Bool = false
     @Published var selectedSex: String = ""
@@ -276,6 +278,8 @@ class InputPatientPresenter: ObservableObject {
 
     @MainActor
     func submitExamination() async {
+        let DPJPId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue)
+
         let examReq = ExaminationRequest(
             _id: examination._id,
             goal: examination.goal,
@@ -283,7 +287,7 @@ class InputPatientPresenter: ObservableObject {
             slideId: examination.slideId,
             examinationDate: examination.examinationDate,
             PIC: pic._id,
-            DPJP: pic._id,
+            DPJP: DPJPId,
             examinationPlanDate: examination.examinationPlanDate
         )
 
@@ -294,56 +298,34 @@ class InputPatientPresenter: ObservableObject {
             slideId: examination2.slideId,
             examinationDate: examination2.examinationDate,
             PIC: pic._id,
-            DPJP: pic._id,
+            DPJP: DPJPId,
             examinationPlanDate: examination2.examinationPlanDate
         )
-
-        print("""
-        req 1:
-        - ID: \(String(describing: examReq._id))
-        - Goal: \(String(describing: examReq.goal))
-        - Preparation Type: \(String(describing: examReq.preparationType))
-        - Slide ID: \(String(describing: examReq.slideId))
-        - Examination Date: \(String(describing: examReq.examinationDate))
-        - PIC: \(String(describing: examReq.PIC))
-        - DPJP: \(String(describing: examReq.DPJP))
-        - Examination Plan Date: \(String(describing: examReq.examinationPlanDate))
-        """)
-
-        print("""
-        req 2:
-        - ID: \(String(describing: examReq2._id))
-        - Goal: \(String(describing: examReq2.goal))
-        - Preparation Type: \(String(describing: examReq2.preparationType))
-        - Slide ID: \(String(describing: examReq2.slideId))
-        - Examination Date: \(String(describing: examReq2.examinationDate))
-        - PIC: \(String(describing: examReq2.PIC))
-        - DPJP: \(String(describing: examReq2.DPJP))
-        - Examination Plan Date: \(String(describing: examReq2.examinationPlanDate))
-        """)
 
         do {
             let response1 = try await interactor?.addNewExamination(patientId: patient._id, examination: examReq)
             let response2 = try await interactor?.addNewExamination(patientId: patient._id, examination: examReq2)
-            print("response1: \(String(describing: response1))")
-            print("response2: \(String(describing: response2))")
 
             if (response1 != nil) && (response2 != nil) {
                 print("Examination added successfully")
-                Router.shared.navigateTo(.home)
+                Router.shared.popToRoot()
             }
         } catch {
+            isError = true
             // Handle error
             switch error {
             case let NetworkError.apiError(apiResponse):
                 print("Error type: \(apiResponse.data.errorType)")
                 print("Error description: \(apiResponse.data.description)")
+                errorMessage = apiResponse.data.description
 
             case let NetworkError.networkError(message):
                 print("Network error: \(message)")
+                errorMessage = message
 
             default:
                 print("Unknown error: \(error.localizedDescription)")
+                errorMessage = error.localizedDescription
             }
         }
     }
