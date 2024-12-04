@@ -28,6 +28,8 @@ struct InputExaminationData: View {
                     image: "Confirm",
                     title: "Buat Tugas Pemeriksaan?",
                     description: "Sediaan Pasien \(presenter.patient.name) akan diperiksa oleh \(presenter.pic.name)",
+                    isError: presenter.isError,
+                    errorMessage: presenter.errorMessage,
                     buttons: [
                         AppButton(
                             title: "Buat Tugas",
@@ -167,6 +169,8 @@ struct InputExaminationData: View {
                             size: .large,
                             isEnabled: true
                         ) {
+                            presenter.isError = false
+                            presenter.errorMessage = ""
                             isSubmitPopUpVisible = true
                         }
                         .frame(maxWidth: .infinity)
@@ -184,7 +188,8 @@ struct InputExaminationData: View {
                     print(presenter.patient.name)
                 }
             }
-        }.navigationBarBackButtonHidden(true)
+        }
+        .navigationBarBackButtonHidden(true)
     }
 }
 

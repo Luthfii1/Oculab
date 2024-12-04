@@ -59,11 +59,14 @@ class InputPatientInteractor {
     func addNewExamination(
         patientId: String,
         examination: ExaminationRequest
-    ) async throws -> Examination {
-        let response: APIResponse<Examination> = try await NetworkHelper.shared.post(
+    ) async throws -> AddExaminationResponse {
+        let response: APIResponse<AddExaminationResponse> = try await NetworkHelper.shared.post(
             urlString: urlCreateExam + patientId,
             body: examination
         )
+        print("response: \(response.code)")
+        print("response: \(response.status)")
+        print("response: \(response.message)")
 
         return response.data
     }
@@ -72,4 +75,16 @@ class InputPatientInteractor {
 struct ErrorMessage: Decodable {
     var errorType: String
     var description: String
+}
+
+struct AddExaminationResponse: Decodable {
+    var _id: String
+    var goal: ExamGoalType
+    var preparationType: ExamPreparationType
+    var slideId: String
+    var examinationDate: String
+    var statusExamination: StatusType
+    var PIC: String
+    var examinationPlanDate: String
+    var DPJP: String
 }

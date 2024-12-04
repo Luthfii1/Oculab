@@ -10,21 +10,12 @@ import Foundation
 enum ExamPreparationType: String, Codable {
     case SPS
     case SP
+    case UNKNOWN
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let rawValue = try container.decode(String.self)
 
-        switch rawValue {
-        case "SPS", "Sewaktu":
-            self = .SPS
-        case "SP", "Pagi":
-            self = .SP
-        default:
-            throw DecodingError.dataCorruptedError(
-                in: container,
-                debugDescription: "Invalid value for ExamGoalType: \(rawValue)"
-            )
-        }
+        self = ExamPreparationType(rawValue: rawValue.uppercased()) ?? .UNKNOWN
     }
 }
