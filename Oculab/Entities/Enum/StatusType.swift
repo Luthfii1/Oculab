@@ -22,8 +22,8 @@ enum StatusType: String, Codable, CaseIterable {
 extension StatusType {
     var description: String {
         switch self {
-        case .INPROGRESS: return "Sedang dianalisa sistem"
-        case .NEEDVALIDATION: return "Sedang Berlangsung"
+        case .INPROGRESS: return "Sedang Dianalisa Sistem"
+        case .NEEDVALIDATION: return "Butuh Konfirmasi"
         case .NOTSTARTED: return "Belum Dimulai"
         case .FINISHED: return "Selesai"
         case .NONE: return "None"
