@@ -41,7 +41,7 @@ struct FOVDetail: View {
                 VStack(spacing: Decimal.d8 + Decimal.d2) {
                     Spacer()
                     Text("Jumlah Bakteri: \(fovData.systemCount) BTA").font(AppTypography.h3)
-                    Text("\(fovData.confidenceLevel)% confidence level")
+                    Text(String(format: "%.2f%% confidence level", fovData.confidenceLevel * 100))
                         .font(AppTypography.p4)
                     HStack {
                         Image("Contrast")
