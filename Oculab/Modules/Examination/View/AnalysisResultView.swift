@@ -33,13 +33,9 @@ struct AnalysisResultView: View {
                             VStack(alignment: .leading, spacing: Decimal.d24) {
                                 ImageSectionComponent(presenter: presenter, examination: examination)
                                 InterpretationSectionComponent(
-                                    examination: examination,
-                                    presenter: presenter,
-                                    selectedTBGrade: $presenter.selectedTBGrade,
-                                    numOfBTA: $presenter.numOfBTA,
-                                    inspectorNotes: $presenter.inspectorNotes,
-                                    isVerifPopUpVisible: $presenter.isVerifPopUpVisible
+                                    examination: examination
                                 )
+                                .environmentObject(presenter)
                             }
                         }
                     } else {
@@ -58,7 +54,7 @@ struct AnalysisResultView: View {
 
                 Spacer()
 
-                ConfirmationPopups()
+                ConfirmationPopups(examinationId: examinationId)
                     .environmentObject(presenter)
             }
         }

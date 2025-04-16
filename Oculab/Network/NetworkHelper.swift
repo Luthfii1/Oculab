@@ -25,7 +25,7 @@ class NetworkHelper {
         guard response is HTTPURLResponse else {
             throw NetworkError.networkError("Invalid response type")
         }
-
+//
 //        //        debug response
 //        debugResponse(data: data)
 

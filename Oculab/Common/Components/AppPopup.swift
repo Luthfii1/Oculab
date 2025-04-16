@@ -11,6 +11,8 @@ struct AppPopup: View {
     var image: String?
     var title: String
     var description: String?
+    var isError: Bool = false
+    var errorMessage: String?
     var buttons: [AppButton]
 
     @Binding var isVisible: Bool
@@ -43,6 +45,14 @@ struct AppPopup: View {
                                 .font(AppTypography.p2)
                                 .multilineTextAlignment(.center)
                                 .foregroundColor(AppColors.slate600)
+                        }
+
+                        // Error message
+                        if let errorMessage = errorMessage {
+                            Text(errorMessage)
+                                .font(AppTypography.p2)
+                                .multilineTextAlignment(.center)
+                                .foregroundColor(AppColors.red500)
                         }
                     }.padding(.top, Decimal.d32)
 

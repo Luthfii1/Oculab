@@ -57,7 +57,9 @@ struct SavedResultView: View {
                                 .frame(height: 200)
 
                             if resultPresenter.groupedFOVs?.bta0.isEmpty != true {
-                                Button {} label: {
+                                Button {
+                                    resultPresenter.navigateToAlbum(fovGroup: .BTA0)
+                                } label: {
                                     FolderCardComponent(
                                         title: .BTA0,
                                         numOfImage: resultPresenter.groupedFOVs?.bta0.count ?? 0
@@ -66,7 +68,9 @@ struct SavedResultView: View {
                             }
 
                             if resultPresenter.groupedFOVs?.bta1to9.isEmpty != true {
-                                Button {} label: {
+                                Button {
+                                    resultPresenter.navigateToAlbum(fovGroup: .BTA1TO9)
+                                } label: {
                                     FolderCardComponent(
                                         title: .BTA1TO9,
                                         numOfImage: resultPresenter.groupedFOVs?.bta1to9.count ?? 0
@@ -75,7 +79,9 @@ struct SavedResultView: View {
                             }
 
                             if resultPresenter.groupedFOVs?.btaabove9.isEmpty != true {
-                                Button {} label: {
+                                Button {
+                                    resultPresenter.navigateToAlbum(fovGroup: .BTAABOVE9)
+                                } label: {
                                     FolderCardComponent(
                                         title: .BTAABOVE9,
                                         numOfImage: resultPresenter.groupedFOVs?.btaabove9.count ?? 0
@@ -85,14 +91,21 @@ struct SavedResultView: View {
                         }
                     }
 
-                    AppCard(icon: "text.badge.checkmark", title: "Hasil Interpretasi", spacing: Decimal.d24) {
+                    AppCard(
+                        icon: "text.badge.checkmark",
+                        title: "Hasil Interpretasi",
+                        spacing: Decimal.d24,
+                        isGrading: .FINISHED
+                    ) {
                         VStack(alignment: .leading, spacing: Decimal.d8) {
                             Text("Interpretasi Petugas")
                                 .font(AppTypography.s5)
                                 .foregroundColor(AppColors.slate300)
                             GradingCardComponent(
-                                type: .SCANTY,
-                                confidenceLevel: .lowConfidence
+                                type: resultPresenter.examinationResult?.expertGrading ?? .unknown,
+                                confidenceLevel: .lowConfidence,
+                                isExpert: true,
+                                expertNote: resultPresenter.examinationResult?.expertNote
                             )
                         }
 
@@ -107,10 +120,47 @@ struct SavedResultView: View {
                                 Text("Interpretasi sistem bukan merupakan hasil akhir untuk pasien")
                                     .font(AppTypography.p4)
                             }
-                            GradingCardComponent(
-                                type: .SCANTY,
-                                confidenceLevel: .lowConfidence
-                            )
+
+                            if resultPresenter.examinationResult?.systemGrading == .NEGATIVE {
+                                GradingCardComponent(
+                                    type: resultPresenter.examinationResult?.systemGrading ?? .unknown,
+                                    confidenceLevel: ConfidenceLevel
+                                        .classify(
+                                            aggregatedConfidence: resultPresenter.examinationResult?
+                                                .confidenceLevelAggregated ?? 0.0
+                                        )
+                                )
+                            } else if resultPresenter.examinationResult?.systemGrading == .Plus2 {
+                                GradingCardComponent(
+                                    type: resultPresenter.examinationResult?.systemGrading ?? .unknown,
+                                    confidenceLevel: ConfidenceLevel
+                                        .classify(
+                                            aggregatedConfidence: resultPresenter.examinationResult?
+                                                .confidenceLevelAggregated ?? 0.0
+                                        ),
+                                    n: resultPresenter.groupedFOVs?.bta1to9.count ?? 0
+                                )
+                            } else if resultPresenter.examinationResult?.systemGrading == .Plus3 {
+                                GradingCardComponent(
+                                    type: resultPresenter.examinationResult?.systemGrading ?? .unknown,
+                                    confidenceLevel: ConfidenceLevel
+                                        .classify(
+                                            aggregatedConfidence: resultPresenter.examinationResult?
+                                                .confidenceLevelAggregated ?? 0.0
+                                        ),
+                                    n: resultPresenter.groupedFOVs?.btaabove9.count ?? 0
+                                )
+                            } else {
+                                GradingCardComponent(
+                                    type: resultPresenter.examinationResult?.systemGrading ?? .unknown,
+                                    confidenceLevel: ConfidenceLevel
+                                        .classify(
+                                            aggregatedConfidence: resultPresenter.examinationResult?
+                                                .confidenceLevelAggregated ?? 0.0
+                                        ),
+                                    n: resultPresenter.examinationResult?.bacteriaTotalCount ?? 0
+                                )
+                            }
                         }
 
                         VStack(alignment: .leading, spacing: Decimal.d16) {
@@ -137,7 +187,7 @@ struct SavedResultView: View {
                 }
             }
             .padding(.horizontal, Decimal.d16)
-            .navigationTitle(examId)
+            .navigationTitle(presenter.examDetailData.slideId)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

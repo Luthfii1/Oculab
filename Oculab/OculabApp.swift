@@ -23,10 +23,9 @@ struct OculabApp: App {
 
     var body: some Scene {
         WindowGroup {
-//            InputPatientData()
             AccountCheckerView()
                 .environmentObject(DependencyInjection.shared.createAuthPresenter())
-//            VideoPlayerView()
+                .colorScheme(.light)
         }
         .modelContainer(container)
     }

@@ -8,8 +8,10 @@
 import Foundation
 
 class API {
-    static let BE: String = "http://b4wgswckgks8488og484s8co.34.50.75.183.sslip.io"
+    static let BE: String = BE_PROD
 //    static let BE: String = "https://oculab-be.vercel.app"
+    static let BE_DEV: String = "https://dev-api.oculab.web.id"
+    static let BE_PROD: String = "https://api.oculab.web.id"
 
     static let ML: String = "https://oculab-ml.vercel.app"
 }

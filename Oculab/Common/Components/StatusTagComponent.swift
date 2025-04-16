@@ -18,7 +18,7 @@ struct StatusTagComponent: View {
                     Image(systemName: "clock.fill").resizable()
                         .frame(width: Decimal.d12 + Decimal.d6, height: Decimal.d12 + Decimal.d6)
                         .foregroundStyle(AppColors.orange500)
-                    Text(StatusType.NEEDVALIDATION.rawValue)
+                    Text(StatusType.INPROGRESS.description)
                         .foregroundStyle(AppColors.slate900)
                 }
             }
@@ -34,7 +34,7 @@ struct StatusTagComponent: View {
                     Image(systemName: "checkmark.circle.fill").resizable()
                         .frame(width: Decimal.d12 + Decimal.d6, height: Decimal.d12 + Decimal.d6)
                         .foregroundStyle(AppColors.green500)
-                    Text(StatusType.FINISHED.rawValue)
+                    Text(StatusType.FINISHED.description)
                         .foregroundStyle(AppColors.slate900)
                 }
             }
@@ -50,7 +50,7 @@ struct StatusTagComponent: View {
                     Image(systemName: "clock.fill").resizable()
                         .frame(width: Decimal.d12 + Decimal.d6, height: Decimal.d12 + Decimal.d6)
                         .foregroundStyle(AppColors.orange500)
-                    Text(StatusType.NEEDVALIDATION.rawValue)
+                    Text(StatusType.NEEDVALIDATION.description)
                         .foregroundStyle(AppColors.slate900)
                 }
             }
@@ -69,7 +69,7 @@ struct StatusTagComponent: View {
                     Image(systemName: "exclamationmark.circle.fill").resizable()
                         .frame(width: Decimal.d12 + Decimal.d6, height: Decimal.d12 + Decimal.d6)
                         .foregroundStyle(AppColors.red500)
-                    Text(StatusType.NOTSTARTED.rawValue)
+                    Text(StatusType.NOTSTARTED.description)
                         .foregroundStyle(AppColors.slate900)
                 }
             }

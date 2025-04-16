@@ -14,9 +14,17 @@ class AnalysisResultInteractor {
         return URL(string: examinationURL + examinationId.lowercased())
     }
 
+    func submitExpertResult(examId: String, expertResult: ExpertExamResult) async throws -> ExpertExamResult {
+        let response: APIResponse<ExpertExamResult> = try await NetworkHelper.shared.post(
+            urlString: API.BE + "/expertResult/post-expert-result/" + examId,
+            body: expertResult)
+
+        return response.data
+    }
+
     func fetchData(examId: String) async throws -> ExaminationResultData {
         let response: APIResponse<Examination> = try await NetworkHelper.shared
-            .get(urlString: "https://oculab-be.vercel.app/examination/get-examination-by-id/" + examId.lowercased())
+            .get(urlString: API.BE + "/examination/get-examination-by-id/" + examId.lowercased())
 
         let examinationDetail = ExaminationResultData(
             examinationId: response.data._id,
@@ -24,12 +32,16 @@ class AnalysisResultInteractor {
             imagePreview: response.data.imagePreview ?? "",
 
             fov: response.data.FOV ?? [],
-            confidenceLevelAggregated: 0.0,
+            confidenceLevelAggregated: response.data.systemResult?.confidenceLevelAggregated ?? 0,
             systemGrading: GradingType(
                 rawValue: response.data.systemResult?.systemGrading.rawValue ?? GradingType.NEGATIVE
                     .rawValue) ??
                 .unknown,
-            bacteriaTotalCount: response.data.systemResult?.systemBacteriaTotalCount ?? 0)
+            expertGrading: GradingType(
+                rawValue: response.data.expertResult?.finalGrading.rawValue ?? GradingType.NEGATIVE
+                    .rawValue) ?? .unknown,
+            bacteriaTotalCount: response.data.systemResult?.systemBacteriaTotalCount ?? 0,
+            expertNote: response.data.expertResult?.notes ?? "")
 
         return examinationDetail
     }
@@ -49,7 +61,9 @@ struct ExaminationResultData: Decodable {
     var fov: [FOVData]
     var confidenceLevelAggregated: Double
     var systemGrading: GradingType
+    var expertGrading: GradingType?
     var bacteriaTotalCount: Int
+    var expertNote: String?
 }
 
 struct FOVGrouping: Decodable {

@@ -10,21 +10,12 @@ import Foundation
 enum ExamGoalType: String, Codable {
     case SCREENING
     case TREATMENT
+    case UNKNOWN
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let rawValue = try container.decode(String.self)
 
-        switch rawValue {
-        case "SCREENING", "Skrining":
-            self = .SCREENING
-        case "Follow Up", "TREATMENT":
-            self = .TREATMENT
-        default:
-            throw DecodingError.dataCorruptedError(
-                in: container,
-                debugDescription: "Invalid value for ExamGoalType: \(rawValue)"
-            )
-        }
+        self = ExamGoalType(rawValue: rawValue.uppercased()) ?? .UNKNOWN
     }
 }

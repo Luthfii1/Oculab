@@ -1,5 +1,5 @@
 //
-//  ExamPresenter.swift
+//  ExamDataPresenter.swift
 //  Oculab
 //
 //  Created by Alifiyah Ariandri on 18/10/24.
@@ -9,10 +9,18 @@ import SwiftUI
 
 class ExamDataPresenter: ObservableObject {
     let videoPresenter = VideoRecordPresenter.shared
-
-    @Published var isLoading: Bool = false
+    @Published var isLoading: Bool = false {
+        didSet {
+            if isLoading {
+                buttonTitle = "Submitting..."
+            } else {
+                buttonTitle = "Mulai Analisis"
+            }
+        }
+    }
 
     @Published var recordVideo: URL?
+    @Published var buttonTitle: String = "Mulai Analisis"
 
     @Published var examDetailData: ExaminationDetailData = .init(
         examinationId: "",
@@ -37,8 +45,15 @@ class ExamDataPresenter: ObservableObject {
         self.interactor = interactor
     }
 
+    func buttonEnabled() -> Bool {
+        return (recordVideo != nil) && !isLoading
+    }
+
     @MainActor
     func handleSubmit() async {
+        isLoading = true
+        defer { isLoading = false }
+
         if let fileURL = recordVideo {
             do {
                 let videoData = try Data(contentsOf: fileURL)
@@ -80,7 +95,6 @@ class ExamDataPresenter: ObservableObject {
 
             examDetailData = examinationResponse
             patientDetailData = patientResponse
-
         } catch {
             // Handle error
             switch error {

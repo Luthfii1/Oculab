@@ -89,26 +89,27 @@ class AuthenticationInteractor: ObservableObject {
     }
 
     private func insertUserSwiftData(data: User) async {
-        modelContext.insert(data)
-
-        do {
-            try modelContext.save()
-        } catch {
-            print("Error: \(error.localizedDescription)")
+        await MainActor.run {
+            modelContext.insert(data)
+            do {
+                try modelContext.save()
+            } catch {
+                print("Error: \(error.localizedDescription)")
+            }
         }
     }
 
     private func getUserSwiftData() async -> User? {
-        let fetchDescriptor = FetchDescriptor<User>()
-
-        do {
-            let localData = try modelContext.fetch(fetchDescriptor)
-            return localData.first ?? nil
-        } catch {
-            print("Error: \(error.localizedDescription)")
+        await MainActor.run {
+            let fetchDescriptor = FetchDescriptor<User>()
+            do {
+                let localData = try modelContext.fetch(fetchDescriptor)
+                return localData.first
+            } catch {
+                print("Error: \(error.localizedDescription)")
+                return nil
+            }
         }
-
-        return nil
     }
 
     private func updateUserSwiftData(data: User) async {

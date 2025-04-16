@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ConfirmationPopups: View {
     @EnvironmentObject var presenter: AnalysisResultPresenter
+    @State var examinationId: String
 
     var body: some View {
         VStack {
@@ -33,7 +34,9 @@ struct ConfirmationPopups: View {
                 description: "Hasil pemeriksaan yang sudah disimpan tidak dapat diubah kembali",
                 buttons: [
                     AppButton(title: "Simpan", colorType: .primary) {
-                        print("Simpan Tapped")
+                        Task {
+                            await presenter.submitExpertResult(examinationId: examinationId)
+                        }
                     },
                     AppButton(title: "Periksa Kembali", colorType: .tertiary) {
                         presenter.isVerifPopUpVisible = false
@@ -46,6 +49,6 @@ struct ConfirmationPopups: View {
 }
 
 #Preview {
-    ConfirmationPopups()
+    ConfirmationPopups(examinationId: "jalo")
         .environmentObject(AnalysisResultPresenter())
 }

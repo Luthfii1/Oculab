@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import LocalAuthentication
 import SwiftUI
 
 enum PinMode {
@@ -26,6 +27,8 @@ class AuthenticationPresenter: ObservableObject {
     @Published var user: User = .init()
     @Published var isPinAuthorized: Bool = false
     @Published var descriptionPIN: String = ""
+    @Published var isFaceIdAvailable: Bool = false
+    @Published var isFaceIdEnabled: Bool = false
     @Published var inputPin = "" {
         didSet {
             if !inputPin.isEmpty {
@@ -76,8 +79,6 @@ class AuthenticationPresenter: ObservableObject {
 
     @MainActor
     func isValidPin() async -> Bool {
-        print("local data: \(await interactor.getUserLocalData()?.accessPin ?? "")")
-        print("input pin: \(inputPin)")
         if await interactor.getUserLocalData()?.accessPin != inputPin {
             isError = true
             return false
@@ -104,7 +105,6 @@ class AuthenticationPresenter: ObservableObject {
                 user.accessPin = secondPin
                 await updateAccount(updateUser: user)
                 isPinAuthorized = true
-                print("PIN set successfully")
             } else {
                 isError = true
                 inputPin = ""
@@ -114,7 +114,6 @@ class AuthenticationPresenter: ObservableObject {
             Task {
                 if await self.isValidPin() {
                     isPinAuthorized = true
-                    print("Authentication successful")
                     Router.shared.popToRoot()
                 } else {
                     inputPin = ""
@@ -233,7 +232,7 @@ class AuthenticationPresenter: ObservableObject {
         }
     }
 
-    private func setDescriptionPIN() {
+    func setDescriptionPIN() {
         if !isError {
             switch state {
             case .create:
@@ -250,5 +249,73 @@ class AuthenticationPresenter: ObservableObject {
 
     private func revalidatePinMatched() -> Bool {
         return firstPin == secondPin
+    }
+
+    // MARK: FACE ID AUTHORIZATION
+
+    func checkFaceIDAvailability() {
+        let context = LAContext()
+        var error: NSError?
+
+        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+            isFaceIdAvailable = true
+            isFaceIdEnabled = UserDefaults.standard.bool(forKey: UserDefaultType.isFaceIdEnabled.rawValue)
+        } else {
+            isFaceIdAvailable = false
+            isFaceIdEnabled = false
+        }
+    }
+
+    @MainActor
+    func authenticateWithFaceID() async {
+        let context = LAContext()
+        var error: NSError?
+
+        // Check if Face ID is available on the device
+        guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
+            // Device does not support Face ID
+            isError = true
+            description = "Perangkat Anda tidak mendukung Face ID"
+            return
+        }
+
+        // Check if Face ID is enabled in app settings
+        guard isFaceIdEnabled else {
+            isError = true
+            description = "Face ID belum diaktifkan. Silakan aktifkan di Pengaturan Profil"
+            return
+        }
+
+        do {
+            try await withCheckedThrowingContinuation { continuation in
+                context.evaluatePolicy(
+                    .deviceOwnerAuthenticationWithBiometrics,
+                    localizedReason: "Autentikasi untuk mengakses aplikasi"
+                ) { success, authenticationError in
+                    if success {
+                        continuation.resume(returning: ())
+                        DispatchQueue.main.async {
+                            self.isPinAuthorized = true
+                            Router.shared.popToRoot()
+                        }
+                    } else {
+                        continuation.resume(throwing: authenticationError ?? NSError(
+                            domain: "AuthenticationError",
+                            code: -1
+                        ))
+                    }
+                }
+            }
+        } catch {
+            DispatchQueue.main.async {
+                self.isError = true
+                self.description = "Autentikasi Face ID gagal: \(error.localizedDescription)"
+            }
+        }
+    }
+
+    func updateFaceIdPreference(_ isEnabled: Bool) {
+        isFaceIdEnabled = isEnabled
+        UserDefaults.standard.set(isEnabled, forKey: "isFaceIdEnabled")
     }
 }

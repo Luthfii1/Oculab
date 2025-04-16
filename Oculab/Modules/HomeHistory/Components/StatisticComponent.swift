@@ -25,11 +25,15 @@ struct StatisticComponent: View {
 
             if isLab {
                 HStack(spacing: Decimal.d32) {
-                    HalfCircleProgress(progress: 0.55).offset(y: 35)
+                    HalfCircleProgress(progress: presenter.progress)
+                        .offset(y: 35)
 
                     VStack(alignment: .leading, spacing: Decimal.d4) {
-                        Text("11 Tugas Selesai").font(AppTypography.h4_1)
-                        Text("dari 20 Tugas").font(AppTypography.p3).foregroundStyle(AppColors.slate300)
+                        Text("\(presenter.statisticExam.totalFinished) Tugas Selesai").font(AppTypography.h4_1)
+                        Text(
+                            "dari \(presenter.statisticExam.totalFinished + presenter.statisticExam.totalNotFinished) Tugas"
+                        )
+                        .font(AppTypography.p3).foregroundStyle(AppColors.slate300)
                     }
                 }
             }
