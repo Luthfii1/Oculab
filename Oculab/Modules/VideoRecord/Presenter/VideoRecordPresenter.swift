@@ -27,6 +27,7 @@ AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelega
     @Published var preview: AVCaptureVideoPreviewLayer!
     @Published var hasTaken: Bool = false
     @Published var isRecording: Bool = false
+    @Published var showPlayerView: Bool = false
     @Published var recordedURLs: [URL] = []
     @Published var previewURL: URL?
     @Published var showPreview: Bool = false
