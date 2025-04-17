@@ -33,10 +33,13 @@ AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelega
     @Published var stitchedImage: UIImage? // For stitched images
     @Published var progressImage: UIImage?
     @Published var progressImageChecker: String = ""
+    @Published var zoomFactor: CGFloat = 1.0
 
     private let videoDataOutput = AVCaptureVideoDataOutput()
     private var lastStitchTime: Date?
     private let stitchInterval: TimeInterval = Stitch.clippingDuration
+    private let minZoomFactor: CGFloat = 1.0
+    private let maxZoomFactor: CGFloat = 4.9
 
     let preRecordingInstructions: [String] = [
         "Gunakan lensa objektif 10x untuk menentukan fokus, kemudian teteskan minyak imersi",
@@ -86,6 +89,11 @@ AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelega
         // Set up the video data output for frame extraction
         videoDataOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "videoFrameQueue"))
         if session.canAddOutput(videoDataOutput) { session.addOutput(videoDataOutput) }
+
+        // Configure zoom
+        try? cameraDevice.lockForConfiguration()
+        cameraDevice.videoZoomFactor = zoomFactor
+        cameraDevice.unlockForConfiguration()
 
         session.commitConfiguration()
 
@@ -212,6 +220,22 @@ AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelega
             } else {
                 print("Access to Photos library denied or restricted.")
             }
+        }
+    }
+
+    func updateZoom(factor: CGFloat) {
+        guard let device = session.inputs.first as? AVCaptureDeviceInput else { return }
+        let cameraDevice = device.device
+
+        let clampedFactor = min(max(factor, minZoomFactor), maxZoomFactor)
+
+        do {
+            try cameraDevice.lockForConfiguration()
+            cameraDevice.videoZoomFactor = clampedFactor
+            cameraDevice.unlockForConfiguration()
+            zoomFactor = clampedFactor
+        } catch {
+            print("Error setting zoom: \(error.localizedDescription)")
         }
     }
 }
