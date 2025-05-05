@@ -13,7 +13,9 @@ struct ExamDetailView: View {
 
     @StateObject private var videoRecordPresenter = VideoRecordPresenter.shared
     @StateObject var presenter = ExamDataPresenter(interactor: ExamInteractor())
+    @State private var showGuidelines = false
 //    @Environment(\.presentationMode) var presentationMode
+    @State private var didFinishOnboarding = false
 
     var body: some View {
         NavigationView {
@@ -68,6 +70,8 @@ struct ExamDetailView: View {
                                 title: "Gambar Sediaan",
                                 isRequired: true,
                                 isEmpty: false,
+                                showOnboardingGuidelines: $showGuidelines,
+                                didFinishOnboarding: $didFinishOnboarding,
                                 selectedURL: $presenter.recordVideo
                             ).environmentObject(presenter)
 
@@ -102,17 +106,22 @@ struct ExamDetailView: View {
                     }
                 }
             }
-
-        }.navigationBarBackButtonHidden(true)
-            .onAppear {
-                Task {
-                    await presenter.fetchData(examId: examId, patientId: patientId)
-                    print(presenter.isLoading)
-                }
+        }
+        .sheet(isPresented: $showGuidelines, onDismiss: {
+            didFinishOnboarding = true
+        }) {
+            GuidelinesOnboardingView()
+        }
+        .navigationBarBackButtonHidden(true)
+        .onAppear {
+            Task {
+                await presenter.fetchData(examId: examId, patientId: patientId)
+                print(presenter.isLoading)
             }
-            .onChange(of: videoRecordPresenter.previewURL) {
-                presenter.recordVideo = videoRecordPresenter.previewURL
-            }
+        }
+        .onChange(of: videoRecordPresenter.previewURL) {
+            presenter.recordVideo = videoRecordPresenter.previewURL
+        }
     }
 }
 
