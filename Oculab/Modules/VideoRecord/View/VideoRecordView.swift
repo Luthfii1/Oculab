@@ -37,7 +37,7 @@ struct VideoRecordView: View {
                         .ignoresSafeArea()
 
                     // ADD HERE
-                    if videoRecordPresenter.isRecording {
+                    if videoRecordPresenter.isRecording && videoRecordPresenter.showPlayerView {
                         VStack {
                             ZStack {
                                 VideoPlayerView()
