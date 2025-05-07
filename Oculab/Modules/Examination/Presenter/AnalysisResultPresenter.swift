@@ -25,6 +25,7 @@ class AnalysisResultPresenter: ObservableObject {
     @Published private var currentStep: Int = 3
     @Published var isVerifPopUpVisible = false
     @Published var isLeavePopUpVisible = false
+    @Published var isWSIImageVisible: Bool = false
 
     func popToRoot() {
         Router.shared.popToRoot()

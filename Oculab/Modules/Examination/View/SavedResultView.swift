@@ -10,7 +10,6 @@ import SwiftUI
 struct SavedResultView: View {
     var examId: String
     var patientId: String
-    @State private var showImageResults: Bool = false
 
     @StateObject var presenter = ExamDataPresenter(interactor: ExamInteractor())
     @StateObject var resultPresenter = AnalysisResultPresenter()
@@ -47,48 +46,46 @@ struct SavedResultView: View {
                         titleSize: AppTypography.s6
                     )
 
-                    if showImageResults {
-                        AppCard(icon: "photo", title: "Hasil Gambar", spacing: Decimal.d16) {
-                            VStack(alignment: .leading, spacing: Decimal.d16) {
-                                Text("Ketuk untuk lihat detail gambar")
-                                    .font(AppTypography.p3)
-                                    .foregroundStyle(AppColors.slate300)
+                    AppCard(icon: "photo", title: "Hasil Gambar", spacing: Decimal.d16) {
+                        VStack(alignment: .leading, spacing: Decimal.d16) {
+                            Text("Ketuk untuk lihat detail gambar")
+                                .font(AppTypography.p3)
+                                .foregroundStyle(AppColors.slate300)
 
-                                RoundedRectangle(cornerRadius: Decimal.d8)
-                                    .foregroundStyle(AppColors.slate50)
-                                    .frame(height: 200)
+                            RoundedRectangle(cornerRadius: Decimal.d8)
+                                .foregroundStyle(AppColors.slate50)
+                                .frame(height: 200)
 
-                                if resultPresenter.groupedFOVs?.bta0.isEmpty != true {
-                                    Button {
-                                        resultPresenter.navigateToAlbum(fovGroup: .BTA0)
-                                    } label: {
-                                        FolderCardComponent(
-                                            title: .BTA0,
-                                            numOfImage: resultPresenter.groupedFOVs?.bta0.count ?? 0
-                                        )
-                                    }
+                            if resultPresenter.groupedFOVs?.bta0.isEmpty != true {
+                                Button {
+                                    resultPresenter.navigateToAlbum(fovGroup: .BTA0)
+                                } label: {
+                                    FolderCardComponent(
+                                        title: .BTA0,
+                                        numOfImage: resultPresenter.groupedFOVs?.bta0.count ?? 0
+                                    )
                                 }
+                            }
 
-                                if resultPresenter.groupedFOVs?.bta1to9.isEmpty != true {
-                                    Button {
-                                        resultPresenter.navigateToAlbum(fovGroup: .BTA1TO9)
-                                    } label: {
-                                        FolderCardComponent(
-                                            title: .BTA1TO9,
-                                            numOfImage: resultPresenter.groupedFOVs?.bta1to9.count ?? 0
-                                        )
-                                    }
+                            if resultPresenter.groupedFOVs?.bta1to9.isEmpty != true {
+                                Button {
+                                    resultPresenter.navigateToAlbum(fovGroup: .BTA1TO9)
+                                } label: {
+                                    FolderCardComponent(
+                                        title: .BTA1TO9,
+                                        numOfImage: resultPresenter.groupedFOVs?.bta1to9.count ?? 0
+                                    )
                                 }
+                            }
 
-                                if resultPresenter.groupedFOVs?.btaabove9.isEmpty != true {
-                                    Button {
-                                        resultPresenter.navigateToAlbum(fovGroup: .BTAABOVE9)
-                                    } label: {
-                                        FolderCardComponent(
-                                            title: .BTAABOVE9,
-                                            numOfImage: resultPresenter.groupedFOVs?.btaabove9.count ?? 0
-                                        )
-                                    }
+                            if resultPresenter.groupedFOVs?.btaabove9.isEmpty != true {
+                                Button {
+                                    resultPresenter.navigateToAlbum(fovGroup: .BTAABOVE9)
+                                } label: {
+                                    FolderCardComponent(
+                                        title: .BTAABOVE9,
+                                        numOfImage: resultPresenter.groupedFOVs?.btaabove9.count ?? 0
+                                    )
                                 }
                             }
                         }
