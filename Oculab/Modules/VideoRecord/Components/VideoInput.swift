@@ -15,7 +15,8 @@ struct VideoInput: View {
     var title: String
     var isRequired: Bool
     var isEmpty: Bool
-
+    @Binding var showOnboardingGuidelines: Bool
+    @Binding var didFinishOnboarding: Bool
     @Binding var selectedURL: URL?
 
     var body: some View {
@@ -35,9 +36,14 @@ struct VideoInput: View {
             VStack(alignment: .center) {
                 if selectedURL == nil {
                     AppButton(title: "Ambil Gambar", leftIcon: "camera", colorType: .secondary, size: .small) {
-                        selectFile()
-                        videoPresenter.previewURL = nil
-                        examPresenter.newVideoRecord()
+                        if UserDefaults.standard.bool(forKey: UserDefaultType.isFirstTimeLogin.rawValue) {
+                            showOnboardingGuidelines = true
+                            UserDefaults.standard.set(false, forKey: UserDefaultType.isFirstTimeLogin.rawValue)
+                        } else {
+                            selectFile()
+                            videoPresenter.previewURL = nil
+                            examPresenter.newVideoRecord()
+                        }
                     }
                 } else {
                     VideoPlayer(player: AVPlayer(url: selectedURL!))
@@ -62,6 +68,13 @@ struct VideoInput: View {
                     ))
                     .foregroundColor(AppColors.slate100)
             )
+        }
+        .onChange(of: didFinishOnboarding) {
+            if didFinishOnboarding {
+                selectFile()
+                videoPresenter.previewURL = nil
+                examPresenter.newVideoRecord()
+            }
         }
     }
 
