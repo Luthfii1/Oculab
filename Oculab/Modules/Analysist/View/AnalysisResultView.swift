@@ -29,13 +29,17 @@ struct AnalysisResultView: View {
                             .foregroundColor(.red)
                             .padding()
                     } else if let examination = presenter.examinationResult {
-                        ScrollView(showsIndicators: false) {
-                            VStack(alignment: .leading, spacing: Decimal.d24) {
-                                ImageSectionComponent(presenter: presenter, examination: examination)
-                                InterpretationSectionComponent(
-                                    examination: examination
-                                )
-                                .environmentObject(presenter)
+                        if examination.statusExamination == .INPROGRESS {
+                            AnalyzingExaminationProgressView()
+                        } else {
+                            ScrollView(showsIndicators: false) {
+                                VStack(alignment: .leading, spacing: Decimal.d24) {
+                                    ImageSectionComponent(presenter: presenter, examination: examination)
+                                    InterpretationSectionComponent(
+                                        examination: examination
+                                    )
+                                    .environmentObject(presenter)
+                                }
                             }
                         }
                     } else {

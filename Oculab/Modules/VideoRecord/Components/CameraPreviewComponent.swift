@@ -26,6 +26,13 @@ struct CameraPreviewComponent: UIViewRepresentable {
             self.videoRecordPresenter.preview = previewLayer
         }
 
+        // Add pinch gesture recognizer
+        let pinchGesture = UIPinchGestureRecognizer(
+            target: context.coordinator,
+            action: #selector(Coordinator.handlePinch(_:))
+        )
+        view.addGestureRecognizer(pinchGesture)
+
         // Starting session
         DispatchQueue.global(qos: .background).async {
             self.videoRecordPresenter.session.startRunning()
@@ -38,6 +45,31 @@ struct CameraPreviewComponent: UIViewRepresentable {
         // Update the preview layer's frame if needed
         if let previewLayer = uiView.layer.sublayers?.first as? AVCaptureVideoPreviewLayer {
             previewLayer.frame = uiView.bounds
+        }
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    class Coordinator: NSObject {
+        let parent: CameraPreviewComponent
+        var startZoom: CGFloat = 1.0
+
+        init(_ parent: CameraPreviewComponent) {
+            self.parent = parent
+        }
+
+        @objc func handlePinch(_ gesture: UIPinchGestureRecognizer) {
+            switch gesture.state {
+            case .began:
+                startZoom = parent.videoRecordPresenter.zoomFactor
+            case .changed:
+                let newScaleFactor = startZoom * gesture.scale
+                parent.videoRecordPresenter.updateZoom(factor: newScaleFactor)
+            default:
+                break
+            }
         }
     }
 }

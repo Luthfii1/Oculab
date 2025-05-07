@@ -41,7 +41,8 @@ class AnalysisResultInteractor {
                 rawValue: response.data.expertResult?.finalGrading.rawValue ?? GradingType.NEGATIVE
                     .rawValue) ?? .unknown,
             bacteriaTotalCount: response.data.systemResult?.systemBacteriaTotalCount ?? 0,
-            expertNote: response.data.expertResult?.notes ?? "")
+            expertNote: response.data.expertResult?.notes ?? "",
+            statusExamination: response.data.statusExamination)
 
         return examinationDetail
     }
@@ -64,6 +65,7 @@ struct ExaminationResultData: Decodable {
     var expertGrading: GradingType?
     var bacteriaTotalCount: Int
     var expertNote: String?
+    var statusExamination: StatusType
 }
 
 struct FOVGrouping: Decodable {
