@@ -49,19 +49,19 @@ targets:
     dependencies:
       - package: Alamofire
 #      - package: SwiftPM
-    postCompileScripts:
-      - script: |
-          export PATH="$PATH:/opt/homebrew/bin"
-          if which swiftformat >/dev/null; then
-            # Only format files that are staged in git
-            git diff --cached --name-only --diff-filter=ACMR | grep ".swift$" | xargs swiftformat
-          else
-            echo "warning: Swiftformat not installed"
-          fi
-        name: SwiftFormat
-        showEnvVars: true
-        basedOnDependencyAnalysis: true
-        runOnlyWhenInstalling: true
+    # postCompileScripts:
+    #   - script: |
+    #       export PATH="$PATH:/opt/homebrew/bin"
+    #       if which swiftformat >/dev/null; then
+    #         # Only format files that are staged in git
+    #         git diff --cached --name-only --diff-filter=ACMR | grep ".swift$" | xargs swiftformat
+    #       else
+    #         echo "warning: Swiftformat not installed"
+    #       fi
+    #     name: SwiftFormat
+    #     showEnvVars: true
+    #     basedOnDependencyAnalysis: true
+    #     runOnlyWhenInstalling: true
   OculabTests:
     type: bundle.unit-test
     supportedDestinations: [iOS]
