@@ -126,51 +126,54 @@ struct FOVDetail: View {
                     zoomScale: $presenter.zoomScale,
                     offset: $presenter.offset
                 )
+                .edgesIgnoringSafeArea([.top, .bottom])
 
-                VStack(spacing: Decimal.d8 + Decimal.d2) {
+                VStack(spacing: 0) {
                     Spacer()
-                    VStack(spacing: Decimal.d4) {
-                        Text("Jumlah Bakteri: \(fovData.systemCount) BTA")
-                            .font(AppTypography.h3)
-                            .foregroundColor(.white)
-                        Text(String(format: "%.2f%% confidence level", fovData.confidenceLevel * 100))
-                            .font(AppTypography.p4)
-                            .foregroundColor(.white.opacity(0.8))
+
+                    // Bottom controls
+                    VStack {
+                        VStack(spacing: Decimal.d4) {
+                            Text("Jumlah Bakteri: \(fovData.systemCount) BTA")
+                                .font(AppTypography.h3)
+                                .foregroundColor(.white)
+                            Text(String(format: "%.2f%% confidence level", fovData.confidenceLevel * 100))
+                                .font(AppTypography.p4)
+                                .foregroundColor(.white.opacity(0.8))
+                        }
+                        .padding(.horizontal, Decimal.d16)
+                        .padding(.vertical, Decimal.d12)
+
+                        HStack(spacing: Decimal.d16) {
+                            Button(action: {
+                                // Add contrast adjustment
+                            }) {
+                                Image("Contrast")
+                                    .foregroundColor(.white)
+                            }
+
+                            Button(action: {
+                                // Add brightness adjustment
+                            }) {
+                                Image("Brightness")
+                                    .foregroundColor(.white)
+                            }
+
+                            Button(action: {
+                                // Add comment functionality
+                            }) {
+                                Image("Comment")
+                                    .foregroundColor(.white)
+                            }
+                        }
+                        .padding(.horizontal, Decimal.d16)
+                        // .padding(.vertical, Decimal.d12)
                     }
-                    .padding(.horizontal, Decimal.d16)
-                    .padding(.vertical, Decimal.d12)
-                    .background(Color.black.opacity(0.7))
-                    .cornerRadius(Decimal.d8)
-
-                    HStack(spacing: Decimal.d16) {
-                        Button(action: {
-                            // Add contrast adjustment
-                        }) {
-                            Image("Contrast")
-                                .foregroundColor(.white)
-                        }
-
-                        Button(action: {
-                            // Add brightness adjustment
-                        }) {
-                            Image("Brightness")
-                                .foregroundColor(.white)
-                        }
-
-                        Button(action: {
-                            // Add comment functionality
-                        }) {
-                            Image("Comment")
-                                .foregroundColor(.white)
-                        }
-                    }
-                    .padding(.horizontal, Decimal.d16)
-                    .padding(.vertical, Decimal.d12)
-                    .background(Color.black.opacity(0.7))
-                    .cornerRadius(Decimal.d8)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.black.opacity(0.4))
                 }
-                .padding(.bottom, Decimal.d20)
             }
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     VStack {
@@ -194,6 +197,7 @@ struct FOVDetail: View {
                     }
                 }
             }
+            .toolbarBackground(.hidden, for: .navigationBar)
             .onAppear {
                 Task {
                     await presenter.verifyingFOV(fovId: fovData._id)
@@ -219,6 +223,7 @@ struct ZoomableImageView: UIViewRepresentable {
         scrollView.showsVerticalScrollIndicator = false
         scrollView.backgroundColor = .black
         scrollView.decelerationRate = .fast
+        scrollView.contentInsetAdjustmentBehavior = .never
 
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
@@ -249,27 +254,25 @@ struct ZoomableImageView: UIViewRepresentable {
                     DispatchQueue.main.async {
                         imageView.image = image
 
-                        // Calculate the proper size for the image view
+                        // Calculate the proper size for the image view to fill width
                         let imageSize = image.size
                         let viewSize = scrollView.bounds.size
-                        let widthRatio = viewSize.width / imageSize.width
-                        let heightRatio = viewSize.height / imageSize.height
-                        let scale = min(widthRatio, heightRatio)
 
-                        let scaledWidth = imageSize.width * scale
+                        // Calculate height to maintain aspect ratio while filling width
+                        let scale = viewSize.width / imageSize.width
                         let scaledHeight = imageSize.height * scale
 
-                        // Set the image view frame
+                        // Set the image view frame to fill width
                         imageView.frame = CGRect(
-                            x: (viewSize.width - scaledWidth) / 2,
+                            x: 0,
                             y: (viewSize.height - scaledHeight) / 2,
-                            width: scaledWidth,
+                            width: viewSize.width,
                             height: scaledHeight
                         )
 
                         // Set content size to allow proper scrolling
                         scrollView.contentSize = CGSize(
-                            width: max(scaledWidth, viewSize.width),
+                            width: viewSize.width,
                             height: max(scaledHeight, viewSize.height)
                         )
 
