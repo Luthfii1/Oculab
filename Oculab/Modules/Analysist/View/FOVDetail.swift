@@ -113,7 +113,7 @@ struct FOVDetail: View {
     var order: Int
     var total: Int
 
-    @State private var zoomScale: CGFloat = 1.0
+    @StateObject private var presenter: FOVDetailPresenter = .init()
 
     var body: some View {
         NavigationView {
@@ -125,26 +125,26 @@ struct FOVDetail: View {
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(
-                                    width: geometry.size.width * zoomScale,
-                                    height: geometry.size.height * zoomScale
+                                    width: geometry.size.width * presenter.zoomScale,
+                                    height: geometry.size.height * presenter.zoomScale
                                 )
                         } placeholder: {
                             ProgressView()
                                 .frame(
-                                    width: geometry.size.width * zoomScale,
-                                    height: geometry.size.height * zoomScale
+                                    width: geometry.size.width * presenter.zoomScale,
+                                    height: geometry.size.height * presenter.zoomScale
                                 )
                         }
-                        .scaleEffect(zoomScale)
+                        .scaleEffect(presenter.zoomScale)
                         .gesture(
                             MagnificationGesture()
                                 .onChanged { value in
-                                    zoomScale = min(max(value, 1.0), 4.0)
+                                    presenter.zoomScale = min(max(value, 1.0), 4.0)
                                 }
                         )
                         .onTapGesture(count: 2) {
                             withAnimation {
-                                zoomScale = zoomScale == 1.0 ? 2.0 : 1.0
+                                presenter.zoomScale = presenter.zoomScale == 1.0 ? 2.0 : 1.0
                             }
                         }
                     }
@@ -186,7 +186,11 @@ struct FOVDetail: View {
                 }
             }
             .background(.black)
-            .onAppear {}
+            .onAppear {
+                Task {
+                    await presenter.verifyingFOV(fovId: fovData._id)
+                }
+            }
         }.navigationBarBackButtonHidden()
     }
 }
