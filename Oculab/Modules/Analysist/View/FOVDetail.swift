@@ -5,107 +5,8 @@
 //  Created by Alifiyah Ariandri on 12/11/24.
 //
 
-// import SwiftUI
-//
-// struct FOVDetail: View {
-//    var slideId: String
-//    var fovData: FOVData
-//    var order: Int
-//    var total: Int
-//
-//    var body: some View {
-//        NavigationView {
-//            ZStack {
-//                ZoomableScrollView { //UIKit
-//                    GeometryReader { geo in
-//                        VStack {
-//                            AsyncImage(url: URL(string: fovData.image)) { phase in
-//                                switch phase {
-//                                case .empty:
-//                                    ProgressView()
-//                                        .frame(width: geo.size.width, height: geo.size.height)
-//
-//                                case let .success(image):
-//                                    image
-//                                        .resizable()
-//                                        .aspectRatio(contentMode: .fit)
-//                                        .frame(width: geo.size.width, height: geo.size.height)
-//
-//                                case .failure:
-//                                    Image(systemName: "xmark.octagon")
-//                                        .resizable()
-//                                        .scaledToFit()
-//                                        .frame(width: geo.size.width / 2)
-//                                        .foregroundColor(.red)
-//
-//                                @unknown default:
-//                                    EmptyView()
-//                                }
-//                            }
-//                        }
-//                        .frame(width: geo.size.width, height: geo.size.height)
-//                    }
-//                }
-//
-//                VStack(spacing: Decimal.d8 + Decimal.d2) {
-//                    Spacer()
-//                    Text("Jumlah Bakteri: \(fovData.systemCount) BTA")
-//                        .font(AppTypography.h3)
-//                    Text(String(format: "%.2f%% confidence level", fovData.confidenceLevel * 100))
-//                        .font(AppTypography.p4)
-//                    HStack {
-//                        Image("Contrast")
-//                        Image("Brightness")
-//                        Image("Comment")
-//                    }
-//                }
-//                .padding(.bottom, Decimal.d20)
-//            }
-//            .foregroundStyle(AppColors.slate0)
-//            .padding(.horizontal, CGFloat(20))
-//            .toolbar {
-//                ToolbarItem(placement: .principal) {
-//                    VStack {
-//                        Text("Gambar \(order + 1) dari \(total)")
-//                            .font(AppTypography.s4_1)
-//                        Text("ID \(slideId)")
-//                            .font(AppTypography.p3)
-//                    }.foregroundStyle(AppColors.slate0)
-//                }
-//
-//                ToolbarItem(placement: .navigationBarLeading) {
-//                    Button(action: {
-//                        Router.shared.navigateBack()
-//                    }) {
-//                        HStack {
-//                            Image("back")
-//                                .foregroundStyle(AppColors.slate0)
-//                        }
-//                    }
-//                }
-//            }
-//            .background(.black)
-//        }
-//        .navigationBarBackButtonHidden()
-//    }
-// }
-
-// #Preview {
-//    FOVDetail(
-//        slideId: "A#EKNIR",
-//        fovData: FOVData(
-//            image: "https://is3.cloudhost.id/oculab-fov/oculab-fov/c5b14ad1-c15b-4d1c-bf2f-1dcf7fbf8d8d.png",
-//            type: .BTA1TO9,
-//            order: 1,
-//            systemCount: 12,
-//            confidenceLevel: 0.95
-//        ),
-//        order: 1,
-//        total: 10
-//    )
-// }
-
 import SwiftUI
+import UIKit
 
 struct FOVDetail: View {
     var slideId: String
@@ -113,65 +14,80 @@ struct FOVDetail: View {
     var order: Int
     var total: Int
 
-    @StateObject private var presenter: FOVDetailPresenter = .init()
+    @StateObject private var presenter = FOVDetailPresenter()
 
     var body: some View {
         NavigationView {
-            ZStack { // SwiftUI
-                GeometryReader { geometry in
-                    ScrollView([.horizontal, .vertical], showsIndicators: false) {
-                        AsyncImage(url: URL(string: fovData.image)) { image in
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(
-                                    width: geometry.size.width * presenter.zoomScale,
-                                    height: geometry.size.height * presenter.zoomScale
-                                )
-                        } placeholder: {
-                            ProgressView()
-                                .frame(
-                                    width: geometry.size.width * presenter.zoomScale,
-                                    height: geometry.size.height * presenter.zoomScale
-                                )
+            ZStack {
+                Color.black.edgesIgnoringSafeArea(.all)
+
+                ZoomableImageComponent(
+                    imageURL: URL(string: fovData.image),
+                    zoomScale: $presenter.zoomScale,
+                    offset: $presenter.offset
+                )
+                .edgesIgnoringSafeArea([.top, .bottom])
+
+                VStack(spacing: 0) {
+                    // Top toolbar background
+                    Color.black.opacity(0.4)
+                        .frame(height: 100)
+                        .edgesIgnoringSafeArea(.top)
+
+                    Spacer()
+
+                    // Bottom controls
+                    VStack {
+                        VStack(spacing: Decimal.d4) {
+                            Text("Jumlah Bakteri: \(fovData.systemCount) BTA")
+                                .font(AppTypography.h3)
+                                .foregroundColor(.white)
+                            Text(String(format: "%.2f%% confidence level", fovData.confidenceLevel * 100))
+                                .font(AppTypography.p4)
+                                .foregroundColor(.white.opacity(0.8))
                         }
-                        .scaleEffect(presenter.zoomScale)
-                        .gesture(
-                            MagnificationGesture()
-                                .onChanged { value in
-                                    presenter.zoomScale = min(max(value, 1.0), 4.0)
-                                }
-                        )
-                        .onTapGesture(count: 2) {
-                            withAnimation {
-                                presenter.zoomScale = presenter.zoomScale == 1.0 ? 2.0 : 1.0
+                        .padding(.horizontal, Decimal.d16)
+                        .padding(.vertical, Decimal.d12)
+
+                        HStack(spacing: Decimal.d16) {
+                            Button(action: {
+                                // Add contrast adjustment
+                            }) {
+                                Image("Contrast")
+                                    .foregroundColor(.white)
+                            }
+
+                            Button(action: {
+                                // Add brightness adjustment
+                            }) {
+                                Image("Brightness")
+                                    .foregroundColor(.white)
+                            }
+
+                            Button(action: {
+                                // Add comment functionality
+                            }) {
+                                Image("Comment")
+                                    .foregroundColor(.white)
                             }
                         }
+                        .padding(.horizontal, Decimal.d16)
                     }
-                }
-
-                VStack(spacing: Decimal.d8 + Decimal.d2) {
-                    Spacer()
-                    Text("Jumlah Bakteri: \(fovData.systemCount) BTA").font(AppTypography.h3)
-                    Text(String(format: "%.2f%% confidence level", fovData.confidenceLevel * 100))
-                        .font(AppTypography.p4)
-                    HStack {
-                        Image("Contrast")
-                        Image("Brightness")
-                        Image("Comment")
-                    }
+                    .frame(maxWidth: .infinity)
+                    .background(Color.black.opacity(0.4))
                 }
             }
-            .foregroundStyle(AppColors.slate0)
-            .padding(.horizontal, CGFloat(20))
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     VStack {
                         Text("Gambar \(order + 1) dari \(total)")
                             .font(AppTypography.s4_1)
+                            .foregroundColor(.white)
                         Text("ID \(slideId)")
                             .font(AppTypography.p3)
-                    }.foregroundStyle(AppColors.slate0)
+                            .foregroundColor(.white.opacity(0.8))
+                    }
                 }
 
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -179,19 +95,20 @@ struct FOVDetail: View {
                         Router.shared.navigateBack()
                     }) {
                         HStack {
-                            Image("back")
-                                .foregroundStyle(AppColors.slate0)
+                            Image("back_white")
+                                .foregroundColor(.white)
                         }
                     }
                 }
             }
-            .background(.black)
+            .toolbarBackground(.hidden, for: .navigationBar)
             .onAppear {
                 Task {
                     await presenter.verifyingFOV(fovId: fovData._id)
                 }
             }
-        }.navigationBarBackButtonHidden()
+        }
+        .navigationBarBackButtonHidden()
     }
 }
 
