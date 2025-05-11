@@ -10,7 +10,7 @@ import Foundation
 struct EmptyBody: Encodable {}
 
 class FOVDetailInteractor {
-    private var endpoint = API.BE_VERCEL
+    private var endpoint = API.BE
 
     func verifyingFOV(fovId: UUID) async throws -> FOVData {
         let response: APIResponse<FOVData> = try await NetworkHelper.shared.update(
