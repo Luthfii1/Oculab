@@ -8,32 +8,50 @@
 import SwiftUI
 
 struct AccountManagementView: View {
+    @State private var selectedUser: String? = nil
+    @State private var showSheet = false
+
     var body: some View {
         NavigationView {
-            VStack(spacing: 24) {
-                
-                AppButton(
-                    title: "Tambah Akun Baru",
-                    leftIcon: "plus",
-                    colorType: .secondary,
-                    action: {}
-                )
-                VStack(spacing: 16) {
+            ScrollView {
+                Spacer().frame(height: Decimal.d24)
 
+                VStack(spacing: 24) {
+                    AppSearchBar(
+                        searchText: .constant(""),
+                        onSearch: {}
+                    )
+
+                    AppButton(
+                        title: "Tambah Akun Baru",
+                        leftIcon: "plus",
+                        colorType: .secondary,
+                        action: {}
+                    )
+
+                    VStack(spacing: 24) {
+                        ContactListView { name in
+                            selectedUser = name
+                            showSheet = true
+                        }
+                    }
                 }
-            }
-            .padding(.horizontal, Decimal.d20)
-            .navigationTitle("Manajemen Akun")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        Router.shared.navigateBack()
-                    }) {
-                        HStack {
+                .padding(.horizontal, Decimal.d20)
+                .navigationTitle("Manajemen Akun")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button(action: {
+                            Router.shared.navigateBack()
+                        }) {
                             Image("back")
                         }
                     }
+                }
+            }
+            .sheet(isPresented: $showSheet) {
+                if let name = selectedUser {
+                    BottomActionSheet(userName: name)
                 }
             }
         }
