@@ -1,5 +1,5 @@
 //
-//  AccountManagementView.swift
+//  UserManagementView.swift
 //  Oculab
 //
 //  Created by Risa on 07/05/25.
@@ -7,7 +7,9 @@
 
 import SwiftUI
 
-struct AccountManagementView: View {
+struct UserManagementView: View {
+    @ObservedObject private var presenter = AccountPresenter()
+//    @EnvironmentObject private var authentication: AuthenticationPresenter
     @State private var selectedUser: String? = nil
     @State private var showSheet = false
 
@@ -26,11 +28,13 @@ struct AccountManagementView: View {
                         title: "Tambah Akun Baru",
                         leftIcon: "plus",
                         colorType: .secondary,
-                        action: {}
+                        action: {
+                            presenter.navigateTo(.newAccount)
+                        }
                     )
 
                     VStack(spacing: 24) {
-                        ContactListView { name in
+                        UserListView { name in
                             selectedUser = name
                             showSheet = true
                         }
@@ -51,13 +55,14 @@ struct AccountManagementView: View {
             }
             .sheet(isPresented: $showSheet) {
                 if let name = selectedUser {
-                    BottomActionSheet(userName: name)
+                    BottomSheetMenu(userName: name)
                 }
             }
         }
+        .navigationBarHidden(true)
     }
 }
 
 #Preview {
-    AccountManagementView()
+    UserManagementView()
 }

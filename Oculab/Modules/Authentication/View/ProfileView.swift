@@ -30,6 +30,23 @@ struct ProfileView: View {
                     )
 
                     AppButton(
+                        title: "Manajemen Akun",
+                        leftIcon: "person.fill",
+                        rightIcon: "arrow.right",
+                        colorType: .tertiary,
+                        titleColor: AppColors.slate900
+                    ) {
+                        profilePresenter.navigateTo(.accountManagement)
+                    }
+                    .padding(.vertical, Decimal.d16)
+                    .background(.white)
+                    .cornerRadius(Decimal.d12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: Decimal.d12)
+                            .stroke(AppColors.slate100)
+                    )
+                    
+                    AppButton(
                         title: "Atur Kata Sandi",
                         leftIcon: "lock",
                         rightIcon: "arrow.right",

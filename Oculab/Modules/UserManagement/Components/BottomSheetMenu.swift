@@ -1,5 +1,5 @@
 //
-//  BottomActionSheet.swift
+//  BottomSheetMenu.swift
 //  Oculab
 //
 //  Created by Risa on 11/05/25.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct BottomActionSheet: View {
+struct BottomSheetMenu: View {
     var userName: String
 
     var body: some View {
@@ -54,5 +54,5 @@ struct BottomActionSheet: View {
 
 
 #Preview {
-    BottomActionSheet(userName: "Icune")
+    BottomSheetMenu(userName: "Icune")
 }

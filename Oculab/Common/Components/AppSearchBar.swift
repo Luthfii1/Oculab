@@ -23,7 +23,7 @@ struct AppSearchBar: View {
                     .font(AppTypography.p2)
                     .foregroundColor(AppColors.slate900)
             }
-            .frame(minWidth: 262, minHeight: 32)
+            .frame(minWidth: 250, minHeight: 32)
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
             .background(AppColors.slate0)

@@ -1,5 +1,5 @@
 //
-//  NewAccountFormView.swift
+//  NewUserFormView.swift
 //  Oculab
 //
 //  Created by Risa on 07/05/25.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct NewAccountFormView: View {
+struct NewUserFormView: View {
     var body: some View {
         NavigationView {
             ZStack {
@@ -32,7 +32,7 @@ struct NewAccountFormView: View {
                         ) {
                         }
                     ],
-                    isVisible: .constant(true)
+                    isVisible: .constant(false)
                 )
                 
                 VStack(spacing: 24) {
@@ -82,9 +82,10 @@ struct NewAccountFormView: View {
                 }
             }
         }
+        .navigationBarHidden(true)
     }
 }
 
 #Preview {
-    NewAccountFormView()
+    NewUserFormView()
 }
