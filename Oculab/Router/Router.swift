@@ -32,6 +32,8 @@ class Router: ObservableObject {
         case informationInterpretation
         case kebijakanPrivasi
         case analyzingStatusProgress
+        case accountManagement
+        case newAccount
     }
 
     @Published var path: NavigationPath = .init()
@@ -81,6 +83,10 @@ class Router: ObservableObject {
             KebijakanPrivasiView()
         case .analyzingStatusProgress:
             AnalyzingExaminationProgressView()
+        case .accountManagement:
+            UserManagementView()
+        case .newAccount:
+            NewUserFormView()
         }
     }
 
