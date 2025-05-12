@@ -11,11 +11,11 @@ class AccountPresenter: ObservableObject {
     var interactor: AccountInteractor? = AccountInteractor()
     
     @Published var isUserLoading = false
-    @Published var groupedAccounts: [String: [Account]] = [:]
+    @Published var groupedAccounts: [String: [AccountResponse]] = [:]
     @Published var sortedGroupedAccounts: [String] = []
     
-    func groupAccountsByName(accounts: [Account]) -> [String: [Account]] {
-        var grouped: [String: [Account]] = [:]
+    func groupAccountsByName(accounts: [AccountResponse]) -> [String: [AccountResponse]] {
+        var grouped: [String: [AccountResponse]] = [:]
 
         for account in accounts {
             guard let firstLetter = account.name.first?.uppercased() else { continue }

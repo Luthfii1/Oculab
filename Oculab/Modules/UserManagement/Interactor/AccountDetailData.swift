@@ -13,11 +13,13 @@ struct Account: Decodable {
     let name: String
     let role: String
     let email: String
+    let username: String?
 
     enum CodingKeys: String, CodingKey {
         case id = "_id"
         case name
         case role
         case email
+        case username
     }
 }

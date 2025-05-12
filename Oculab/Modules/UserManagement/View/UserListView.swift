@@ -12,13 +12,14 @@ struct UserListView: View {
     
     @ObservedObject private var presenter = AccountPresenter()
     
-    let groupedAccounts: [String: [String]] = [
-        "A": ["Adinda Putri Maharani", "Ahmad Fahri Rahman"],
-        "B": ["Brigitta Maharani Wijaya", "Budianto Santoso", "Bulan Purnama Sari"]
-    ]
+//    let groupedAccounts: [String: [String]] = [
+//        "A": ["Adinda Putri Maharani", "Ahmad Fahri Rahman"],
+//        "B": ["Brigitta Maharani Wijaya", "Budianto Santoso", "Bulan Purnama Sari"]
+//    ]
 
     var sortedKeys: [String] {
-        groupedAccounts.keys.sorted()
+//        groupedAccounts.keys.sorted()
+        presenter.groupedAccounts.keys.sorted()
     }
 
     var body: some View {
@@ -66,10 +67,11 @@ struct UserListView: View {
                 await presenter.fetchAllAccount()
             }
         }
+        
     }
 }
 
 
-//#Preview {
-////    UserListView.(onTapMore: .constant({}))
-//}
+#Preview {
+//    UserListView.(onTapMore: .constant({}))
+}
