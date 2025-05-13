@@ -5,7 +5,6 @@
 //  Created by Risa on 11/05/25.
 //
 
-
 import SwiftUI
 
 struct AppSearchBar: View {
@@ -32,7 +31,7 @@ struct AppSearchBar: View {
                     .stroke(AppColors.slate200, lineWidth: 1)
             )
             .cornerRadius(12)
-            
+
             AppButton(
                 title: "Cari",
                 cornerRadius: 12,
@@ -45,7 +44,6 @@ struct AppSearchBar: View {
 }
 
 #Preview {
-
     AppSearchBar(
         searchText: .constant("Search"),
         onSearch: {}

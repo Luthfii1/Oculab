@@ -1,10 +1,9 @@
 //
-//  Account.swift
+//  AccountDetailData.swift
 //  Oculab
 //
 //  Created by Risa on 11/05/25.
 //
-
 
 import Foundation
 

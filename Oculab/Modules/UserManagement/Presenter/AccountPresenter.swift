@@ -9,11 +9,11 @@ import Foundation
 
 class AccountPresenter: ObservableObject {
     var interactor: AccountInteractor? = AccountInteractor()
-    
+
     @Published var isUserLoading = false
     @Published var groupedAccounts: [String: [AccountResponse]] = [:]
     @Published var sortedGroupedAccounts: [String] = []
-    
+
     func groupAccountsByName(accounts: [AccountResponse]) -> [String: [AccountResponse]] {
         var grouped: [String: [AccountResponse]] = [:]
 
@@ -58,7 +58,7 @@ class AccountPresenter: ObservableObject {
             }
         }
     }
-    
+
     func navigateTo(_ destination: Router.Route) {
         Router.shared.navigateTo(destination)
     }
