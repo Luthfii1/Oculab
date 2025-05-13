@@ -21,20 +21,17 @@ struct NewUserFormView: View {
                             colorType: .secondary,
                             size: .large,
                             isEnabled: true
-                        ) {
-                            
-                        },
+                        ) {},
 
                         AppButton(
                             title: "Kembali ke Daftar Akun",
                             colorType: .tertiary,
                             isEnabled: true
-                        ) {
-                        }
+                        ) {}
                     ],
                     isVisible: .constant(false)
                 )
-                
+
                 VStack(spacing: 24) {
                     Image("AddAccount")
                     VStack(spacing: 16) {

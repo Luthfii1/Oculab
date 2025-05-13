@@ -16,14 +16,14 @@ extension NetworkHelper {
                 userInfo: [NSLocalizedDescriptionKey: "Error creating request"]
             )
         }
-        
+
         headers?.forEach { key, value in
-                   request.setValue(value, forHTTPHeaderField: key)
-               }
-        
-        // Debug print request headers
-        print("🧾 Request Headers: \(request.allHTTPHeaderFields ?? [:])")
-        print("📡 Request URL: \(urlString)")
+            request.setValue(value, forHTTPHeaderField: key)
+        }
+
+//        // Debug print request headers
+//        print("🧾 Request Headers: \(request.allHTTPHeaderFields ?? [:])")
+//        print("📡 Request URL: \(urlString)")
 
         let (data, response) = try await URLSession.shared.data(for: request)
         return try handleAsyncResponse(data: data, response: response)

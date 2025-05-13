@@ -17,7 +17,7 @@ struct AccountResponse: Codable, Identifiable {
 
 class AccountInteractor: ObservableObject {
     private let apiGetAllAccount = API.BE + "/user/get-all-user-data"
-    
+
     func getAllAccount() async throws -> [AccountResponse] {
         guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
             throw URLError(.userAuthenticationRequired)
@@ -33,7 +33,7 @@ class AccountInteractor: ObservableObject {
             urlString: apiGetAllAccount,
             headers: headers
         )
-        
+
         let result = response.data.map { account in
             AccountResponse(
                 id: account.id,

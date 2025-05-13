@@ -45,7 +45,7 @@ struct ProfileView: View {
                         RoundedRectangle(cornerRadius: Decimal.d12)
                             .stroke(AppColors.slate100)
                     )
-                    
+
                     AppButton(
                         title: "Atur Kata Sandi",
                         leftIcon: "lock",
