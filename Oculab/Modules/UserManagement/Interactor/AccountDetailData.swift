@@ -11,9 +11,10 @@ import Foundation
 struct Account: Decodable {
     let id: String
     let name: String
-    let role: String
+    let role: RolesType
     let email: String
     let username: String?
+    let accessPin: String?
 
     enum CodingKeys: String, CodingKey {
         case id = "_id"
@@ -21,5 +22,6 @@ struct Account: Decodable {
         case role
         case email
         case username
+        case accessPin
     }
 }
