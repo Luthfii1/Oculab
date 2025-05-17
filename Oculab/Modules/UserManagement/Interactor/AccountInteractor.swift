@@ -85,6 +85,7 @@ class AccountInteractor: ObservableObject {
             body: RegisterAccountBody(role: roleType, name: name, email: email)
         )
         
+        //username & currentPassword will be sent to user's email
         return RegisterAccountResponse(
             id: response.data.id,
             username: response.data.username,
@@ -114,7 +115,7 @@ class AccountInteractor: ObservableObject {
     ) async throws -> AccountResponse {
         let response: APIResponse<Account> = try await NetworkHelper.shared.delete(
             urlString: apiDeleteAccount + userId.lowercased(),
-            body: nil
+            body: EmptyBody()
         )
         
         return AccountResponse(
