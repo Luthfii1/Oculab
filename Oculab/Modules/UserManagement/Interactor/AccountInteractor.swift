@@ -7,38 +7,6 @@
 
 import Foundation
 
-struct RegisterAccountBody: Codable {
-    var role: RolesType
-    var name: String
-    var email: String
-}
-
-struct UpdatePasswordBody: Codable {
-    var previousPassword: String
-    var newPassword: String
-}
-
-struct AccountResponse: Codable, Identifiable {
-    var id: String
-    var name: String
-    var role: RolesType
-    var email: String
-    var username: String?
-    var accessPin: String?
-}
-
-struct RegisterAccountResponse: Codable {
-    var id: String
-    var username: String
-    var currentPassword: String
-}
-
-struct UpdatePasswordResponse: Codable {
-    var userId: String
-    var username: String
-    var currentPassword: String
-}
-
 class AccountInteractor: ObservableObject {
     private let apiGetAllAccount = API.BE + "/user/get-all-user-data"
     private let apiRegisterAccount = API.BE + "/user/register"
@@ -86,6 +54,7 @@ class AccountInteractor: ObservableObject {
         )
         
         //username & currentPassword will be sent to user's email
+        print("Successfully registered \(name) as \(roleType.rawValue)")
         return RegisterAccountResponse(
             id: response.data.id,
             username: response.data.username,

@@ -6,14 +6,35 @@
 //
 
 import Foundation
+import SwiftUI
 
 class AccountPresenter: ObservableObject {
     var interactor: AccountInteractor? = AccountInteractor()
 
+    // UI state
     @Published var isUserLoading = false
+    @Published var isRegistering = false
+    @Published var showSuccessPopup = false
+    @Published var successInfo: (name: String, role: String) = ("", "")
+    @Published var registrationError: String? = nil
+    
+    // Data
     @Published var groupedAccounts: [String: [AccountResponse]] = [:]
     @Published var sortedGroupedAccounts: [String] = []
-
+    
+    // Form validation - IMPORTANT: This must not modify any published properties
+    func isFormValid(name: String, email: String, role: String) -> Bool {
+        let emailRegex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"
+        let validEmail = email.range(of: emailRegex, options: .regularExpression) != nil
+        
+        return !name.isEmpty && validEmail && !role.isEmpty
+    }
+    
+    // Get role type from string
+    func getRoleType(from roleString: String) -> RolesType {
+        return RolesType(rawValue: roleString) ?? .LAB
+    }
+    
     func groupAccountsByName(accounts: [AccountResponse]) -> [String: [AccountResponse]] {
         var grouped: [String: [AccountResponse]] = [:]
 
@@ -25,7 +46,6 @@ class AccountPresenter: ObservableObject {
         for key in grouped.keys {
             grouped[key]?.sort { $0.name < $1.name }
         }
-        print("masuk groupaccount \(grouped)")
 
         return grouped
     }
@@ -58,8 +78,64 @@ class AccountPresenter: ObservableObject {
             }
         }
     }
+    
+    @MainActor
+    func registerNewAccount(role: String, name: String, email: String) async {
+        isRegistering = true
+        
+        do {
+            // Convert string to enum
+            let roleType = getRoleType(from: role)
+            
+            // Call the interactor to register the account
+            let result = try await interactor?.registerAccount(
+                roleType: roleType,
+                name: name,
+                email: email
+            )
+            
+            // Handle success
+            if let result = result {
+                print("Registration successful: \(result.id), \(result.username)")
+                
+                successInfo = (name: name, role: roleType.rawValue)
+                
+                showSuccessPopup = true
+                
+                Task {
+                    await fetchAllAccount()
+                }
+            } else {
+
+                registrationError = "Failed to register account: No response from server"
+            }
+            
+        } catch {
+            print("Registration error: \(error)")
+                
+                switch error {
+                case let NetworkError.apiError(apiResponse):
+                    registrationError = apiResponse.data.description
+                    
+                case let NetworkError.networkError(message):
+                    registrationError = message
+                    
+                default:
+                    registrationError = error.localizedDescription
+                }
+        }
+        isRegistering = false
+    }
+    
+    func resetForm() {
+        showSuccessPopup = false
+    }
 
     func navigateTo(_ destination: Router.Route) {
         Router.shared.navigateTo(destination)
+    }
+    
+    func navigateBack() {
+        Router.shared.navigateBack()
     }
 }

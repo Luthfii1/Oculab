@@ -10,21 +10,11 @@ import SwiftUI
 struct UserListView: View {
     var onTapMore: (String) -> Void
 
-    @ObservedObject private var presenter = AccountPresenter()
-
-//    let groupedAccounts: [String: [String]] = [
-//        "A": ["Adinda Putri Maharani", "Ahmad Fahri Rahman"],
-//        "B": ["Brigitta Maharani Wijaya", "Budianto Santoso", "Bulan Purnama Sari"]
-//    ]
-
-    var sortedKeys: [String] {
-//        groupedAccounts.keys.sorted()
-        presenter.groupedAccounts.keys.sorted()
-    }
+    @StateObject private var presenter = AccountPresenter()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
-            ForEach(sortedKeys, id: \.self) { key in
+            ForEach(presenter.groupedAccounts.keys.sorted(), id: \.self) { key in
                 VStack(alignment: .leading, spacing: 8) {
                     Text(key)
                         .font(AppTypography.s4_1)
@@ -68,8 +58,4 @@ struct UserListView: View {
             }
         }
     }
-}
-
-#Preview {
-//    UserListView.(onTapMore: .constant({}))
 }
