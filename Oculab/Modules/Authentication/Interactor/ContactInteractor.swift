@@ -8,7 +8,7 @@
 import Foundation
 import SwiftData
 
-struct ContactResponse {
+struct ContactResponse: Decodable {
     var id: String
     var whatsappLink: String
 }
@@ -19,7 +19,7 @@ class ContactInteractor {
     func getWhatsappLinkById(contactId: String) async throws -> ContactResponse {
         let urlString = "\(urlGetWhatsappLink)\(contactId)"
 
-        let response: APIResponse<Contact> = try await NetworkHelper.shared.get(
+        let response: APIResponse<ContactResponse> = try await NetworkHelper.shared.get(
             urlString: urlString
         )
 

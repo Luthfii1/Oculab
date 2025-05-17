@@ -47,6 +47,21 @@ struct FOVAlbum: View {
                                         .scaledToFill()
                                         .frame(width: 74, height: 74)
                                         .clipped()
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 2)
+                                                .stroke(fov.verified ? Color.green : Color.clear, lineWidth: 4)
+                                        )
+                                        .overlay(
+                                            Group {
+                                                if fov.verified {
+                                                    Image(systemName: "checkmark.circle.fill")
+                                                        .foregroundColor(.green)
+                                                        .font(.system(size: 20))
+                                                        .padding(4)
+                                                }
+                                            },
+                                            alignment: .topTrailing
+                                        )
                                 case .failure:
                                     Image(systemName: "exclamationmark.triangle.fill")
                                         .resizable()

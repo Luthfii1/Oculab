@@ -60,7 +60,7 @@ class AccountInteractor: ObservableObject {
             urlString: apiGetAllAccount,
             headers: headers
         )
-        
+
         let result = response.data.map { account in
             AccountResponse(
                 id: account.id,

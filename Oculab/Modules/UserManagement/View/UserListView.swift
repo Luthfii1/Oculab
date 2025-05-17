@@ -9,9 +9,9 @@ import SwiftUI
 
 struct UserListView: View {
     var onTapMore: (String) -> Void
-    
+
     @ObservedObject private var presenter = AccountPresenter()
-    
+
 //    let groupedAccounts: [String: [String]] = [
 //        "A": ["Adinda Putri Maharani", "Ahmad Fahri Rahman"],
 //        "B": ["Brigitta Maharani Wijaya", "Budianto Santoso", "Bulan Purnama Sari"]
@@ -30,7 +30,7 @@ struct UserListView: View {
                         .font(AppTypography.s4_1)
                         .foregroundColor(AppColors.slate400)
                         .padding(.horizontal)
-                    
+
                     VStack(spacing: 0) {
                         if let accounts = presenter.groupedAccounts[key] {
                             ForEach(accounts, id: \.id) { account in
@@ -38,9 +38,9 @@ struct UserListView: View {
                                     Text(account.name)
                                         .font(AppTypography.p2)
                                         .foregroundColor(AppColors.slate900)
-                                    
+
                                     Spacer()
-                                    
+
                                     Button {
                                         onTapMore(account.name)
                                     } label: {
@@ -50,7 +50,7 @@ struct UserListView: View {
                                 }
                                 .padding(.vertical, 12)
                                 .padding(.horizontal)
-                                
+
                                 if account.id != accounts.last?.id {
                                     Divider()
                                 }
@@ -67,10 +67,8 @@ struct UserListView: View {
                 await presenter.fetchAllAccount()
             }
         }
-        
     }
 }
-
 
 #Preview {
 //    UserListView.(onTapMore: .constant({}))

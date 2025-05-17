@@ -42,7 +42,6 @@ struct BottomSheetMenu: View {
             }
             .padding(.vertical, 4)
 
-
             Spacer()
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -51,7 +50,6 @@ struct BottomSheetMenu: View {
         .presentationDragIndicator(.visible)
     }
 }
-
 
 #Preview {
     BottomSheetMenu(userName: "Icune")
