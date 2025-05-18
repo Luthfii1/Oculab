@@ -22,7 +22,7 @@ struct NewUserFormView: View {
                     AppPopup(
                         image: "Success",
                         title: "Berhasil membuat Akun",
-                        description: "Anda telah berhasil menambahkan akun baru untuk \(presenter.successInfo.name) dengan role \(presenter.successInfo.role)",
+                        description: "Anda telah berhasil menambahkan akun baru untuk \(presenter.registrationSuccess.name) dengan role \(presenter.registrationSuccess.role)",
                         buttons: [
                             AppButton(
                                 title: "Buat Akun Lain",
@@ -93,7 +93,9 @@ struct NewUserFormView: View {
                                 rightIcon: "arrow.right",
                                 isEnabled: presenter.isFormValid(name: name, email: email, role: role),
                                 action: {
-                                    registerAccount()
+                                    Task {
+                                        await presenter.registerNewAccount(role: role, name: name, email: email)
+                                    }
                                 }
                             )
                         }
@@ -133,17 +135,6 @@ struct NewUserFormView: View {
                 Text(presenter.registrationError ?? "Unknown error")
             }
         )
-    }
-    
-    // Move async task outside the view body
-    private func registerAccount() {
-        Task {
-            await presenter.registerNewAccount(
-                role: role,
-                name: name,
-                email: email
-            )
-        }
     }
 }
 

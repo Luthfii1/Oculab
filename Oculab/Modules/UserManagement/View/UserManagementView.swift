@@ -8,11 +8,8 @@
 import SwiftUI
 
 struct UserManagementView: View {
-    @ObservedObject private var presenter = AccountPresenter()
-//    @EnvironmentObject private var authentication: AuthenticationPresenter
-    @State private var selectedUser: String? = nil
-    @State private var showSheet = false
-
+    @StateObject private var presenter = AccountPresenter()
+    
     var body: some View {
         NavigationView {
             ScrollView {
@@ -34,10 +31,7 @@ struct UserManagementView: View {
                     )
 
                     VStack(spacing: 24) {
-                        UserListView { name in
-                            selectedUser = name
-                            showSheet = true
-                        }
+                        UserListView(presenter: presenter)
                     }
                 }
                 .padding(.horizontal, Decimal.d20)
@@ -46,20 +40,15 @@ struct UserManagementView: View {
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: {
-                            Router.shared.navigateBack()
+                            presenter.navigateBack()
                         }) {
                             Image("back")
                         }
                     }
                 }
             }
-            .sheet(isPresented: Binding<Bool>(
-                get: { selectedUser != nil && showSheet },
-                set: { if !$0 { showSheet = false; selectedUser = nil } }
-            )) {
-                if let name = selectedUser {
-                    BottomSheetMenu(userName: name)
-                }
+            .sheet(item: $presenter.selectedUser) { _ in
+                BottomSheetMenu(presenter: presenter)
             }
         }
         .navigationBarHidden(true)

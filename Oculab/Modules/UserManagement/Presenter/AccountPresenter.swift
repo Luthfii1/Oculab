@@ -11,28 +11,42 @@ import SwiftUI
 class AccountPresenter: ObservableObject {
     var interactor: AccountInteractor? = AccountInteractor()
 
+    // UI State
     @Published var isUserLoading = false
     @Published var isRegistering = false
+    @Published var isDeleting = false
     @Published var showSuccessPopup = false
-    @Published var successInfo: (name: String, role: String) = ("", "")
-    @Published var registrationError: String? = nil
     
-    @Published var groupedAccounts: [String: [AccountResponse]] = [:]
+    @Published var registrationError: String? = nil
+    @Published var registrationSuccess: (name: String, role: String) = ("", "")
+    @Published var deletionError: String? = nil
+    @Published var deletionSuccess: (userName: String, message: String)? = nil
+
+    
+    // Data
+    @Published var groupedAccounts: [String: [Account]] = [:]
     @Published var sortedGroupedAccounts: [String] = []
     
-    func isFormValid(name: String, email: String, role: String) -> Bool {
-        let emailRegex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"
-        let validEmail = email.range(of: emailRegex, options: .regularExpression) != nil
-        
-        return !name.isEmpty && validEmail && !role.isEmpty
+    // Selected user for bottom sheet
+    @Published var selectedUser: SelectedUser? = nil
+    
+    // Model for selected user
+    struct SelectedUser: Identifiable {
+        var id: String
+        var name: String
     }
     
-    func getRoleType(from roleString: String) -> RolesType {
-        return RolesType(rawValue: roleString) ?? .LAB
+    // User selection methods
+    func selectUser(_ account: Account) {
+        selectedUser = SelectedUser(id: account.id, name: account.name)
     }
     
-    func groupAccountsByName(accounts: [AccountResponse]) -> [String: [AccountResponse]] {
-        var grouped: [String: [AccountResponse]] = [:]
+    func clearSelection() {
+        selectedUser = nil
+    }
+    
+    func groupAccountsByName(accounts: [Account]) -> [String: [Account]] {
+        var grouped: [String: [Account]] = [:]
 
         for account in accounts {
             guard let firstLetter = account.name.first?.uppercased() else { continue }
@@ -80,21 +94,18 @@ class AccountPresenter: ObservableObject {
         isRegistering = true
         
         do {
-            // Convert string to enum
             let roleType = getRoleType(from: role)
             
-            // Call the interactor to register the account
             let result = try await interactor?.registerAccount(
                 roleType: roleType,
                 name: name,
                 email: email
             )
             
-            // Handle success
             if let result = result {
                 print("Registration successful: \(result.id), \(result.username)")
                 
-                successInfo = (name: name, role: roleType.rawValue)
+                registrationSuccess = (name: name, role: roleType.rawValue)
                 
                 showSuccessPopup = true
                 
@@ -102,29 +113,78 @@ class AccountPresenter: ObservableObject {
                     await fetchAllAccount()
                 }
             } else {
-
                 registrationError = "Failed to register account: No response from server"
             }
             
         } catch {
             print("Registration error: \(error)")
                 
-                switch error {
-                case let NetworkError.apiError(apiResponse):
-                    registrationError = apiResponse.data.description
-                    
-                case let NetworkError.networkError(message):
-                    registrationError = message
-                    
-                default:
-                    registrationError = error.localizedDescription
-                }
+            switch error {
+            case let NetworkError.apiError(apiResponse):
+                registrationError = apiResponse.data.description
+                
+            case let NetworkError.networkError(message):
+                registrationError = message
+                
+            default:
+                registrationError = error.localizedDescription
+            }
         }
         isRegistering = false
     }
     
+    func isFormValid(name: String, email: String, role: String) -> Bool {
+        let emailRegex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"
+        let validEmail = email.range(of: emailRegex, options: .regularExpression) != nil
+        
+        return !name.isEmpty && validEmail && !role.isEmpty
+    }
+    
+    func getRoleType(from roleString: String) -> RolesType {
+        return RolesType(rawValue: roleString) ?? .LAB
+    }
+    
     func resetForm() {
         showSuccessPopup = false
+    }
+    
+    @MainActor
+    func deleteSelectedUser() async {
+        guard let userId = selectedUser?.id else { return }
+        
+        isDeleting = true
+        defer { isDeleting = false }
+        
+        do {
+            let result = try await interactor?.deleteAccount(userId: userId)
+            
+            if let result = result {
+                print("Deletion successful: \(result.id): \(result.name)")
+                deletionSuccess = (userName: result.name, message: "\(result.name) has been successfully deleted.")
+
+                clearSelection()
+                
+                Task {
+                    await fetchAllAccount()
+                }
+            } else {
+                deletionError = "Failed to delete account: No response from server"
+            }
+            
+        } catch {
+            print("Deletion error: \(error)")
+                
+            switch error {
+            case let NetworkError.apiError(apiResponse):
+                deletionError = apiResponse.data.description
+                
+            case let NetworkError.networkError(message):
+                deletionError = message
+                
+            default:
+                deletionError = error.localizedDescription
+            }
+        }
     }
 
     func navigateTo(_ destination: Router.Route) {

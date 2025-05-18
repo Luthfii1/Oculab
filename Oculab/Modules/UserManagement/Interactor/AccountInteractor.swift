@@ -13,7 +13,7 @@ class AccountInteractor: ObservableObject {
     private let apiUpdatePasswordAccount = API.BE + "/user/update-password/"
     private let apiDeleteAccount = API.BE + "/user/delete-user/"
     
-    func getAllAccount() async throws -> [AccountResponse] {
+    func getAllAccount() async throws -> [Account] {
         guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
             throw URLError(.userAuthenticationRequired)
         }
@@ -30,7 +30,7 @@ class AccountInteractor: ObservableObject {
         )
 
         let result = response.data.map { account in
-            AccountResponse(
+            Account(
                 id: account.id,
                 name: account.name,
                 role: account.role,
@@ -54,7 +54,6 @@ class AccountInteractor: ObservableObject {
         )
         
         //username & currentPassword will be sent to user's email
-        print("Successfully registered \(name) as \(roleType.rawValue)")
         return RegisterAccountResponse(
             id: response.data.id,
             username: response.data.username,
@@ -81,19 +80,29 @@ class AccountInteractor: ObservableObject {
     
     func deleteAccount(
         userId: String
-    ) async throws -> AccountResponse {
-        let response: APIResponse<Account> = try await NetworkHelper.shared.delete(
+    ) async throws -> DeleteAccountResponse {
+        guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
+        print("TOKEN", token)
+
+        let headers = [
+            "Authorization": "Bearer \(token)",
+            "Content-Type": "application/json"
+        ]
+        
+        let response: APIResponse<DeleteAccountResponse> = try await NetworkHelper.shared.delete(
             urlString: apiDeleteAccount + userId.lowercased(),
-            body: EmptyBody()
+            body: EmptyBody(),
+            headers: headers
         )
         
-        return AccountResponse(
+        return DeleteAccountResponse(
             id: response.data.id,
             name: response.data.name,
             role: response.data.role,
-            email: response.data.email,
-            username: response.data.username ?? "",
-            accessPin: response.data.accessPin ?? ""
+            email: response.data.email
         )
     }
 }

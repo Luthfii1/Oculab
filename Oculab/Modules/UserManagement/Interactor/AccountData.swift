@@ -25,24 +25,24 @@ struct Account: Decodable {
     }
 }
 
-struct RegisterAccountBody: Codable {
-    var role: RolesType
-    var name: String
-    var email: String
-}
-
-struct UpdatePasswordBody: Codable {
-    var previousPassword: String
-    var newPassword: String
-}
-
-struct AccountResponse: Codable, Identifiable {
+struct DeleteAccountResponse: Codable, Identifiable {
     var id: String
     var name: String
     var role: RolesType
     var email: String
-    var username: String?
-    var accessPin: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case id = "userId"
+        case name
+        case role
+        case email
+    }
+}
+
+struct RegisterAccountBody: Codable {
+    var role: RolesType
+    var name: String
+    var email: String
 }
 
 struct RegisterAccountResponse: Codable {
@@ -55,13 +55,13 @@ struct RegisterAccountResponse: Codable {
         case username
         case currentPassword
     }
-    
-    init(id: String, username: String, currentPassword: String) {
-        self.id = id
-        self.username = username
-        self.currentPassword = currentPassword
-    }
 }
+
+struct UpdatePasswordBody: Codable {
+    var previousPassword: String
+    var newPassword: String
+}
+
 struct UpdatePasswordResponse: Codable {
     var userId: String
     var username: String
