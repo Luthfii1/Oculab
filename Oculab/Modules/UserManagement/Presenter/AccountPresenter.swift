@@ -11,18 +11,15 @@ import SwiftUI
 class AccountPresenter: ObservableObject {
     var interactor: AccountInteractor? = AccountInteractor()
 
-    // UI state
     @Published var isUserLoading = false
     @Published var isRegistering = false
     @Published var showSuccessPopup = false
     @Published var successInfo: (name: String, role: String) = ("", "")
     @Published var registrationError: String? = nil
     
-    // Data
     @Published var groupedAccounts: [String: [AccountResponse]] = [:]
     @Published var sortedGroupedAccounts: [String] = []
     
-    // Form validation - IMPORTANT: This must not modify any published properties
     func isFormValid(name: String, email: String, role: String) -> Bool {
         let emailRegex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"
         let validEmail = email.range(of: emailRegex, options: .regularExpression) != nil
@@ -30,7 +27,6 @@ class AccountPresenter: ObservableObject {
         return !name.isEmpty && validEmail && !role.isEmpty
     }
     
-    // Get role type from string
     func getRoleType(from roleString: String) -> RolesType {
         return RolesType(rawValue: roleString) ?? .LAB
     }

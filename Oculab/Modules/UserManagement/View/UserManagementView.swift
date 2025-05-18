@@ -53,7 +53,10 @@ struct UserManagementView: View {
                     }
                 }
             }
-            .sheet(isPresented: $showSheet) {
+            .sheet(isPresented: Binding<Bool>(
+                get: { selectedUser != nil && showSheet },
+                set: { if !$0 { showSheet = false; selectedUser = nil } }
+            )) {
                 if let name = selectedUser {
                     BottomSheetMenu(userName: name)
                 }
