@@ -8,18 +8,26 @@
 import SwiftUI
 
 struct BottomSheetMenu: View {
-    var userName: String
+    @ObservedObject var presenter: AccountPresenter
+    @Environment(\.dismiss) private var dismiss
+    @State private var isLoaded = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text(userName)
+            if !isLoaded {
+                ProgressView()
+                    .padding(.top, 32)
+            }
+            
+            Text(presenter.selectedUser?.name ?? "")
                 .font(AppTypography.s4)
                 .foregroundColor(AppColors.slate900)
                 .padding(.top, 32)
                 .padding(.bottom, 4)
+                .opacity(isLoaded ? 1 : 0)
 
             Button {
-                // Ubah logic here
+                // Edit account logic
             } label: {
                 HStack {
                     Image(systemName: "pencil")
@@ -29,18 +37,29 @@ struct BottomSheetMenu: View {
                 .foregroundColor(AppColors.slate900)
             }
             .padding(.vertical, 4)
+            .opacity(isLoaded ? 1 : 0)
 
             Button {
-                // Hapus logic here
+                Task {
+                    await presenter.deleteSelectedUser()
+                    dismiss()
+                }
             } label: {
                 HStack {
-                    Image(systemName: "trash")
-                    Text("Hapus Akun")
-                        .font(AppTypography.p3)
+                    if presenter.isDeleting {
+                        ProgressView()
+                            .foregroundColor(AppColors.red500)
+                    } else {
+                        Image(systemName: "trash")
+                        Text("Hapus Akun")
+                            .font(AppTypography.p3)
+                    }
                 }
                 .foregroundColor(AppColors.red500)
             }
             .padding(.vertical, 4)
+            .opacity(isLoaded ? 1 : 0)
+            .disabled(presenter.isDeleting)
 
             Spacer()
         }
@@ -48,9 +67,39 @@ struct BottomSheetMenu: View {
         .padding()
         .presentationDetents([.fraction(0.2)])
         .presentationDragIndicator(.visible)
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                isLoaded = true
+            }
+        }
+        .alert(
+            presenter.deletionSuccess != nil ? "Deletion Successful" : "Deletion Failed",
+            isPresented: Binding(
+                get: { presenter.deletionSuccess != nil || presenter.deletionError != nil },
+                set: {
+                    if !$0 {
+                        presenter.deletionSuccess = nil
+                        presenter.deletionError = nil
+                    }
+                }
+            ),
+            actions: {
+                Button("OK") {
+                    presenter.deletionSuccess = nil
+                    presenter.deletionError = nil
+                }
+            },
+            message: {
+                if let successInfo = presenter.deletionSuccess {
+                    Text(successInfo.message)
+                } else {
+                    Text(presenter.deletionError ?? "Unknown error")
+                }
+            }
+        )
     }
 }
 
 #Preview {
-    BottomSheetMenu(userName: "Icune")
+    BottomSheetMenu(presenter: AccountPresenter())
 }
