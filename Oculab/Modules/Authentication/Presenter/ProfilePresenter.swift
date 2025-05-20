@@ -49,6 +49,8 @@ class ProfilePresenter: ObservableObject {
         }
     }
 
+    @Published var showSuccessPopup: Bool = false
+    
     init(interactor: ProfileInteractorProtocol, authInteractor: AuthenticationInteractor) {
         self.interactor = interactor
         self.authInteractor = authInteractor
@@ -123,7 +125,7 @@ class ProfilePresenter: ObservableObject {
             let response = try await authInteractor.updateUserById(user: updateUser)
 
             user = response
-            Router.shared.popToRoot()
+            showSuccessPopup = true
         } catch {
             isOldPasswordError = true
             switch error {
@@ -141,5 +143,9 @@ class ProfilePresenter: ObservableObject {
                 descriptionOldPassword = error.localizedDescription
             }
         }
+    }
+    
+    func backToProfilePage() {
+        Router.shared.popToRoot()
     }
 }
