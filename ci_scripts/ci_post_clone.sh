@@ -42,11 +42,19 @@ cat <<EOL > Oculab.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.re
         "revision" : "f455c2975872ccd2d9c81594c658af65716e9b9a",
         "version" : "5.9.1"
       }
+    },
+    {
+      "identity" : "lottie-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/airbnb/lottie-ios.git",
+      "state" : {
+        "revision" : "4f5b970b47145a25c38a297326461c935760d8a9",
+        "version" : "4.5.1"
+      }
     }
   ],
   "version" : 3
 }
-
 EOL
 
 # Resolve package dependencies to generate Package.resolved
