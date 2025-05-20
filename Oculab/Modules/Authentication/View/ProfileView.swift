@@ -21,30 +21,32 @@ struct ProfileView: View {
                         title: "Informasi Akun",
                         isExtendable: false,
                         data: [
-                            (key: "Username", value: profilePresenter.user.name),
-                            (key: "Role", value: profilePresenter.user.role.rawValue),
+                            (key: "Username", value: authPresenter.user.username ?? authPresenter.user.name),
+                            (key: "Role", value: authPresenter.user.role.rawValue.capitalized),
                             (key: "Jabatan Pekerjaan", value: "Ahli Teknologi Laboratorium Medik"),
                         ],
                         titleSize: AppTypography.s4_1,
-                        titleCard: profilePresenter.user.name
+                        titleCard: authPresenter.user.name
                     )
 
-                    AppButton(
-                        title: "Manajemen Akun",
-                        leftIcon: "person.fill",
-                        rightIcon: "arrow.right",
-                        colorType: .tertiary,
-                        titleColor: AppColors.slate900
-                    ) {
-                        profilePresenter.navigateTo(.accountManagement)
+                    if authPresenter.user.role == .ADMIN {
+                        AppButton(
+                            title: "Manajemen Akun",
+                            leftIcon: "person.fill",
+                            rightIcon: "arrow.right",
+                            colorType: .tertiary,
+                            titleColor: AppColors.slate900
+                        ) {
+                            profilePresenter.navigateTo(.accountManagement)
+                        }
+                        .padding(.vertical, Decimal.d16)
+                        .background(.white)
+                        .cornerRadius(Decimal.d12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: Decimal.d12)
+                                .stroke(AppColors.slate100)
+                        )
                     }
-                    .padding(.vertical, Decimal.d16)
-                    .background(.white)
-                    .cornerRadius(Decimal.d12)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: Decimal.d12)
-                            .stroke(AppColors.slate100)
-                    )
 
                     AppButton(
                         title: "Atur Kata Sandi",

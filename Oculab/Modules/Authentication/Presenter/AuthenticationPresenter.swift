@@ -17,7 +17,7 @@ class AuthenticationPresenter: ObservableObject {
     @Published var description: String = ""
     @Published var textColor: Color = AppColors.slate900
     @Published var pinColor: Color = AppColors.purple500
-    @Published var email = ""
+    @Published var username = ""
     @Published var password = ""
     @Published var buttonText = "Login"
     @Published var isKeyboardVisible = false
@@ -58,7 +58,7 @@ class AuthenticationPresenter: ObservableObject {
     }
 
     var isFilled: Bool {
-        !email.isEmpty && !password.isEmpty && !isLoading
+        !username.isEmpty && !password.isEmpty && !isLoading
     }
 
     var title: String {
@@ -173,7 +173,7 @@ class AuthenticationPresenter: ObservableObject {
         defer { isLoading = false }
 
         do {
-            _ = try await interactor.login(email: email, password: password)
+            _ = try await interactor.login(username: username, password: password)
             handleErrorState(isError: false)
         } catch {
             switch error {
@@ -216,7 +216,7 @@ class AuthenticationPresenter: ObservableObject {
     }
 
     func clearInput() {
-        email = ""
+        username = ""
         password = ""
         isError = false
     }
