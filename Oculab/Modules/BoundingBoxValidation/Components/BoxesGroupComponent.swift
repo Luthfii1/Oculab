@@ -1,4 +1,3 @@
-
 //
 //  BoxesGroupComponent.swift
 //  Oculab
@@ -13,13 +12,23 @@ struct BoxesGroupComponentView: View {
     var height: Double
     var zoomScale: CGFloat
     @State private var boxes: [BoxModel]
-    @State private var selectedBox: BoxModel?
+    @Binding var selectedBox: BoxModel?
+    var onBoxSelected: ((BoxModel) -> Void)?
 
-    init(width: Double, height: Double, zoomScale: CGFloat, boxes: [BoxModel]) {
+    init(
+        width: Double,
+        height: Double,
+        zoomScale: CGFloat,
+        boxes: [BoxModel],
+        selectedBox: Binding<BoxModel?>,
+        onBoxSelected: ((BoxModel) -> Void)? = nil
+    ) {
         self.width = width
         self.height = height
         self.zoomScale = zoomScale
         _boxes = State(initialValue: boxes)
+        _selectedBox = selectedBox
+        self.onBoxSelected = onBoxSelected
     }
 
     var body: some View {
@@ -36,6 +45,7 @@ struct BoxesGroupComponentView: View {
                 )
                 .onTapGesture {
                     selectedBox = box
+                    onBoxSelected?(box)
                 }
             }
         }
