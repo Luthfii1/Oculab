@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-import SwiftUI
-
 struct TrayView: View {
     @Binding var selectedBox: BoxModel?
     let boxes: [BoxModel]
@@ -25,6 +23,7 @@ struct TrayView: View {
                     Spacer().frame(height: 52)
                     Text("Verifikasi Bakteri")
                         .font(AppTypography.s4)
+                        .foregroundColor(.black)
                 }
 
                 VStack(alignment: .leading, spacing: Decimal.d12) {
@@ -41,6 +40,7 @@ struct TrayView: View {
                             }) {
                                 Image(systemName: "chevron.left")
                             }
+                            .foregroundColor(currentIndex > 0 ? .black : AppColors.slate100)
                             .disabled(currentIndex == 0)
 
                             Button(action: {
@@ -50,6 +50,7 @@ struct TrayView: View {
                             }) {
                                 Image(systemName: "chevron.right")
                             }
+                            .foregroundColor(currentIndex < boxes.count - 1 ? .black : AppColors.slate100)
                             .disabled(currentIndex == boxes.count - 1)
                         }
                     }
@@ -103,12 +104,53 @@ struct TrayView: View {
     }
 }
 
+//
+// struct TrayView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        BoxesGroupComponentView(width: 300, height: 400, boxes: [
+//            BoxModel(id: 1, width: 100, height: 50, x: 50, y: 50),
+//            BoxModel(id: 2, width: 100, height: 50, x: 150, y: 150),
+//            BoxModel(id: 3, width: 100, height: 50, x: 250, y: 250)
+//        ])
+//    }
+// }
+
 struct TrayView_Previews: PreviewProvider {
+    @State static var selectedBox: BoxModel? = BoxModel(id: 2, width: 25, height: 30, x: 180, y: 400)
+    static let boxes = [
+        BoxModel(id: 1, width: 17, height: 10, x: 40, y: 300),
+        BoxModel(id: 2, width: 25, height: 30, x: 180, y: 400),
+        BoxModel(id: 3, width: 20, height: 25, x: 70, y: 170),
+        BoxModel(id: 4, width: 15, height: 15, x: 210, y: 200),
+        BoxModel(id: 5, width: 15, height: 20, x: 130, y: 350),
+    ]
+
     static var previews: some View {
-        BoxesGroupComponentView(width: 300, height: 400, boxes: [
-            BoxModel(id: 1, width: 100, height: 50, x: 50, y: 50),
-            BoxModel(id: 2, width: 100, height: 50, x: 150, y: 150),
-            BoxModel(id: 3, width: 100, height: 50, x: 250, y: 250)
-        ])
+        // Bind selectedBox to state for interactivity
+        StatefulPreviewWrapper(selectedBox) { selectedBoxBinding in
+            TrayView(
+                selectedBox: selectedBoxBinding,
+                boxes: boxes,
+                onVerify: { print("Verify tapped") },
+                onFlag: { print("Flag tapped") },
+                onReject: { print("Reject tapped") }
+            )
+        }
+        .previewLayout(.sizeThatFits)
+    }
+}
+
+// Utility to allow @Binding in previews
+struct StatefulPreviewWrapper<Value: Equatable, Content: View>: View {
+    @State var value: Value
+    var content: (Binding<Value>) -> Content
+
+    init(_ value: Value, content: @escaping (Binding<Value>) -> Content) {
+        _value = State(wrappedValue: value)
+        self.content = content
+    }
+
+    var body: some View {
+        content($value)
     }
 }

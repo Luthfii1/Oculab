@@ -16,7 +16,7 @@
 //    var body: some View {
 //        NavigationView {
 //            ZStack {
-//                ZoomableScrollView { //UIKit
+//                ZoomableScrollView { // UIKit
 //                    GeometryReader { geo in
 //                        VStack {
 //                            AsyncImage(url: URL(string: fovData.image)) { phase in
@@ -89,7 +89,7 @@
 //        .navigationBarBackButtonHidden()
 //    }
 // }
-
+//
 // #Preview {
 //    FOVDetail(
 //        slideId: "A#EKNIR",
@@ -115,27 +115,105 @@ struct FOVDetail: View {
 
     @State private var zoomScale: CGFloat = 1.0
 
+    @State private var offset = CGSize(width: 0, height: 0)
+
+    @State private var imageSize: CGSize = .zero
+
     var body: some View {
         NavigationView {
             ZStack { // SwiftUI
+//                GeometryReader { geometry in
+//                    ScrollView([.horizontal, .vertical], showsIndicators: false) {
+//                        ZStack {
+//                            AsyncImage(url: URL(string: fovData.image)) { image in
+//                                image
+//                                    .resizable()
+//                                    .aspectRatio(contentMode: .fit)
+//                                    .overlay(
+//                                        GeometryReader { _ in
+//                                            BoxesGroupComponentView(
+//                                                width: geometry.size.width * zoomScale,
+//                                                height: geometry.size.height * zoomScale,
+//                                                zoomScale: zoomScale,
+//                                                boxes: [
+//                                                    // HARDCODED TEST DATA
+//                                                    BoxModel(id: 1, width: 17, height: 10, x: 40, y: 300),
+//                                                    BoxModel(id: 2, width: 25, height: 30, x: 180, y: 400),
+//                                                    BoxModel(id: 3, width: 20, height: 25, x: 70, y: 170),
+//                                                    BoxModel(id: 4, width: 15, height: 15, x: 210, y: 200),
+//                                                    BoxModel(id: 5, width: 15, height: 20, x: 130, y: 350),
+//                                                ]
+//                                            )
+//                                        }
+//                                    )
+//                                    .frame(
+//                                        width: geometry.size.width * zoomScale,
+//                                        height: geometry.size.height * zoomScale
+//                                    )
+//                            } placeholder: {
+//                                ProgressView()
+//                                    .frame(
+//                                        width: geometry.size.width * zoomScale,
+//                                        height: geometry.size.height * zoomScale
+//                                    )
+//                            }
+//                        }
+//                        .scaleEffect(zoomScale)
+//                        .gesture(
+//                            MagnificationGesture()
+//                                .onChanged { value in
+//                                    zoomScale = min(max(value, 1.0), 4.0)
+//                                }
+//                        )
+//                        .onTapGesture(count: 2) {
+//                            withAnimation {
+//                                zoomScale = zoomScale == 1.0 ? 2.0 : 1.0
+//                            }
+//                        }
+//                    }
+//                }
+
                 GeometryReader { geometry in
                     ScrollView([.horizontal, .vertical], showsIndicators: false) {
-                        AsyncImage(url: URL(string: fovData.image)) { image in
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(
-                                    width: geometry.size.width * zoomScale,
-                                    height: geometry.size.height * zoomScale
-                                )
-                        } placeholder: {
-                            ProgressView()
-                                .frame(
-                                    width: geometry.size.width * zoomScale,
-                                    height: geometry.size.height * zoomScale
-                                )
+                        ZStack {
+                            AsyncImage(url: URL(string: fovData.image)) { image in
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .overlay(
+                                        GeometryReader { _ in
+                                            BoxesGroupComponentView(
+                                                width: geometry.size.width * zoomScale,
+                                                height: geometry.size.height * zoomScale,
+                                                zoomScale: zoomScale,
+                                                boxes: [
+                                                    BoxModel(id: 1, width: 17, height: 10, x: 40, y: 300),
+                                                    BoxModel(id: 2, width: 25, height: 30, x: 180, y: 400),
+                                                    BoxModel(id: 3, width: 20, height: 25, x: 70, y: 170),
+                                                    BoxModel(id: 4, width: 15, height: 15, x: 210, y: 200),
+                                                    BoxModel(id: 5, width: 15, height: 20, x: 130, y: 350),
+                                                ]
+                                            )
+                                        }
+                                    )
+                                    .frame(
+                                        width: geometry.size.width * zoomScale,
+                                        height: geometry.size.height * zoomScale
+                                    )
+                            } placeholder: {
+                                ProgressView()
+                                    .frame(
+                                        width: geometry.size.width * zoomScale,
+                                        height: geometry.size.height * zoomScale
+                                    )
+                            }
                         }
-                        .scaleEffect(zoomScale)
+                        .frame(
+                            width: geometry.size.width * zoomScale,
+                            height: geometry.size.height * zoomScale,
+                            alignment: .center
+                        )
+
                         .gesture(
                             MagnificationGesture()
                                 .onChanged { value in
