@@ -31,7 +31,7 @@ class Router: ObservableObject {
         case inputPatientData
         case informationInterpretation
         case kebijakanPrivasi
-        case analyzingStatusProgress
+        case analyzingStatusProgress(examinationId: String)
         case accountManagement
         case newAccount
     }
@@ -81,8 +81,8 @@ class Router: ObservableObject {
             InformationPage()
         case .kebijakanPrivasi:
             KebijakanPrivasiView()
-        case .analyzingStatusProgress:
-            AnalyzingExaminationProgressView()
+        case let .analyzingStatusProgress(examinationId):
+            AnalyzingExaminationProgressView(examinationId: examinationId)
         case .accountManagement:
             UserManagementView()
         case .newAccount:

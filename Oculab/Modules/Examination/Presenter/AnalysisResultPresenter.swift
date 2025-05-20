@@ -93,6 +93,14 @@ class AnalysisResultPresenter: ObservableObject {
         }
     }
 
+    @MainActor
+    func getStatusExamination(examinationId: String) async {
+        await fetchData(examinationId: examinationId)
+        if examinationResult?.statusExamination == .FINISHED {
+            Router.shared.navigateBack()
+        }
+    }
+
     func navigateToAlbum(fovGroup: FOVType) {
         Router.shared.navigateTo(.photoAlbum(fovGroup: fovGroup, examId: examinationResult?.examinationId ?? ""))
     }
