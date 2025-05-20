@@ -96,20 +96,27 @@ struct FOVDetail: View {
                     }
                 }
 
-                VStack(spacing: Decimal.d8 + Decimal.d2) {
+                VStack {
                     Spacer()
-                    Text("Jumlah Bakteri: \(fovData.systemCount) BTA").font(AppTypography.h3)
-                    Text(String(format: "%.2f%% confidence level", fovData.confidenceLevel * 100))
-                        .font(AppTypography.p4)
-                    HStack {
-                        Image("Contrast")
-                        Image("Brightness")
-                        Image("Comment")
-                    }
+
+                    VStack(spacing: Decimal.d8 + Decimal.d2) {
+                        Text("Jumlah Bakteri: \(fovData.systemCount) BTA").font(AppTypography.h3)
+                        Text(String(format: "%.2f%% confidence level", fovData.confidenceLevel * 100))
+                            .font(AppTypography.p4)
+                        HStack {
+                            Image("Contrast")
+                            Image("Brightness")
+                            Image("Comment")
+                        }
+                    }.padding(.vertical)
+                        .frame(maxWidth: .infinity)
+                        .background(Color.black.opacity(0.5))
                 }
+                .padding(.vertical)
+                .cornerRadius(12)
+                .ignoresSafeArea(edges: .bottom)
             }
             .foregroundStyle(AppColors.slate0)
-            .padding(.horizontal, CGFloat(20))
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     VStack {
@@ -131,6 +138,8 @@ struct FOVDetail: View {
                     }
                 }
             }
+            .toolbarBackground(Color.black, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .background(.black)
             .onAppear {}
         }.navigationBarBackButtonHidden()
