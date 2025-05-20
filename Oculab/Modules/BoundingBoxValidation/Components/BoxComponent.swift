@@ -40,14 +40,3 @@ struct BoxComponentView: View {
             )
     }
 }
-
-// #Preview {
-//    BoxComponentView(
-//        box: BoxModel(id: 1, width: 100, height: 39, x: 0, y: 0),
-//        boxes: [
-//            BoxModel(id: 1, width: 100, height: 39, x: 0, y: 0),
-//            BoxModel(id: 2, width: 100, height: 39, x: 50, y: 50)
-//        ],
-//        isSelected: false // or false
-//    )
-// }

@@ -104,17 +104,6 @@ struct TrayView: View {
     }
 }
 
-//
-// struct TrayView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        BoxesGroupComponentView(width: 300, height: 400, boxes: [
-//            BoxModel(id: 1, width: 100, height: 50, x: 50, y: 50),
-//            BoxModel(id: 2, width: 100, height: 50, x: 150, y: 150),
-//            BoxModel(id: 3, width: 100, height: 50, x: 250, y: 250)
-//        ])
-//    }
-// }
-
 struct TrayView_Previews: PreviewProvider {
     @State static var selectedBox: BoxModel? = BoxModel(id: 2, width: 25, height: 30, x: 180, y: 400)
     static let boxes = [
@@ -140,7 +129,6 @@ struct TrayView_Previews: PreviewProvider {
     }
 }
 
-// Utility to allow @Binding in previews
 struct StatefulPreviewWrapper<Value: Equatable, Content: View>: View {
     @State var value: Value
     var content: (Binding<Value>) -> Content
