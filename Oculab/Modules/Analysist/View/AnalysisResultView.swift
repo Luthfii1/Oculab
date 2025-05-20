@@ -30,7 +30,8 @@ struct AnalysisResultView: View {
                             .padding()
                     } else if let examination = presenter.examinationResult {
                         if examination.statusExamination == .INPROGRESS {
-                            AnalyzingExaminationProgressView()
+                            AnalyzingExaminationProgressView(examinationId: examinationId)
+                                .environmentObject(presenter)
                         } else {
                             ScrollView(showsIndicators: false) {
                                 VStack(alignment: .leading, spacing: Decimal.d24) {
