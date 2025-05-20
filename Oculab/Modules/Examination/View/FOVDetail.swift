@@ -1,10 +1,3 @@
-//
-//  FOVDetail.swift
-//  Oculab
-//
-//  Created by Alifiyah Ariandri on 12/11/24.
-//
-
 import SwiftUI
 
 struct FOVDetail: View {
@@ -22,7 +15,7 @@ struct FOVDetail: View {
         NavigationView {
             ZStack {
                 GeometryReader { geometry in
-                    ZStack {
+                    ScrollView([.horizontal, .vertical]) {
                         AsyncImage(url: URL(string: fovData.image)) { image in
                             image
                                 .resizable()
@@ -55,7 +48,7 @@ struct FOVDetail: View {
                                 .clipped()
                                 .onChange(of: selectedBox) { newBox in
                                     if let box = newBox {
-                                        centerBox(box, imageGeometry: geometry, screenGeometry: geometry)
+                                        resetThenZoomToBox(box, screenGeometry: geometry)
                                     }
                                 }
                         } placeholder: {
@@ -66,7 +59,6 @@ struct FOVDetail: View {
                                 )
                         }
 
-                        // Custom pan gesture to handle dragging - now works at any zoom level
                         Color.clear
                             .gesture(
                                 DragGesture()
@@ -144,55 +136,47 @@ struct FOVDetail: View {
         }.navigationBarBackButtonHidden()
     }
 
-    private func centerBox(_ box: BoxModel, imageGeometry: GeometryProxy, screenGeometry: GeometryProxy) {
-        print("Centering box \(box.id) at position (\(box.x), \(box.y))")
-        print("Image size: \(imageGeometry.size)")
-        print("Screen size: \(screenGeometry.size)")
-        print("Current zoom scale: \(zoomScale)")
+    func resetThenZoomToBox(_ box: BoxModel, screenGeometry: GeometryProxy) {
+        withAnimation(.easeOut(duration: 0.3)) {
+            zoomScale = 1.0
+            offset = .zero
+        }
 
-        // Calculate box center position relative to the image (in image coordinates)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+            zoomToBox(box, screenGeometry: screenGeometry)
+        }
+    }
+
+    func zoomToBox(_ box: BoxModel, screenGeometry: GeometryProxy) {
+        let newZoom: CGFloat = 2.0
+
+        // Center of the box (in image coordinates)
         let boxCenterX = box.x + box.width / 2
         let boxCenterY = box.y + box.height / 2
 
-        print("Box center in image coordinates: (\(boxCenterX), \(boxCenterY))")
-
-        // Convert to screen coordinates by applying zoom scale
-        let boxCenterScreenX = boxCenterX * zoomScale
-        let boxCenterScreenY = boxCenterY * zoomScale
-
-        print("Box center in screen coordinates: (\(boxCenterScreenX), \(boxCenterScreenY))")
-
-        // Calculate the visible area center (accounting for tray at bottom)
+        // Screen visible center
         let screenCenterX = screenGeometry.size.width / 2
-        // Adjust Y center to account for tray - assume tray takes up about 1/3 of screen
-        let trayHeight = screenGeometry.size.height * 0.35 // Approximate tray height
+        let trayHeight = screenGeometry.size.height * 0.35
         let visibleAreaHeight = screenGeometry.size.height - trayHeight
         let visibleCenterY = visibleAreaHeight / 2
 
-        print("Visible area center: (\(screenCenterX), \(visibleCenterY))")
+        // New box center in screen coordinates after zoom
+        let boxCenterScreenX = boxCenterX * newZoom
+        let boxCenterScreenY = boxCenterY * newZoom
 
-        // Calculate the offset needed to move box center to visible area center
+        // Target offset: move box center to visible area center
         let targetOffsetX = screenCenterX - boxCenterScreenX
         let targetOffsetY = visibleCenterY - boxCenterScreenY - 50
 
-        print("Target offset: (\(targetOffsetX), \(targetOffsetY))")
-
-        // Apply the offset with bounds checking
-        let boundedOffset = limitOffset(CGSize(width: targetOffsetX, height: targetOffsetY), geometry: screenGeometry)
-
-        print("Bounded offset: (\(boundedOffset.width), \(boundedOffset.height))")
-
-        withAnimation(.easeInOut(duration: 0.5)) {
-            offset = boundedOffset
+        withAnimation(.easeInOut(duration: 0.35)) {
+            zoomScale = newZoom
+            offset = CGSize(width: targetOffsetX, height: targetOffsetY)
         }
     }
 
     private func limitOffset(_ newOffset: CGSize, geometry: GeometryProxy) -> CGSize {
         let scaledWidth = geometry.size.width * zoomScale
         let scaledHeight = geometry.size.height * zoomScale
-
-        let maxOffsetX = max(0, (scaledWidth - geometry.size.width) / 2)
-        let maxOffsetY = max(0, (scaledHeight - geometry.size.height) / 2)
 
         let limitedX: CGFloat
         let limitedY: CGFloat
