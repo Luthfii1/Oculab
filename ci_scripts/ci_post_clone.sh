@@ -48,7 +48,7 @@ cat <<EOL > Oculab.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.re
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/airbnb/lottie-ios.git",
       "state" : {
-        "revision" : "4f5b970b47145a25c38a297326461c935760d8a9",
+        "revision" : "047aa81b77adcbf583a966dfef620d17650cc656",
         "version" : "4.5.1"
       }
     }
