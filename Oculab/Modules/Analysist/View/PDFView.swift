@@ -13,9 +13,38 @@ struct PDFPageView: View {
     var patientData = TempPatientData()
     var preparatData = TempPreparatData()
     var hasilData = TempHasilData()
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        PDFKitView(pdfDocument: PDFDocument(data: generatePDF())!)
+        NavigationView {
+            PDFKitView(pdfDocument: PDFDocument(data: generatePDF())!)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button(action: {
+                            dismiss()
+                        }) {
+                            HStack {
+                                Image(systemName: "chevron.left")
+                                    .foregroundColor(.black)
+                                
+                                Text("Kembali")
+                                    .foregroundStyle(.black)
+                            }
+                        }
+                    }
+                    
+                    
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(action: {
+                            sharePDF()
+                        }) {
+                            Image(systemName: "square.and.arrow.up")
+                                .foregroundColor(.black)
+                        }
+                    }
+                }
+        }
     }
 
     @MainActor
@@ -183,6 +212,17 @@ struct PDFPageView: View {
             }
         }
     }
+
+    private func sharePDF() {
+        let pdfData = generatePDF()
+        let activityVC = UIActivityViewController(activityItems: [pdfData], applicationActivities: nil)
+        
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = windowScene.windows.first,
+           let rootVC = window.rootViewController {
+            rootVC.present(activityVC, animated: true)
+        }
+    }
 }
 
 // Placeholder data structs
@@ -199,6 +239,20 @@ struct TempPatientData {
     var sex = "{Perempuan}"
     var bpjs = "-"
 }
+
+// name patient
+// nik
+// age
+// sex
+// bpjs number
+// sampleId
+// health facility
+// laborant name
+// tujuan
+// jenisUji
+// hasil
+// catatan petugas
+// interpretasi generative
 
 struct TempPreparatData {
     var id = "{OCU-40}"
