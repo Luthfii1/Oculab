@@ -72,7 +72,7 @@ struct PDFPageView: View {
             )
             drawLines(context)
             drawHasilPemeriksaan(regularText)
-            drawImage()
+            drawIUATLDStandard()
         }
     }
 
@@ -121,11 +121,102 @@ struct PDFPageView: View {
         NSAttributedString(string: description, attributes: regularText).draw(in: descriptionRect)
     }
 
-    private func drawImage() {
-        guard let image = UIImage(named: "GradeDescription") else { return }
-
-        let imageRect = CGRect(x: 33, y: 475, width: 305, height: 160)
-        image.draw(in: imageRect)
+    private struct TableRow {
+        let left: String
+        let right: String
+    }
+    
+    private func drawIUATLDStandard() {
+        let boldAttributes = [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10)]
+        let regularAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 8)]
+        
+        // Table dimensions
+        let startX: CGFloat = 33
+        let startY: CGFloat = 475
+        let tableWidth: CGFloat = 500
+        let rowHeight: CGFloat = 25
+        let headerHeight: CGFloat = 25
+        let leftColumnWidth: CGFloat = tableWidth / 5
+        let rightColumnWidth: CGFloat = (tableWidth * 4) / 5
+        let rightColumnPadding: CGFloat = 10
+        let leftColumnPadding: CGFloat = 10  // Added padding for left column
+        let verticalPadding: CGFloat = 5
+        
+        // Draw headers
+        let leftHeader = NSAttributedString(string: "Pelaporan", attributes: boldAttributes)
+        let rightHeader = NSAttributedString(string: "Hasil Pengamatan", attributes: boldAttributes)
+        
+        // Position headers
+        let leftHeaderX = startX + leftColumnPadding
+        let rightHeaderX = startX + leftColumnWidth + rightColumnPadding
+        
+        // Draw headers with vertical padding
+        leftHeader.draw(at: CGPoint(x: leftHeaderX, y: startY + verticalPadding))
+        rightHeader.draw(at: CGPoint(x: rightHeaderX, y: startY + verticalPadding))
+        
+        // Table data
+        let rows: [TableRow] = [
+            TableRow(left: "Negatif", right: "Tidak ditemukan BTA dalam 100 lapang pandang"),
+            TableRow(left: "Scanty", right: "Ditemukan 1-9 BTA dalam 100 lapang pandang"),
+            TableRow(left: "Positif (1+)", right: "Ditemukan 10-99 BTA dalam 100 lapang pandang"),
+            TableRow(left: "Positif (2+)", right: "Ditemukan 1-9 BTA dalam setiap lapang pandang, minimal dalam 50 lapang pandang"),
+            TableRow(left: "Positif (3+)", right: "Ditemukan ≥10 BTA dalam setiap lapang pandang, minimal dalam 20 lapang pandang")
+        ]
+        
+        // Draw content
+        for (index, row) in rows.enumerated() {
+            let yPosition = startY + headerHeight + (CGFloat(index) * rowHeight)
+            
+            // Create attributed strings for left and right text
+            let leftText = NSAttributedString(string: row.left, attributes: regularAttributes)
+            let rightText = NSAttributedString(string: row.right, attributes: regularAttributes)
+            
+            // Calculate x positions for left-aligned text
+            let leftTextX = startX + leftColumnPadding
+            let rightTextX = startX + leftColumnWidth + rightColumnPadding
+            
+            // Draw left-aligned text with vertical padding
+            leftText.draw(at: CGPoint(x: leftTextX, y: yPosition + verticalPadding))
+            
+            // Draw right text with wrapping and vertical padding
+            let rightTextRect = CGRect(
+                x: rightTextX,
+                y: yPosition + verticalPadding,
+                width: rightColumnWidth - rightColumnPadding - 20,
+                height: rowHeight - (verticalPadding * 2)
+            )
+            rightText.draw(in: rightTextRect)
+        }
+        
+        // Draw table lines
+        if let context = UIGraphicsGetCurrentContext() {
+            context.setStrokeColor(UIColor.lightGray.cgColor)
+            context.setLineWidth(1.0)
+            
+            // Draw horizontal lines
+            for i in 0...6 {
+                let y = startY + (CGFloat(i) * rowHeight)
+                context.move(to: CGPoint(x: startX, y: y))
+                context.addLine(to: CGPoint(x: startX + tableWidth, y: y))
+            }
+            
+            // Draw vertical lines
+            let totalHeight = headerHeight + (5 * rowHeight)
+            
+            // Left line
+            context.move(to: CGPoint(x: startX, y: startY))
+            context.addLine(to: CGPoint(x: startX, y: startY + totalHeight))
+            
+            // Middle line
+            context.move(to: CGPoint(x: startX + leftColumnWidth, y: startY))
+            context.addLine(to: CGPoint(x: startX + leftColumnWidth, y: startY + totalHeight))
+            
+            // Right line
+            context.move(to: CGPoint(x: startX + tableWidth, y: startY))
+            context.addLine(to: CGPoint(x: startX + tableWidth, y: startY + totalHeight))
+            
+            context.strokePath()
+        }
     }
 
     private func drawInfoSection(
