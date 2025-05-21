@@ -73,6 +73,7 @@ struct PDFPageView: View {
             drawLines(context)
             drawHasilPemeriksaan(regularText)
             drawIUATLDStandard()
+            drawSignatures(boldText, regularText)
         }
     }
 
@@ -281,6 +282,58 @@ struct PDFPageView: View {
             context.addLine(to: CGPoint(x: 563, y: CGFloat(yOffset)))
         }
         context.strokePath()
+    }
+
+    private func drawSignatures(_ boldText: [NSAttributedString.Key: Any], _ regularText: [NSAttributedString.Key: Any]) {
+        let startY: CGFloat = 700
+        let signatureSize = CGSize(width: 100, height: 50)
+        let lineWidth: CGFloat = 1.0
+        
+        // Left signature (Petugas Lab)
+        let leftX: CGFloat = 33
+        let leftTitle = NSAttributedString(string: "Petugas Lab", attributes: boldText)
+        leftTitle.draw(at: CGPoint(x: leftX, y: startY))
+        
+        // Draw signature image placeholder
+        if let signatureImage = UIImage(named: "ttd") {
+            signatureImage.draw(in: CGRect(x: leftX, y: startY + 20, width: signatureSize.width, height: signatureSize.height))
+        }
+        
+        // Draw horizontal line
+        if let context = UIGraphicsGetCurrentContext() {
+            context.setStrokeColor(UIColor.black.cgColor)
+            context.setLineWidth(lineWidth)
+            context.move(to: CGPoint(x: leftX, y: startY + 80))
+            context.addLine(to: CGPoint(x: leftX + signatureSize.width, y: startY + 80))
+            context.strokePath()
+        }
+        
+        // Draw name
+        let leftName = NSAttributedString(string: "{Bunga Prameswari, S.Tr.Kes}", attributes: regularText)
+        leftName.draw(at: CGPoint(x: leftX, y: startY + 90))
+        
+        // Right signature (Dokter PJ)
+        let rightX: CGFloat = 400
+        let rightTitle = NSAttributedString(string: "Dokter PJ Pemeriksaan Lab", attributes: boldText)
+        rightTitle.draw(at: CGPoint(x: rightX, y: startY))
+        
+        // Draw signature image placeholder
+        if let signatureImage = UIImage(named: "ttd") {
+            signatureImage.draw(in: CGRect(x: rightX, y: startY + 20, width: signatureSize.width, height: signatureSize.height))
+        }
+        
+        // Draw horizontal line
+        if let context = UIGraphicsGetCurrentContext() {
+            context.setStrokeColor(UIColor.black.cgColor)
+            context.setLineWidth(lineWidth)
+            context.move(to: CGPoint(x: rightX, y: startY + 80))
+            context.addLine(to: CGPoint(x: rightX + signatureSize.width, y: startY + 80))
+            context.strokePath()
+        }
+        
+        // Draw name
+        let rightName = NSAttributedString(string: "{dr. John Doe}", attributes: regularText)
+        rightName.draw(at: CGPoint(x: rightX, y: startY + 90))
     }
 
     // Save PDF to file system
