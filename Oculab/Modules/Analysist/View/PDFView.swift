@@ -9,11 +9,8 @@ import PDFKit
 import SwiftUI
 
 struct PDFPageView: View {
-    var kopData = Kop()
-    var patientData = TempPatientData()
-    var preparatData = TempPreparatData()
-    var hasilData = TempHasilData()
-
+    @StateObject private var presenter = PDFPresenter()
+    
     var body: some View {
         PDFKitView(pdfDocument: PDFDocument(data: generatePDF())!)
     }
@@ -34,9 +31,14 @@ struct PDFPageView: View {
             // Draw PDF content
             drawHeader(regularText)
             drawInfoSection(
-                title: patientData.name,
+                title: presenter.data.patient.name,
                 labels: ["NIK", "Umur", "Jenis Kelamin", "No. BPJS"],
-                values: [patientData.nik, "\(patientData.age) Tahun", patientData.sex, patientData.bpjs],
+                values: [
+                    presenter.data.patient.nik,
+                    "\(presenter.data.patient.age) Tahun",
+                    presenter.data.patient.sex,
+                    presenter.data.patient.bpjs
+                ],
                 xTitle: 33,
                 yStart: 149,
                 boldText,
@@ -46,7 +48,11 @@ struct PDFPageView: View {
             drawInfoSection(
                 title: "Informasi Sediaan",
                 labels: ["ID Pemeriksaan", "Diambil di", "Petugas"],
-                values: [preparatData.id, preparatData.place, preparatData.laborant],
+                values: [
+                    presenter.data.preparat.id,
+                    presenter.data.preparat.place,
+                    presenter.data.preparat.laborant
+                ],
                 xTitle: 246,
                 yStart: 149,
                 boldText,
@@ -58,14 +64,14 @@ struct PDFPageView: View {
 
             drawInterpretasi(
                 title: "Interpretasi Mikroskopis",
-                description: "{Pelaporan BTA pada Sediaan dengan Pewarnaan Z-N berdasarkan Rekomendasi IUALTD/WHO. Hasil positif pada sediaan BTA (Bakteri Tahan Asam) menjadi indikasi awal adanya infeksi mikobakteri dan potensi penyakit TB. Positifnya hasil sediaan dan tingkatan BTA mencerminkan beban bakteri relatif dan terkait dengan gejala penyakit. Terapi pasien untuk TB dapat dimulai berdasarkan hasil sediaan dan presentasi klinis, dengan perubahan status BTA yang penting untuk memantau respons terapi}",
+                description: presenter.data.hasil.descInterpretasi,
                 yContent: 388,
                 boldText,
                 regularText
             )
             drawInterpretasi(
                 title: "Catatan Petugas",
-                description: "{Ada kemungkinan infeksi penyakit tuberculosis}",
+                description: presenter.data.hasil.descNotesPetugas,
                 yContent: 640,
                 boldText,
                 regularText
@@ -80,11 +86,11 @@ struct PDFPageView: View {
     // Draw header section with logo, description, phone, email
     private func drawHeader(_ regularText: [NSAttributedString.Key: Any]) {
         UIImage(named: "logo")?.draw(at: CGPoint(x: 32, y: 32))
-        NSAttributedString(string: kopData.desc, attributes: regularText).draw(at: CGPoint(x: 32, y: 72))
+        NSAttributedString(string: presenter.data.kopSurat.desc, attributes: regularText).draw(at: CGPoint(x: 32, y: 72))
         
         // Phone number with icon
         let phoneIcon = UIImage(named: "phoneIcon")?.resizeImage(targetSize: CGSize(width: 12, height: 12))
-        let phoneText = NSAttributedString(string: kopData.notelp, attributes: regularText)
+        let phoneText = NSAttributedString(string: presenter.data.kopSurat.notelp, attributes: regularText)
         let phoneTextSize = phoneText.size()
         let phoneIconSize = phoneIcon?.size ?? .zero
         let phoneX = 563 - phoneTextSize.width - phoneIconSize.width - 4 // 4 is padding between text and icon
@@ -93,7 +99,7 @@ struct PDFPageView: View {
         
         // Email with icon
         let emailIcon = UIImage(named: "envelopeIcon")?.resizeImage(targetSize: CGSize(width: 12, height: 12))
-        let emailText = NSAttributedString(string: kopData.email, attributes: regularText)
+        let emailText = NSAttributedString(string: presenter.data.kopSurat.email, attributes: regularText)
         let emailTextSize = emailText.size()
         let emailIconSize = emailIcon?.size ?? .zero
         let emailX = 563 - emailTextSize.width - emailIconSize.width - 4
@@ -254,7 +260,12 @@ struct PDFPageView: View {
             .foregroundColor: UIColor.red
         ]
         let labels = ["Tujuan Pemeriksaan", "Jenis Uji", "ID Sediaan", "Hasil Pemeriksaan"]
-        let values = [hasilData.tujuan, hasilData.jenisUji, hasilData.idSediaan, hasilData.hasil]
+        let values = [
+            presenter.data.hasil.tujuan,
+            presenter.data.hasil.jenisUji,
+            presenter.data.hasil.idSediaan,
+            presenter.data.hasil.hasil
+        ]
 
         for (index, label) in labels.enumerated() {
             let xPosition: CGFloat = [33, 186, 287, 412][index]
@@ -350,34 +361,6 @@ struct PDFPageView: View {
             }
         }
     }
-}
-
-// Placeholder data structs
-struct Kop {
-    var desc = "Pathologist Expert Companion for Accessible TB Care"
-    var notelp = "+62 838 0000 0000"
-    var email = "ai.oculab@gmail.com"
-}
-
-struct TempPatientData {
-    var name = "{Alya Annisa Kirana}"
-    var nik = "{167012039484700}"
-    var age = 23
-    var sex = "{Perempuan}"
-    var bpjs = "-"
-}
-
-struct TempPreparatData {
-    var id = "{OCU-40}"
-    var place = "{Puskesmas Rawa Buntu}"
-    var laborant = "{Bunga Prameswari, S.Tr.Kes}"
-}
-
-struct TempHasilData {
-    var tujuan = "{Skrining}"
-    var jenisUji = "{Sewaktu}"
-    var hasil = "{Positif (3+)}"
-    var idSediaan = "{24/11/1/0123A}"
 }
 
 // PDF Viewer
