@@ -80,8 +80,25 @@ struct PDFPageView: View {
     private func drawHeader(_ regularText: [NSAttributedString.Key: Any]) {
         UIImage(named: "logo")?.draw(at: CGPoint(x: 32, y: 32))
         NSAttributedString(string: kopData.desc, attributes: regularText).draw(at: CGPoint(x: 32, y: 72))
-        NSAttributedString(string: kopData.notelp, attributes: regularText).draw(at: CGPoint(x: 427, y: 54))
-        NSAttributedString(string: kopData.email, attributes: regularText).draw(at: CGPoint(x: 427, y: 70))
+        
+        // Phone number with icon
+        let phoneIcon = UIImage(named: "phoneIcon")?.resizeImage(targetSize: CGSize(width: 12, height: 12))
+        let phoneText = NSAttributedString(string: kopData.notelp, attributes: regularText)
+        let phoneTextSize = phoneText.size()
+        let phoneIconSize = phoneIcon?.size ?? .zero
+        let phoneX = 563 - phoneTextSize.width - phoneIconSize.width - 4 // 4 is padding between text and icon
+        phoneText.draw(at: CGPoint(x: phoneX, y: 54))
+        phoneIcon?.draw(at: CGPoint(x: phoneX + phoneTextSize.width + 4, y: 54))
+        
+        // Email with icon
+        let emailIcon = UIImage(named: "envelopeIcon")?.resizeImage(targetSize: CGSize(width: 12, height: 12))
+        let emailText = NSAttributedString(string: kopData.email, attributes: regularText)
+        let emailTextSize = emailText.size()
+        let emailIconSize = emailIcon?.size ?? .zero
+        let emailX = 563 - emailTextSize.width - emailIconSize.width - 4
+        emailText.draw(at: CGPoint(x: emailX, y: 70))
+        emailIcon?.draw(at: CGPoint(x: emailX + emailTextSize.width + 4, y: 70))
+        
         UIImage(named: "line")?.draw(at: CGPoint(x: 0, y: 97))
     }
 
