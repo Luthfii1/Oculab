@@ -12,7 +12,7 @@ struct UserListView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
-            ForEach(presenter.sortedGroupedAccounts, id: \.self) { key in
+            ForEach(presenter.displayedSortedGroupedAccounts, id: \.self) { key in
                 VStack(alignment: .leading, spacing: 8) {
                     Text(key)
                         .font(AppTypography.s4_1)
@@ -20,7 +20,7 @@ struct UserListView: View {
                         .padding(.horizontal)
 
                     VStack(spacing: 0) {
-                        if let accounts = presenter.groupedAccounts[key] {
+                        if let accounts = presenter.displayedGroupedAccounts[key] {
                             ForEach(accounts, id: \.id) { account in
                                 HStack {
                                     Text(account.name)
@@ -48,11 +48,6 @@ struct UserListView: View {
                     .background(Color.white)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
-            }
-        }
-        .onAppear {
-            Task {
-                await presenter.fetchAllAccount()
             }
         }
     }

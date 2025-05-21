@@ -7,11 +7,12 @@
 
 import Foundation
 import SwiftUI
+import Combine
 
 class AccountPresenter: ObservableObject {
     var interactor: AccountInteractor? = AccountInteractor()
+    private var cancellables = Set<AnyCancellable>()
 
-    // UI State
     @Published var isUserLoading = false
     @Published var isRegistering = false
     @Published var isDeleting = false
@@ -22,18 +23,40 @@ class AccountPresenter: ObservableObject {
     @Published var deletionError: String? = nil
     @Published var deletionSuccess: (userName: String, message: String)? = nil
 
+    @Published var searchText: String = ""
+    @Published var isSearching: Bool = false
+    @Published var filteredGroupedAccounts: [String: [Account]] = [:]
+    @Published var filteredSortedGroupedAccounts: [String] = []
     
-    // Data
     @Published var groupedAccounts: [String: [Account]] = [:]
     @Published var sortedGroupedAccounts: [String] = []
     
-    // Selected user for bottom sheet
     @Published var selectedUser: SelectedUser? = nil
     
     // Model for selected user
     struct SelectedUser: Identifiable {
         var id: String
         var name: String
+    }
+    
+    // Computed property to get accounts based on search state
+    var displayedGroupedAccounts: [String: [Account]] {
+        return searchText.isEmpty ? groupedAccounts : filteredGroupedAccounts
+    }
+    
+    var displayedSortedGroupedAccounts: [String] {
+        return searchText.isEmpty ? sortedGroupedAccounts : filteredSortedGroupedAccounts
+    }
+    
+    init() {
+        // Set up search text debounce for real-time searching
+        $searchText
+            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
+            .removeDuplicates()
+            .sink { [weak self] searchText in
+                self?.searchAccounts(query: searchText)
+            }
+            .store(in: &cancellables)
     }
     
     // User selection methods
@@ -71,6 +94,11 @@ class AccountPresenter: ObservableObject {
             if let response {
                 groupedAccounts = groupAccountsByName(accounts: response)
                 sortedGroupedAccounts = groupedAccounts.keys.sorted()
+                
+                // If there was an active search, apply it to the new data
+                if !searchText.isEmpty {
+                    searchAccounts(query: searchText)
+                }
             }
 
         } catch {
@@ -87,6 +115,63 @@ class AccountPresenter: ObservableObject {
                 print("Unknown error: \(error.localizedDescription)")
             }
         }
+    }
+    
+    // Search functionality
+    func searchAccounts(query: String) {
+        if query.isEmpty {
+            // Reset filtered results when query is empty
+            filteredGroupedAccounts = [:]
+            filteredSortedGroupedAccounts = []
+            return
+        }
+        
+        // Set searching state
+        isSearching = true
+        
+        // Filter accounts based on the query
+        var newFilteredGroups: [String: [Account]] = [:]
+        
+        // Iterate through all accounts in all groups
+        for (_, accounts) in groupedAccounts {
+            for account in accounts {
+                // Check if the account name or email contains the query (case insensitive)
+                if account.name.lowercased().contains(query.lowercased()) ||
+                   account.email.lowercased().contains(query.lowercased()) {
+                    
+                    // Get the first letter to use as the group key
+                    guard let firstLetter = account.name.first?.uppercased() else { continue }
+                    
+                    // Add to filtered results
+                    if newFilteredGroups[firstLetter] != nil {
+                        newFilteredGroups[firstLetter]?.append(account)
+                    } else {
+                        newFilteredGroups[firstLetter] = [account]
+                    }
+                }
+            }
+        }
+        
+        // Sort accounts within each group by name
+        for key in newFilteredGroups.keys {
+            newFilteredGroups[key]?.sort { $0.name < $1.name }
+        }
+        
+        // Update filtered results
+        filteredGroupedAccounts = newFilteredGroups
+        filteredSortedGroupedAccounts = newFilteredGroups.keys.sorted()
+        
+        isSearching = false
+    }
+    
+    func clearSearch() {
+        searchText = ""
+        filteredGroupedAccounts = [:]
+        filteredSortedGroupedAccounts = []
+    }
+    
+    func performSearch() {
+        searchAccounts(query: searchText)
     }
     
     @MainActor
