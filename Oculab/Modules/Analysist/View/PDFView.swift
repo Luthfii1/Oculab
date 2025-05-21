@@ -157,13 +157,19 @@ struct PDFPageView: View {
     // Draw the result table for bacteriological examination
     private func drawHasilPemeriksaan(_ regularText: [NSAttributedString.Key: Any]) {
         let boldAttributes = [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 12)]
+        let boldRedAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.boldSystemFont(ofSize: 12),
+            .foregroundColor: UIColor.red
+        ]
         let labels = ["Tujuan Pemeriksaan", "Jenis Uji", "ID Sediaan", "Hasil Pemeriksaan"]
         let values = [hasilData.tujuan, hasilData.jenisUji, hasilData.idSediaan, hasilData.hasil]
 
         for (index, label) in labels.enumerated() {
             let xPosition: CGFloat = [33, 186, 287, 412][index]
             NSAttributedString(string: label, attributes: boldAttributes).draw(at: CGPoint(x: xPosition, y: 317))
-            NSAttributedString(string: values[index], attributes: regularText).draw(at: CGPoint(x: xPosition, y: 353))
+            // Use bold red attributes for the result value (index 3)
+            let attributes = index == 3 ? boldRedAttributes : regularText
+            NSAttributedString(string: values[index], attributes: attributes).draw(at: CGPoint(x: xPosition, y: 353))
         }
 
         NSAttributedString(string: "HASIL PEMERIKSAAN BAKTERIOLOGIS", attributes: boldAttributes)
