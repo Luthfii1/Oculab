@@ -113,4 +113,8 @@ class AnalysisResultPresenter: ObservableObject {
             total: total
         ))
     }
+    
+    func navigateToPDFView() {
+        Router.shared.navigateTo(.pdf)
+    }
 }

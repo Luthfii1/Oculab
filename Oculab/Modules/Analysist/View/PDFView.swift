@@ -12,7 +12,35 @@ struct PDFPageView: View {
     @StateObject private var presenter = PDFPresenter()
     
     var body: some View {
-        PDFKitView(pdfDocument: PDFDocument(data: generatePDF())!)
+        NavigationView {
+            PDFKitView(pdfDocument: PDFDocument(data: generatePDF())!)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button(action: {
+                            dismiss()
+                        }) {
+                            HStack {
+                                Image(systemName: "chevron.left")
+                                    .foregroundColor(.black)
+                                
+                                Text("Kembali")
+                                    .foregroundStyle(.black)
+                            }
+                        }
+                    }
+                    
+                    
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(action: {
+                            sharePDF()
+                        }) {
+                            Image(systemName: "square.and.arrow.up")
+                                .foregroundColor(.black)
+                        }
+                    }
+                }
+        }
     }
 
     @MainActor
@@ -359,6 +387,17 @@ struct PDFPageView: View {
             } catch {
                 print("Error saving PDF: \(error.localizedDescription)")
             }
+        }
+    }
+
+    private func sharePDF() {
+        let pdfData = generatePDF()
+        let activityVC = UIActivityViewController(activityItems: [pdfData], applicationActivities: nil)
+        
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = windowScene.windows.first,
+           let rootVC = window.rootViewController {
+            rootVC.present(activityVC, animated: true)
         }
     }
 }
