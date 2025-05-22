@@ -7,24 +7,50 @@
 
 import Foundation
 
+struct UserUpdatePasswordResponse: Codable {
+    var userId: String
+    var email: String
+    var newPassword: String
+}
+
+struct UserUpdatePasswordBody: Codable {
+    var newPassword: String
+    var previousPassword: String
+}
+
 protocol ProfileInteractorProtocol {
-    func editNewPassword(password: String) async throws -> User
+    func editNewPassword(newPassword: String, previousPassword: String) async throws -> UserUpdatePasswordResponse
     func editNewPIN(pin: String) async throws
     func activateFaceID() async throws
 }
 
 class ProfileInteractor: ProfileInteractorProtocol {
-    private let apiAuthenticationService = API.BE + "/user"
+    private let apiAuthenticationService = API.BE_STAGING + "/user"
 
-    func editNewPassword(password: String) async throws -> User {
-        let userId = UserDefaults.standard.value(forKey: UserDefaultType.userId.rawValue)
-
-        let response: APIResponse<User> = try await NetworkHelper.shared.update(
-            urlString: apiAuthenticationService + "/update-user/\(String(describing: userId))",
-            body: password
+    func editNewPassword(newPassword: String, previousPassword: String) async throws -> UserUpdatePasswordResponse {
+        guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
+        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
+                throw URLError(.userAuthenticationRequired)
+            }
+        let headers = [
+            "Authorization": "Bearer \(token)",
+            "Content-Type": "application/json"
+        ]
+        
+        let response: APIResponse<UserUpdatePasswordResponse> = try await NetworkHelper.shared.update(
+            urlString: apiAuthenticationService + "/update-user-password/\(String(describing: userId))",
+            body: UserUpdatePasswordBody(newPassword: newPassword, previousPassword: previousPassword),
+            headers: headers
         )
 
-        return response.data
+        return UserUpdatePasswordResponse(
+            userId: response.data.userId,
+            email: response.data.email,
+            newPassword: response.data.newPassword
+        )
     }
 
     func editNewPIN(pin: String) async throws {}
