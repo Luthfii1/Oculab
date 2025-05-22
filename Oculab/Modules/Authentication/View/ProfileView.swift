@@ -21,7 +21,7 @@ struct ProfileView: View {
                         title: "Informasi Akun",
                         isExtendable: false,
                         data: [
-                            (key: "Username", value: authPresenter.user.username ?? authPresenter.user.name),
+                            (key: "Email", value: authPresenter.user.email ?? authPresenter.user.name),
                             (key: "Role", value: authPresenter.user.role.rawValue.capitalized),
                             (key: "Jabatan Pekerjaan", value: "Ahli Teknologi Laboratorium Medik"),
                         ],

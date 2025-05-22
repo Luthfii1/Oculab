@@ -32,11 +32,11 @@ struct LoginView: View {
                         .multilineTextAlignment(.center)
                     VStack(spacing: 8) {
                         AppTextField(
-                            title: "Username",
+                            title: "Email",
                             isRequired: true,
-                            placeholder: "Contoh: indrikla",
+                            placeholder: "Contoh: indrikla24@gmail.com",
                             isError: presenter.isError,
-                            text: $presenter.username
+                            text: $presenter.email
                         )
                         AppTextField(
                             title: "Kata Sandi",
