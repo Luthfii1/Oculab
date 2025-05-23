@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 struct UserBody: Codable {
-    let username: String
+    let email: String
     let password: String
 }
 
@@ -25,12 +25,12 @@ class AuthenticationInteractor: ObservableObject {
         self.modelContext = modelContext
     }
 
-    private let apiAuthenticationService = API.BE + "/user"
+    private let apiAuthenticationService = API.BE_STAGING + "/user"
 
-    func login(username: String, password: String) async throws -> LoginResponse {
+    func login(email: String, password: String) async throws -> LoginResponse {
         let response: APIResponse<LoginResponse> = try await NetworkHelper.shared.post(
             urlString: apiAuthenticationService + "/login",
-            body: UserBody(username: username, password: password)
+            body: UserBody(email: email, password: password)
         )
 
         let isFirstTime = UserDefaults.standard.bool(forKey: UserDefaultType.isFirstTimeLogin.rawValue) == false

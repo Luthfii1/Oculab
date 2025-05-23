@@ -11,6 +11,7 @@ struct BottomSheetMenu: View {
     @ObservedObject var presenter: AccountPresenter
     @Environment(\.dismiss) private var dismiss
     @State private var isLoaded = false
+    @State private var navigateToEdit = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -27,7 +28,13 @@ struct BottomSheetMenu: View {
                 .opacity(isLoaded ? 1 : 0)
 
             Button {
-                // Edit account logic
+                // Find the full account for the selected user
+                if let userId = presenter.selectedUser?.id,
+                   let account = presenter.findAccountById(userId) {
+                    print(userId)
+                    presenter.navigateTo(.editAccount(account: account))
+                    dismiss()
+                }
             } label: {
                 HStack {
                     Image(systemName: "pencil")

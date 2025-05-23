@@ -14,14 +14,19 @@ class AccountPresenter: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
 
     @Published var isUserLoading = false
-    @Published var isRegistering = false
-    @Published var isDeleting = false
-    @Published var showSuccessPopup = false
     
+    @Published var isRegistering = false
     @Published var registrationError: String? = nil
     @Published var registrationSuccess: (name: String, role: String) = ("", "")
+    @Published var showSuccessPopup = false
+    
+    @Published var isDeleting = false
     @Published var deletionError: String? = nil
     @Published var deletionSuccess: (userName: String, message: String)? = nil
+    
+    @Published var isEditing = false
+    @Published var editError: String? = nil
+    @Published var editSuccess: (name: String, role: String) = ("", "")
 
     @Published var searchText: String = ""
     @Published var isSearching: Bool = false
@@ -218,19 +223,85 @@ class AccountPresenter: ObservableObject {
         isRegistering = false
     }
     
-    func isFormValid(name: String, email: String, role: String) -> Bool {
-        let emailRegex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"
-        let validEmail = email.range(of: emailRegex, options: .regularExpression) != nil
-        
-        return !name.isEmpty && validEmail && !role.isEmpty
-    }
-    
     func getRoleType(from roleString: String) -> RolesType {
         return RolesType(rawValue: roleString) ?? .LAB
     }
     
     func resetForm() {
         showSuccessPopup = false
+    }
+    
+    func validateEmail(_ email: String) -> Bool {
+        let emailRegex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"
+        return email.range(of: emailRegex, options: .regularExpression) != nil
+    }
+    
+    func validateName(_ name: String) -> Bool {
+        return !name.isEmpty
+    }
+    
+    func validateRole(_ role: String) -> Bool {
+        return !role.isEmpty
+    }
+    
+    func isFormValid(name: String, email: String, role: String) -> Bool {
+        return validateName(name) && validateEmail(email) && validateRole(role)
+    }
+    
+    func findAccountById(_ id: String) -> Account? {
+        for (_, accounts) in groupedAccounts {
+            if let account = accounts.first(where: { $0.id == id }) {
+                return account
+            }
+        }
+        
+        return nil
+    }
+    
+    @MainActor
+    func editSelectedUser(role: String, name: String, userId: String) async {
+        
+        isEditing = true
+        defer { isEditing = false }
+        
+        do {
+            print("masuk do presenter")
+            let result = try await interactor?.editAccount(
+                userId: userId,
+                name: name,
+                role: getRoleType(from: role)
+            )
+            
+            if let result = result {
+                print("Edit successful: \(result.id): \(result.name)")
+                
+                selectedUser = SelectedUser(id: result.id, name: result.name)
+                
+                editSuccess = (name: name, role: role)
+                
+                showSuccessPopup = true
+                
+                Task {
+                    await fetchAllAccount()
+                }
+            } else {
+                editError = "Failed to edit account: No response from server"
+            }
+            
+        } catch {
+            print("Edit error: \(error)")
+                
+            switch error {
+            case let NetworkError.apiError(apiResponse):
+                editError = apiResponse.data.description
+                
+            case let NetworkError.networkError(message):
+                editError = message
+                
+            default:
+                editError = error.localizedDescription
+            }
+        }
     }
     
     @MainActor
@@ -280,3 +351,4 @@ class AccountPresenter: ObservableObject {
         Router.shared.navigateBack()
     }
 }
+

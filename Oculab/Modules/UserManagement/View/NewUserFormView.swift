@@ -30,10 +30,6 @@ struct NewUserFormView: View {
                                 size: .large,
                                 isEnabled: true
                             ) {
-                                // Reset form
-                                name = ""
-                                email = ""
-                                role = ""
                                 presenter.resetForm()
                             },
                             
@@ -61,6 +57,7 @@ struct NewUserFormView: View {
                     VStack(spacing: 24) {
                         Image("AddAccount")
                         VStack(spacing: 16) {
+                            // Role dropdown
                             AppDropdown(
                                 title: "Role",
                                 placeholder: "Laboran",
@@ -71,30 +68,44 @@ struct NewUserFormView: View {
                                 choices: [("Laboran", RolesType.LAB.rawValue), ("Admin", RolesType.ADMIN.rawValue)],
                                 selectedChoice: $role
                             )
-                        
+                            
+                            // Name field
                             AppTextField(
                                 title: "Nama",
+                                isRequired: true,
                                 placeholder: "John Doe",
                                 text: $name
                             )
                             
+                            // Email field
                             AppTextField(
                                 title: "Email",
+                                isRequired: true,
                                 placeholder: "john@gmail.com",
                                 text: $email
                             )
                             
+                            // Loading indicator
                             if presenter.isRegistering {
                                 ProgressView()
                             }
                             
+                            // Register button
                             AppButton(
                                 title: "Daftarkan Akun",
                                 rightIcon: "arrow.right",
-                                isEnabled: presenter.isFormValid(name: name, email: email, role: role),
+                                isEnabled: presenter.isFormValid(
+                                    name: name,
+                                    email: email,
+                                    role: role
+                                ),
                                 action: {
                                     Task {
-                                        await presenter.registerNewAccount(role: role, name: name, email: email)
+                                        await presenter.registerNewAccount(
+                                            role: role,
+                                            name: name,
+                                            email: email
+                                        )
                                     }
                                 }
                             )
@@ -111,7 +122,7 @@ struct NewUserFormView: View {
                             presenter.navigateBack()
                         }) {
                             HStack {
-                                Image("Destroy")
+                                Image(systemName: "chevron.left")
                             }
                         }
                     }
