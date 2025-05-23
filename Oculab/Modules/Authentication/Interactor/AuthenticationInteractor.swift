@@ -19,6 +19,18 @@ struct LoginResponse: Codable {
     let userId: String
 }
 
+struct UserUpdateAccessPinResponse: Codable {
+    var userId: String
+    var email: String
+    var newAccessPin: String
+}
+
+struct UserUpdateAccessPinBody: Codable {
+    var newAccessPin: String
+    var previousAccessPin: String
+}
+
+
 class AuthenticationInteractor: ObservableObject {
     private var modelContext: ModelContext
     init(modelContext: ModelContext) {
@@ -136,5 +148,34 @@ class AuthenticationInteractor: ObservableObject {
         } catch {
             print("Error deleting all users: \(error.localizedDescription)")
         }
+    }
+    
+    func editNewPIN(newAccessPin: String, previousAccessPin: String) async throws -> UserUpdateAccessPinResponse {
+        guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
+        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
+                throw URLError(.userAuthenticationRequired)
+            }
+        let headers = [
+            "Authorization": "Bearer \(token)",
+            "Content-Type": "application/json"
+        ]
+        
+        let response: APIResponse<UserUpdateAccessPinResponse> = try await NetworkHelper.shared.update(
+            urlString: apiAuthenticationService + "/update-user-accessPin/\(String(describing: userId))",
+            body: UserUpdateAccessPinBody(
+                newAccessPin: newAccessPin,
+                previousAccessPin: previousAccessPin
+            ),
+            headers: headers
+        )
+
+        return UserUpdateAccessPinResponse(
+            userId: response.data.userId,
+            email: response.data.email,
+            newAccessPin: response.data.newAccessPin
+        )
     }
 }

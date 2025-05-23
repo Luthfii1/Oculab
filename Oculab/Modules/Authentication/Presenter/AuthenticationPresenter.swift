@@ -56,18 +56,14 @@ class AuthenticationPresenter: ObservableObject {
             setDescriptionPIN()
         }
     }
+    
+    @Published var oldAccessPin = ""
+    @Published var newAccessPin = ""
+    @Published var isAccessPinChangeInProgress = false
+    @Published var showAccessPinSuccessPopup = false
 
     var isFilled: Bool {
         !email.isEmpty && !password.isEmpty && !isLoading
-    }
-
-    var title: String {
-        switch state {
-        case .create: return "Atur PIN"
-        case .revalidate: return "Konfirmasi PIN"
-        case .authenticate: return "Masukkan PIN"
-        case .changePIN: return "PIN Saat Ini"
-        }
     }
 
     private var interactor: AuthenticationInteractor
@@ -76,17 +72,31 @@ class AuthenticationPresenter: ObservableObject {
         self.interactor = interactor
         setDescriptionPIN()
     }
-
+    
+    // MARK: ACCESS PIN
+    
     @MainActor
     func isValidPin() async -> Bool {
-        if await interactor.getUserLocalData()?.accessPin != inputPin {
-            isError = true
-            return false
+        // For PIN change flow, we should check against oldAccessPin, not the stored PIN
+        if isAccessPinChangeInProgress {
+            if oldAccessPin != inputPin {
+                isError = true
+                description = "PIN saat ini salah"
+                return false
+            }
+        } else {
+            // Normal authentication - check against stored PIN
+            if await interactor.getUserLocalData()?.accessPin != inputPin {
+                isError = true
+                description = "PIN salah, silakan coba lagi"
+                return false
+            }
         }
+        
         isError = false
         return true
     }
-
+    
     @MainActor
     func handlePinInput(_ pin: String) async {
         guard pin.count == 4 else { return }
@@ -102,12 +112,21 @@ class AuthenticationPresenter: ObservableObject {
             secondPin = pin
 
             if revalidatePinMatched() {
-                user.accessPin = secondPin
-                await updateAccount(updateUser: user)
-                isPinAuthorized = true
+                if isAccessPinChangeInProgress {
+                    // This is part of PIN change flow - call the PIN update API
+                    newAccessPin = secondPin
+                    await postEditAccessPin()
+                } else {
+                    // This is initial PIN setup - just update locally and authorize
+                    user.accessPin = secondPin
+                    await interactor.updateUserLocalData(user: user)
+                    isPinAuthorized = true
+                    Router.shared.popToRoot()
+                }
             } else {
                 isError = true
                 inputPin = ""
+                // Error description is already set in revalidatePinMatched()
             }
 
         case .authenticate:
@@ -117,21 +136,144 @@ class AuthenticationPresenter: ObservableObject {
                     Router.shared.popToRoot()
                 } else {
                     inputPin = ""
+                    // Error description is already set in isValidPin()
                 }
             }
 
         case .changePIN:
             Task {
                 if await self.isValidPin() {
+                    oldAccessPin = inputPin // Store the old PIN
+                    isAccessPinChangeInProgress = true
                     inputPin = ""
+                    firstPin = ""
+                    secondPin = ""
                     state = .create
+                    
                     Router.shared.navigateTo(.userAccessPin(state: .create))
                 } else {
                     inputPin = ""
+                    // Error description is already set in isValidPin()
                 }
             }
         }
     }
+    
+    @MainActor
+    func postEditAccessPin() async {
+        guard !newAccessPin.isEmpty, !oldAccessPin.isEmpty else {
+            print("PIN fields are empty")
+            isError = true
+            return
+        }
+        
+        do {
+            _ = try await interactor.editNewPIN(
+                newAccessPin: newAccessPin,
+                previousAccessPin: oldAccessPin
+            )
+            
+            // Update local user data
+            user.accessPin = newAccessPin
+            await interactor.updateUserLocalData(user: user)
+            
+            // Show success and reset
+            showAccessPinSuccessPopup = true
+            resetPinChangeFlow()
+            
+        } catch {
+            isError = true
+            switch error {
+            case let NetworkError.apiError(apiResponse):
+                print("Error type: \(apiResponse.data.errorType)")
+                print("Error description: \(apiResponse.data.description)")
+                description = apiResponse.data.description
+
+            case let NetworkError.networkError(message):
+                print("Network error: \(message)")
+                description = message
+
+            default:
+                print("Unknown error: \(error.localizedDescription)")
+                description = error.localizedDescription
+            }
+        }
+    }
+    
+    func resetPinChangeFlow() {
+        oldAccessPin = ""
+        newAccessPin = ""
+        firstPin = ""
+        secondPin = ""
+        inputPin = ""
+        isAccessPinChangeInProgress = false
+        isError = false
+        description = ""
+    }
+    
+    func setDescriptionPIN() {
+        if !isError {
+            switch state {
+            case .create:
+                if isAccessPinChangeInProgress {
+                    descriptionPIN = "Masukkan PIN baru Anda"
+                } else {
+                    descriptionPIN = "Atur PIN untuk kemudahan login di sesi berikutnya"
+                }
+            case .revalidate:
+                if isAccessPinChangeInProgress {
+                    descriptionPIN = "Konfirmasi PIN baru Anda"
+                } else {
+                    descriptionPIN = "Masukkan PIN kembali untuk konfirmasi"
+                }
+            case .authenticate:
+                descriptionPIN = "Masukkan PIN untuk mengakses aplikasi"
+            case .changePIN:
+                descriptionPIN = "Masukkan PIN Anda saat ini"
+            }
+        }
+    }
+        
+    var title: String {
+        switch state {
+        case .create:
+            return isAccessPinChangeInProgress ? "PIN Baru" : "Atur PIN"
+        case .revalidate:
+            return isAccessPinChangeInProgress ? "Konfirmasi PIN Baru" : "Konfirmasi PIN"
+        case .authenticate:
+            return "Masukkan PIN"
+        case .changePIN:
+            return "PIN Saat Ini"
+        }
+    }
+
+    func clearInput() {
+        email = ""
+        password = ""
+        isError = false
+    }
+
+    private func handleErrorState(isError: Bool, errorData: ApiErrorData? = nil) {
+        DispatchQueue.main.async {
+            if isError, let errorData = errorData {
+                print("Error type: \(errorData.errorType)")
+                print("Error description: \(errorData.description)")
+                self.description = errorData.description
+            }
+            self.isError = isError
+        }
+    }
+    
+    private func revalidatePinMatched() -> Bool {
+        let matched = firstPin == secondPin
+        if !matched {
+            // Set error description when PINs don't match
+            description = "PIN tidak cocok, silakan coba lagi"
+        }
+        return matched
+    }
+    
+    // MARK: USER AUTHENTICATION
 
     @MainActor
     func getAccountById() async {
@@ -214,43 +356,7 @@ class AuthenticationPresenter: ObservableObject {
             }
         }
     }
-
-    func clearInput() {
-        email = ""
-        password = ""
-        isError = false
-    }
-
-    private func handleErrorState(isError: Bool, errorData: ApiErrorData? = nil) {
-        DispatchQueue.main.async {
-            if isError, let errorData = errorData {
-                print("Error type: \(errorData.errorType)")
-                print("Error description: \(errorData.description)")
-                self.description = errorData.description
-            }
-            self.isError = isError
-        }
-    }
-
-    func setDescriptionPIN() {
-        if !isError {
-            switch state {
-            case .create:
-                descriptionPIN = "Atur PIN untuk kemudahan login di sesi berikutnya"
-            case .revalidate:
-                descriptionPIN = "Masukkan PIN kembali untuk konfirmasi"
-            case .authenticate:
-                descriptionPIN = "Masukkan PIN untuk mengakses aplikasi"
-            case .changePIN:
-                descriptionPIN = "Masukkan PIN Anda saat ini"
-            }
-        }
-    }
-
-    private func revalidatePinMatched() -> Bool {
-        return firstPin == secondPin
-    }
-
+    
     // MARK: FACE ID AUTHORIZATION
 
     func checkFaceIDAvailability() {
