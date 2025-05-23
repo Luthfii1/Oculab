@@ -10,6 +10,7 @@ import SwiftUI
 
 struct PDFPageView: View {
     @StateObject private var presenter = PDFPresenter()
+    @Environment(\.dismiss) private var dismiss  
     
     var body: some View {
         NavigationView {
