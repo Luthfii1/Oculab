@@ -20,7 +20,7 @@ struct UserUpdatePasswordBody: Codable {
 
 protocol ProfileInteractorProtocol {
     func editNewPassword(newPassword: String, previousPassword: String) async throws -> UserUpdatePasswordResponse
-    func editNewPIN(pin: String) async throws
+//    func editNewPIN(newAccessPin: String, previousAccessPin: String) async throws -> UserUpdateAccessPinResponse
     func activateFaceID() async throws
 }
 
@@ -42,7 +42,10 @@ class ProfileInteractor: ProfileInteractorProtocol {
         
         let response: APIResponse<UserUpdatePasswordResponse> = try await NetworkHelper.shared.update(
             urlString: apiAuthenticationService + "/update-user-password/\(String(describing: userId))",
-            body: UserUpdatePasswordBody(newPassword: newPassword, previousPassword: previousPassword),
+            body: UserUpdatePasswordBody(
+                newPassword: newPassword,
+                previousPassword: previousPassword
+            ),
             headers: headers
         )
 
@@ -52,8 +55,6 @@ class ProfileInteractor: ProfileInteractorProtocol {
             newPassword: response.data.newPassword
         )
     }
-
-    func editNewPIN(pin: String) async throws {}
 
     func activateFaceID() async throws {}
 }
