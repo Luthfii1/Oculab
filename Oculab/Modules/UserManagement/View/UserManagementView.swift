@@ -80,6 +80,11 @@ struct UserManagementView: View {
                     }
                 }
             }
+            .simultaneousGesture(
+                DragGesture().onChanged { _ in
+                    UIApplication.shared.endEditing()
+                }
+            )
             .sheet(item: $presenter.selectedUser) { _ in
                 BottomSheetMenu(presenter: presenter)
             }
