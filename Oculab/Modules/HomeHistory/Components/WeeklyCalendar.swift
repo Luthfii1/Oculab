@@ -142,7 +142,6 @@ struct WeeklyCalendarView: View {
     }
 
     private func setupCurrentWeek() {
-        selectedDate = Date()
         currentWeek = getWeek(for: selectedDate)
     }
 
