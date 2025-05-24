@@ -64,11 +64,9 @@ struct InterpretationSectionComponent: View {
             .focused($focusedField, equals: .notes)
 
             AppButton(
-                title: "Simpan Hasil Pemeriksaan",
+                title: presenter.buttonTitle,
                 rightIcon: "checkmark",
-                isEnabled: {
-                    presenter.isEnableToSubmit()
-                }()
+                isEnabled: presenter.isEnableToSubmit()
             ) {
                 presenter.isVerifPopUpVisible = true
             }
