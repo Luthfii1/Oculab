@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 struct UserBody: Codable {
-    let username: String
+    let email: String
     let password: String
 }
 
@@ -19,18 +19,30 @@ struct LoginResponse: Codable {
     let userId: String
 }
 
+struct UserUpdateAccessPinResponse: Codable {
+    var userId: String
+    var email: String
+    var newAccessPin: String
+}
+
+struct UserUpdateAccessPinBody: Codable {
+    var newAccessPin: String
+    var previousAccessPin: String
+}
+
+
 class AuthenticationInteractor: ObservableObject {
     private var modelContext: ModelContext
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
     }
 
-    private let apiAuthenticationService = API.BE + "/user"
+    private let apiAuthenticationService = API.BE_STAGING + "/user"
 
-    func login(username: String, password: String) async throws -> LoginResponse {
+    func login(email: String, password: String) async throws -> LoginResponse {
         let response: APIResponse<LoginResponse> = try await NetworkHelper.shared.post(
             urlString: apiAuthenticationService + "/login",
-            body: UserBody(username: username, password: password)
+            body: UserBody(email: email, password: password)
         )
 
         let isFirstTime = UserDefaults.standard.bool(forKey: UserDefaultType.isFirstTimeLogin.rawValue) == false
@@ -136,5 +148,34 @@ class AuthenticationInteractor: ObservableObject {
         } catch {
             print("Error deleting all users: \(error.localizedDescription)")
         }
+    }
+    
+    func editNewPIN(newAccessPin: String, previousAccessPin: String) async throws -> UserUpdateAccessPinResponse {
+        guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
+        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
+                throw URLError(.userAuthenticationRequired)
+            }
+        let headers = [
+            "Authorization": "Bearer \(token)",
+            "Content-Type": "application/json"
+        ]
+        
+        let response: APIResponse<UserUpdateAccessPinResponse> = try await NetworkHelper.shared.update(
+            urlString: apiAuthenticationService + "/update-user-accessPin/\(String(describing: userId))",
+            body: UserUpdateAccessPinBody(
+                newAccessPin: newAccessPin,
+                previousAccessPin: previousAccessPin
+            ),
+            headers: headers
+        )
+
+        return UserUpdateAccessPinResponse(
+            userId: response.data.userId,
+            email: response.data.email,
+            newAccessPin: response.data.newAccessPin
+        )
     }
 }

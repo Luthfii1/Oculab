@@ -121,4 +121,8 @@ class AnalysisResultPresenter: ObservableObject {
             return selectedTBGrade != ""
         }
     }
+    
+    func navigateToPDFView() {
+        Router.shared.navigateTo(.pdf)
+    }
 }

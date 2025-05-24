@@ -113,18 +113,18 @@ class ProfilePresenter: ObservableObject {
 
     @MainActor
     func postEditPassword(authPresenter: AuthenticationPresenter) async {
-        guard let updateUser = await authInteractor.getUserLocalData() else {
-            print("no data")
+        guard !confirmPassword.isEmpty, !oldPassword.isEmpty else {
+            print("Password fields are empty")
+            descriptionOldPassword = "Please enter both old and new passwords"
+            isOldPasswordError = true
             return
         }
-
-        updateUser.password = confirmPassword
-        updateUser.previousPassword = oldPassword
-
+        
         do {
-            let response = try await authInteractor.updateUserById(user: updateUser)
-
-            user = response
+            _ = try await interactor.editNewPassword(
+                newPassword: confirmPassword,
+                previousPassword: oldPassword)
+            
             showSuccessPopup = true
         } catch {
             isOldPasswordError = true

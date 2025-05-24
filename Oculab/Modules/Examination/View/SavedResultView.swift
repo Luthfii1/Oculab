@@ -171,7 +171,7 @@ struct SavedResultView: View {
                                 size: .small,
                                 isEnabled: true
                             ) {
-                                print("Lihat PDF Tapped")
+                                resultPresenter.navigateToPDFView()
                             }
 
                             AppButton(
