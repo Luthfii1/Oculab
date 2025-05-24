@@ -64,15 +64,9 @@ struct InterpretationSectionComponent: View {
             .focused($focusedField, equals: .notes)
 
             AppButton(
-                title: "Simpan Hasil Pemeriksaan",
+                title: presenter.buttonTitle,
                 rightIcon: "checkmark",
-                isEnabled: {
-                    if presenter.selectedTBGrade == GradingType.SCANTY.rawValue {
-                        return !presenter.numOfBTA.isEmpty && Int(presenter.numOfBTA) != nil
-                    } else {
-                        return presenter.selectedTBGrade != ""
-                    }
-                }()
+                isEnabled: presenter.isEnableToSubmit()
             ) {
                 presenter.isVerifPopUpVisible = true
             }
