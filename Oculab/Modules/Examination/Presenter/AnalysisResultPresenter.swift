@@ -131,7 +131,8 @@ class AnalysisResultPresenter: ObservableObject {
     }
     
     func navigateToPDFView() {
-        Router.shared.navigateTo(.pdf)
+        guard let examId = examinationResult?.examinationId else { return }
+        Router.shared.navigateTo(.pdf(examinationId: examId))
     }
     
     func checkIsAllFOVsVerified() {
