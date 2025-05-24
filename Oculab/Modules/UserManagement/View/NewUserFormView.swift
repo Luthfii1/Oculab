@@ -10,10 +10,6 @@ import SwiftUI
 struct NewUserFormView: View {
     @StateObject private var presenter = AccountPresenter()
     
-    @State private var name: String = ""
-    @State private var email: String = ""
-    @State private var role: String = ""
-    
     var body: some View {
         NavigationView {
             ZStack {
@@ -66,7 +62,8 @@ struct NewUserFormView: View {
                                 rightIcon: "chevron.down",
                                 isDisabled: false,
                                 choices: [("Laboran", RolesType.LAB.rawValue), ("Admin", RolesType.ADMIN.rawValue)],
-                                selectedChoice: $role
+                                isSearchEnabled: false,
+                                selectedChoice: $presenter.role
                             )
                             
                             // Name field
@@ -74,7 +71,7 @@ struct NewUserFormView: View {
                                 title: "Nama",
                                 isRequired: true,
                                 placeholder: "John Doe",
-                                text: $name
+                                text: $presenter.name
                             )
                             
                             // Email field
@@ -82,7 +79,9 @@ struct NewUserFormView: View {
                                 title: "Email",
                                 isRequired: true,
                                 placeholder: "john@gmail.com",
-                                text: $email
+                                description: presenter.editError,
+                                isError: presenter.isError,
+                                text: $presenter.email
                             )
                             
                             // Loading indicator
@@ -95,16 +94,16 @@ struct NewUserFormView: View {
                                 title: "Daftarkan Akun",
                                 rightIcon: "arrow.right",
                                 isEnabled: presenter.isFormValid(
-                                    name: name,
-                                    email: email,
-                                    role: role
+                                    name: presenter.name,
+                                    email: presenter.email,
+                                    role: presenter.role
                                 ),
                                 action: {
                                     Task {
                                         await presenter.registerNewAccount(
-                                            role: role,
-                                            name: name,
-                                            email: email
+                                            role: presenter.role,
+                                            name: presenter.name,
+                                            email: presenter.email
                                         )
                                     }
                                 }
@@ -129,6 +128,7 @@ struct NewUserFormView: View {
                 }
             }
         }
+        .dismissKeyboardOnTap()
         .navigationBarHidden(true)
         // Error alert
         .alert(
