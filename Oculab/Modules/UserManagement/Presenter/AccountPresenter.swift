@@ -17,6 +17,17 @@ class AccountPresenter: ObservableObject {
     @Published var name = ""
     @Published var role: String = ""
     @Published var userId: String = ""
+    @Published var email: String = "" {
+        didSet {
+            if !validateEmail(email) {
+                isError = true
+                editError = "Format email tidak valid"
+            } else {
+                editError = nil
+                isError = false
+            }
+        }
+    }
     
     @Published var isRegistering = false
     @Published var registrationError: String? = nil
@@ -29,6 +40,7 @@ class AccountPresenter: ObservableObject {
     
     @Published var isEditing = false
     @Published var editError: String? = nil
+    @Published var isError = false
     @Published var editSuccess: (name: String, role: String) = ("", "")
     private var debounceTime: TimeInterval = 0.3
 
@@ -209,6 +221,10 @@ class AccountPresenter: ObservableObject {
             } else {
                 registrationError = "Failed to register account: No response from server"
             }
+            
+            self.name = ""
+            self.role = ""
+            self.email = ""
             
         } catch {
             switch error {
