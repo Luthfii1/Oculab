@@ -10,18 +10,16 @@ import Foundation
 class AccountInteractor: ObservableObject {
     private let apiGetAllAccount = API.BE + "/user/get-all-user-data"
     private let apiRegisterAccount = API.BE + "/user/register"
-    private let apiUpdatePasswordAccount = API.BE + "/user/update-password/"
     private let apiDeleteAccount = API.BE + "/user/delete-user/"
+    private let apiEditAccount = API.BE + "/user/update-user/"
     
     func getAllAccount() async throws -> [Account] {
         guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
             throw URLError(.userAuthenticationRequired)
         }
-        print("TOKEN", token)
 
         let headers = [
-            "Authorization": "Bearer \(token)",
-            "Content-Type": "application/json"
+            "Authorization": "Bearer \(token)"
         ]
 
         let response: APIResponse<[Account]> = try await NetworkHelper.shared.get(
@@ -43,11 +41,7 @@ class AccountInteractor: ObservableObject {
         return result
     }
     
-    func registerAccount(
-        roleType: RolesType,
-        name: String,
-        email: String
-    ) async throws -> RegisterAccountResponse {
+    func registerAccount(roleType: RolesType, name: String, email: String) async throws -> RegisterAccountResponse {
         let response: APIResponse<RegisterAccountResponse> = try await NetworkHelper.shared.post(
             urlString: apiRegisterAccount,
             body: RegisterAccountBody(role: roleType, name: name, email: email)
@@ -61,35 +55,41 @@ class AccountInteractor: ObservableObject {
         )
     }
     
-    func updatePassword(
-        userId: String,
-        previousPassword: String,
-        newPassword: String
-    ) async throws -> UpdatePasswordResponse {
-        let response: APIResponse<UpdatePasswordResponse> = try await NetworkHelper.shared.update(
-            urlString: apiUpdatePasswordAccount + userId.lowercased(),
-            body: UpdatePasswordBody(previousPassword: previousPassword, newPassword: newPassword)
-        )
-        
-        return UpdatePasswordResponse(
-            userId: response.data.userId,
-            username: response.data.username,
-            currentPassword: response.data.currentPassword
-        )
-    }
-    
-    func deleteAccount(
-        userId: String
-    ) async throws -> DeleteAccountResponse {
+    func editAccount(userId: String, name: String? = nil, role: RolesType? = nil) async throws -> EditAccountResponse {
         guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
             throw URLError(.userAuthenticationRequired)
         }
         
-        print("TOKEN", token)
+        let requestBody = EditAccountBody(
+            name: name,
+            role: role
+        )
+        
+        let headers = [
+            "Authorization": "Bearer \(token)"
+        ]
+        
+        let response: APIResponse<EditAccountResponse> = try await NetworkHelper.shared.update(
+            urlString: apiEditAccount + userId.lowercased(),
+            body: requestBody,
+            headers: headers
+        )
+        
+        return EditAccountResponse(
+            id: response.data.id,
+            name: response.data.name,
+            role: response.data.role,
+            email: response.data.email
+        )
+    }
+    
+    func deleteAccount(userId: String) async throws -> DeleteAccountResponse {
+        guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
+            throw URLError(.userAuthenticationRequired)
+        }
 
         let headers = [
-            "Authorization": "Bearer \(token)",
-            "Content-Type": "application/json"
+            "Authorization": "Bearer \(token)"
         ]
         
         let response: APIResponse<DeleteAccountResponse> = try await NetworkHelper.shared.delete(

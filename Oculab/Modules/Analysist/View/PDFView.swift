@@ -19,7 +19,7 @@ struct PDFPageView: View {
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: {
-                            dismiss()
+//                            dismiss()
                         }) {
                             HStack {
                                 Image(systemName: "chevron.left")

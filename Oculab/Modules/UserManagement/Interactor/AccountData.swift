@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Account: Decodable {
+struct Account: Hashable, Codable {
     let id: String
     let name: String
     let role: RolesType
@@ -57,14 +57,26 @@ struct RegisterAccountResponse: Codable {
     }
 }
 
-struct UpdatePasswordBody: Codable {
-    var previousPassword: String
-    var newPassword: String
+struct EditAccountBody: Codable {
+    var name: String?
+    var role: RolesType?
+    
+    init(name: String? = nil, role: RolesType? = nil) {
+        self.name = name
+        self.role = role
+    }
 }
 
-struct UpdatePasswordResponse: Codable {
-    var userId: String
-    var username: String
-    var currentPassword: String
+struct EditAccountResponse: Codable, Identifiable {
+    var id: String
+    var name: String
+    var role: RolesType
+    var email: String
+    
+    enum CodingKeys: String, CodingKey {
+        case id = "userId"
+        case name
+        case role
+        case email
+    }
 }
-
