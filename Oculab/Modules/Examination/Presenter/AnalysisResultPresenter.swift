@@ -113,4 +113,12 @@ class AnalysisResultPresenter: ObservableObject {
             total: total
         ))
     }
+    
+    func isEnableToSubmit() -> Bool {
+        if selectedTBGrade == GradingType.SCANTY.rawValue {
+            return !numOfBTA.isEmpty && Int(numOfBTA) != nil
+        } else {
+            return selectedTBGrade != ""
+        }
+    }
 }

@@ -67,11 +67,7 @@ struct InterpretationSectionComponent: View {
                 title: "Simpan Hasil Pemeriksaan",
                 rightIcon: "checkmark",
                 isEnabled: {
-                    if presenter.selectedTBGrade == GradingType.SCANTY.rawValue {
-                        return !presenter.numOfBTA.isEmpty && Int(presenter.numOfBTA) != nil
-                    } else {
-                        return presenter.selectedTBGrade != ""
-                    }
+                    presenter.isEnableToSubmit()
                 }()
             ) {
                 presenter.isVerifPopUpVisible = true
