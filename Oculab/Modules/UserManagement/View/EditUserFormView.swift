@@ -58,6 +58,7 @@ struct EditUserFormView: View {
                                 leftIcon: "person.fill",
                                 rightIcon: "chevron.down",
                                 choices: [("Laboran", RolesType.LAB.rawValue), ("Admin", RolesType.ADMIN.rawValue)],
+                                isSearchEnabled: false,
                                 selectedChoice: $role
                             )
                             
