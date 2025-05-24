@@ -12,35 +12,35 @@ struct EditUserFormView: View {
     let account: Account
     
     var body: some View {
-            NavigationView {
-                ZStack {
-                    // Success popup
-                    if presenter.showSuccessPopup {
-                        AppPopup(
-                            image: "Success",
-                            title: "Berhasil mengubah Akun",
-                            description: "Anda telah berhasil mengubah akun untuk \(presenter.editSuccess.name) dengan role \(presenter.editSuccess.role)",
-                            buttons: [
-                                AppButton(
-                                    title: "Kembali ke Daftar Akun",
-                                    colorType: .secondary,
-                                    size: .large,
-                                    isEnabled: true
-                                ) {
+        NavigationView {
+            ZStack {
+                // Success popup
+                if presenter.showSuccessPopup {
+                    AppPopup(
+                        image: "Success",
+                        title: "Berhasil mengubah Akun",
+                        description: "Anda telah berhasil mengubah akun untuk \(presenter.editSuccess.name) dengan role \(presenter.editSuccess.role)",
+                        buttons: [
+                            AppButton(
+                                title: "Kembali ke Daftar Akun",
+                                colorType: .secondary,
+                                size: .large,
+                                isEnabled: true
+                            ) {
+                                presenter.resetForm()
+                                presenter.navigateBack()
+                            }
+                        ],
+                        isVisible: Binding(
+                            get: { presenter.showSuccessPopup },
+                            set: { newValue in
+                                if !newValue {
                                     presenter.resetForm()
-                                    presenter.navigateBack()
                                 }
-                            ],
-                            isVisible: Binding(
-                                get: { presenter.showSuccessPopup },
-                                set: { newValue in
-                                    if !newValue {
-                                        presenter.resetForm()
-                                    }
-                                }
-                            )
+                            }
                         )
-                    }
+                    )
+                }
                 ScrollView {
                     VStack(spacing: 24) {
                         Image("AddAccount")
@@ -103,6 +103,11 @@ struct EditUserFormView: View {
                     }
                     .padding(.horizontal, Decimal.d20)
                 }
+                .simultaneousGesture(
+                    DragGesture().onChanged { _ in
+                        UIApplication.shared.endEditing()
+                    }
+                )
                 .navigationTitle("Edit Akun")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
@@ -118,6 +123,7 @@ struct EditUserFormView: View {
             }
         }
         .navigationBarHidden(true)
+        .dismissKeyboardOnTap()
         // Error alert
         .alert(
             "Edit Failed",

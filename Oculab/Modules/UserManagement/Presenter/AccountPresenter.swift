@@ -199,7 +199,7 @@ class AccountPresenter: ObservableObject {
                 email: email
             )
             
-            if let result = result {
+            if result != nil {
                 registrationSuccess = (name: name, role: roleType.rawValue)
                 showSuccessPopup = true
                 
