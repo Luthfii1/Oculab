@@ -107,7 +107,7 @@ struct PDFPageView: View {
             )
             drawInterpretasi(
                 title: "Catatan Petugas",
-                description: presenter.data?.hasilPDFData.descNotesPetugas ?? "",
+                description: presenter.data?.hasilPDFData.descNotesPetugas ?? "Tidak ada catatan",
                 yContent: 640,
                 boldText,
                 regularText
