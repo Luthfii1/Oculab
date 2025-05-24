@@ -41,8 +41,12 @@ struct UserListView: View {
                                         presenter.selectUser(account)
                                     } label: {
                                         Image(systemName: "ellipsis")
+                                            .font(.system(size: 20, weight: .medium))
                                             .foregroundColor(AppColors.slate400)
+                                            .frame(width: 44)
+                                            .contentShape(Rectangle())
                                     }
+                                    .buttonStyle(PlainButtonStyle())
                                 }
                                 .padding(.vertical, 16)
                                 .padding(.horizontal)

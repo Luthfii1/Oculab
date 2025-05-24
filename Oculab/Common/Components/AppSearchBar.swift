@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct AppSearchBar: View {
     @Binding var searchText: String
@@ -35,6 +36,7 @@ struct AppSearchBar: View {
                     Button(action: {
                         localSearchText = ""
                         searchText = ""
+                        UIApplication.shared.endEditing()
                     }) {
                         Image(systemName: "xmark.circle.fill")
                             .foregroundColor(AppColors.slate400)
@@ -64,6 +66,7 @@ struct AppSearchBar: View {
                 title: "Cari",
                 cornerRadius: 12,
                 action: {
+                    UIApplication.shared.endEditing()
                     onSearch()
                 }
             )
