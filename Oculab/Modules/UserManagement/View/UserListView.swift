@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct UserListView: View {
-    @ObservedObject var presenter: AccountPresenter
+    @EnvironmentObject var presenter: AccountPresenter
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
-            ForEach(presenter.sortedGroupedAccounts, id: \.self) { key in
+            ForEach(presenter.displayedSortedGroupedAccounts, id: \.self) { key in
                 VStack(alignment: .leading, spacing: 8) {
                     Text(key)
                         .font(AppTypography.s4_1)
@@ -20,14 +20,22 @@ struct UserListView: View {
                         .padding(.horizontal)
 
                     VStack(spacing: 0) {
-                        if let accounts = presenter.groupedAccounts[key] {
+                        if let accounts = presenter.displayedGroupedAccounts[key] {
                             ForEach(accounts, id: \.id) { account in
                                 HStack {
-                                    Text(account.name)
-                                        .font(AppTypography.p2)
-                                        .foregroundColor(AppColors.slate900)
+                                    Button {
+                                        if let account = presenter.findAccountById(account.id) {
+                                            presenter.navigateTo(.editAccount(account: account))
+                                        }
+                                    } label: {
+                                        HStack {
+                                            Text(account.name)
+                                                .font(AppTypography.p2)
+                                                .foregroundColor(AppColors.slate900)
 
-                                    Spacer()
+                                            Spacer()
+                                        }
+                                    }
 
                                     Button {
                                         presenter.selectUser(account)
@@ -36,7 +44,7 @@ struct UserListView: View {
                                             .foregroundColor(AppColors.slate400)
                                     }
                                 }
-                                .padding(.vertical, 12)
+                                .padding(.vertical, 16)
                                 .padding(.horizontal)
 
                                 if account.id != accounts.last?.id {
@@ -48,11 +56,6 @@ struct UserListView: View {
                     .background(Color.white)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
-            }
-        }
-        .onAppear {
-            Task {
-                await presenter.fetchAllAccount()
             }
         }
     }

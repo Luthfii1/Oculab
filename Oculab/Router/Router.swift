@@ -34,6 +34,7 @@ class Router: ObservableObject {
         case analyzingStatusProgress(examinationId: String)
         case accountManagement
         case newAccount
+        case editAccount(account: Account)
     }
 
     @Published var path: NavigationPath = .init()
@@ -87,6 +88,8 @@ class Router: ObservableObject {
             UserManagementView()
         case .newAccount:
             NewUserFormView()
+        case let .editAccount(account):
+            EditUserFormView(account: account)
         }
     }
 

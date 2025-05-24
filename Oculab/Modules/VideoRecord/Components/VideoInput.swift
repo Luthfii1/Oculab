@@ -18,6 +18,9 @@ struct VideoInput: View {
     @Binding var showOnboardingGuidelines: Bool
     @Binding var didFinishOnboarding: Bool
     @Binding var selectedURL: URL?
+    
+    @State private var showFullScreenPlayer = false
+    @State private var showVideoErrorAlert = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: Decimal.d8) {
@@ -52,7 +55,29 @@ struct VideoInput: View {
                         .cornerRadius(Decimal.d8)
 
                     AppButton(title: "Preview Video", leftIcon: "eye", colorType: .secondary, size: .small) {
-                        previewVideo()
+                        // Cek apakah file masih bisa diputar
+                        if let url = selectedURL, FileManager.default.fileExists(atPath: url.path) {
+                            showFullScreenPlayer = true
+                        } else {
+                            showVideoErrorAlert = true
+                        }
+                    }
+                }
+            }
+            // Alert untuk error handling
+            .alert(isPresented: $showVideoErrorAlert) {
+                Alert(
+                    title: Text("Gagal Memutar Video"),
+                    message: Text("Video tidak dapat diputar. Silakan rekam ulang sampel."),
+                    dismissButton: .default(Text("Kembali"))
+                )
+            }
+            
+            // Full-screen video preview overlay
+            .fullScreenCover(isPresented: $showFullScreenPlayer) {
+                if let url = selectedURL {
+                    FullScreenVideoPlayerView(videoURL: url) {
+                        showFullScreenPlayer = false
                     }
                 }
             }
