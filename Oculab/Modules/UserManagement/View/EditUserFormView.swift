@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct EditUserFormView: View {
-    @Environment(\.dismiss) private var dismiss
     @StateObject private var presenter = AccountPresenter()
     
     let account: Account
@@ -100,7 +99,7 @@ struct EditUserFormView: View {
                             )
                             
                             Button("Batal") {
-                                dismiss()
+                                presenter.navigateBack()
                             }
                             .font(AppTypography.p2)
                             .foregroundColor(AppColors.slate600)
@@ -115,7 +114,7 @@ struct EditUserFormView: View {
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: {
-                            dismiss()
+                            presenter.navigateBack()
                         }) {
                             Image(systemName: "chevron.left")
                                 .foregroundColor(.black)
