@@ -9,38 +9,45 @@ import PDFKit
 import SwiftUI
 
 struct PDFPageView: View {
+    var examinationId: String
     @StateObject private var presenter = PDFPresenter()
-    @Environment(\.dismiss) private var dismiss  
     
     var body: some View {
-        NavigationView {
-            PDFKitView(pdfDocument: PDFDocument(data: generatePDF())!)
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        Button(action: {
-//                            dismiss()
-                        }) {
-                            HStack {
-                                Image(systemName: "chevron.left")
+        VStack {
+            if presenter.data != nil {
+                PDFKitView(pdfDocument: PDFDocument(data: generatePDF())!)
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button(action: {
+                                sharePDF()
+                            }) {
+                                Image(systemName: "square.and.arrow.up")
                                     .foregroundColor(.black)
-                                
-                                Text("Kembali")
-                                    .foregroundStyle(.black)
                             }
                         }
                     }
-                    
-                    
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button(action: {
-                            sharePDF()
-                        }) {
-                            Image(systemName: "square.and.arrow.up")
-                                .foregroundColor(.black)
-                        }
-                    }
+            } else {
+                VStack {
+                    Spacer()
+                        .frame(height: UIScreen.main.bounds.height * 0.2)
+
+                    LottieHelper(animationName: "loadingPaperplane")
+                        .frame(width: 84, height: 84)
+                        .padding(.bottom, 72)
+
+                    Text("Mendownload data")
+                        .font(AppTypography.h2)
+                        .padding(.bottom, 12)
+
+                    Spacer()
                 }
+            }
+        }
+        .onAppear {
+            Task {
+                await presenter.getPdfData(examinationId: examinationId)
+            }
         }
     }
 
@@ -60,13 +67,13 @@ struct PDFPageView: View {
             // Draw PDF content
             drawHeader(regularText)
             drawInfoSection(
-                title: presenter.data.patient.name,
+                title: presenter.data?.patientPDFData.name ?? "",
                 labels: ["NIK", "Umur", "Jenis Kelamin", "No. BPJS"],
                 values: [
-                    presenter.data.patient.nik,
-                    "\(presenter.data.patient.age) Tahun",
-                    presenter.data.patient.sex,
-                    presenter.data.patient.bpjs
+                    presenter.data?.patientPDFData.nik ?? "",
+                    "\(presenter.data?.patientPDFData.age ?? 0) Tahun",
+                    presenter.data?.patientPDFData.sex ?? "",
+                    presenter.data?.patientPDFData.bpjs ?? ""
                 ],
                 xTitle: 33,
                 yStart: 149,
@@ -78,9 +85,9 @@ struct PDFPageView: View {
                 title: "Informasi Sediaan",
                 labels: ["ID Pemeriksaan", "Diambil di", "Petugas"],
                 values: [
-                    presenter.data.preparat.id,
-                    presenter.data.preparat.place,
-                    presenter.data.preparat.laborant
+                    presenter.data?.preparatPDFData.id ?? "",
+                    presenter.data?.preparatPDFData.place ?? "",
+                    presenter.data?.preparatPDFData.laborant ?? ""
                 ],
                 xTitle: 246,
                 yStart: 149,
@@ -93,14 +100,14 @@ struct PDFPageView: View {
 
             drawInterpretasi(
                 title: "Interpretasi Mikroskopis",
-                description: presenter.data.hasil.descInterpretasi,
+                description: presenter.data?.hasilPDFData.descInterpretasi ?? "",
                 yContent: 388,
                 boldText,
                 regularText
             )
             drawInterpretasi(
                 title: "Catatan Petugas",
-                description: presenter.data.hasil.descNotesPetugas,
+                description: presenter.data?.hasilPDFData.descNotesPetugas ?? "Tidak ada catatan",
                 yContent: 640,
                 boldText,
                 regularText
@@ -115,11 +122,11 @@ struct PDFPageView: View {
     // Draw header section with logo, description, phone, email
     private func drawHeader(_ regularText: [NSAttributedString.Key: Any]) {
         UIImage(named: "logo")?.draw(at: CGPoint(x: 32, y: 32))
-        NSAttributedString(string: presenter.data.kopSurat.desc, attributes: regularText).draw(at: CGPoint(x: 32, y: 72))
+        NSAttributedString(string: presenter.data?.kopPDFData.desc ?? "", attributes: regularText).draw(at: CGPoint(x: 32, y: 72))
         
         // Phone number with icon
         let phoneIcon = UIImage(named: "phoneIcon")?.resizeImage(targetSize: CGSize(width: 12, height: 12))
-        let phoneText = NSAttributedString(string: presenter.data.kopSurat.notelp, attributes: regularText)
+        let phoneText = NSAttributedString(string: presenter.data?.kopPDFData.notelp ?? "", attributes: regularText)
         let phoneTextSize = phoneText.size()
         let phoneIconSize = phoneIcon?.size ?? .zero
         let phoneX = 563 - phoneTextSize.width - phoneIconSize.width - 4 // 4 is padding between text and icon
@@ -128,7 +135,7 @@ struct PDFPageView: View {
         
         // Email with icon
         let emailIcon = UIImage(named: "envelopeIcon")?.resizeImage(targetSize: CGSize(width: 12, height: 12))
-        let emailText = NSAttributedString(string: presenter.data.kopSurat.email, attributes: regularText)
+        let emailText = NSAttributedString(string: presenter.data?.kopPDFData.email ?? "", attributes: regularText)
         let emailTextSize = emailText.size()
         let emailIconSize = emailIcon?.size ?? .zero
         let emailX = 563 - emailTextSize.width - emailIconSize.width - 4
@@ -290,10 +297,10 @@ struct PDFPageView: View {
         ]
         let labels = ["Tujuan Pemeriksaan", "Jenis Uji", "ID Sediaan", "Hasil Pemeriksaan"]
         let values = [
-            presenter.data.hasil.tujuan,
-            presenter.data.hasil.jenisUji,
-            presenter.data.hasil.idSediaan,
-            presenter.data.hasil.hasil
+            presenter.data?.hasilPDFData.tujuan ?? "",
+            presenter.data?.hasilPDFData.jenisUji ?? "",
+            presenter.data?.hasilPDFData.idSediaan ?? "",
+            presenter.data?.hasilPDFData.hasil ?? ""
         ]
 
         for (index, label) in labels.enumerated() {
@@ -334,10 +341,10 @@ struct PDFPageView: View {
         let leftTitle = NSAttributedString(string: "Petugas Lab", attributes: boldText)
         leftTitle.draw(at: CGPoint(x: leftX, y: startY))
         
-        // Draw signature image placeholder
-        if let signatureImage = UIImage(named: "ttd") {
-            signatureImage.draw(in: CGRect(x: leftX, y: startY + 20, width: signatureSize.width, height: signatureSize.height))
-        }
+//        // Draw signature image placeholder
+//        if let signatureImage = UIImage(named: "ttd") {
+//            signatureImage.draw(in: CGRect(x: leftX, y: startY + 20, width: signatureSize.width, height: signatureSize.height))
+//        }
         
         // Draw horizontal line
         if let context = UIGraphicsGetCurrentContext() {
@@ -349,7 +356,7 @@ struct PDFPageView: View {
         }
         
         // Draw name
-        let leftName = NSAttributedString(string: "{Bunga Prameswari, S.Tr.Kes}", attributes: regularText)
+        let leftName = NSAttributedString(string: presenter.data?.preparatPDFData.laborant ?? "", attributes: regularText)
         leftName.draw(at: CGPoint(x: leftX, y: startY + 90))
         
         // Right signature (Dokter PJ)
@@ -357,10 +364,10 @@ struct PDFPageView: View {
         let rightTitle = NSAttributedString(string: "Dokter PJ Pemeriksaan Lab", attributes: boldText)
         rightTitle.draw(at: CGPoint(x: rightX, y: startY))
         
-        // Draw signature image placeholder
-        if let signatureImage = UIImage(named: "ttd") {
-            signatureImage.draw(in: CGRect(x: rightX, y: startY + 20, width: signatureSize.width, height: signatureSize.height))
-        }
+//        // Draw signature image placeholder
+//        if let signatureImage = UIImage(named: "ttd") {
+//            signatureImage.draw(in: CGRect(x: rightX, y: startY + 20, width: signatureSize.width, height: signatureSize.height))
+//        }
         
         // Draw horizontal line
         if let context = UIGraphicsGetCurrentContext() {
@@ -372,7 +379,7 @@ struct PDFPageView: View {
         }
         
         // Draw name
-        let rightName = NSAttributedString(string: "{dr. John Doe}", attributes: regularText)
+        let rightName = NSAttributedString(string:  presenter.data?.preparatPDFData.dpjp ?? "", attributes: regularText)
         rightName.draw(at: CGPoint(x: rightX, y: startY + 90))
     }
 
@@ -423,5 +430,5 @@ struct PDFKitView: UIViewRepresentable {
 
 // Preview the PDF page view
 #Preview {
-    PDFPageView()
+    PDFPageView(examinationId: "9af22750-a547-4b29-93f4-7d290d2d6c0a")
 }
