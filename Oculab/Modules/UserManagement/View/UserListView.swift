@@ -44,7 +44,7 @@ struct UserListView: View {
                                             .foregroundColor(AppColors.slate400)
                                     }
                                 }
-                                .padding(.vertical, 12)
+                                .padding(.vertical, 16)
                                 .padding(.horizontal)
 
                                 if account.id != accounts.last?.id {
