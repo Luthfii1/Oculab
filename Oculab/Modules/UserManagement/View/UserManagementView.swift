@@ -61,7 +61,8 @@ struct UserManagementView: View {
                                 .padding(.vertical, 40)
                         } else {
                             VStack(spacing: 24) {
-                                UserListView(presenter: presenter)
+                                UserListView()
+                                    .environmentObject(presenter)
                             }
                         }
                     }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct UserListView: View {
-    @ObservedObject var presenter: AccountPresenter
+    @EnvironmentObject var presenter: AccountPresenter
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
@@ -23,11 +23,19 @@ struct UserListView: View {
                         if let accounts = presenter.displayedGroupedAccounts[key] {
                             ForEach(accounts, id: \.id) { account in
                                 HStack {
-                                    Text(account.name)
-                                        .font(AppTypography.p2)
-                                        .foregroundColor(AppColors.slate900)
+                                    Button {
+                                        if let account = presenter.findAccountById(account.id) {
+                                            presenter.navigateTo(.editAccount(account: account))
+                                        }
+                                    } label: {
+                                        HStack {
+                                            Text(account.name)
+                                                .font(AppTypography.p2)
+                                                .foregroundColor(AppColors.slate900)
 
-                                    Spacer()
+                                            Spacer()
+                                        }
+                                    }
 
                                     Button {
                                         presenter.selectUser(account)

@@ -31,7 +31,6 @@ struct BottomSheetMenu: View {
                 // Find the full account for the selected user
                 if let userId = presenter.selectedUser?.id,
                    let account = presenter.findAccountById(userId) {
-                    print(userId)
                     presenter.navigateTo(.editAccount(account: account))
                     dismiss()
                 }
