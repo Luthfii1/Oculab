@@ -37,7 +37,7 @@ class AuthenticationInteractor: ObservableObject {
         self.modelContext = modelContext
     }
 
-    private let apiAuthenticationService = API.BE_STAGING + "/user"
+    private let apiAuthenticationService = API.BE + "/user"
 
     func login(email: String, password: String) async throws -> LoginResponse {
         let response: APIResponse<LoginResponse> = try await NetworkHelper.shared.post(
