@@ -7,11 +7,10 @@
 
 import Foundation
 import SwiftUI
-import Combine
 
 class AccountPresenter: ObservableObject {
     var interactor: AccountInteractor? = AccountInteractor()
-    private var cancellables = Set<AnyCancellable>()
+    private var searchTimer: Timer?
 
     @Published var isUserLoading = false
     
@@ -27,8 +26,19 @@ class AccountPresenter: ObservableObject {
     @Published var isEditing = false
     @Published var editError: String? = nil
     @Published var editSuccess: (name: String, role: String) = ("", "")
+    private var debounceTime: TimeInterval = 0.3
 
-    @Published var searchText: String = ""
+    @Published var searchText: String = "" {
+        didSet {
+            // Cancel any existing timer
+            searchTimer?.invalidate()
+            
+            // Create a new timer
+            searchTimer = Timer.scheduledTimer(withTimeInterval: debounceTime, repeats: false) { [weak self] _ in
+                self?.searchAccounts(query: self?.searchText ?? "")
+            }
+        }
+    }
     @Published var isSearching: Bool = false
     @Published var filteredGroupedAccounts: [String: [Account]] = [:]
     @Published var filteredSortedGroupedAccounts: [String] = []
@@ -53,15 +63,8 @@ class AccountPresenter: ObservableObject {
         return searchText.isEmpty ? sortedGroupedAccounts : filteredSortedGroupedAccounts
     }
     
-    init() {
-        // Set up search text debounce for real-time searching
-        $searchText
-            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
-            .removeDuplicates()
-            .sink { [weak self] searchText in
-                self?.searchAccounts(query: searchText)
-            }
-            .store(in: &cancellables)
+    deinit {
+        searchTimer?.invalidate()
     }
     
     // User selection methods
@@ -193,10 +196,7 @@ class AccountPresenter: ObservableObject {
             )
             
             if let result = result {
-                print("Registration successful: \(result.id), \(result.username)")
-                
                 registrationSuccess = (name: name, role: roleType.rawValue)
-                
                 showSuccessPopup = true
                 
                 Task {
@@ -207,8 +207,6 @@ class AccountPresenter: ObservableObject {
             }
             
         } catch {
-            print("Registration error: \(error)")
-                
             switch error {
             case let NetworkError.apiError(apiResponse):
                 registrationError = apiResponse.data.description
@@ -265,7 +263,6 @@ class AccountPresenter: ObservableObject {
         defer { isEditing = false }
         
         do {
-            print("masuk do presenter")
             let result = try await interactor?.editAccount(
                 userId: userId,
                 name: name,
@@ -273,12 +270,8 @@ class AccountPresenter: ObservableObject {
             )
             
             if let result = result {
-                print("Edit successful: \(result.id): \(result.name)")
-                
                 selectedUser = SelectedUser(id: result.id, name: result.name)
-                
                 editSuccess = (name: name, role: role)
-                
                 showSuccessPopup = true
                 
                 Task {
@@ -289,8 +282,6 @@ class AccountPresenter: ObservableObject {
             }
             
         } catch {
-            print("Edit error: \(error)")
-                
             switch error {
             case let NetworkError.apiError(apiResponse):
                 editError = apiResponse.data.description
@@ -315,9 +306,7 @@ class AccountPresenter: ObservableObject {
             let result = try await interactor?.deleteAccount(userId: userId)
             
             if let result = result {
-                print("Deletion successful: \(result.id): \(result.name)")
                 deletionSuccess = (userName: result.name, message: "\(result.name) has been successfully deleted.")
-
                 clearSelection()
                 
                 Task {
@@ -328,8 +317,6 @@ class AccountPresenter: ObservableObject {
             }
             
         } catch {
-            print("Deletion error: \(error)")
-                
             switch error {
             case let NetworkError.apiError(apiResponse):
                 deletionError = apiResponse.data.description

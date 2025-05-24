@@ -9,15 +9,14 @@ import Foundation
 
 class AccountInteractor: ObservableObject {
     private let apiGetAllAccount = API.BE + "/user/get-all-user-data"
-    private let apiRegisterAccount = API.BE_PROD + "/user/register"
+    private let apiRegisterAccount = API.BE + "/user/register"
     private let apiDeleteAccount = API.BE + "/user/delete-user/"
-    private let apiEditAccount = API.BE_STAGING + "/user/update-user/"
+    private let apiEditAccount = API.BE + "/user/update-user/"
     
     func getAllAccount() async throws -> [Account] {
         guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
             throw URLError(.userAuthenticationRequired)
         }
-        print("TOKEN", token)
 
         let headers = [
             "Authorization": "Bearer \(token)"
@@ -57,13 +56,9 @@ class AccountInteractor: ObservableObject {
     }
     
     func editAccount(userId: String, name: String? = nil, role: RolesType? = nil) async throws -> EditAccountResponse {
-        print("masuk editaccount interactor")
         guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
             throw URLError(.userAuthenticationRequired)
         }
-        print("masuk editaccount interactor")
-        
-        print("TOKEN", token)
         
         let requestBody = EditAccountBody(
             name: name,
@@ -80,8 +75,6 @@ class AccountInteractor: ObservableObject {
             headers: headers
         )
         
-        print("Successfully edited account: \(response.data.id)")
-        
         return EditAccountResponse(
             id: response.data.id,
             name: response.data.name,
@@ -94,8 +87,6 @@ class AccountInteractor: ObservableObject {
         guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
             throw URLError(.userAuthenticationRequired)
         }
-        
-        print("TOKEN", token)
 
         let headers = [
             "Authorization": "Bearer \(token)"
