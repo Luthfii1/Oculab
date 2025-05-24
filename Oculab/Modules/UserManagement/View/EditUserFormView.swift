@@ -9,12 +9,7 @@ import SwiftUI
 
 struct EditUserFormView: View {
     @StateObject private var presenter = AccountPresenter()
-    
     let account: Account
-    
-    @State private var name: String = ""
-    @State private var role: String = ""
-    @State private var userId: String = ""
     
     var body: some View {
             NavigationView {
@@ -52,20 +47,20 @@ struct EditUserFormView: View {
                         VStack(spacing: 16) {
                             AppDropdown(
                                 title: "Role",
-                                placeholder: role,
+                                placeholder: presenter.role,
                                 isRequired: true,
                                 leftIcon: "person.fill",
                                 rightIcon: "chevron.down",
                                 choices: [("Laboran", RolesType.LAB.rawValue), ("Admin", RolesType.ADMIN.rawValue)],
                                 isSearchEnabled: false,
-                                selectedChoice: $role
+                                selectedChoice: $presenter.role
                             )
                             
                             AppTextField(
                                 title: "Nama",
                                 isRequired: true,
                                 placeholder: "Masukkan nama",
-                                text: $name
+                                text: $presenter.name
                             )
                             
                             AppTextField(
@@ -88,11 +83,10 @@ struct EditUserFormView: View {
                                 isEnabled: true,
                                 action: {
                                     Task {
-                                        print("Masuk simpan perubahan \(role) and \(name)")
                                         await presenter.editSelectedUser(
-                                            role: role,
-                                            name: name,
-                                            userId: userId
+                                            role: presenter.role,
+                                            name: presenter.name,
+                                            userId: presenter.userId
                                         )
                                     }
                                 }
@@ -141,12 +135,10 @@ struct EditUserFormView: View {
             }
         )
         .onAppear {
-                name = account.name
-                role = account.role.rawValue
-                userId = account.id
-            }
+            presenter.setAccount(account: account)
         }
     }
+}
 
 #Preview {
     EditUserFormView(account:

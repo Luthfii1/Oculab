@@ -14,6 +14,10 @@ class AccountPresenter: ObservableObject {
 
     @Published var isUserLoading = false
     
+    @Published var name = ""
+    @Published var role: String = ""
+    @Published var userId: String = ""
+    
     @Published var isRegistering = false
     @Published var registrationError: String? = nil
     @Published var registrationSuccess: (name: String, role: String) = ("", "")
@@ -336,6 +340,12 @@ class AccountPresenter: ObservableObject {
     
     func navigateBack() {
         Router.shared.navigateBack()
+    }
+    
+    func setAccount(account: Account) {
+        self.name = account.name
+        self.role = account.role.rawValue
+        self.userId = account.id
     }
 }
 
