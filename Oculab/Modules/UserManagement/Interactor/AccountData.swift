@@ -47,12 +47,12 @@ struct RegisterAccountBody: Codable {
 
 struct RegisterAccountResponse: Codable {
     var id: String
-    var username: String
+    var email: String
     var currentPassword: String
     
     enum CodingKeys: String, CodingKey {
         case id = "userId"
-        case username
+        case email
         case currentPassword
     }
 }
