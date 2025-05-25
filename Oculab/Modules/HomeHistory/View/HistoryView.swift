@@ -25,7 +25,7 @@ struct HistoryView: View {
                         }
                         .frame(maxWidth: .infinity)
 
-                    } else if presenter.filteredExaminationByDate.isEmpty {
+                    } else if presenter.finishedExaminationsByDate.isEmpty {
                         VStack(alignment: .center) {
                             Image("Empty")
                             Text("Tidak ada pemeriksaan diselesaikan pada \(formatDate(selectedDate))")
@@ -36,24 +36,40 @@ struct HistoryView: View {
                         }.frame(maxWidth: .infinity)
                     } else {
                         VStack(spacing: Decimal.d12) {
-                            ForEach(presenter.filteredExaminationByDate) { exam in
+                            ForEach(presenter.finishedExaminationsByDate) { exam in
                                 Button {
                                     Router.shared.navigateTo(.savedResult(
                                         examId: exam.id,
                                         patientId: exam.patientId
                                     ))
                                 } label: {
-                                    HomeActivityComponent(
-                                        slideId: exam.slideId,
-                                        status: exam.statusExamination,
-                                        date: exam.date,
-                                        patientName: exam.patientName,
-                                        patientDOB: exam.patientDob.toFormattedDate(),
-                                        picName: exam.picName,
-                                        isLab: true
+                                    FinishedExaminationCard(
+                                        slideId: exam.slideId.uppercased(),
+                                        result: exam.finalGradingResult,
+                                        patientName: exam.patientName.capitalized,
+                                        patientDOB: exam.patientDob,
+                                        dpjpName: exam.dpjpName
                                     )
                                 }
                             }
+//                            ForEach(presenter.finishedExaminationsByDate) { exam in
+//                                Button {
+//                                    Router.shared.navigateTo(.savedResult(
+//                                        examId: exam.id,
+//                                        patientId: exam.patientId
+//                                    ))
+//                                } label: {
+//                                    FinishedExaminationCard(
+//                                        slideId: exam.slideId.uppercased(),
+//                                        result: exam.finalGradingResult,
+//                                        patientName: exam.patientName.capitalized,
+//                                        patientDOB: exam.patientDob,
+//                                        dpjpName: exam.dpjpName
+//                                    )
+//                                    
+//                                   
+//                                }
+//                            }
                         }
                     }
                 }
@@ -64,12 +80,17 @@ struct HistoryView: View {
         .ignoresSafeArea()
         .onAppear {
             Task {
-                await presenter.fetchData()
-                presenter.filterLatestActivityByDate(date: selectedDate)
+                await presenter.fetchFinishedExaminationsByDate(date: selectedDate)
+//                presenter
+//                presenter.finishedExaminationsByDate(date: selectedDate)
             }
         }
         .onChange(of: selectedDate) {
-            presenter.filterLatestActivityByDate(date: selectedDate)
+            Task {
+                await presenter.fetchFinishedExaminationsByDate(date: selectedDate)
+
+//            presenter.filterLatestActivityByDate(date: selectedDate)
+            }
         }
         .navigationBarBackButtonHidden(true)
     }
@@ -79,6 +100,16 @@ struct HistoryView: View {
         dateFormatter.locale = Locale(identifier: "id_ID") // Bahasa Indonesia
         dateFormatter.dateFormat = "dd MMMM yyyy"
         return dateFormatter.string(from: date)
+    }
+    
+    private func formatGradingResult(_ result: String) -> String {
+        // Convert "Positive 1+" to "Positif 1+" and "Negative" to "Negatif"
+        if result.lowercased().contains("positive") {
+            return result.replacingOccurrences(of: "Positive", with: "Positif")
+        } else if result.lowercased().contains("negative") {
+            return "Negatif"
+        }
+        return result
     }
 }
 
