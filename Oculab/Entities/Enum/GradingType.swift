@@ -25,6 +25,17 @@ enum GradingType: String, Codable, CaseIterable {
         var container = encoder.singleValueContainer()
         try container.encode(rawValue)
     }
+    
+    var displayValue: String {
+        switch self {
+        case .NEGATIVE: return "Negatif"
+        case .SCANTY: return "SCANTY"
+        case .Plus1: return "Positif 1+"
+        case .Plus2: return "Positif 2+"
+        case .Plus3: return "Positif 3+"
+        case .unknown: return "Unknown"
+        }
+    }
 
     func description(withValues value: Int) -> String {
         switch self {
