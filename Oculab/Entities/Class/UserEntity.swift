@@ -15,7 +15,6 @@ class User: Codable, Identifiable {
     var role: RolesType
     var token: String?
     var email: String?
-    var username: String?
     var password: String?
     var accessPin: String?
     var previousPassword: String?
@@ -27,7 +26,6 @@ class User: Codable, Identifiable {
         role: RolesType = .ADMIN,
         token: String? = nil,
         email: String? = "noName@example.com",
-        username: String? = nil,
         password: String? = nil,
         previousPassword: String? = nil,
         accessPin: String? = "8888",
@@ -38,7 +36,6 @@ class User: Codable, Identifiable {
         self.role = role
         self.token = token
         self.email = email
-        self.username = username
         self.password = password
         self.previousPassword = previousPassword
         self.accessPin = accessPin
@@ -51,7 +48,6 @@ class User: Codable, Identifiable {
         case role
         case token
         case email
-        case username
         case password
         case accessPin
         case previousPassword
@@ -64,7 +60,6 @@ class User: Codable, Identifiable {
         self.role = try container.decode(RolesType.self, forKey: .role)
         self.token = try container.decodeIfPresent(String.self, forKey: .token)
         self.email = try container.decodeIfPresent(String.self, forKey: .email)
-        self.username = try container.decodeIfPresent(String.self, forKey: .username)
         self.password = try container.decodeIfPresent(String.self, forKey: .password)
         self.accessPin = try container.decodeIfPresent(String.self, forKey: .accessPin)
         self.previousPassword = try container.decodeIfPresent(String.self, forKey: .previousPassword)
@@ -77,7 +72,6 @@ class User: Codable, Identifiable {
         try container.encode(role, forKey: .role)
         try container.encodeIfPresent(token, forKey: .token)
         try container.encodeIfPresent(email, forKey: .email)
-        try container.encodeIfPresent(username, forKey: .username)
         try container.encodeIfPresent(password, forKey: .password)
         try container.encodeIfPresent(accessPin, forKey: .accessPin)
         try container.encodeIfPresent(previousPassword, forKey: .previousPassword)

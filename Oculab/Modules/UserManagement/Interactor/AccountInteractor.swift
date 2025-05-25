@@ -47,10 +47,9 @@ class AccountInteractor: ObservableObject {
             body: RegisterAccountBody(role: roleType, name: name, email: email)
         )
         
-        //username & currentPassword will be sent to user's email
         return RegisterAccountResponse(
             id: response.data.id,
-            username: response.data.username,
+            email: response.data.email,
             currentPassword: response.data.currentPassword
         )
     }
