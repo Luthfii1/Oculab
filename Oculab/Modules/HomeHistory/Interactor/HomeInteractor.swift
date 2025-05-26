@@ -73,64 +73,20 @@ class HomeInteractor {
 
         let fullURL = apiGetFinishedExaminationCardData + userId + "/" + date
 
-        do {
-            let response: APIResponse<[Examination]> = try await NetworkHelper.shared.get(urlString: fullURL)
-            
-            return response.data.map { exam in
-                FinishedExaminationCardData(
-                    examinationId: exam._id,
-                    patientId: exam.patientId ?? "",
-                    slideId: exam.slideId,
-                    patientName: exam.patientName ?? "",
-                    patientDob: exam.patientDoB ?? "",
-                    dpjpName: exam.dpjpName ?? "",
-                    finalGradingResult: exam.finalGradingResult ??
-                                      exam.expertResult?.finalGrading.rawValue ??
-                                      GradingType.unknown.rawValue
-                )
-            }
-            
-        } catch {
-            // Handle "no data found" as empty result
-            if let networkError = error as? NetworkError,
-               case .apiError(let apiResponse) = networkError,
-               apiResponse.data.errorType == "VALIDATION_ERROR" &&
-               apiResponse.data.description.contains("No finished examinations found") {
-                return []
-            }
-            
-            throw error
+        let response: APIResponse<[FinishedExaminationCardData]> = try await NetworkHelper.shared.get(urlString: fullURL)
+
+        let finishedExaminationResponse = response.data.map { exam in
+            return FinishedExaminationCardData(
+                examinationId: exam.id,
+                patientId: exam.patientId,
+                slideId: exam.slideId,
+                patientName: exam.patientName,
+                patientDob: exam.patientDob,
+                dpjpName: exam.dpjpName ?? "",
+                finalGradingResult: exam.finalGradingResult
+            )
         }
-    
-//    func getFinishedDataCard(date: String) async throws -> [FinishedExaminationCardData] {
-//        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
-//            throw NSError(
-//                domain: "UserIDNotFound",
-//                code: -1,
-//                userInfo: [NSLocalizedDescriptionKey: "User ID not found"]
-//            )
-//        }
-//
-//        let response: APIResponse<[Examination]> = try await NetworkHelper.shared
-//            .get(urlString: apiGetFinishedExaminationCardData + userId + "/" + date)
-//        
-//        let fullURL = apiGetFinishedExaminationCardData + userId + "/" + date
-//            print("🔗 API URL: \(fullURL)")
-//
-//        let examinationDataCard = response.data.map { exam -> FinishedExaminationCardData in
-//
-//            return FinishedExaminationCardData(
-//                examinationId: exam._id,
-//                patientId: exam.patientId ?? "",
-//                slideId: exam.slideId,
-//                patientName: exam.patientName ?? "",
-//                patientDob: exam.patientDoB ?? "",
-//                dpjpName: exam.dpjpName ?? "",
-//                finalGradingResult: exam.finalGradingResult ?? exam.expertResult?.finalGrading.rawValue ?? GradingType.unknown.rawValue
-//            )
-//        }
-//
-//        return examinationDataCard
+        return finishedExaminationResponse
     }
 }
 

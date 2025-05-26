@@ -43,22 +43,13 @@ struct HistoryView: View {
                                         patientId: exam.patientId
                                     ))
                                 } label: {
-//                                    HomeActivityComponent(
-//                                        slideId: exam.slideId,
-//                                        status: exam.statusExamination,
-//                                        date: exam.date,
-//                                        patientName: exam.patientName,
-//                                        patientDOB: exam.patientDob.toFormattedDate(),
-//                                        picName: exam.picName,
-//                                        isLab: true
-//                                    )
-//                                    
                                     FinishedExaminationCard(
                                         slideId: exam.slideId,
-                                        result: exam.finalGradingResult ?? GradingType.unknown.rawValue,
+                                        result: exam.finalGradingResult.rawValue,
                                         patientName: exam.patientName,
-                                        patientDOB: exam.patientDob,
-                                        dpjpName: exam.dpjpName)
+                                        patientDOB: exam.patientDob.toFormattedDate(),
+                                        dpjpName: exam.dpjpName ?? ""
+                                    )
                                 }
                             }
                         }
