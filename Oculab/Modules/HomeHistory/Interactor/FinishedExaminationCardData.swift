@@ -41,3 +41,5 @@ struct FinishedExaminationCardData: Decodable, Identifiable {
     var dpjpName: String
     var finalGradingResult: String?
 }
+
+

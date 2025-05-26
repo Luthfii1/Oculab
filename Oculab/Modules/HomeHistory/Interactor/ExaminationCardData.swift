@@ -22,4 +22,7 @@ struct ExaminationCardData: Decodable, Identifiable {
     var patientId: String
     var picName: String
     var picId: String
+    
+    var finalGradingResult: String?
+    var dpjpName: String?
 }

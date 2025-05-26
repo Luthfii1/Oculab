@@ -25,7 +25,7 @@ struct HistoryView: View {
                         }
                         .frame(maxWidth: .infinity)
 
-                    } else if presenter.filteredExaminationByDate.isEmpty {
+                    } else if presenter.finishedExaminationsByDate.isEmpty {
                         VStack(alignment: .center) {
                             Image("Empty")
                             Text("Tidak ada pemeriksaan diselesaikan pada \(formatDate(selectedDate))")
@@ -36,22 +36,29 @@ struct HistoryView: View {
                         }.frame(maxWidth: .infinity)
                     } else {
                         VStack(spacing: Decimal.d12) {
-                            ForEach(presenter.filteredExaminationByDate) { exam in
+                            ForEach(presenter.finishedExaminationsByDate) { exam in
                                 Button {
                                     Router.shared.navigateTo(.savedResult(
                                         examId: exam.id,
                                         patientId: exam.patientId
                                     ))
                                 } label: {
-                                    HomeActivityComponent(
+//                                    HomeActivityComponent(
+//                                        slideId: exam.slideId,
+//                                        status: exam.statusExamination,
+//                                        date: exam.date,
+//                                        patientName: exam.patientName,
+//                                        patientDOB: exam.patientDob.toFormattedDate(),
+//                                        picName: exam.picName,
+//                                        isLab: true
+//                                    )
+//                                    
+                                    FinishedExaminationCard(
                                         slideId: exam.slideId,
-                                        status: exam.statusExamination,
-                                        date: exam.date,
+                                        result: exam.finalGradingResult ?? GradingType.unknown.rawValue,
                                         patientName: exam.patientName,
-                                        patientDOB: exam.patientDob.toFormattedDate(),
-                                        picName: exam.picName,
-                                        isLab: true
-                                    )
+                                        patientDOB: exam.patientDob,
+                                        dpjpName: exam.dpjpName)
                                 }
                             }
                         }
@@ -64,12 +71,13 @@ struct HistoryView: View {
         .ignoresSafeArea()
         .onAppear {
             Task {
-                await presenter.fetchData()
-                presenter.filterLatestActivityByDate(date: selectedDate)
+                await presenter.fetchFinishedExaminationsByDate(date: selectedDate)
             }
         }
         .onChange(of: selectedDate) {
-            presenter.filterLatestActivityByDate(date: selectedDate)
+            Task {
+                await presenter.fetchFinishedExaminationsByDate(date: selectedDate)
+            }
         }
         .navigationBarBackButtonHidden(true)
     }
