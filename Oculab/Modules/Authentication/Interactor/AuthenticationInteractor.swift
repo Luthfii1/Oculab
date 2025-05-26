@@ -45,10 +45,10 @@ class AuthenticationInteractor: ObservableObject {
             body: UserBody(email: email, password: password)
         )
 
-        let isFirstTime = UserDefaults.standard.bool(forKey: UserDefaultType.isFirstTimeLogin.rawValue) == false
-        if isFirstTime {
-            UserDefaults.standard.set(true, forKey: UserDefaultType.isFirstTimeLogin.rawValue)
-        }
+//        let isFirstTime = UserDefaults.standard.bool(forKey: UserDefaultType.isFirstTimeLogin.rawValue) == false
+//        if isFirstTime {
+//            UserDefaults.standard.set(true, forKey: UserDefaultType.isFirstTimeLogin.rawValue)
+//        }
 
         // Store user data
         UserDefaults.standard.set(response.data.accessToken, forKey: UserDefaultType.accessToken.rawValue)
