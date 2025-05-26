@@ -11,11 +11,13 @@ import SwiftUI
 @main
 struct OculabApp: App {
     let container: ModelContainer
+    @AppStorage(UserDefaultType.hasSeenOnboarding.rawValue) var hasSeenOnboarding: Bool = false
 
     init() {
         do {
             self.container = try ModelContainer(for: User.self)
             DependencyInjection.shared.initializer(modelContext: container.mainContext)
+            
         } catch {
             fatalError("Failed to initialize SwiftData")
         }

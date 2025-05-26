@@ -86,7 +86,7 @@ class ProfilePresenter: ObservableObject {
 
     @MainActor
     func logout() {
-        for item in UserDefaultType.allCases {
+        for item in UserDefaultType.allCases where item != .hasSeenOnboarding {
             UserDefaults.standard.removeObject(forKey: item.rawValue)
         }
     }

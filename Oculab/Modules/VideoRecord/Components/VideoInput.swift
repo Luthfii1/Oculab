@@ -39,9 +39,10 @@ struct VideoInput: View {
             VStack(alignment: .center) {
                 if selectedURL == nil {
                     AppButton(title: "Ambil Gambar", leftIcon: "camera", colorType: .secondary, size: .small) {
-                        if UserDefaults.standard.bool(forKey: UserDefaultType.isFirstTimeLogin.rawValue) {
+                        if !UserDefaults.standard.bool(forKey: UserDefaultType.hasSeenOnboarding.rawValue) {
                             showOnboardingGuidelines = true
-                            UserDefaults.standard.set(false, forKey: UserDefaultType.isFirstTimeLogin.rawValue)
+                            UserDefaults.standard.set(true, forKey: UserDefaultType.hasSeenOnboarding.rawValue)
+                            
                         } else {
                             selectFile()
                             videoPresenter.previewURL = nil
