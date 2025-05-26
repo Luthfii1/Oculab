@@ -11,6 +11,7 @@ class HomeInteractor {
     private let examinationURL = API.BE + "/examination"
     private let apiURL = API.BE + "/examination/get-number-of-examinations"
     private let apiGetAllData = API.BE + "/examination/get-all-examinations/"
+    private let apiGetFinishedExaminationCardData = API.BE + "/examination/get-finished-examination-card-data/"
 
     func getStatisticExamination() async throws -> ExaminationStatistic {
         guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
@@ -56,10 +57,36 @@ class HomeInteractor {
                 patientDob: exam.patientDoB ?? "",
                 patientId: exam.patientId ?? "",
                 picName: exam.picName ?? "",
-                picId: exam.picId ?? ""
+                picId: exam.picId ?? "",
+                finalGradingResult: exam.expertResult?.finalGrading.rawValue ?? GradingType.unknown.rawValue,
+                dpjpName: exam.dpjpName ?? ""
             )
         }
 
         return examinationDataCard
     }
+    
+    func getFinishedDataCard(date: String) async throws -> [FinishedExaminationCardData] {
+        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
+            throw NSError(domain: "UserIDNotFound", code: -1, userInfo: [NSLocalizedDescriptionKey: "User ID not found"])
+        }
+
+        let fullURL = apiGetFinishedExaminationCardData + userId + "/" + date
+
+        let response: APIResponse<[FinishedExaminationCardData]> = try await NetworkHelper.shared.get(urlString: fullURL)
+
+        let finishedExaminationResponse = response.data.map { exam in
+            return FinishedExaminationCardData(
+                examinationId: exam.id,
+                patientId: exam.patientId,
+                slideId: exam.slideId,
+                patientName: exam.patientName,
+                patientDob: exam.patientDob,
+                dpjpName: exam.dpjpName ?? "",
+                finalGradingResult: exam.finalGradingResult
+            )
+        }
+        return finishedExaminationResponse
+    }
 }
+

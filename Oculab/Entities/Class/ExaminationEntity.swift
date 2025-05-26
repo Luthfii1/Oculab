@@ -34,6 +34,9 @@ class Examination: Decodable, Identifiable {
     var picName: String?
 
     var dpjpId: String?
+    var dpjpName: String?
+    
+    var finalGradingResult: String?
 
     init(
         _id: String,
@@ -55,10 +58,10 @@ class Examination: Decodable, Identifiable {
         patientId: String? = nil,
         patientDoB: String? = nil,
         picId: String? = nil,
+        picName: String? = nil,
         dpjpId: String? = nil,
-
-        picName: String? = nil
-
+        dpjpName: String? = nil,
+        finalGradingResult: String? = nil
     ) {
         self._id = _id
         self.goal = goal
@@ -81,9 +84,12 @@ class Examination: Decodable, Identifiable {
         self.patientDoB = patientDoB
 
         self.dpjpId = dpjpId
+        self.dpjpName = dpjpName
 
         self.picId = picId
         self.picName = picName
+        
+        self.finalGradingResult = finalGradingResult
     }
 
     enum CodingKeys: String, CodingKey {
@@ -109,6 +115,8 @@ class Examination: Decodable, Identifiable {
         case picId
         case picName
         case dpjpId
+        case dpjpName
+        case finalGradingResult
     }
 
     required init(from decoder: Decoder) throws {
@@ -181,6 +189,9 @@ class Examination: Decodable, Identifiable {
         self.patientDoB = try container.decodeIfPresent(String.self, forKey: .patientDoB)
 
         self.dpjpId = try container.decodeIfPresent(String.self, forKey: .dpjpId)
+        self.dpjpName = try container.decodeIfPresent(String.self, forKey: .dpjpName)
+        
+        self.finalGradingResult = try container.decodeIfPresent(String.self, forKey: .finalGradingResult)
     }
 
     func encode(to encoder: any Encoder) throws {
