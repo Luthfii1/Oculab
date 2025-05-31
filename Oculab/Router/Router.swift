@@ -28,13 +28,16 @@ class Router: ObservableObject {
         case detailedPhoto(slideId: String, fovData: FOVData, order: Int, total: Int)
         case profile
         case editPassword
-        case inputPatientData
+        case inputPatientData(patientId: String? = nil)
         case informationInterpretation
         case kebijakanPrivasi
         case analyzingStatusProgress(examinationId: String)
         case accountManagement
         case newAccount
         case editAccount(account: Account)
+        case patientList
+        case newPatient
+        case patientDetail(patientId: String)
     }
 
     @Published var path: NavigationPath = .init()
@@ -76,8 +79,8 @@ class Router: ObservableObject {
         case .editPassword:
             EditPasswordView()
                 .environmentObject(DependencyInjection.shared.createProfilePresenter())
-        case .inputPatientData:
-            InputPatientData()
+        case .inputPatientData(let patientId):
+            InputPatientData(patientId: patientId)
         case .informationInterpretation:
             InformationPage()
         case .kebijakanPrivasi:
@@ -90,6 +93,12 @@ class Router: ObservableObject {
             NewUserFormView()
         case let .editAccount(account):
             EditUserFormView(account: account)
+        case .patientList:
+            PatientListView()
+        case .newPatient:
+            PatientForm(isAddingNewPatient: true)
+        case let .patientDetail(patientId):
+            PatientDetail(patientId: patientId)
         }
     }
 

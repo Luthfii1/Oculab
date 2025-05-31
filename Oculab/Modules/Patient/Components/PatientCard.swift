@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct PatientCard: View {
+ struct PatientCard: View {
     let name: String
     let birthDate: String
     

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PatientForm: View {
     var isAddingNewPatient: Bool
-    var presenter = InputPatientPresenter()
+    var presenter = PatientPresenter()
 
     var body: some View {
         NavigationView {
@@ -25,11 +25,10 @@ struct PatientForm: View {
 
                 AppButton(
                     title: isAddingNewPatient ? "Tambahkan Pasien Baru" : "Simpan Data Pasien",
-                    leftIcon: isAddingNewPatient ? "plus" : "",
-                    rightIcon: isAddingNewPatient ? "" : "checkmark"
+                    leftIcon: isAddingNewPatient ? "plus" : "checkmark"
                 ) {
                     Task {
-                        await presenter.addNewPatient()
+//                        await presenter.addNewPatient()
                     }
                 }
             }
@@ -41,7 +40,7 @@ struct PatientForm: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
-                        Router.shared.navigateBack()
+                        presenter.navigateBack()
                     }) {
                         HStack {
                             Image("back")
@@ -50,6 +49,7 @@ struct PatientForm: View {
                 }
             }
         }
+        .navigationBarBackButtonHidden(true)
     }
 }
 

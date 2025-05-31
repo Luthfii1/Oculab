@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PatientListView: View {
-    @StateObject private var presenter = AccountPresenter()
+    @StateObject private var presenter = PatientPresenter()
     
     var body: some View {
         NavigationView {
@@ -20,10 +20,10 @@ struct PatientListView: View {
                 }
                 
                 AppSearchBar(
-                    searchText: $presenter.searchText,
+                    searchText: .constant(""),
                     placeholder: "Cari nama pasien",
                     onSearch: {
-                        presenter.searchAccounts(query: presenter.searchText)
+                        
                     }
                 )
 
@@ -32,59 +32,42 @@ struct PatientListView: View {
                     leftIcon: "plus",
                     colorType: .secondary,
                     action: {
-                        presenter.navigateTo(.newAccount)
+                        Router.shared.navigateTo(.newPatient)
                     }
                 )
                 
-                if !presenter.searchText.isEmpty && presenter.displayedSortedGroupedAccounts.isEmpty {
-                    VStack(spacing: 20) {
-                        Image(systemName: "magnifyingglass")
-                            .font(.system(size: 48))
-                            .foregroundColor(.gray)
-                        
-                        Text("Tidak ada hasil untuk \"\(presenter.searchText)\"")
-                            .font(.system(size: 16))
-                            .foregroundColor(.gray)
-                            .multilineTextAlignment(.center)
-                        
-                        Button(action: {
-                            presenter.clearSearch()
-                        }) {
-                            Text("Hapus Pencarian")
-                                .font(.system(size: 14))
-                                .foregroundColor(.purple)
-                        }
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding(.top, 40)
+                if presenter.isPatientLoading {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .padding(.top, 40)
                 } else {
-                    if presenter.isUserLoading {
-                        ProgressView()
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .padding(.top, 40)
-                    } else {
-                        ScrollView {
-                            LazyVGrid(columns: [
-                                GridItem(.flexible(), spacing: 12),
-                                GridItem(.flexible(), spacing: 12)
-                            ], spacing: 16) {
-                                PatientCard(name: "Rasyad Caesaradhi", birthDate: "19/12/00")
-                                PatientCard(name: "Indri Klarissa", birthDate: "19/12/00")
-                                PatientCard(name: "Bunga Prameswari", birthDate: "19/12/00")
-                                PatientCard(name: "Alifiyah Ariandri", birthDate: "19/12/00")
-                                PatientCard(name: "Misbachul Munir", birthDate: "19/12/00")
-                                PatientCard(name: "Annisa Az Zahra", birthDate: "19/12/00")
-                                PatientCard(name: "Rasyad Caesaradhi", birthDate: "19/12/00")
-                                PatientCard(name: "Indri Klarissa", birthDate: "19/12/00")
-                                PatientCard(name: "Bunga Prameswari", birthDate: "19/12/00")
-                                PatientCard(name: "Alifiyah Ariandri", birthDate: "19/12/00")
+                    ScrollView {
+                        LazyVGrid(columns: [
+                            GridItem(.flexible(), spacing: 12),
+                            GridItem(.flexible(), spacing: 12)
+                        ], spacing: 16) {
+                            ForEach(presenter.patientNameDoB, id: \.1) { nameWithDoB, patientId in
+                                Button {
+                                    presenter.navigateTo(.patientDetail(patientId: patientId))
+                                } label: {
+                                    PatientCard(
+                                        name: nameWithDoB.components(separatedBy: " (").first ?? "",
+                                        birthDate: nameWithDoB.components(separatedBy: " (").last?.replacingOccurrences(of: ")", with: "") ?? ""
+                                    )
+                                }
                             }
                         }
                     }
                 }
+                
             }
             .padding(.horizontal, Decimal.d20)
             .background(Color(.systemBackground))
+            .onAppear {
+                Task {
+                    await presenter.getAllPatient()
+                }
+            }
         }
         .navigationBarHidden(true)
     }

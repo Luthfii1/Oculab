@@ -9,7 +9,8 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var dependencyInjection: DependencyInjection
-
+    @EnvironmentObject private var authPresenter: AuthenticationPresenter
+    
     var body: some View {
         TabView {
             HomeView()
@@ -18,13 +19,20 @@ struct ContentView: View {
                     Image(systemName: "rectangle.split.2x2.fill")
                     Text("Pemeriksaan")
                 }
-
-            HistoryView(selectedDate: Date())
-                .tabItem {
-                    Image(systemName: "clock.arrow.circlepath")
-                    Text("Riwayat")
-                }
-
+            if authPresenter.user.role == .LAB {
+                HistoryView(selectedDate: Date())
+                    .tabItem {
+                        Image(systemName: "clock.arrow.circlepath")
+                        Text("Riwayat")
+                    }
+            } else {
+                PatientListView()
+                    .tabItem {
+                        Image(systemName: "clock.arrow.circlepath")
+                        Text("Riwayat")
+                    }
+            }
+            
             ProfileView()
                 .environmentObject(DependencyInjection.shared.createAuthPresenter())
                 .environmentObject(DependencyInjection.shared.createProfilePresenter())
