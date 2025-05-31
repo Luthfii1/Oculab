@@ -20,10 +20,10 @@ struct PatientListView: View {
                 }
                 
                 AppSearchBar(
-                    searchText: .constant(""),
+                    searchText: $presenter.searchText,
                     placeholder: "Cari nama pasien",
                     onSearch: {
-                        
+                        presenter.searchPatients()
                     }
                 )
 
@@ -40,13 +40,33 @@ struct PatientListView: View {
                     ProgressView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .padding(.top, 40)
+                } else if !presenter.searchText.isEmpty && presenter.filteredPatientNameDoB.isEmpty {
+                    VStack(spacing: 20) {
+                        Image(systemName: "magnifyingglass")
+                            .font(.system(size: 48))
+                            .foregroundColor(AppColors.slate300)
+                        
+                        Text("Tidak ada hasil untuk \"\(presenter.searchText)\"")
+                            .font(AppTypography.s3)
+                            .foregroundColor(AppColors.slate700)
+                            .multilineTextAlignment(.center)
+                        
+                        Button(action: {
+                            presenter.clearSearch()
+                        }) {
+                            Text("Hapus Pencarian")
+                                .font(AppTypography.p2)
+                                .foregroundColor(AppColors.purple600)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     ScrollView {
                         LazyVGrid(columns: [
                             GridItem(.flexible(), spacing: 12),
                             GridItem(.flexible(), spacing: 12)
                         ], spacing: 16) {
-                            ForEach(presenter.patientNameDoB, id: \.1) { nameWithDoB, patientId in
+                            ForEach(presenter.filteredPatientNameDoB, id: \.1) { nameWithDoB, patientId in
                                 Button {
                                     presenter.navigateTo(.patientDetail(patientId: patientId))
                                 } label: {
@@ -67,6 +87,9 @@ struct PatientListView: View {
                 Task {
                     await presenter.getAllPatient()
                 }
+            }
+            .onChange(of: presenter.searchText) { _, _ in
+                presenter.searchPatients()
             }
         }
         .navigationBarHidden(true)
