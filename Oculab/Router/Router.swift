@@ -36,7 +36,7 @@ class Router: ObservableObject {
         case newAccount
         case editAccount(account: Account)
         case patientList
-        case newPatient
+        case patientForm(patientId: String? = nil)
         case patientDetail(patientId: String)
     }
 
@@ -95,8 +95,8 @@ class Router: ObservableObject {
             EditUserFormView(account: account)
         case .patientList:
             PatientListView()
-        case .newPatient:
-            PatientForm(isAddingNewPatient: true)
+        case .patientForm(let patientId):
+            PatientForm(patientId: patientId)
         case let .patientDetail(patientId):
             PatientDetail(patientId: patientId)
         }

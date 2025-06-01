@@ -49,7 +49,7 @@ struct InputPatientData: View {
                         .disabled(patientId != nil)
                         
                         if presenter.selectedPatient != "" {
-                            PatientFormField(focusedField: _focusedField)
+                            PatientDisplayField(focusedField: _focusedField)
                                 .environmentObject(presenter)
                             
                             AppButton(

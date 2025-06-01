@@ -8,31 +8,47 @@
 import SwiftUI
 
 struct PatientForm: View {
-    var isAddingNewPatient: Bool
-    var presenter = PatientPresenter()
+    let patientId: String?
+    @StateObject private var presenter = PatientPresenter()
+    
+    private var isAddingNewPatient: Bool {
+        patientId == nil
+    }
+
+    init(patientId: String? = nil) {
+        self.patientId = patientId
+    }
 
     var body: some View {
         NavigationView {
             VStack {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: Decimal.d24) {
-                        PatientFormField()
-                            .environmentObject(presenter)
+                if presenter.isPatientLoading {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: Decimal.d24) {
+                            PatientFormField()
+                                .environmentObject(presenter)
+                        }
                     }
-                }
 
-                Spacer()
+                    Spacer()
 
-                AppButton(
-                    title: isAddingNewPatient ? "Tambahkan Pasien Baru" : "Simpan Data Pasien",
-                    leftIcon: isAddingNewPatient ? "plus" : "checkmark"
-                ) {
-                    Task {
-//                        await presenter.addNewPatient()
+                    AppButton(
+                        title: isAddingNewPatient ? "Tambahkan Pasien Baru" : "Simpan Data Pasien",
+                        leftIcon: isAddingNewPatient ? "plus" : "checkmark"
+                    ) {
+                        Task {
+                            if isAddingNewPatient {
+                                await presenter.addNewPatient()
+                            } else {
+                                await presenter.updatePatient()
+                            }
+                        }
                     }
                 }
             }
-
             .padding(.horizontal, Decimal.d20)
             .padding(.vertical, Decimal.d24)
             .navigationTitle(isAddingNewPatient ? "Data Pasien Baru" : "Ubah Data Pasien")
@@ -40,12 +56,28 @@ struct PatientForm: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
-                        presenter.navigateBack()
+                        Router.shared.navigateBack()
                     }) {
                         HStack {
                             Image("back")
                         }
                     }
+                }
+            }
+            .onAppear {
+                if let patientId = patientId {
+                    Task {
+                        await presenter.getPatientById(patientId: patientId)
+                    }
+                }
+            }
+            .alert("Error", isPresented: .constant(presenter.errorMessage != nil)) {
+                Button("OK") {
+                    presenter.errorMessage = nil
+                }
+            } message: {
+                if let errorMessage = presenter.errorMessage {
+                    Text(errorMessage)
                 }
             }
         }
@@ -54,5 +86,9 @@ struct PatientForm: View {
 }
 
 #Preview {
-    PatientForm(isAddingNewPatient: true)
+    PatientForm()
+}
+
+#Preview("Edit Patient") {
+    PatientForm(patientId: "d0c1a2b3-4f5e-6789-91ab-cdef12345678")
 }

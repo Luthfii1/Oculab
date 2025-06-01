@@ -1,4 +1,3 @@
-
 //
 //  PatientDetail.swift
 //  Oculab
@@ -15,17 +14,19 @@ struct PatientDetail: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                if let patient = presenter.patient {
+                if !presenter.isLoadingPatient && !presenter.patient.name.isEmpty {
                     Spacer().frame(height: Decimal.d24)
                     
                     AppCard(icon: "person.fill", title: "Data Pasien", spacing: Decimal.d16, isEnablingEdit: true) {
                         ExtendedCard(data: [
-                            ("Nama", patient.name),
-                            ("NIK", patient.NIK),
-                            ("Tanggal Lahir", presenter.formatDate(patient.DoB)),
-                            ("Jenis Kelamin", patient.sex.rawValue),
-                            ("Nomor BPJS", patient.BPJS ?? ""),
+                            ("Nama", presenter.patient.name),
+                            ("NIK", presenter.patient.NIK),
+                            ("Tanggal Lahir", presenter.formatDate(presenter.patient.DoB)),
+                            ("Jenis Kelamin", presenter.patient.sex.rawValue),
+                            ("Nomor BPJS", presenter.patient.BPJS ?? ""),
                         ], titleSize: AppTypography.s5)
+                    } action: {
+                        presenter.navigateTo(.patientForm(patientId: patientId))
                     }
                     
                     AppCard(
@@ -59,6 +60,9 @@ struct PatientDetail: View {
                             }
                         }
                     }
+                } else if presenter.isLoadingPatient {
+                    ProgressView("Loading patient data...")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
             .padding(.horizontal, Decimal.d20)

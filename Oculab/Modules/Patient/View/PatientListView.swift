@@ -32,7 +32,7 @@ struct PatientListView: View {
                     leftIcon: "plus",
                     colorType: .secondary,
                     action: {
-                        Router.shared.navigateTo(.newPatient)
+                        presenter.navigateTo(.patientForm())
                     }
                 )
                 
