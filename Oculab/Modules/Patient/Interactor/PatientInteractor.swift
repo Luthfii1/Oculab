@@ -12,6 +12,7 @@ class PatientInteractor: ObservableObject {
     let urlGetDataPatient = API.BE + "/patient/get-patient-by-id/"
     let urlGetAllExamByPatientId = API.BE + "/examination/get-examination-card-by-patient/"
     let urlCreatePatient = API.BE + "/patient/create-new-patient/"
+    let urlUpdatePatient = API.BE + "/patient/update-data/"
     
     func getAllPatient() async throws -> [Patient] {
         let response: APIResponse<[Patient]> = try await NetworkHelper.shared.get(urlString: apiGetAllPatient)
@@ -43,11 +44,12 @@ class PatientInteractor: ObservableObject {
         return response.data
     }
     
-//    func getAllExamByPatientId(patientId: String) async throws -> [ExaminationResultCardData] {
-//
-//        let response: APIResponse<[ExaminationResultCardData]> = try await NetworkHelper.shared
-//            .get(urlString: urlGetAllExamByPatientId + patientId)
-//        
-//        return response.data
-//    }
+    func updatePatient(patient: Patient, patientId: String) async throws -> Patient {
+        let response: APIResponse<Patient> = try await NetworkHelper.shared.update(
+            urlString: urlUpdatePatient + patientId.lowercased(),
+            body: patient
+        )
+
+        return response.data
+    }
 }

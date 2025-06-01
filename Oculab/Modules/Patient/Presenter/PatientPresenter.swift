@@ -135,7 +135,6 @@ class PatientPresenter: ObservableObject {
             isPatientLoading = false
         }
         
-        // Ensure the patient has the latest form data
         patient.DoB = selectedDoB
         patient.BPJS = BPJSnumber.isEmpty ? nil : BPJSnumber
         
@@ -169,11 +168,25 @@ class PatientPresenter: ObservableObject {
             isPatientLoading = false
         }
         
+        patient.DoB = selectedDoB
+        patient.BPJS = BPJSnumber.isEmpty ? nil : BPJSnumber
+        
+        switch selectedSex {
+        case "Perempuan":
+            patient.sex = .FEMALE
+        case "Laki-laki":
+            patient.sex = .MALE
+        default:
+            patient.sex = .UNKNOWN
+        }
+        
         do {
-//            let response = try await interactor?.updatePatient(patient: patient)
-//            if response != nil {
-//                Router.shared.navigateBack()
-//            }
+            let response = try await interactor?.updatePatient(patient: patient, patientId: String(describing: patient._id))
+
+            if let updatedPatient = response {
+                self.patient = updatedPatient
+                Router.shared.navigateBack()
+            }
         } catch {
             switch error {
             case let NetworkError.apiError(apiResponse):
