@@ -7,6 +7,12 @@
 
 import SwiftUI
 
+enum ViewType {
+    case lab
+    case admin
+    case adminPatientDetail
+}
+
 struct HomeActivityComponent: View {
     var slideId: String
     var status: StatusType
@@ -14,8 +20,7 @@ struct HomeActivityComponent: View {
     var patientName: String
     var patientDOB: String
     var picName: String
-
-    var isLab: Bool
+    var viewType: ViewType
 
     var body: some View {
         VStack(alignment: .leading, spacing: Decimal.d8) {
@@ -30,14 +35,15 @@ struct HomeActivityComponent: View {
                     .background(AppColors.purple50)
                     .foregroundStyle(AppColors.purple500)
                     .cornerRadius(Decimal.d8)
-                Text(isLab ? slideId : patientName + " (\(patientDOB))").font(AppTypography.s4_1)
+                Text(getDisplayText()).font(AppTypography.s4_1)
                     .foregroundStyle(AppColors.slate900)
                     .multilineTextAlignment(.leading)
             }
-
-            if isLab {
+            
+            switch viewType {
+            case .lab:
                 Text(patientName + " (\(patientDOB))").font(AppTypography.p4).foregroundStyle(AppColors.slate900)
-            } else {
+            case .admin, .adminPatientDetail:
                 Text("Petugas Pemeriksaan").font(AppTypography.s6).foregroundStyle(AppColors.slate300)
                 Text(picName).font(AppTypography.p2).foregroundStyle(AppColors.slate900)
             }
@@ -49,6 +55,15 @@ struct HomeActivityComponent: View {
                 .stroke(AppColors.slate100)
         )
     }
+        
+    private func getDisplayText() -> String {
+        switch viewType {
+        case .lab, .adminPatientDetail:
+            return slideId
+        case .admin:
+            return patientName + " (\(patientDOB))"
+        }
+    }
 }
 
 #Preview {
@@ -59,7 +74,7 @@ struct HomeActivityComponent: View {
         patientName: "Muhammad Rasyad Caesarardhi",
         patientDOB: "19/12/00",
         picName: "Bachul",
-        isLab: false
+        viewType: .lab
     )
 
     HomeActivityComponent(
@@ -69,6 +84,16 @@ struct HomeActivityComponent: View {
         patientName: "Muhammad Rasyad Caesarardhi",
         patientDOB: "19/12/00",
         picName: "Bachul",
-        isLab: true
+        viewType: .admin
+    )
+    
+    HomeActivityComponent(
+        slideId: "24/11/1/0123A",
+        status: .FINISHED,
+        date: "18 September 2024",
+        patientName: "Muhammad Rasyad Caesarardhi",
+        patientDOB: "19/12/00",
+        picName: "Bachul",
+        viewType: .adminPatientDetail
     )
 }

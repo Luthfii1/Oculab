@@ -48,15 +48,23 @@ struct PatientDetail: View {
                                 .frame(maxWidth: .infinity, minHeight: 60)
                         } else {
                             ForEach(presenter.examinationList) { examination in
-                                HomeActivityComponent(
-                                    slideId: examination.slideId,
-                                    status: examination.statusExamination,
-                                    date: presenter.formatDateTime(examination.examinationDate),
-                                    patientName: examination.patientName,
-                                    patientDOB: presenter.formatDate(examination.patientDob),
-                                    picName: examination.dpjpName ?? "Belum ditentukan",
-                                    isLab: examination.statusExamination == .FINISHED
-                                )
+                                Button {
+                                    Router.shared.navigateTo(.examDetailAdmin(
+                                        examId: examination.id,
+                                        patientId: patientId
+                                    ))
+                                } label: {
+                                    HomeActivityComponent(
+                                        slideId: examination.slideId,
+                                        status: examination.statusExamination,
+                                        date: presenter.formatDateTime(examination.examinationDate),
+                                        patientName: examination.patientName,
+                                        patientDOB: presenter.formatDate(examination.patientDob),
+                                        picName: examination.dpjpName ?? "Belum ditentukan",
+                                        viewType: .adminPatientDetail
+                                    )
+                                }
+                                
                             }
                         }
                     }
