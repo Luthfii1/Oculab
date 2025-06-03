@@ -1,5 +1,5 @@
 //
-//  PatientFormField.swift
+//  PatientDisplayField.swift
 //  Oculab
 //
 //  Created by Alifiyah Ariandri on 08/11/24.
@@ -13,7 +13,7 @@ enum FormField {
     case bpjs
 }
 
-struct PatientFormField: View {
+struct PatientDisplayField: View {
     @EnvironmentObject var presenter: InputPatientPresenter
     @FocusState var focusedField: FormField?
 
@@ -85,6 +85,6 @@ struct PatientFormField: View {
 }
 
 #Preview {
-    PatientFormField()
+    PatientDisplayField()
         .environmentObject(InputPatientPresenter())
 }

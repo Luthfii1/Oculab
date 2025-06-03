@@ -8,9 +8,14 @@
 import SwiftUI
 
 struct InputPatientData: View {
+    let patientId: String?
     @ObservedObject var presenter = InputPatientPresenter()
     @FocusState private var focusedField: FormField?
-
+    
+    init(patientId: String? = nil) {
+        self.patientId = patientId
+    }
+    
     var body: some View {
         NavigationView {
             ScrollView(showsIndicators: false) {
@@ -18,7 +23,7 @@ struct InputPatientData: View {
                     Spacer().frame(height: Decimal.d24)
                     AppStepper(stepTitles: ["Data Pasien", "Data Sediaan", "Hasil"], currentStep: 0)
                     Spacer().frame(height: Decimal.d24)
-
+                    
                     VStack(alignment: .leading, spacing: Decimal.d24) {
                         // PIC Dropdown
                         AppDropdown(
@@ -28,24 +33,25 @@ struct InputPatientData: View {
                             choices: presenter.picName,
                             selectedChoice: $presenter.selectedPIC
                         )
-
+                        
                         // Patient Search Dropdown
                         AppDropdown(
                             title: "Nama",
-                            placeholder: "Cari nama pasien",
+                            placeholder: patientId != nil ? "Pasien dipilih otomatis" : "Cari nama pasien",
                             leftIcon: "person.fill",
                             rightIcon: "",
                             choices: presenter.patientNameDoB,
-                            description: "Pilih atau masukkan data pasien baru",
+                            description: patientId != nil ? "Pasien telah dipilih dari riwayat" : "Pilih atau masukkan data pasien baru",
                             selectedChoice: $presenter.selectedPatient,
-                            isEnablingAdding: true
+                            isEnablingAdding: patientId == nil
                         )
                         .focused($focusedField, equals: .search)
-
+                        .disabled(patientId != nil)
+                        
                         if presenter.selectedPatient != "" {
-                            PatientFormField(focusedField: _focusedField)
+                            PatientDisplayField(focusedField: _focusedField)
                                 .environmentObject(presenter)
-
+                            
                             AppButton(
                                 title: "Isi Detail Sediaan",
                                 rightIcon: "arrow.forward",
@@ -53,7 +59,7 @@ struct InputPatientData: View {
                             ) {
                                 presenter.newExam()
                             }
-
+                            
                             Spacer()
                         }
                     }
@@ -78,12 +84,22 @@ struct InputPatientData: View {
                 Task {
                     await presenter.getAllUser()
                     await presenter.getAllPatient()
+                    
+                    // Auto-fill patient if patientId is provided
+                    if let patientId = patientId, !patientId.isEmpty {
+                        await presenter.getPatientById(patientId: patientId)
+                        // Set the selected patient to trigger the form display
+                        presenter.selectedPatient = patientId
+                    }
                 }
             }
             .onChange(of: presenter.selectedPatient) { _, newValue in
                 Task {
                     print(presenter.selectedPatient)
-                    await presenter.getPatientById(patientId: newValue)
+                    // Only fetch if it's not already auto-filled
+                    if patientId == nil || newValue != patientId {
+                        await presenter.getPatientById(patientId: newValue)
+                    }
                 }
             }
             .onChange(of: presenter.selectedPIC) { _, newValue in
@@ -98,6 +114,7 @@ struct InputPatientData: View {
     }
 }
 
-#Preview {
-    InputPatientData()
+#Preview("With Patient") {
+    InputPatientData(patientId: "d0c1a2b3-4f5e-6789-91ab-cdef12345678")
 }
+
