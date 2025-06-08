@@ -1,4 +1,20 @@
+//
+//  FOVDetail.swift
+//  Oculab
+//
+//  Created by Alifiyah Ariandri on 12/11/24.
+//
+
 import SwiftUI
+
+// MARK: - Interaction Mode Enum
+
+// Step 1: Define the possible interaction modes for the view.
+enum InteractionMode {
+    case panAndZoom
+    case verify
+    case add
+}
 
 struct FOVDetail: View {
     var slideId: String
@@ -13,6 +29,11 @@ struct FOVDetail: View {
 
     @State private var lastScale: CGFloat = 1.0
     @State private var gestureCenter: CGPoint = .zero
+
+    // MARK: - State for Interaction Mode
+
+    // Step 2: Add a state to track the current mode, defaulting to pan/zoom.
+    @State private var interactionMode: InteractionMode = .panAndZoom
 
     @ObservedObject var presenter: FOVDetailPresenter = .init()
 
@@ -33,6 +54,7 @@ struct FOVDetail: View {
                                             height: imageGeometry.size.height,
                                             zoomScale: zoomScale,
                                             boxes: presenter.boxes,
+                                            interactionMode: interactionMode, 
                                             selectedBox: $selectedBox,
                                             onBoxSelected: { box in
                                                 selectedBox = box
@@ -49,6 +71,8 @@ struct FOVDetail: View {
                                 .onChange(of: selectedBox) { newBox in
                                     if let box = newBox {
                                         resetThenZoomToBox(box, screenGeometry: geometry)
+                                        // Optional: Reset mode after selection to allow panning again.
+                                        interactionMode = .panAndZoom
                                     }
                                 }
                         } placeholder: {
@@ -103,7 +127,6 @@ struct FOVDetail: View {
                                 gestureCenter = value.location
                             }
                     )
-
                     .onTapGesture(count: 2) {
                         withAnimation {
                             if zoomScale == 1.0 {
@@ -123,14 +146,39 @@ struct FOVDetail: View {
                         Text("Jumlah Bakteri: \(fovData.systemCount) BTA").font(AppTypography.h3)
                         Text(String(format: "%.2f%% confidence level", fovData.confidenceLevel * 100))
                             .font(AppTypography.p4)
-                        HStack {
-                            Image("Contrast")
-                            Image("Brightness")
-                            Image("Comment")
+
+                        // MARK: - Control Buttons
+
+                        // Step 3 & 4: Turn images into buttons that toggle the mode and give visual feedback.
+                        HStack(spacing: 20) {
+                            Image("Contrast") // Assuming this remains an image/button
+
+                            Image("Brightness") // Assuming this remains an image/button
+
+                            Button(action: {
+                                // Toggle between verify and default pan/zoom mode
+                                interactionMode = (interactionMode == .verify) ? .panAndZoom : .verify
+                            }) {
+                                Image("verify")
+                                    .padding(10)
+                                    .background(interactionMode == .verify ? Color.blue.opacity(0.4) : Color.clear)
+                                    .clipShape(Circle())
+                            }
+
+                            Button(action: {
+                                // Toggle between add and default pan/zoom mode
+                                interactionMode = (interactionMode == .add) ? .panAndZoom : .add
+                            }) {
+                                Image("add")
+                                    .padding(10)
+                                    .background(interactionMode == .add ? Color.green.opacity(0.4) : Color.clear)
+                                    .clipShape(Circle())
+                            }
                         }
-                    }.padding(.vertical)
-                        .frame(maxWidth: .infinity)
-                        .background(Color.black.opacity(0.5))
+                    }
+                    .padding(.vertical)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.black.opacity(0.5))
                 }
                 .padding(.vertical)
                 .cornerRadius(12)

@@ -13,6 +13,11 @@ struct BoxesGroupComponentView: View {
     var width: Double
     var height: Double
     var zoomScale: CGFloat
+
+    // MARK: STEP 1: Tambahkan properti untuk menampung interaction mode
+
+    let interactionMode: InteractionMode
+
     @State private var boxes: [BoxModel]
     @Binding var selectedBox: BoxModel?
     var onBoxSelected: ((BoxModel) -> Void)?
@@ -23,6 +28,10 @@ struct BoxesGroupComponentView: View {
         height: Double,
         zoomScale: CGFloat,
         boxes: [BoxModel],
+
+        // MARK: STEP 2: Terima interactionMode sebagai parameter baru
+
+        interactionMode: InteractionMode,
         selectedBox: Binding<BoxModel?>,
         onBoxSelected: ((BoxModel) -> Void)? = nil
     ) {
@@ -31,6 +40,10 @@ struct BoxesGroupComponentView: View {
         self.height = height
         self.zoomScale = zoomScale
         _boxes = State(initialValue: boxes)
+
+        // MARK: STEP 3: Simpan nilai interactionMode
+
+        self.interactionMode = interactionMode
         _selectedBox = selectedBox
         self.onBoxSelected = onBoxSelected
     }
@@ -51,6 +64,11 @@ struct BoxesGroupComponentView: View {
                     selectedBox = box
                     onBoxSelected?(box)
                 }
+
+                // MARK: STEP 4: Nonaktifkan gesture tap jika mode bukan .verify
+
+                // Ini akan membuat box tidak bisa diklik sama sekali.
+                .disabled(interactionMode != .verify)
             }
         }
         .frame(width: width * zoomScale, height: height * zoomScale)
@@ -82,6 +100,7 @@ struct BoxesGroupComponentView: View {
     }
 }
 
+// ... Sisa kode (BoxStatus, BoxModel) tidak perlu diubah ...
 enum BoxStatus: String, Decodable {
     case none = "UNVERIFIED"
     case verified = "VERIFIED"
