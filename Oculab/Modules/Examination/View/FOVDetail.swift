@@ -76,24 +76,60 @@ struct FOVDetail: View {
 
                     .scrollDisabled(interactionMode == .add)
                 }
+
+                let yOffset = (interactionMode != .panAndZoom) ? 250.0 : 0.0
+
                 bottomControlsView
+                    .offset(y: yOffset)
+
+                VStack {
+                    if interactionMode == .verify {
+                        Text("Ketuk kotak anotasi bakteri yang ingin Anda verifikasi, tandai, atau hilangkan")
+                            .font(AppTypography.p2).multilineTextAlignment(.center)
+                            .padding(.horizontal, Decimal.d20)
+                    } else if interactionMode == .add {
+                        Text("Ketuk area lapangan pandang untuk menambahkan/menghapus anotasi bakteri")
+                            .font(AppTypography.p2).multilineTextAlignment(.center)
+                            .padding(.horizontal, Decimal.d20)
+                    }
+
+                    Spacer()
+                }
             }
             .foregroundStyle(Color.white)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    VStack {
-                        Text("Gambar \(order + 1) dari \(total)")
-                            .font(AppTypography.s4_1)
-                        Text("ID \(slideId)")
-                            .font(AppTypography.p3)
-                    }.foregroundStyle(Color.white)
-                }
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {}) {
-                        HStack {
-                            Image(systemName: "chevron.left")
-                                .foregroundStyle(Color.white)
+                    Group {
+                        if interactionMode == .panAndZoom {
+                            VStack {
+                                Text("Gambar \(order + 1) dari \(total)")
+                                    .font(AppTypography.h3)
+                                Text("ID \(slideId)")
+                                    .font(AppTypography.p3)
+                            }
+                        } else if interactionMode == .verify {
+                            Text("Verifikasi Bakteri")
+                                .font(AppTypography.h3)
+                        } else {
+                            Text("Anotasi Bakteri")
+                                .font(AppTypography.h3)
                         }
+                    }
+                    .id(interactionMode)
+                    .foregroundStyle(Color.white)
+                }
+
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        if interactionMode == .panAndZoom {
+                        } else {
+                            withAnimation {
+                                interactionMode = .panAndZoom
+                            }
+                        }
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundStyle(Color.white)
                     }
                 }
             }
@@ -205,14 +241,19 @@ struct FOVDetail: View {
                     Image("Contrast")
                     Image("Brightness")
                     Button(action: {
-                        interactionMode = (interactionMode == .verify) ? .panAndZoom : .verify
+                        withAnimation(.easeInOut) {
+                            interactionMode = (interactionMode == .verify) ? .panAndZoom : .verify
+                        }
+
                     }) {
                         Image("verify")
                             .background(interactionMode == .verify ? AppColors.purple100.opacity(0.4) : Color.clear)
                             .clipShape(Circle())
                     }
                     Button(action: {
-                        interactionMode = (interactionMode == .add) ? .panAndZoom : .add
+                        withAnimation(.easeInOut) {
+                            interactionMode = (interactionMode == .add) ? .panAndZoom : .add
+                        }
                     }) {
                         Image("add")
                             .background(interactionMode == .add ? AppColors.purple100.opacity(0.4) : Color.clear)
@@ -227,6 +268,7 @@ struct FOVDetail: View {
         .padding(.vertical)
         .cornerRadius(12)
         .ignoresSafeArea(edges: .bottom)
+        .transition(.move(edge: .bottom).combined(with: .opacity))
     }
 
     private func confirmNewBox(_ finalRect: CGRect) {
