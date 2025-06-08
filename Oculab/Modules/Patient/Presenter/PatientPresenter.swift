@@ -251,7 +251,9 @@ class PatientPresenter: ObservableObject {
     
     func formatDateTime(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd/MM/yyyy HH:mm"
+        formatter.dateFormat = "dd MMMM yyyy HH:mm"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
         return formatter.string(from: date)
     }
+
 }
