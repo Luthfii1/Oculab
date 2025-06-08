@@ -10,8 +10,13 @@ import SwiftUI
 /// A view representing a bounding box that can be resized and moved.
 /// It displays handles at the corners for resizing and provides buttons for confirmation or cancellation.
 struct ResizableBoundingBoxView: View {
+    // MARK: - Properties
+
     /// Binding to the CGRect that defines the box's position and size.
     @Binding var rect: CGRect
+
+    /// The current zoom scale of the parent content view.
+    let zoomScale: CGFloat
 
     /// Closure to be called when the user confirms the box.
     let onConfirm: (CGRect) -> Void
@@ -19,18 +24,21 @@ struct ResizableBoundingBoxView: View {
     /// Closure to be called when the user cancels the operation.
     let onCancel: () -> Void
 
+    /// Stores the state of the rectangle at the beginning of a drag gesture.
+    /// This is the key to preventing the "running away" effect.
+    @State private var startingRect: CGRect?
+
     /// The size of the corner resize handles.
     private let handleSize: CGFloat = 24.0
 
-    /// The radius of the corner handles.
-    private let handleRadius: CGFloat = 12.0
+    // MARK: - Body
 
     var body: some View {
         ZStack(alignment: .topLeading) {
             // Main rectangle shape
             Rectangle()
                 .fill(Color.green.opacity(0.2))
-                .border(Color.green, width: 2)
+                .border(Color.green, width: 2 / zoomScale) // Scale border width
 
             // Draggable handles at each corner
             handle(position: .topLeft)
@@ -43,9 +51,7 @@ struct ResizableBoundingBoxView: View {
                 Spacer()
                 HStack {
                     Spacer()
-                    Button(action: {
-                        onConfirm(rect)
-                    }) {
+                    Button(action: { onConfirm(rect) }) {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.largeTitle)
                             .foregroundColor(.green)
@@ -60,29 +66,66 @@ struct ResizableBoundingBoxView: View {
                 }
                 .padding(.bottom, 12)
             }
+            .scaleEffect(1 / zoomScale) // Scale buttons so they don't get tiny when zoomed out
         }
         .frame(width: rect.width, height: rect.height)
         .position(x: rect.midX, y: rect.midY)
-        // Gesture to move the entire box
+        // **FIXED**: Gesture to move the entire box
         .gesture(
             DragGesture()
                 .onChanged { value in
-                    self.rect.origin.x += value.translation.width
-                    self.rect.origin.y += value.translation.height
+                    // On the first change, store the starting position.
+                    if self.startingRect == nil {
+                        self.startingRect = self.rect
+                    }
+
+                    var newRect = self.startingRect!
+                    // Calculate new origin based on the STARTING point + translation.
+                    // This prevents cumulative additions (the "running" effect).
+                    newRect.origin.x += value.translation.width / self.zoomScale
+                    newRect.origin.y += value.translation.height / self.zoomScale
+                    self.rect = newRect
+                }
+                .onEnded { _ in
+                    // Clear the starting position when the drag ends.
+                    self.startingRect = nil
                 }
         )
     }
+
+    // MARK: - Helper Views and Functions
 
     /// A helper function to create a resize handle.
     private func handle(position: Corner) -> some View {
         Circle()
             .fill(Color.green)
-            .frame(width: handleSize, height: handleSize)
+            .frame(width: handleSize / zoomScale, height: handleSize / zoomScale) // Scale handle size
             .position(position.point(in: rect))
+            // **FIXED**: Gesture for resizing a corner
             .gesture(
                 DragGesture()
                     .onChanged { value in
-                        resize(with: value.translation, from: position)
+                        // On the first change, store the starting position.
+                        if self.startingRect == nil {
+                            self.startingRect = self.rect
+                        }
+
+                        // Scale the translation to match the content's zoom level
+                        let scaledTranslation = CGSize(
+                            width: value.translation.width / zoomScale,
+                            height: value.translation.height / zoomScale
+                        )
+
+                        // Calculate the new rect based on the STARTING rect and current translation
+                        self.rect = self.resize(
+                            rect: self.startingRect!,
+                            with: scaledTranslation,
+                            from: position
+                        )
+                    }
+                    .onEnded { _ in
+                        // Clear the starting position when the drag ends.
+                        self.startingRect = nil
                     }
             )
     }
@@ -101,10 +144,10 @@ struct ResizableBoundingBoxView: View {
         }
     }
 
-    /// Logic to resize the rectangle based on which corner handle is dragged.
-    private func resize(with translation: CGSize, from corner: Corner) {
+    /// **REFACTORED**: Pure function to calculate the new resized rectangle.
+    private func resize(rect: CGRect, with translation: CGSize, from corner: Corner) -> CGRect {
         var newRect = rect
-        let minSize: CGFloat = 40.0 // Minimum size for the box
+        let minSize: CGFloat = 40.0 / zoomScale // Scale min size
 
         switch corner {
         case .topLeft:
@@ -128,13 +171,11 @@ struct ResizableBoundingBoxView: View {
         // Enforce minimum size
         if newRect.width < minSize {
             newRect.size.width = rect.width
-            newRect.origin.x = rect.origin.x
         }
         if newRect.height < minSize {
             newRect.size.height = rect.height
-            newRect.origin.y = rect.origin.y
         }
 
-        rect = newRect
+        return newRect
     }
 }

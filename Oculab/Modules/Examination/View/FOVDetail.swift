@@ -162,6 +162,7 @@ struct FOVDetail: View {
                                 )
                                 ResizableBoundingBoxView(
                                     rect: rectBinding,
+                                    zoomScale: zoomScale,
                                     onConfirm: { finalRect in
                                         confirmNewBox(finalRect)
                                     },
