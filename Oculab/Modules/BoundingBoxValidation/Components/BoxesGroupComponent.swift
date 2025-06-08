@@ -67,7 +67,7 @@ struct BoxesGroupComponentView: View {
         }
     }
 
-    private func updateBoxStatus(id: Int, to status: BoxStatus) {
+    private func updateBoxStatus(id: String, to status: BoxStatus) {
         if let index = boxes.firstIndex(where: { $0.id == id }) {
             boxes[index].status = status
         }
@@ -79,7 +79,7 @@ enum BoxStatus {
 }
 
 struct BoxModel: Identifiable, Equatable {
-    let id: Int
+    let id: String
     var width: Double
     var height: Double
     var x: Double
