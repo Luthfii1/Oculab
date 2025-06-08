@@ -67,10 +67,30 @@ struct FOVDetail: View {
                         DragGesture(minimumDistance: 0)
                             .onChanged { value in gestureCenter = value.location }
                     )
-                    .onTapGesture(count: 2) {
+
+                    .onTapGesture(count: 2) { location in
                         guard newBoxRect == nil else { return }
-                        withAnimation {
-                            if zoomScale == 1.0 { zoomScale = 2.0 } else { zoomScale = 1.0; offset = .zero }
+
+                        withAnimation(.easeInOut) {
+                            if zoomScale > 1.0 {
+                                zoomScale = 1.0
+                                offset = .zero
+                            } else {
+                                let newScale: CGFloat = 2.0
+
+                                let translatedCenter = CGPoint(
+                                    x: (location.x - offset.width) / zoomScale,
+                                    y: (location.y - offset.height) / zoomScale
+                                )
+
+                                let newOffset = CGSize(
+                                    width: location.x - translatedCenter.x * newScale,
+                                    height: location.y - translatedCenter.y * newScale
+                                )
+
+                                zoomScale = newScale
+                                offset = limitOffset(newOffset, geometry: geometry)
+                            }
                         }
                     }
 
