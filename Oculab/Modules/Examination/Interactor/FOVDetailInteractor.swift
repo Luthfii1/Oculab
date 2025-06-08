@@ -18,6 +18,11 @@ class FOVDetailInteractor {
         return boxURL + boxId.lowercased()
     }
 
+    private func createAddURL(with fovId: String) -> String {
+        let fovURL = API.BE + "/boundingBox/add-bounding-box/"
+        return fovURL + fovId.lowercased()
+    }
+
     func fetchData(fovId: String) async throws -> FOVDetailData {
         //        try await debugFetchData(fovId: fovId)
 
@@ -49,21 +54,50 @@ class FOVDetailInteractor {
         let body = StatusBody(boxStatus: newStatus)
 
         let url = createUpdateURL(with: boxId)
-//        print("[DEBUG] URL: \(url)")
-//        print("[DEBUG] Request body: \(body)")
+        print("[DEBUG] URL: \(url)")
+        print("[DEBUG] Request body: \(body)")
 
         do {
             let response: APIResponse<BoxModel> = try await NetworkHelper.shared.put(urlString: url, body: body)
-//            print("[DEBUG] Response status: \(response.status)")
-//            print("[DEBUG] Response message: \(response.message)")
-//            print("[DEBUG] Response code: \(response.code)")
+            print("[DEBUG] Response status: \(response.status)")
+            print("[DEBUG] Response message: \(response.message)")
+            print("[DEBUG] Response code: \(response.code)")
 
             return response
         } catch {
-//            print("[DEBUG] Error updating data: \(error)")
+            print("[DEBUG] Error updating data: \(error)")
             throw error
         }
     }
+
+    func addBox(fovId: String, x: Double, y: Double, width: Double, height: Double) async throws
+        -> APIResponse<BoxModel>
+    {
+        let body = AddBoxRequest(x: x, y: y, width: width, height: height)
+
+        let url = createAddURL(with: fovId)
+        print("[DEBUG] URL: \(url)")
+        print("[DEBUG] Request body: \(body)")
+
+        do {
+            let response: APIResponse<BoxModel> = try await NetworkHelper.shared.put(urlString: url, body: body)
+            print("[DEBUG] Response status: \(response.status)")
+            print("[DEBUG] Response message: \(response.message)")
+            print("[DEBUG] Response code: \(response.code)")
+
+            return response
+        } catch {
+            print("[DEBUG] Error updating data: \(error)")
+            throw error
+        }
+    }
+}
+
+struct AddBoxRequest: Codable {
+    let x: Double
+    let y: Double
+    let width: Double
+    let height: Double
 }
 
 struct StatusBody: Codable {

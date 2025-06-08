@@ -64,4 +64,23 @@ class FOVDetailPresenter: ObservableObject {
             }
         }
     }
+
+    @MainActor
+    func addBox(fovId: String, x: Double, y: Double, width: Double, height: Double) async {
+        do {
+            let response = try await interactor?.addBox(fovId: fovId, x: x, y: y, width: width, height: height)
+        } catch {
+            switch error {
+            case let NetworkError.apiError(apiResponse):
+                print("Error type: \(apiResponse.data.errorType)")
+                print("Error description: \(apiResponse.data.description)")
+
+            case let NetworkError.networkError(message):
+                print("Network error: \(message)")
+
+            default:
+                print("Unknown error: \(error.localizedDescription)")
+            }
+        }
+    }
 }

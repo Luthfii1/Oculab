@@ -117,7 +117,7 @@ struct FOVDetail: View {
             .background(.black)
             .onAppear {
                 Task {
-                    await presenter.fetchData(fovId: "b13046c1-16cb-4a68-a657-225537390109")
+                    await presenter.fetchData(fovId: fovData._id.uuidString)
                 }
             }
         }.navigationBarBackButtonHidden()
@@ -272,8 +272,27 @@ struct FOVDetail: View {
         print("Box confirmed! Sending to BE...")
         print("x: \(originalX), y: \(originalY), width: \(originalWidth), height: \(originalHeight)")
 
-        // TODO: Call your presenter to send data to the backend
-        // await presenter.addNewBox(x: originalX, y: originalY, width: originalWidth, height: originalHeight)
+        // **PERBAIKAN KUNCI**: Buat model baru di sisi klien dan tambahkan ke presenter.
+        let newClientBox = BoxModel(
+            id: UUID().uuidString, // ID sementara
+            width: originalWidth,
+            height: originalHeight,
+            x: originalX,
+            y: originalY,
+            status: .none // Status awal
+        )
+        // Tambahkan langsung ke array untuk update UI instan
+        presenter.boxes.append(newClientBox)
+
+        Task {
+            await presenter.addBox(
+                fovId: fovData._id.uuidString,
+                x: originalX,
+                y: originalY,
+                width: originalWidth,
+                height: originalHeight
+            )
+        }
 
         // Clean up
         newBoxRect = nil

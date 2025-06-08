@@ -8,17 +8,20 @@
 import SwiftUI
 
 struct BoxesGroupComponentView: View {
-    var presenter: FOVDetailPresenter
+    // MARK: - Properties
 
+    var presenter: FOVDetailPresenter
     var width: Double
     var height: Double
     var zoomScale: CGFloat
-
-    // MARK: STEP 1: Tambahkan properti untuk menampung interaction mode
-
     let interactionMode: InteractionMode
 
-    @State private var boxes: [BoxModel]
+    // **PERBAIKAN KUNCI 1**: Kembalikan ke @State untuk memungkinkan update UI instan (optimistic).
+    @State private var localBoxes: [BoxModel]
+
+    // Terima array asli untuk perbandingan
+    private let sourceBoxes: [BoxModel]
+
     @Binding var selectedBox: BoxModel?
     var onBoxSelected: ((BoxModel) -> Void)?
 
@@ -28,9 +31,6 @@ struct BoxesGroupComponentView: View {
         height: Double,
         zoomScale: CGFloat,
         boxes: [BoxModel],
-
-        // MARK: STEP 2: Terima interactionMode sebagai parameter baru
-
         interactionMode: InteractionMode,
         selectedBox: Binding<BoxModel?>,
         onBoxSelected: ((BoxModel) -> Void)? = nil
@@ -39,18 +39,21 @@ struct BoxesGroupComponentView: View {
         self.width = width
         self.height = height
         self.zoomScale = zoomScale
-        _boxes = State(initialValue: boxes)
 
-        // MARK: STEP 3: Simpan nilai interactionMode
+        // Simpan data asli dari presenter
+        self.sourceBoxes = boxes
+        // Inisialisasi State dengan data awal
+        self._localBoxes = State(initialValue: boxes)
 
         self.interactionMode = interactionMode
-        _selectedBox = selectedBox
+        self._selectedBox = selectedBox
         self.onBoxSelected = onBoxSelected
     }
 
     var body: some View {
         ZStack(alignment: .topLeading) {
-            ForEach(boxes) { box in
+            // Gunakan salinan lokal untuk ForEach agar UI bisa update instan
+            ForEach(localBoxes) { box in
                 BoxComponentView(
                     box: box,
                     selectedBox: selectedBox,
@@ -64,18 +67,20 @@ struct BoxesGroupComponentView: View {
                     selectedBox = box
                     onBoxSelected?(box)
                 }
-
-                // MARK: STEP 4: Nonaktifkan gesture tap jika mode bukan .verify
-
-                // Ini akan membuat box tidak bisa diklik sama sekali.
                 .disabled(interactionMode != .verify)
             }
         }
         .frame(width: width * zoomScale, height: height * zoomScale)
+        // **PERBAIKAN KUNCI 2**: Tambahkan .onChange untuk sinkronisasi.
+        // Jika data dari presenter berubah (misalnya setelah menambah kotak baru),
+        // perbarui salinan lokal kita.
+        .onChange(of: sourceBoxes) { newSourceBoxes in
+            self.localBoxes = newSourceBoxes
+        }
         .sheet(item: $selectedBox) { selected in
             TrayView(
                 selectedBox: $selectedBox,
-                boxes: boxes,
+                boxes: localBoxes, // Gunakan data lokal
                 onVerify: {
                     updateBoxStatus(id: selected.id, to: .verified)
                 },
@@ -90,12 +95,17 @@ struct BoxesGroupComponentView: View {
     }
 
     private func updateBoxStatus(id: String, to status: BoxStatus) {
-        if let index = boxes.firstIndex(where: { $0.id == id }) {
-            boxes[index].status = status
+        // **PERBAIKAN KUNCI 3**: Lakukan "Optimistic Update".
+        // 1. Ubah data di salinan lokal SECARA LANGSUNG untuk UI instan.
+        if let index = localBoxes.firstIndex(where: { $0.id == id }) {
+            localBoxes[index].status = status
+        }
 
-            Task {
-                await presenter.updateStatus(boxId: id, newStatus: status)
-            }
+        // 2. Kirim permintaan ke server di latar belakang.
+        Task {
+            await presenter.updateStatus(boxId: id, newStatus: status)
+            // Jika gagal, presenter yang seharusnya bertanggung jawab
+            // untuk memuat ulang data yang benar.
         }
     }
 }
