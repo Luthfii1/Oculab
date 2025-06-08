@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-// MARK: - Interaction Mode Enum
-
 enum InteractionMode {
     case panAndZoom
     case verify
@@ -28,12 +26,8 @@ struct FOVDetail: View {
 
     @State private var lastScale: CGFloat = 1.0
     @State private var gestureCenter: CGPoint = .zero
-
-    // MARK: - State for Add Feature
-
     @State private var interactionMode: InteractionMode = .panAndZoom
 
-    /// Holds the CGRect for the new box being created. Nil when not in add mode.
     @State private var newBoxRect: CGRect?
 
     @ObservedObject var presenter: FOVDetailPresenter = .init()
@@ -43,16 +37,11 @@ struct FOVDetail: View {
             ZStack {
                 GeometryReader { geometry in
                     ScrollView([.horizontal, .vertical]) {
-                        // MARK: - Refactored View
-
-                        // The complex AsyncImage view has been moved to its own function
-                        // to help the Swift compiler process the view hierarchy.
                         imageContentView(geometry: geometry)
                     }
                     .gesture(
                         MagnificationGesture()
                             .onChanged { value in
-                                // Prevent zooming while adding a box
                                 guard newBoxRect == nil else { return }
 
                                 let delta = value / lastScale
@@ -79,34 +68,30 @@ struct FOVDetail: View {
                             .onChanged { value in gestureCenter = value.location }
                     )
                     .onTapGesture(count: 2) {
-                        // Prevent double-tap zoom while adding a box
                         guard newBoxRect == nil else { return }
                         withAnimation {
                             if zoomScale == 1.0 { zoomScale = 2.0 } else { zoomScale = 1.0; offset = .zero }
                         }
                     }
-                    // Disable scroll view's own gestures when in add mode to prevent conflict
+
                     .scrollDisabled(interactionMode == .add)
                 }
-
-                // ... (Your existing bottom tray view code) ...
                 bottomControlsView
             }
-            .foregroundStyle(Color.white) // Using standard color for brevity
+            .foregroundStyle(Color.white)
             .toolbar {
-                // ... (Your existing toolbar code) ...
                 ToolbarItem(placement: .principal) {
                     VStack {
                         Text("Gambar \(order + 1) dari \(total)")
+                            .font(AppTypography.s4_1)
                         Text("ID \(slideId)")
+                            .font(AppTypography.p3)
                     }.foregroundStyle(Color.white)
                 }
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        // Router.shared.navigateBack() // Simplified
-                    }) {
+                    Button(action: {}) {
                         HStack {
-                            Image(systemName: "chevron.left") // Using SF Symbol for compatibility
+                            Image(systemName: "chevron.left")
                                 .foregroundStyle(Color.white)
                         }
                     }
@@ -123,10 +108,6 @@ struct FOVDetail: View {
         }.navigationBarBackButtonHidden()
     }
 
-    // MARK: - View Builders
-
-    /// A helper function to build the complex image content view.
-    /// This breaks up the main `body` expression to prevent compiler errors.
     private func imageContentView(geometry: GeometryProxy) -> some View {
         AsyncImage(url: URL(string: fovData.image)) { image in
             image
@@ -135,10 +116,7 @@ struct FOVDetail: View {
                 .overlay(
                     GeometryReader { imageGeometry in
 
-                        // MARK: ZStack for all boxes (existing and new)
-
                         ZStack(alignment: .topLeading) {
-                            // Existing boxes from your presenter
                             BoxesGroupComponentView(
                                 presenter: presenter,
                                 width: imageGeometry.size.width,
@@ -152,10 +130,7 @@ struct FOVDetail: View {
                                 }
                             )
 
-                            // MARK: Display Resizable Box if it exists
-
                             if newBoxRect != nil {
-                                // **FIXED**: Create a non-optional binding. This is safe because of the `if` check.
                                 let rectBinding = Binding<CGRect>(
                                     get: { self.newBoxRect! },
                                     set: { self.newBoxRect = $0 }
@@ -172,8 +147,6 @@ struct FOVDetail: View {
                                 )
                             }
                         }
-
-                        // MARK: Capture size for coordinate conversion
 
                         .onAppear {
                             self.imageSize = imageGeometry.size
@@ -193,12 +166,9 @@ struct FOVDetail: View {
                     }
                 }
 
-                // MARK: Gesture to add a new box
-
                 .onTapGesture { location in
-                    // Only create a box if in "add" mode and no box is currently being edited
+
                     if interactionMode == .add, newBoxRect == nil {
-                        // Create a new box at the tap location
                         let initialSize = CGSize(width: 100, height: 100)
                         self.newBoxRect = CGRect(
                             origin: CGPoint(
@@ -218,33 +188,34 @@ struct FOVDetail: View {
         }
     }
 
-    /// A computed property for the bottom control tray view.
     private var bottomControlsView: some View {
         VStack {
             Spacer()
-            VStack(spacing: 20) {
-                Text("Jumlah Bakteri: \(fovData.systemCount) BTA") // Removed .font for brevity
+            VStack(spacing: Decimal.d8 + Decimal.d2) {
+                Text("Jumlah Bakteri: \(fovData.systemCount) BTA")
+                    .font(AppTypography.h3)
+                    .foregroundStyle(AppColors.slate0)
                 Text(String(
                     format: "%.2f%% confidence level",
-                    fovData.confidenceLevel * 100
-                )) // Removed .font for brevity
-                HStack(spacing: 20) {
-                    Image(systemName: "circle.lefthalf.filled") // Using SF Symbol for compatibility
-                    Image(systemName: "sun.max.fill") // Using SF Symbol for compatibility
+                    fovData.confidenceLevel
+                ))
+                .font(AppTypography.p4)
+                .foregroundStyle(AppColors.slate0)
+                HStack(spacing: Decimal.d16) {
+                    Image("Contrast")
+                    Image("Brightness")
                     Button(action: {
                         interactionMode = (interactionMode == .verify) ? .panAndZoom : .verify
                     }) {
-                        Image(systemName: "checkmark.square") // Using SF Symbol for compatibility
-                            .padding(10)
-                            .background(interactionMode == .verify ? Color.blue.opacity(0.4) : Color.clear)
+                        Image("verify")
+                            .background(interactionMode == .verify ? AppColors.purple100.opacity(0.4) : Color.clear)
                             .clipShape(Circle())
                     }
                     Button(action: {
                         interactionMode = (interactionMode == .add) ? .panAndZoom : .add
                     }) {
-                        Image(systemName: "plus.app") // Using SF Symbol for compatibility
-                            .padding(10)
-                            .background(interactionMode == .add ? Color.green.opacity(0.4) : Color.clear)
+                        Image("add")
+                            .background(interactionMode == .add ? AppColors.purple100.opacity(0.4) : Color.clear)
                             .clipShape(Circle())
                     }
                 }
@@ -258,12 +229,7 @@ struct FOVDetail: View {
         .ignoresSafeArea(edges: .bottom)
     }
 
-    // MARK: - Functions for Add Feature
-
-    /// Called when the user confirms the new box.
     private func confirmNewBox(_ finalRect: CGRect) {
-        // **FIXED**: Convert coordinates from the view's scaled and panned space to the original image space.
-        // We must account for both the offset (pan) and the zoomScale.
         let originalX = (finalRect.origin.x - offset.width) / zoomScale
         let originalY = (finalRect.origin.y - offset.height) / zoomScale
         let originalWidth = finalRect.size.width / zoomScale
@@ -272,16 +238,14 @@ struct FOVDetail: View {
         print("Box confirmed! Sending to BE...")
         print("x: \(originalX), y: \(originalY), width: \(originalWidth), height: \(originalHeight)")
 
-        // **PERBAIKAN KUNCI**: Buat model baru di sisi klien dan tambahkan ke presenter.
         let newClientBox = BoxModel(
-            id: UUID().uuidString, // ID sementara
+            id: UUID().uuidString,
             width: originalWidth,
             height: originalHeight,
             x: originalX,
             y: originalY,
-            status: .none // Status awal
+            status: .none
         )
-        // Tambahkan langsung ke array untuk update UI instan
         presenter.boxes.append(newClientBox)
 
         Task {
@@ -294,12 +258,10 @@ struct FOVDetail: View {
             )
         }
 
-        // Clean up
         newBoxRect = nil
         interactionMode = .panAndZoom
     }
 
-    /// Called when the user cancels creating a new box.
     private func cancelNewBox() {
         newBoxRect = nil
         interactionMode = .panAndZoom
@@ -319,21 +281,17 @@ struct FOVDetail: View {
     func zoomToBox(_ box: BoxModel, screenGeometry: GeometryProxy) {
         let newZoom: CGFloat = 2.0
 
-        // Center of the box (in image coordinates)
         let boxCenterX = box.x + box.width / 2
         let boxCenterY = box.y + box.height / 2
 
-        // Screen visible center
         let screenCenterX = screenGeometry.size.width / 2
         let trayHeight = screenGeometry.size.height * 0.35
         let visibleAreaHeight = screenGeometry.size.height - trayHeight
         let visibleCenterY = visibleAreaHeight / 2
 
-        // New box center in screen coordinates after zoom
         let boxCenterScreenX = boxCenterX * newZoom
         let boxCenterScreenY = boxCenterY * newZoom
 
-        // Target offset: move box center to visible area center
         let targetOffsetX = screenCenterX - boxCenterScreenX
         let targetOffsetY = visibleCenterY - boxCenterScreenY - 50
 
