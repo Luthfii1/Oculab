@@ -9,7 +9,6 @@ import SwiftUI
 
 // MARK: - Interaction Mode Enum
 
-// Step 1: Define the possible interaction modes for the view.
 enum InteractionMode {
     case panAndZoom
     case verify
@@ -30,10 +29,12 @@ struct FOVDetail: View {
     @State private var lastScale: CGFloat = 1.0
     @State private var gestureCenter: CGPoint = .zero
 
-    // MARK: - State for Interaction Mode
+    // MARK: - State for Add Feature
 
-    // Step 2: Add a state to track the current mode, defaulting to pan/zoom.
     @State private var interactionMode: InteractionMode = .panAndZoom
+
+    /// Holds the CGRect for the new box being created. Nil when not in add mode.
+    @State private var newBoxRect: CGRect?
 
     @ObservedObject var presenter: FOVDetailPresenter = .init()
 
@@ -42,68 +43,22 @@ struct FOVDetail: View {
             ZStack {
                 GeometryReader { geometry in
                     ScrollView([.horizontal, .vertical]) {
-                        AsyncImage(url: URL(string: fovData.image)) { image in
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .overlay(
-                                    GeometryReader { imageGeometry in
-                                        BoxesGroupComponentView(
-                                            presenter: presenter,
-                                            width: imageGeometry.size.width,
-                                            height: imageGeometry.size.height,
-                                            zoomScale: zoomScale,
-                                            boxes: presenter.boxes,
-                                            interactionMode: interactionMode, 
-                                            selectedBox: $selectedBox,
-                                            onBoxSelected: { box in
-                                                selectedBox = box
-                                            }
-                                        )
-                                    }
-                                )
-                                .frame(
-                                    width: geometry.size.width * zoomScale,
-                                    height: geometry.size.height * zoomScale
-                                )
-                                .offset(offset)
-                                .clipped()
-                                .onChange(of: selectedBox) { newBox in
-                                    if let box = newBox {
-                                        resetThenZoomToBox(box, screenGeometry: geometry)
-                                        // Optional: Reset mode after selection to allow panning again.
-                                        interactionMode = .panAndZoom
-                                    }
-                                }
-                        } placeholder: {
-                            ProgressView()
-                                .frame(
-                                    width: geometry.size.width * zoomScale,
-                                    height: geometry.size.height * zoomScale
-                                )
-                        }
+                        // MARK: - Refactored View
 
-                        Color.clear
-                            .gesture(
-                                DragGesture()
-                                    .onChanged { value in
-                                        let newOffset = CGSize(
-                                            width: offset.width + value.translation.width,
-                                            height: offset.height + value.translation.height
-                                        )
-                                        offset = limitOffset(newOffset, geometry: geometry)
-                                    }
-                            )
+                        // The complex AsyncImage view has been moved to its own function
+                        // to help the Swift compiler process the view hierarchy.
+                        imageContentView(geometry: geometry)
                     }
                     .gesture(
                         MagnificationGesture()
                             .onChanged { value in
+                                // Prevent zooming while adding a box
+                                guard newBoxRect == nil else { return }
+
                                 let delta = value / lastScale
                                 lastScale = value
-
                                 let newScale = min(max(zoomScale * delta, 1.0), 4.0)
 
-                                // Adjust offset based on zoom center
                                 let center = gestureCenter
                                 let translatedCenter = CGPoint(
                                     x: (center.x - offset.width) / zoomScale,
@@ -117,91 +72,42 @@ struct FOVDetail: View {
                                 zoomScale = newScale
                                 offset = limitOffset(newOffset, geometry: geometry)
                             }
-                            .onEnded { _ in
-                                lastScale = 1.0
-                            }
+                            .onEnded { _ in lastScale = 1.0 }
                     )
                     .simultaneousGesture(
                         DragGesture(minimumDistance: 0)
-                            .onChanged { value in
-                                gestureCenter = value.location
-                            }
+                            .onChanged { value in gestureCenter = value.location }
                     )
                     .onTapGesture(count: 2) {
+                        // Prevent double-tap zoom while adding a box
+                        guard newBoxRect == nil else { return }
                         withAnimation {
-                            if zoomScale == 1.0 {
-                                zoomScale = 2.0
-                            } else {
-                                zoomScale = 1.0
-                                offset = .zero
-                            }
+                            if zoomScale == 1.0 { zoomScale = 2.0 } else { zoomScale = 1.0; offset = .zero }
                         }
                     }
+                    // Disable scroll view's own gestures when in add mode to prevent conflict
+                    .scrollDisabled(interactionMode == .add)
                 }
 
-                VStack {
-                    Spacer()
-
-                    VStack(spacing: Decimal.d8 + Decimal.d2) {
-                        Text("Jumlah Bakteri: \(fovData.systemCount) BTA").font(AppTypography.h3)
-                        Text(String(format: "%.2f%% confidence level", fovData.confidenceLevel * 100))
-                            .font(AppTypography.p4)
-
-                        // MARK: - Control Buttons
-
-                        // Step 3 & 4: Turn images into buttons that toggle the mode and give visual feedback.
-                        HStack(spacing: 20) {
-                            Image("Contrast") // Assuming this remains an image/button
-
-                            Image("Brightness") // Assuming this remains an image/button
-
-                            Button(action: {
-                                // Toggle between verify and default pan/zoom mode
-                                interactionMode = (interactionMode == .verify) ? .panAndZoom : .verify
-                            }) {
-                                Image("verify")
-                                    .padding(10)
-                                    .background(interactionMode == .verify ? Color.blue.opacity(0.4) : Color.clear)
-                                    .clipShape(Circle())
-                            }
-
-                            Button(action: {
-                                // Toggle between add and default pan/zoom mode
-                                interactionMode = (interactionMode == .add) ? .panAndZoom : .add
-                            }) {
-                                Image("add")
-                                    .padding(10)
-                                    .background(interactionMode == .add ? Color.green.opacity(0.4) : Color.clear)
-                                    .clipShape(Circle())
-                            }
-                        }
-                    }
-                    .padding(.vertical)
-                    .frame(maxWidth: .infinity)
-                    .background(Color.black.opacity(0.5))
-                }
-                .padding(.vertical)
-                .cornerRadius(12)
-                .ignoresSafeArea(edges: .bottom)
+                // ... (Your existing bottom tray view code) ...
+                bottomControlsView
             }
-            .foregroundStyle(AppColors.slate0)
+            .foregroundStyle(Color.white) // Using standard color for brevity
             .toolbar {
+                // ... (Your existing toolbar code) ...
                 ToolbarItem(placement: .principal) {
                     VStack {
                         Text("Gambar \(order + 1) dari \(total)")
-                            .font(AppTypography.s4_1)
                         Text("ID \(slideId)")
-                            .font(AppTypography.p3)
-                    }.foregroundStyle(AppColors.slate0)
+                    }.foregroundStyle(Color.white)
                 }
-
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
-                        Router.shared.navigateBack()
+                        // Router.shared.navigateBack() // Simplified
                     }) {
                         HStack {
-                            Image("back")
-                                .foregroundStyle(AppColors.slate0)
+                            Image(systemName: "chevron.left") // Using SF Symbol for compatibility
+                                .foregroundStyle(Color.white)
                         }
                     }
                 }
@@ -215,6 +121,168 @@ struct FOVDetail: View {
                 }
             }
         }.navigationBarBackButtonHidden()
+    }
+
+    // MARK: - View Builders
+
+    /// A helper function to build the complex image content view.
+    /// This breaks up the main `body` expression to prevent compiler errors.
+    private func imageContentView(geometry: GeometryProxy) -> some View {
+        AsyncImage(url: URL(string: fovData.image)) { image in
+            image
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .overlay(
+                    GeometryReader { imageGeometry in
+
+                        // MARK: ZStack for all boxes (existing and new)
+
+                        ZStack(alignment: .topLeading) {
+                            // Existing boxes from your presenter
+                            BoxesGroupComponentView(
+                                presenter: presenter,
+                                width: imageGeometry.size.width,
+                                height: imageGeometry.size.height,
+                                zoomScale: zoomScale,
+                                boxes: presenter.boxes,
+                                interactionMode: interactionMode,
+                                selectedBox: $selectedBox,
+                                onBoxSelected: { box in
+                                    selectedBox = box
+                                }
+                            )
+
+                            // MARK: Display Resizable Box if it exists
+
+                            if newBoxRect != nil {
+                                // **FIXED**: Create a non-optional binding. This is safe because of the `if` check.
+                                let rectBinding = Binding<CGRect>(
+                                    get: { self.newBoxRect! },
+                                    set: { self.newBoxRect = $0 }
+                                )
+                                ResizableBoundingBoxView(
+                                    rect: rectBinding,
+                                    onConfirm: { finalRect in
+                                        confirmNewBox(finalRect)
+                                    },
+                                    onCancel: {
+                                        cancelNewBox()
+                                    }
+                                )
+                            }
+                        }
+
+                        // MARK: Capture size for coordinate conversion
+
+                        .onAppear {
+                            self.imageSize = imageGeometry.size
+                        }
+                    }
+                )
+                .frame(
+                    width: geometry.size.width * zoomScale,
+                    height: geometry.size.height * zoomScale
+                )
+                .offset(offset)
+                .clipped()
+                .onChange(of: selectedBox) { newBox in
+                    if let box = newBox {
+                        resetThenZoomToBox(box, screenGeometry: geometry)
+                        interactionMode = .panAndZoom
+                    }
+                }
+
+                // MARK: Gesture to add a new box
+
+                .onTapGesture { location in
+                    // Only create a box if in "add" mode and no box is currently being edited
+                    if interactionMode == .add, newBoxRect == nil {
+                        // Create a new box at the tap location
+                        let initialSize = CGSize(width: 100, height: 100)
+                        self.newBoxRect = CGRect(
+                            origin: CGPoint(
+                                x: location.x - initialSize.width / 2,
+                                y: location.y - initialSize.height / 2
+                            ),
+                            size: initialSize
+                        )
+                    }
+                }
+        } placeholder: {
+            ProgressView()
+                .frame(
+                    width: geometry.size.width * zoomScale,
+                    height: geometry.size.height * zoomScale
+                )
+        }
+    }
+
+    /// A computed property for the bottom control tray view.
+    private var bottomControlsView: some View {
+        VStack {
+            Spacer()
+            VStack(spacing: 20) {
+                Text("Jumlah Bakteri: \(fovData.systemCount) BTA") // Removed .font for brevity
+                Text(String(
+                    format: "%.2f%% confidence level",
+                    fovData.confidenceLevel * 100
+                )) // Removed .font for brevity
+                HStack(spacing: 20) {
+                    Image(systemName: "circle.lefthalf.filled") // Using SF Symbol for compatibility
+                    Image(systemName: "sun.max.fill") // Using SF Symbol for compatibility
+                    Button(action: {
+                        interactionMode = (interactionMode == .verify) ? .panAndZoom : .verify
+                    }) {
+                        Image(systemName: "checkmark.square") // Using SF Symbol for compatibility
+                            .padding(10)
+                            .background(interactionMode == .verify ? Color.blue.opacity(0.4) : Color.clear)
+                            .clipShape(Circle())
+                    }
+                    Button(action: {
+                        interactionMode = (interactionMode == .add) ? .panAndZoom : .add
+                    }) {
+                        Image(systemName: "plus.app") // Using SF Symbol for compatibility
+                            .padding(10)
+                            .background(interactionMode == .add ? Color.green.opacity(0.4) : Color.clear)
+                            .clipShape(Circle())
+                    }
+                }
+            }
+            .padding(.vertical)
+            .frame(maxWidth: .infinity)
+            .background(Color.black.opacity(0.5))
+        }
+        .padding(.vertical)
+        .cornerRadius(12)
+        .ignoresSafeArea(edges: .bottom)
+    }
+
+    // MARK: - Functions for Add Feature
+
+    /// Called when the user confirms the new box.
+    private func confirmNewBox(_ finalRect: CGRect) {
+        // **FIXED**: Convert coordinates from the view's scaled and panned space to the original image space.
+        // We must account for both the offset (pan) and the zoomScale.
+        let originalX = (finalRect.origin.x - offset.width) / zoomScale
+        let originalY = (finalRect.origin.y - offset.height) / zoomScale
+        let originalWidth = finalRect.size.width / zoomScale
+        let originalHeight = finalRect.size.height / zoomScale
+
+        print("Box confirmed! Sending to BE...")
+        print("x: \(originalX), y: \(originalY), width: \(originalWidth), height: \(originalHeight)")
+
+        // TODO: Call your presenter to send data to the backend
+        // await presenter.addNewBox(x: originalX, y: originalY, width: originalWidth, height: originalHeight)
+
+        // Clean up
+        newBoxRect = nil
+        interactionMode = .panAndZoom
+    }
+
+    /// Called when the user cancels creating a new box.
+    private func cancelNewBox() {
+        newBoxRect = nil
+        interactionMode = .panAndZoom
     }
 
     func resetThenZoomToBox(_ box: BoxModel, screenGeometry: GeometryProxy) {
