@@ -11,6 +11,9 @@ struct FOVDetail: View {
     @State private var imageSize: CGSize = .zero
     @State private var selectedBox: BoxModel?
 
+    @State private var lastScale: CGFloat = 1.0
+    @State private var gestureCenter: CGPoint = .zero
+
     var body: some View {
         NavigationView {
             ZStack {
@@ -74,16 +77,36 @@ struct FOVDetail: View {
                     .gesture(
                         MagnificationGesture()
                             .onChanged { value in
-                                let newZoom = min(max(value, 1.0), 4.0)
-                                zoomScale = newZoom
-                                // Reset offset when zooming out to 1.0
-                                if newZoom == 1.0 {
-                                    withAnimation {
-                                        offset = .zero
-                                    }
-                                }
+                                let delta = value / lastScale
+                                lastScale = value
+
+                                let newScale = min(max(zoomScale * delta, 1.0), 4.0)
+
+                                // Adjust offset based on zoom center
+                                let center = gestureCenter
+                                let translatedCenter = CGPoint(
+                                    x: (center.x - offset.width) / zoomScale,
+                                    y: (center.y - offset.height) / zoomScale
+                                )
+                                let newOffset = CGSize(
+                                    width: center.x - translatedCenter.x * newScale,
+                                    height: center.y - translatedCenter.y * newScale
+                                )
+
+                                zoomScale = newScale
+                                offset = limitOffset(newOffset, geometry: geometry)
+                            }
+                            .onEnded { _ in
+                                lastScale = 1.0
                             }
                     )
+                    .simultaneousGesture(
+                        DragGesture(minimumDistance: 0)
+                            .onChanged { value in
+                                gestureCenter = value.location
+                            }
+                    )
+
                     .onTapGesture(count: 2) {
                         withAnimation {
                             if zoomScale == 1.0 {
