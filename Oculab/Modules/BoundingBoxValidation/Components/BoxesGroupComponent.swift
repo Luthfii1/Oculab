@@ -74,15 +74,45 @@ struct BoxesGroupComponentView: View {
     }
 }
 
-enum BoxStatus {
-    case none, verified, trashed, flagged
+enum BoxStatus: String, Decodable {
+    case none
+    case verified
+    case trashed
+    case flagged
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let statusString = try container.decode(String.self)
+
+        switch statusString.uppercased() {
+        case "VERIFIED":
+            self = .verified
+        case "FLAG":
+            self = .flagged
+        case "DELETED":
+            self = .trashed
+        case "UNVERIFIED":
+            fallthrough
+        default:
+            self = .none
+        }
+    }
 }
 
-struct BoxModel: Identifiable, Equatable {
+struct BoxModel: Identifiable, Equatable, Decodable {
     let id: String
     var width: Double
     var height: Double
     var x: Double
     var y: Double
-    var status: BoxStatus = .none
+    var status: BoxStatus
+
+    enum CodingKeys: String, CodingKey {
+        case id = "_id"
+        case width
+        case height
+        case x = "xCoordinate"
+        case y = "yCoordinate"
+        case status
+    }
 }

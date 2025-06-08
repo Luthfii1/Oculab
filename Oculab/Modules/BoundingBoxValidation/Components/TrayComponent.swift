@@ -105,13 +105,20 @@ struct TrayView: View {
 }
 
 struct TrayView_Previews: PreviewProvider {
-    @State static var selectedBox: BoxModel? = BoxModel(id: "box_2", width: 25, height: 30, x: 180, y: 400)
+    @State static var selectedBox: BoxModel? = BoxModel(
+        id: "box_2",
+        width: 25,
+        height: 30,
+        x: 180,
+        y: 400,
+        status: .none
+    )
     static let boxes = [
-        BoxModel(id: "box_1", width: 17, height: 10, x: 40, y: 300),
-        BoxModel(id: "box_2", width: 25, height: 30, x: 180, y: 400),
-        BoxModel(id: "box_3", width: 20, height: 25, x: 70, y: 170),
-        BoxModel(id: "box_4", width: 15, height: 15, x: 210, y: 200),
-        BoxModel(id: "box_5", width: 15, height: 20, x: 130, y: 350),
+        BoxModel(id: "box_1", width: 17, height: 10, x: 40, y: 300, status: .none),
+        BoxModel(id: "box_2", width: 25, height: 30, x: 180, y: 400, status: .none),
+        BoxModel(id: "box_3", width: 20, height: 25, x: 70, y: 170, status: .none),
+        BoxModel(id: "box_4", width: 15, height: 15, x: 210, y: 200, status: .none),
+        BoxModel(id: "box_5", width: 15, height: 20, x: 130, y: 350, status: .none),
     ]
 
     static var previews: some View {

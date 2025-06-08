@@ -14,6 +14,8 @@ struct FOVDetail: View {
     @State private var lastScale: CGFloat = 1.0
     @State private var gestureCenter: CGPoint = .zero
 
+    @ObservedObject var presenter: FOVDetailPresenter = .init()
+
     var body: some View {
         NavigationView {
             ZStack {
@@ -29,14 +31,7 @@ struct FOVDetail: View {
                                             width: imageGeometry.size.width,
                                             height: imageGeometry.size.height,
                                             zoomScale: zoomScale,
-                                            boxes: [
-                                                BoxModel(id: "box_4", width: 15, height: 15, x: 210, y: 200),
-                                                BoxModel(id: "box_1", width: 17, height: 10, x: 40, y: 300),
-                                                BoxModel(id: "box_2", width: 25, height: 30, x: 180, y: 400),
-                                                BoxModel(id: "box_5", width: 15, height: 20, x: 130, y: 350),
-                                                BoxModel(id: "box_3", width: 20, height: 25, x: 70, y: 170),
-
-                                            ],
+                                            boxes: presenter.boxes,
                                             selectedBox: $selectedBox,
                                             onBoxSelected: { box in
                                                 selectedBox = box
@@ -165,7 +160,11 @@ struct FOVDetail: View {
             .toolbarBackground(Color.black, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .background(.black)
-            .onAppear {}
+            .onAppear {
+                Task {
+                    await presenter.fetchData(fovId: "b13046c1-16cb-4a68-a657-225537390109")
+                }
+            }
         }.navigationBarBackButtonHidden()
     }
 
