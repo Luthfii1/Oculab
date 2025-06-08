@@ -13,8 +13,13 @@ class FOVDetailInteractor {
         return fovURL + fovId.lowercased()
     }
 
+    private func createUpdateURL(with boxId: String) -> String {
+        let boxURL = API.BE + "/boundingBox/update-box-status/"
+        return boxURL + boxId.lowercased()
+    }
+
     func fetchData(fovId: String) async throws -> FOVDetailData {
-//        try await debugFetchData(fovId: fovId)
+        //        try await debugFetchData(fovId: fovId)
 
         let response: APIResponse<FOVDetailData> = try await NetworkHelper.shared
             .get(urlString: createGetURL(with: fovId))
@@ -37,6 +42,32 @@ class FOVDetailInteractor {
         let decoded = try JSONDecoder().decode(APIResponse<FOVDetailData>.self, from: data)
         print("Decoded response: \(decoded)")
     }
+
+    func updateData(boxId: String, newStatus: String) async throws
+        -> APIResponse<BoxModel>
+    {
+        let body = StatusBody(boxStatus: newStatus)
+
+        let url = createUpdateURL(with: boxId)
+//        print("[DEBUG] URL: \(url)")
+//        print("[DEBUG] Request body: \(body)")
+
+        do {
+            let response: APIResponse<BoxModel> = try await NetworkHelper.shared.put(urlString: url, body: body)
+//            print("[DEBUG] Response status: \(response.status)")
+//            print("[DEBUG] Response message: \(response.message)")
+//            print("[DEBUG] Response code: \(response.code)")
+
+            return response
+        } catch {
+//            print("[DEBUG] Error updating data: \(error)")
+            throw error
+        }
+    }
+}
+
+struct StatusBody: Codable {
+    let boxStatus: String
 }
 
 struct FOVDetailData: Decodable {

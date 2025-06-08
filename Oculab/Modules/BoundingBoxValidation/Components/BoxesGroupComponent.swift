@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct BoxesGroupComponentView: View {
+    var presenter: FOVDetailPresenter
+
     var width: Double
     var height: Double
     var zoomScale: CGFloat
@@ -16,6 +18,7 @@ struct BoxesGroupComponentView: View {
     var onBoxSelected: ((BoxModel) -> Void)?
 
     init(
+        presenter: FOVDetailPresenter,
         width: Double,
         height: Double,
         zoomScale: CGFloat,
@@ -23,6 +26,7 @@ struct BoxesGroupComponentView: View {
         selectedBox: Binding<BoxModel?>,
         onBoxSelected: ((BoxModel) -> Void)? = nil
     ) {
+        self.presenter = presenter
         self.width = width
         self.height = height
         self.zoomScale = zoomScale
@@ -70,15 +74,19 @@ struct BoxesGroupComponentView: View {
     private func updateBoxStatus(id: String, to status: BoxStatus) {
         if let index = boxes.firstIndex(where: { $0.id == id }) {
             boxes[index].status = status
+
+            Task {
+                await presenter.updateStatus(boxId: id, newStatus: status)
+            }
         }
     }
 }
 
 enum BoxStatus: String, Decodable {
-    case none
-    case verified
-    case trashed
-    case flagged
+    case none = "UNVERIFIED"
+    case verified = "VERIFIED"
+    case trashed = "DELETED"
+    case flagged = "FLAGGED"
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -87,12 +95,12 @@ enum BoxStatus: String, Decodable {
         switch statusString.uppercased() {
         case "VERIFIED":
             self = .verified
-        case "FLAG":
+        case "FLAGGED":
             self = .flagged
         case "DELETED":
             self = .trashed
         case "UNVERIFIED":
-            fallthrough
+            self = .none
         default:
             self = .none
         }

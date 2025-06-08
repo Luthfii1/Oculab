@@ -28,6 +28,7 @@ struct FOVDetail: View {
                                 .overlay(
                                     GeometryReader { imageGeometry in
                                         BoxesGroupComponentView(
+                                            presenter: presenter,
                                             width: imageGeometry.size.width,
                                             height: imageGeometry.size.height,
                                             zoomScale: zoomScale,

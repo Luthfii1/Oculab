@@ -45,4 +45,23 @@ class FOVDetailPresenter: ObservableObject {
             }
         }
     }
+
+    @MainActor
+    func updateStatus(boxId: String, newStatus: BoxStatus) async {
+        do {
+            let response = try await interactor?.updateData(boxId: boxId, newStatus: newStatus.rawValue)
+        } catch {
+            switch error {
+            case let NetworkError.apiError(apiResponse):
+                print("Error type: \(apiResponse.data.errorType)")
+                print("Error description: \(apiResponse.data.description)")
+
+            case let NetworkError.networkError(message):
+                print("Network error: \(message)")
+
+            default:
+                print("Unknown error: \(error.localizedDescription)")
+            }
+        }
+    }
 }
