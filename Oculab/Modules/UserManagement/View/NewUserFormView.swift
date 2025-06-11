@@ -84,30 +84,31 @@ struct NewUserFormView: View {
                                 text: $presenter.email
                             )
                             
-                            // Loading indicator
-                            if presenter.isRegistering {
-                                ProgressView()
-                            }
-                            
                             // Register button
-                            AppButton(
-                                title: "Daftarkan Akun",
-                                rightIcon: "arrow.right",
-                                isEnabled: presenter.isFormValid(
-                                    name: presenter.name,
-                                    email: presenter.email,
-                                    role: presenter.role
-                                ),
-                                action: {
-                                    Task {
-                                        await presenter.registerNewAccount(
-                                            role: presenter.role,
-                                            name: presenter.name,
-                                            email: presenter.email
-                                        )
+                            ZStack {
+                                AppButton(
+                                    title: presenter.isRegistering ? "" : "Daftarkan Akun",
+                                    rightIcon: presenter.isRegistering ? nil : "arrow.right",
+                                    isEnabled: presenter.isFormValid(
+                                        name: presenter.name,
+                                        email: presenter.email,
+                                        role: presenter.role
+                                    ) && !presenter.isRegistering,
+                                    action: {
+                                        Task {
+                                            await presenter.registerNewAccount(
+                                                role: presenter.role,
+                                                name: presenter.name,
+                                                email: presenter.email
+                                            )
+                                        }
                                     }
+                                )
+                                if presenter.isRegistering {
+                                    ProgressView()
+                                        .tint(AppColors.slate200)
                                 }
-                            )
+                            }
                         }
                         Spacer()
                     }

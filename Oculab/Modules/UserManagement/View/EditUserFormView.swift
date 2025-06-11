@@ -71,26 +71,28 @@ struct EditUserFormView: View {
                                 isDisabled: true,
                                 text: .constant(account.email)
                             )
-                            
-                            if presenter.isEditing {
-                                ProgressView()
-                            }
-                            
+
                             // Save button
-                            AppButton(
-                                title: "Simpan Perubahan",
-                                rightIcon: "arrow.right",
-                                isEnabled: true,
-                                action: {
-                                    Task {
-                                        await presenter.editSelectedUser(
-                                            role: presenter.role,
-                                            name: presenter.name,
-                                            userId: presenter.userId
-                                        )
+                            ZStack {
+                                AppButton(
+                                    title: presenter.isEditing ? "" : "Simpan Perubahan",
+                                    rightIcon: presenter.isEditing ? nil : "arrow.right",
+                                    isEnabled: !presenter.isEditing,
+                                    action: {
+                                        Task {
+                                            await presenter.editSelectedUser(
+                                                role: presenter.role,
+                                                name: presenter.name,
+                                                userId: presenter.userId
+                                            )
+                                        }
                                     }
+                                )
+                                if presenter.isEditing {
+                                    ProgressView()
+                                        .tint(AppColors.slate200)
                                 }
-                            )
+                            }
                             
                             Button("Batal") {
                                 presenter.navigateBack()
