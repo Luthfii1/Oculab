@@ -18,89 +18,92 @@ struct TrayView: View {
         if let selectedBox = selectedBox,
            let currentIndex = boxes.firstIndex(where: { $0.id == selectedBox.id })
         {
-            VStack(alignment: .leading, spacing: Decimal.d24) {
-                VStack(alignment: .leading) {
-                    Spacer().frame(height: 52)
-                    Text("Verifikasi Bakteri")
-                        .font(AppTypography.s4)
-                        .foregroundColor(.black)
-                }
-
-                VStack(alignment: .leading, spacing: Decimal.d12) {
-                    HStack {
-                        Text("Anotasi \(selectedBox.id)")
-                            .font(AppTypography.p3)
+            ZStack {
+                AppColors.slate0.ignoresSafeArea()
+                VStack(alignment: .leading, spacing: Decimal.d16) {
+                    VStack(alignment: .leading) {
+                        Text("Verifikasi Bakteri")
+                            .font(AppTypography.s4)
                             .foregroundColor(.black)
-                        Spacer()
-                        HStack(spacing: Decimal.d8) {
-                            Button(action: {
-                                if currentIndex > 0 {
-                                    self.selectedBox = boxes[currentIndex - 1]
-                                }
-                            }) {
-                                Image(systemName: "chevron.left")
-                            }
-                            .foregroundColor(currentIndex > 0 ? .black : AppColors.slate100)
-                            .disabled(currentIndex == 0)
+                    }
+                    .padding(.top, Decimal.d16)
 
-                            Button(action: {
-                                if currentIndex < boxes.count - 1 {
-                                    self.selectedBox = boxes[currentIndex + 1]
+                    VStack(alignment: .leading, spacing: Decimal.d12) {
+                        HStack {
+                            Text("Anotasi \(selectedBox.id)")
+                                .font(AppTypography.p3)
+                                .foregroundColor(.black)
+                            Spacer()
+                            HStack(spacing: Decimal.d8) {
+                                Button(action: {
+                                    if currentIndex > 0 {
+                                        self.selectedBox = boxes[currentIndex - 1]
+                                    }
+                                }) {
+                                    Image(systemName: "chevron.left")
                                 }
-                            }) {
-                                Image(systemName: "chevron.right")
+                                .foregroundColor(currentIndex > 0 ? .black : AppColors.slate100)
+                                .disabled(currentIndex == 0)
+
+                                Button(action: {
+                                    if currentIndex < boxes.count - 1 {
+                                        self.selectedBox = boxes[currentIndex + 1]
+                                    }
+                                }) {
+                                    Image(systemName: "chevron.right")
+                                }
+                                .foregroundColor(currentIndex < boxes.count - 1 ? .black : AppColors.slate100)
+                                .disabled(currentIndex == boxes.count - 1)
                             }
-                            .foregroundColor(currentIndex < boxes.count - 1 ? .black : AppColors.slate100)
-                            .disabled(currentIndex == boxes.count - 1)
                         }
+                        .padding(.horizontal, Decimal.d12)
+                        .padding(.vertical, Decimal.d12)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(AppColors.slate50)
+                        .cornerRadius(Decimal.d8)
+                        .shadow(color: .black.opacity(0.05), radius: 1, x: 0, y: 1)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: Decimal.d8)
+                                .inset(by: 0.5)
+                                .stroke(AppColors.slate200, lineWidth: 1)
+                        )
                     }
-                    .padding(.horizontal, Decimal.d12)
-                    .padding(.vertical, Decimal.d12)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(AppColors.slate50)
-                    .cornerRadius(Decimal.d8)
-                    .shadow(color: .black.opacity(0.05), radius: 1, x: 0, y: 1)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: Decimal.d8)
-                            .inset(by: 0.5)
-                            .stroke(AppColors.slate200, lineWidth: 1)
-                    )
-                }
 
-                Button(action: { onVerify?() }) {
-                    HStack {
-                        Image(systemName: "checkmark.circle")
-                        Text("Verifikasi Anotasi Bakteri").font(AppTypography.p3)
+                    VStack(alignment: .leading, spacing: Decimal.d12) {
+                        Button(action: { onVerify?() }) {
+                            HStack {
+                                Image(systemName: "checkmark.circle")
+                                Text("Verifikasi Anotasi Bakteri").font(AppTypography.p3)
+                            }
+                            .foregroundColor(.black)
+                        }
+                        .buttonStyle(.plain)
+
+                        Button(action: { onFlag?() }) {
+                            HStack {
+                                Image(systemName: "flag.fill")
+                                Text("Flag Anotasi Bakteri").font(AppTypography.p3)
+                            }
+                            .foregroundColor(.black)
+                        }
+                        .buttonStyle(.plain)
+
+                        Button(action: { onReject?() }) {
+                            HStack {
+                                Image(systemName: "trash")
+                                Text("Konfirmasi Bukan Bakteri").font(AppTypography.p3)
+                            }
+                            .foregroundColor(AppColors.red700)
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .foregroundColor(.black)
+                    .padding(.bottom, Decimal.d16)
                 }
-                .buttonStyle(.plain)
-
-                Button(action: { onFlag?() }) {
-                    HStack {
-                        Image(systemName: "flag.fill")
-                        Text("Flag Anotasi Bakteri").font(AppTypography.p3)
-                    }
-                    .foregroundColor(.black)
-                }
-                .buttonStyle(.plain)
-
-                Button(action: { onReject?() }) {
-                    HStack {
-                        Image(systemName: "trash")
-                        Text("Konfirmasi Bukan Bakteri").font(AppTypography.p3)
-                    }
-                    .foregroundColor(AppColors.red700)
-                }
-                .buttonStyle(.plain)
-
-                Spacer(minLength: 0)
+                .padding(.horizontal, Decimal.d16)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .presentationDetents([.height(280)])
+                .presentationDragIndicator(.visible)
             }
-            .padding(.horizontal, Decimal.d16)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .presentationDetents([.medium])
-            .presentationDragIndicator(.visible)
-            .background(AppColors.slate0)
         }
     }
 }
