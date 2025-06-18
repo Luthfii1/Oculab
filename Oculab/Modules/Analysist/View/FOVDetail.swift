@@ -56,9 +56,6 @@ struct FOVDetail: View {
                             Text("Jumlah Bakteri: \(fovData.systemCount) BTA")
                                 .font(AppTypography.h3)
                                 .foregroundColor(.white)
-                            Text(String(format: "%.2f%% confidence level", fovData.confidenceLevel * 100))
-                                .font(AppTypography.p4)
-                                .foregroundColor(.white.opacity(0.8))
                         }
                         .padding(.horizontal, Decimal.d16)
                         .padding(.vertical, Decimal.d12)

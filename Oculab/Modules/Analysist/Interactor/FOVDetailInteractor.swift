@@ -36,8 +36,6 @@ class FOVDetailInteractor {
     func fetchData(fovId: UUID) async throws -> FOVDetailData {
         let fovURL = API.BE + "/boundingBox/get-bounding-box-data/"
         let url = fovURL + fovId.uuidString.toLowercase()
-        
-        print("URL: \(url)")
 
         let response: APIResponse<FOVDetailData> = try await NetworkHelper.shared
             .get(urlString: url)

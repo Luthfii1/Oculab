@@ -34,8 +34,6 @@ class FOVDetailPresenter: ObservableObject {
                 fovDetail = result
                 boxes = result.boxes
             }
-            print("fetch data: \(result?.boxes.count ?? 0)")
-
         } catch {
             switch error {
             case let NetworkError.apiError(apiResponse):
@@ -76,6 +74,9 @@ class FOVDetailPresenter: ObservableObject {
     @MainActor
     func updateBoxStatus(boxId: String, newStatus: BoxStatus) async {
         do {
+            guard let index = boxes.firstIndex(where: { $0.id == boxId }) else { return }
+            boxes[index].status = newStatus
+
             _ = try await interactor?.updateBoxStatus(boxId: boxId, newStatus: newStatus.rawValue)
         } catch {
             handleErrorState(

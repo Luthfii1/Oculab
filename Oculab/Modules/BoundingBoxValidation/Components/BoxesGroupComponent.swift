@@ -34,25 +34,21 @@ struct BoxesGroupComponentView: View {
                 selectedBox: $presenter.selectedBox,
                 boxes: presenter.boxes,
                 onVerify: {
-                    updateBoxStatus(id: selected.id, to: .verified)
+                    Task {
+                        await presenter.updateBoxStatus(boxId: selected.id, newStatus: .verified)
+                    }
                 },
                 onFlag: {
-                    updateBoxStatus(id: selected.id, to: .flagged)
+                    Task {
+                        await presenter.updateBoxStatus(boxId: selected.id, newStatus: .flagged)
+                    }
                 },
                 onReject: {
-                    updateBoxStatus(id: selected.id, to: .trashed)
+                    Task {
+                        await presenter.updateBoxStatus(boxId: selected.id, newStatus: .trashed)
+                    }
                 }
             )
-        }
-    }
-
-    private func updateBoxStatus(id: String, to status: BoxStatus) {
-        if let index = presenter.boxes.firstIndex(where: { $0.id == id }) {
-            presenter.boxes[index].status = status
-
-            Task {
-                await presenter.updateBoxStatus(boxId: id, newStatus: status)
-            }
         }
     }
 }
