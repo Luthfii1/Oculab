@@ -20,54 +20,56 @@ struct TrayView: View {
         {
             ZStack {
                 AppColors.slate0.ignoresSafeArea()
-                VStack(alignment: .leading, spacing: Decimal.d16) {
-                    VStack(alignment: .leading) {
-                        Text("Verifikasi Bakteri")
-                            .font(AppTypography.s4)
-                            .foregroundColor(.black)
-                    }
-                    .padding(.top, Decimal.d16)
-
+                VStack(alignment: .leading, spacing: Decimal.d32) {
                     VStack(alignment: .leading, spacing: Decimal.d12) {
-                        HStack {
-                            Text("Anotasi \(selectedBox.id)")
-                                .font(AppTypography.p3)
+                        VStack(alignment: .leading) {
+                            Text("Verifikasi Bakteri")
+                                .font(AppTypography.s4)
                                 .foregroundColor(.black)
-                            Spacer()
-                            HStack(spacing: Decimal.d8) {
-                                Button(action: {
-                                    if currentIndex > 0 {
-                                        self.selectedBox = boxes[currentIndex - 1]
-                                    }
-                                }) {
-                                    Image(systemName: "chevron.left")
-                                }
-                                .foregroundColor(currentIndex > 0 ? .black : AppColors.slate100)
-                                .disabled(currentIndex == 0)
-
-                                Button(action: {
-                                    if currentIndex < boxes.count - 1 {
-                                        self.selectedBox = boxes[currentIndex + 1]
-                                    }
-                                }) {
-                                    Image(systemName: "chevron.right")
-                                }
-                                .foregroundColor(currentIndex < boxes.count - 1 ? .black : AppColors.slate100)
-                                .disabled(currentIndex == boxes.count - 1)
-                            }
                         }
-                        .padding(.horizontal, Decimal.d12)
-                        .padding(.vertical, Decimal.d12)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(AppColors.slate50)
-                        .cornerRadius(Decimal.d8)
-                        .shadow(color: .black.opacity(0.05), radius: 1, x: 0, y: 1)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: Decimal.d8)
-                                .inset(by: 0.5)
-                                .stroke(AppColors.slate200, lineWidth: 1)
-                        )
+                        
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Text("Anotasi \(selectedBox.id)")
+                                    .font(AppTypography.p3)
+                                    .foregroundColor(.black)
+                                Spacer()
+                                HStack(spacing: Decimal.d8) {
+                                    Button(action: {
+                                        if currentIndex > 0 {
+                                            self.selectedBox = boxes[currentIndex - 1]
+                                        }
+                                    }) {
+                                        Image(systemName: "chevron.left")
+                                    }
+                                    .foregroundColor(currentIndex > 0 ? .black : AppColors.slate100)
+                                    .disabled(currentIndex == 0)
+
+                                    Button(action: {
+                                        if currentIndex < boxes.count - 1 {
+                                            self.selectedBox = boxes[currentIndex + 1]
+                                        }
+                                    }) {
+                                        Image(systemName: "chevron.right")
+                                    }
+                                    .foregroundColor(currentIndex < boxes.count - 1 ? .black : AppColors.slate100)
+                                    .disabled(currentIndex == boxes.count - 1)
+                                }
+                            }
+                            .padding(.horizontal, Decimal.d12)
+                            .padding(.vertical, Decimal.d12)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(AppColors.slate50)
+                            .cornerRadius(Decimal.d8)
+                            .shadow(color: .black.opacity(0.05), radius: 1, x: 0, y: 1)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: Decimal.d8)
+                                    .inset(by: 0.5)
+                                    .stroke(AppColors.slate200, lineWidth: 1)
+                            )
+                        }
                     }
+                    .padding(.top, Decimal.m12)
 
                     VStack(alignment: .leading, spacing: Decimal.d12) {
                         Button(action: { onVerify?() }) {
