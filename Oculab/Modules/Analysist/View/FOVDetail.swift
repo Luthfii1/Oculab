@@ -21,12 +21,26 @@ struct FOVDetail: View {
             ZStack {
                 Color.black.edgesIgnoringSafeArea(.all)
 
-                ZoomableImageComponent(
-                    imageURL: URL(string: fovData.image),
-                    zoomScale: $presenter.zoomScale,
-                    offset: $presenter.offset
-                )
-                .edgesIgnoringSafeArea([.top, .bottom])
+                if presenter.fovDetail != nil {
+                    ZoomableImageComponent(
+                        imageURL: URL(string: fovData.image),
+                        zoomScale: $presenter.zoomScale,
+                        offset: $presenter.offset
+                    )
+                    .environmentObject(presenter)
+                    .edgesIgnoringSafeArea([.top, .bottom])
+                } else {
+                    // view with information that the data is loading because the data is not yet fetched
+                    Text("Data is loading...")
+                        .multilineTextAlignment(.center)
+                        .font(AppTypography.h3)
+                        .padding()
+                        .background(Color.black.opacity(0.4))
+                        .cornerRadius(10)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .edgesIgnoringSafeArea([.top, .bottom])
+                }
 
                 VStack(spacing: 0) {
                     // Top toolbar background
@@ -42,9 +56,6 @@ struct FOVDetail: View {
                             Text("Jumlah Bakteri: \(fovData.systemCount) BTA")
                                 .font(AppTypography.h3)
                                 .foregroundColor(.white)
-                            Text(String(format: "%.2f%% confidence level", fovData.confidenceLevel * 100))
-                                .font(AppTypography.p4)
-                                .foregroundColor(.white.opacity(0.8))
                         }
                         .padding(.horizontal, Decimal.d16)
                         .padding(.vertical, Decimal.d12)
@@ -104,6 +115,7 @@ struct FOVDetail: View {
             .toolbarBackground(.hidden, for: .navigationBar)
             .onAppear {
                 Task {
+                    await presenter.fetchData(fovId: fovData._id)
                     await presenter.verifyingFOV(fovId: fovData._id)
                 }
             }

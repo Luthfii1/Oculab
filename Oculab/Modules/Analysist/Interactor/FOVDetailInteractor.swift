@@ -20,4 +20,36 @@ class FOVDetailInteractor {
 
         return response.data
     }
+
+    func updateBoxStatus(boxId: String, newStatus: String) async throws -> APIResponse<BoxModel> {
+        let body = StatusBody(boxStatus: newStatus)
+        let url = endpoint + "/boundingBox/update-box-status/" + boxId.lowercased()
+        
+        let response: APIResponse<BoxModel> = try await NetworkHelper.shared.put(
+            urlString: url,
+            body: body
+        )
+        
+        return response
+    }
+
+    func fetchData(fovId: UUID) async throws -> FOVDetailData {
+        let fovURL = API.BE + "/boundingBox/get-bounding-box-data/"
+        let url = fovURL + fovId.uuidString.toLowercase()
+
+        let response: APIResponse<FOVDetailData> = try await NetworkHelper.shared
+            .get(urlString: url)
+
+        return response.data
+    }
+}
+
+struct StatusBody: Codable {
+    let boxStatus: String
+}
+
+struct FOVDetailData: Decodable {
+    var frameWidth: Int
+    var frameHeight: Int
+    var boxes: [BoxModel]
 }

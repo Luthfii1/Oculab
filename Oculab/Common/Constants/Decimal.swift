@@ -18,4 +18,14 @@ enum Decimal {
     static let d20 = 20.0
     static let d24 = 24.0
     static let d32 = 32.0
+    // minus values
+    static let m2 = -2.0
+    static let m4 = -4.0
+    static let m6 = -6.0
+    static let m8 = -8.0
+    static let m12 = -12.0
+    static let m16 = -16.0
+    static let m20 = -20.0
+    static let m24 = -24.0
+    static let m32 = -32.0
 }

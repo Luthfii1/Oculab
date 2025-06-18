@@ -118,9 +118,11 @@ class AnalysisResultPresenter: ObservableObject {
     }
     
     func isEnableToSubmit() -> Bool {
-        if !isAllFOVsVerified {
-            return false
-        }
+        
+        // TODO: Need to discuss is it should check all FOVs Verified or not
+//        if !isAllFOVsVerified {
+//            return false
+//        }
         
         // check if the interpretation already chosen from user
         if selectedTBGrade == GradingType.SCANTY.rawValue {
