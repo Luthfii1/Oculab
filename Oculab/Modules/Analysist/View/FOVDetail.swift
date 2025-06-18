@@ -114,27 +114,6 @@ struct FOVDetail: View {
                 }
             }
             .toolbarBackground(.hidden, for: .navigationBar)
-            .sheet(item: $presenter.selectedBox) { box in
-                TrayView(
-                    selectedBox: $presenter.selectedBox,
-                    boxes: presenter.boxes,
-                    onVerify: {
-                        Task {
-                            await presenter.updateBoxStatus(boxId: box.id, newStatus: .verified)
-                        }
-                    },
-                    onFlag: {
-                        Task {
-                            await presenter.updateBoxStatus(boxId: box.id, newStatus: .flagged)
-                        }
-                    },
-                    onReject: {
-                        Task {
-                            await presenter.updateBoxStatus(boxId: box.id, newStatus: .trashed)
-                        }
-                    }
-                )
-            }
             .onAppear {
                 Task {
                     await presenter.fetchData(fovId: fovData._id)
