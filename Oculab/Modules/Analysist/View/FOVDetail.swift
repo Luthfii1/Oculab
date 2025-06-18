@@ -21,18 +21,9 @@ struct FOVDetail: View {
             ZStack {
                 Color.black.edgesIgnoringSafeArea(.all)
 
-                if let fovDetail = presenter.fovDetail {
+                if presenter.fovDetail != nil {
                     ZoomableImageComponent(
-                        imageURL: URL(string: fovData.image),
-                        zoomScale: $presenter.zoomScale,
-                        offset: $presenter.offset,
-                        selectedBox: $presenter.selectedBox,
-                        boxes: presenter.boxes,
-                        onBoxSelected: { box in
-                            presenter.selectedBox = box
-                        },
-                        frameWidth: Double(fovDetail.frameWidth),
-                        frameHeight: Double(fovDetail.frameHeight)
+                        imageURL: URL(string: fovData.image)
                     )
                     .environmentObject(presenter)
                     .edgesIgnoringSafeArea([.top, .bottom])

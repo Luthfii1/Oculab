@@ -10,14 +10,7 @@ import UIKit
 
 struct ZoomableImageComponent: UIViewRepresentable {
     let imageURL: URL?
-    @Binding var zoomScale: CGFloat
-    @Binding var offset: CGSize
-    @Binding var selectedBox: BoxModel?
     @EnvironmentObject var presenter: FOVDetailPresenter
-    var boxes: [BoxModel] = []
-    var onBoxSelected: ((BoxModel) -> Void)?
-    var frameWidth: Double
-    var frameHeight: Double
 
     func makeUIView(context: Context) -> UIScrollView {
         let scrollView = UIScrollView()
@@ -94,21 +87,13 @@ struct ZoomableImageComponent: UIViewRepresentable {
                         scrollView.contentSize = containerView.frame.size
 
                         // Set initial zoom and offset
-                        scrollView.zoomScale = zoomScale
-                        scrollView.contentOffset = CGPoint(x: offset.width, y: offset.height)
+                        scrollView.zoomScale = presenter.zoomScale
+                        scrollView.contentOffset = CGPoint(x: presenter.offset.width, y: presenter.offset.height)
 
                         // Add BoxesGroupComponentView
                         let hostingController = UIHostingController(
-                            rootView: BoxesGroupComponentView(
-                                presenter: presenter,
-                                width: frameWidth,
-                                height: frameHeight,
-                                zoomScale: zoomScale,
-                                boxes: boxes,
-                                selectedBox: $selectedBox,
-                                onBoxSelected: onBoxSelected
-                            )
-                            .environmentObject(presenter)
+                            rootView: BoxesGroupComponentView()
+                                .environmentObject(presenter)
                         )
                         hostingController.view.backgroundColor = .clear
                         hostingController.view.frame = imageView.frame
@@ -140,7 +125,7 @@ struct ZoomableImageComponent: UIViewRepresentable {
         }
 
         func scrollViewDidZoom(_ scrollView: UIScrollView) {
-            parent.zoomScale = scrollView.zoomScale
+            parent.presenter.zoomScale = scrollView.zoomScale
 
             // Center the image when zoomed out
             if let containerView = scrollView.viewWithTag(1),
@@ -166,12 +151,12 @@ struct ZoomableImageComponent: UIViewRepresentable {
 
         func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
             isZooming = false
-            parent.zoomScale = scale
+            parent.presenter.zoomScale = scale
         }
 
         func scrollViewDidScroll(_ scrollView: UIScrollView) {
             if !isZooming {
-                parent.offset = CGSize(
+                parent.presenter.offset = CGSize(
                     width: scrollView.contentOffset.x,
                     height: scrollView.contentOffset.y
                 )

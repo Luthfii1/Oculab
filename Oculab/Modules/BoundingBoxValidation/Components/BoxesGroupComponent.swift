@@ -8,56 +8,30 @@
 import SwiftUI
 
 struct BoxesGroupComponentView: View {
-    var presenter: FOVDetailPresenter
-
-    var width: Double
-    var height: Double
-    var zoomScale: CGFloat
-    @State private var boxes: [BoxModel]
-    @Binding var selectedBox: BoxModel?
-    var onBoxSelected: ((BoxModel) -> Void)?
-
-    init(
-        presenter: FOVDetailPresenter,
-        width: Double,
-        height: Double,
-        zoomScale: CGFloat,
-        boxes: [BoxModel],
-        selectedBox: Binding<BoxModel?>,
-        onBoxSelected: ((BoxModel) -> Void)? = nil
-    ) {
-        self.presenter = presenter
-        self.width = width
-        self.height = height
-        self.zoomScale = zoomScale
-        _boxes = State(initialValue: boxes)
-        _selectedBox = selectedBox
-        self.onBoxSelected = onBoxSelected
-    }
+    @EnvironmentObject var presenter: FOVDetailPresenter
 
     var body: some View {
         ZStack(alignment: .topLeading) {
-            ForEach(boxes) { box in
+            ForEach(presenter.boxes) { box in
                 BoxComponentView(
                     box: box,
-                    selectedBox: selectedBox,
-                    zoomScale: zoomScale
+                    selectedBox: presenter.selectedBox,
+                    zoomScale: presenter.zoomScale
                 )
                 .position(
-                    x: box.x * zoomScale,
-                    y: box.y * zoomScale
+                    x: box.x * presenter.zoomScale,
+                    y: box.y * presenter.zoomScale
                 )
                 .onTapGesture {
-                    selectedBox = box
-                    onBoxSelected?(box)
+                    presenter.selectedBox = box
                 }
             }
         }
-        .frame(width: width * zoomScale, height: height * zoomScale)
-        .sheet(item: $selectedBox) { selected in
+        .frame(width: Double(presenter.fovDetail?.frameWidth ?? 0) * presenter.zoomScale, height: Double(presenter.fovDetail?.frameHeight ?? 0) * presenter.zoomScale)
+        .sheet(item: $presenter.selectedBox) { selected in
             TrayView(
-                selectedBox: $selectedBox,
-                boxes: boxes,
+                selectedBox: $presenter.selectedBox,
+                boxes: presenter.boxes,
                 onVerify: {
                     updateBoxStatus(id: selected.id, to: .verified)
                 },
@@ -72,8 +46,8 @@ struct BoxesGroupComponentView: View {
     }
 
     private func updateBoxStatus(id: String, to status: BoxStatus) {
-        if let index = boxes.firstIndex(where: { $0.id == id }) {
-            boxes[index].status = status
+        if let index = presenter.boxes.firstIndex(where: { $0.id == id }) {
+            presenter.boxes[index].status = status
 
             Task {
                 await presenter.updateBoxStatus(boxId: id, newStatus: status)
