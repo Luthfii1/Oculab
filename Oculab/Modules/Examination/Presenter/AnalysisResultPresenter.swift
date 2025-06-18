@@ -25,6 +25,9 @@ class AnalysisResultPresenter: ObservableObject {
     @Published private var currentStep: Int = 3
     @Published var isVerifPopUpVisible = false
     @Published var isLeavePopUpVisible = false
+    @Published var isWSIImageVisible: Bool = false
+    @Published var buttonTitle: String = "Simpan Hasil Pemeriksaan"
+    @Published var isAllFOVsVerified: Bool = false
 
     func popToRoot() {
         Router.shared.popToRoot()
@@ -75,6 +78,7 @@ class AnalysisResultPresenter: ObservableObject {
             let groupedFOVs = try await interactor?.fetchFOVData(examId: examinationId)
             if let groupedFOVs {
                 self.groupedFOVs = groupedFOVs
+                checkIsAllFOVsVerified()
             }
         } catch {
             // Handle error
@@ -92,6 +96,14 @@ class AnalysisResultPresenter: ObservableObject {
         }
     }
 
+    @MainActor
+    func getStatusExamination(examinationId: String) async {
+        await fetchData(examinationId: examinationId)
+        if examinationResult?.statusExamination == .FINISHED {
+            Router.shared.navigateBack()
+        }
+    }
+
     func navigateToAlbum(fovGroup: FOVType) {
         Router.shared.navigateTo(.photoAlbum(fovGroup: fovGroup, examId: examinationResult?.examinationId ?? ""))
     }
@@ -103,5 +115,49 @@ class AnalysisResultPresenter: ObservableObject {
             order: order,
             total: total
         ))
+    }
+    
+    func isEnableToSubmit() -> Bool {
+        
+        // TODO: Need to discuss is it should check all FOVs Verified or not
+//        if !isAllFOVsVerified {
+//            return false
+//        }
+        
+        // check if the interpretation already chosen from user
+        if selectedTBGrade == GradingType.SCANTY.rawValue {
+            return !numOfBTA.isEmpty && Int(numOfBTA) != nil
+        } else {
+            return selectedTBGrade != ""
+        }
+    }
+    
+    func navigateToPDFView() {
+        guard let examId = examinationResult?.examinationId else { return }
+        Router.shared.navigateTo(.pdf(examinationId: examId))
+    }
+    
+    func checkIsAllFOVsVerified() {
+        guard let groupedFOVs = groupedFOVs else {
+            self.isAllFOVsVerified = false
+            self.buttonTitle = "Verikasi Semua Lapang Pandang"
+            return
+        }
+        
+        // Check each group
+        let bta0Verified = groupedFOVs.bta0.allSatisfy { $0.verified }
+        let bta1to9Verified = groupedFOVs.bta1to9.allSatisfy { $0.verified }
+        let btaAbove9Verified = groupedFOVs.btaabove9.allSatisfy { $0.verified }
+        
+        // All groups must be verified
+        let isAllVerified = bta0Verified && bta1to9Verified && btaAbove9Verified
+        self.isAllFOVsVerified = isAllVerified
+        
+        // Update button title based on verification status
+        if isAllVerified {
+            self.buttonTitle = "Simpan Hasil Pemeriksaan"
+        } else {
+            self.buttonTitle = "Verikasi Semua Lapang Pandang"
+        }
     }
 }

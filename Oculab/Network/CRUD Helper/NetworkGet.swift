@@ -8,14 +8,22 @@
 import Foundation
 
 extension NetworkHelper {
-    func get<T: Decodable>(urlString: String) async throws -> APIResponse<T> {
-        guard let request = createRequest(urlString: urlString, httpMethod: "GET", body: nil) else {
+    func get<T: Decodable>(urlString: String, headers: [String: String]? = nil) async throws -> APIResponse<T> {
+        guard var request = createRequest(urlString: urlString, httpMethod: "GET", body: nil) else {
             throw NSError(
                 domain: "InvalidRequest",
                 code: -1,
                 userInfo: [NSLocalizedDescriptionKey: "Error creating request"]
             )
         }
+
+        headers?.forEach { key, value in
+            request.setValue(value, forHTTPHeaderField: key)
+        }
+
+//        // Debug print request headers
+//        print("🧾 Request Headers: \(request.allHTTPHeaderFields ?? [:])")
+//        print("📡 Request URL: \(urlString)")
 
         let (data, response) = try await URLSession.shared.data(for: request)
         return try handleAsyncResponse(data: data, response: response)

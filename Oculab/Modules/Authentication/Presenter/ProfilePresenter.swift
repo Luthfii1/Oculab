@@ -49,6 +49,8 @@ class ProfilePresenter: ObservableObject {
         }
     }
 
+    @Published var showSuccessPopup: Bool = false
+    
     init(interactor: ProfileInteractorProtocol, authInteractor: AuthenticationInteractor) {
         self.interactor = interactor
         self.authInteractor = authInteractor
@@ -84,7 +86,7 @@ class ProfilePresenter: ObservableObject {
 
     @MainActor
     func logout() {
-        for item in UserDefaultType.allCases {
+        for item in UserDefaultType.allCases where item != .hasSeenOnboarding {
             UserDefaults.standard.removeObject(forKey: item.rawValue)
         }
     }
@@ -111,19 +113,19 @@ class ProfilePresenter: ObservableObject {
 
     @MainActor
     func postEditPassword(authPresenter: AuthenticationPresenter) async {
-        guard let updateUser = await authInteractor.getUserLocalData() else {
-            print("no data")
+        guard !confirmPassword.isEmpty, !oldPassword.isEmpty else {
+            print("Password fields are empty")
+            descriptionOldPassword = "Please enter both old and new passwords"
+            isOldPasswordError = true
             return
         }
-
-        updateUser.password = confirmPassword
-        updateUser.previousPassword = oldPassword
-
+        
         do {
-            let response = try await authInteractor.updateUserById(user: updateUser)
-
-            user = response
-            Router.shared.popToRoot()
+            _ = try await interactor.editNewPassword(
+                newPassword: confirmPassword,
+                previousPassword: oldPassword)
+            
+            showSuccessPopup = true
         } catch {
             isOldPasswordError = true
             switch error {
@@ -141,5 +143,9 @@ class ProfilePresenter: ObservableObject {
                 descriptionOldPassword = error.localizedDescription
             }
         }
+    }
+    
+    func backToProfilePage() {
+        Router.shared.popToRoot()
     }
 }

@@ -20,34 +20,37 @@ struct ImageSectionComponent: View {
                     .font(AppTypography.s4_1)
                     .padding(.leading, Decimal.d8)
             }
+
             Text("Ketuk untuk lihat detail gambar")
                 .font(AppTypography.p3)
                 .foregroundStyle(AppColors.slate300)
 
-            AsyncImage(url: URL(
-                string: examination
-                    .imagePreview
-            )) { phase in
-                switch phase {
-                case .empty:
-                    ProgressView().frame(height: 114)
-                case let .success(image):
-                    image
-                        .resizable()
-                        .scaledToFill()
-                        .frame(height: 114)
-                        .clipped()
-                case .failure:
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 114)
-                        .foregroundColor(.red)
-                @unknown default:
-                    EmptyView()
+            if presenter.isWSIImageVisible {
+                AsyncImage(url: URL(
+                    string: examination
+                        .imagePreview
+                )) { phase in
+                    switch phase {
+                    case .empty:
+                        ProgressView().frame(height: 114)
+                    case let .success(image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                            .frame(height: 114)
+                            .clipped()
+                    case .failure:
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 114)
+                            .foregroundColor(.red)
+                    @unknown default:
+                        EmptyView()
+                    }
                 }
+                .cornerRadius(Decimal.d8)
             }
-            .cornerRadius(Decimal.d8)
 
             if !(presenter.groupedFOVs?.bta0.isEmpty ?? true) {
                 // Checking if the `data` array within each group is not empty

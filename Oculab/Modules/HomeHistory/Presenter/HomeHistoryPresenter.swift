@@ -17,6 +17,8 @@ class HomeHistoryPresenter: ObservableObject {
     @Published var latestExamination: [ExaminationCardData] = []
     @Published var filteredExamination: [ExaminationCardData] = []
     @Published var filteredExaminationByDate: [ExaminationCardData] = []
+    
+    @Published var finishedExaminationsByDate: [FinishedExaminationCardData] = []
 
     @Published var statisticExam: ExaminationStatistic = .init()
     @Published var progress: CGFloat = 0.0
@@ -86,7 +88,41 @@ class HomeHistoryPresenter: ObservableObject {
         filteredExaminationByDate = latestExamination
             .filter { $0.date == selectedDateString && $0.statusExamination == .FINISHED }
     }
-
+    
+    @MainActor
+    func fetchFinishedExaminationsByDate(date: Date) async {
+        isAllExamsLoading = true
+        defer { isAllExamsLoading = false }
+        
+        do {
+            let response = try await interactor?.getFinishedDataCard(date: date.formattedYearMonthDay())
+            
+            if let response {
+                finishedExaminationsByDate = response
+                print("Successfully loaded \(response.count) examinations")
+            } else {
+                finishedExaminationsByDate = []
+                print("No response from interactor")
+            }
+            
+        } catch {
+            // Handle different types of errors
+            switch error {
+                case let NetworkError.apiError(apiResponse):
+                    if apiResponse.data.errorType == "VALIDATION_ERROR" &&
+                       apiResponse.data.description.contains("No finished examinations found") {
+                        finishedExaminationsByDate = []
+                    }
+                    
+                case let NetworkError.networkError(message):
+                    print("Network error: \(message)")
+                    
+                default:
+                    print("Unknown error: \(error.localizedDescription)")
+                }
+        }
+    }
+    
     @MainActor
     func fetchData() async {
         isAllExamsLoading = true

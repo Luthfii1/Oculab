@@ -16,6 +16,7 @@ struct AppDropdown: View {
     var isDisabled: Bool = false
     var choices: [(display: String, value: String)] // List of dropdown choices with display and value
     var description: String? = nil // Description or additional info
+    var isSearchEnabled: Bool = true // New parameter to control search functionality
     @Binding var selectedChoice: String
 
     @State private var isDropdownOpen: Bool = false
@@ -24,7 +25,10 @@ struct AppDropdown: View {
 
     // Computed property to filter choices based on search text
     private var filteredChoices: [(display: String, value: String)] {
-        choices.filter { $0.display.localizedCaseInsensitiveContains(searchText) || searchText.isEmpty }
+        if isSearchEnabled {
+            return choices.filter { $0.display.localizedCaseInsensitiveContains(searchText) || searchText.isEmpty }
+        }
+        return choices
     }
 
     // Colors based on the state (disabled or normal)
@@ -60,7 +64,9 @@ struct AppDropdown: View {
                 if !isDisabled {
                     withAnimation {
                         isDropdownOpen.toggle()
-                        searchText = "" // Reset search when dropdown is opened
+                        if isSearchEnabled {
+                            searchText = "" // Reset search when dropdown is opened
+                        }
                     }
                 }
             }) {
@@ -71,15 +77,22 @@ struct AppDropdown: View {
                                 .foregroundColor(AppColors.purple700)
                         }
 
-                        TextField(placeholder, text: $searchText, onEditingChanged: { editing in
-                            if editing {
-                                isDropdownOpen = true
-                            }
-                        })
-                        .foregroundColor(textColor)
-                        .disabled(isDisabled)
-                        .padding(.horizontal, Decimal.d8)
-                        .multilineTextAlignment(.leading)
+                        if isSearchEnabled {
+                            TextField(placeholder, text: $searchText, onEditingChanged: { editing in
+                                if editing {
+                                    isDropdownOpen = true
+                                }
+                            })
+                            .foregroundColor(textColor)
+                            .disabled(isDisabled)
+                            .padding(.horizontal, Decimal.d8)
+                            .multilineTextAlignment(.leading)
+                        } else {
+                            Text(selectedChoice.isEmpty ? placeholder : choices.first(where: { $0.value == selectedChoice })?.display ?? selectedChoice)
+                                .foregroundColor(textColor)
+                                .padding(.horizontal, Decimal.d8)
+                                .multilineTextAlignment(.leading)
+                        }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -90,7 +103,9 @@ struct AppDropdown: View {
                 }
                 .onChange(of: selectedChoice) {
                     // Update search text based on selected choice display value
-                    searchText = choices.first(where: { $0.value == selectedChoice })?.display ?? selectedChoice
+                    if isSearchEnabled {
+                        searchText = choices.first(where: { $0.value == selectedChoice })?.display ?? selectedChoice
+                    }
                 }
 
                 .padding()
@@ -106,7 +121,7 @@ struct AppDropdown: View {
             // Dropdown choices (visible when the dropdown is open and filtered by search)
             if isDropdownOpen {
                 VStack(alignment: .leading) {
-                    if isEnablingAdding {
+                    if isSearchEnabled && isEnablingAdding {
                         Button {
                             isDropdownOpen = false
                             selectedChoice = searchText
@@ -131,7 +146,9 @@ struct AppDropdown: View {
                             ForEach(filteredChoices, id: \.value) { choice in
                                 Button(action: {
                                     selectedChoice = choice.value
-                                    searchText = choice.display
+                                    if isSearchEnabled {
+                                        searchText = choice.display
+                                    }
                                     isDropdownOpen = false
                                 }) {
                                     Text(choice.display)
@@ -170,17 +187,35 @@ struct AppDropdown: View {
 
 #Preview {
     ScrollView {
-        AppDropdown(
-            title: "Select Option",
-            placeholder: "Choose an option...",
-            isRequired: true,
-            leftIcon: "list.bullet",
-            rightIcon: "chevron.down",
-            isDisabled: false,
-            choices: [("Option 1", "value1"), ("Option 2", "value2"), ("Option 3", "value3"), ("Option 4", "value4")],
-            description: "Please select an option from the dropdown",
-            selectedChoice: .constant("")
-        )
+        VStack(spacing: 20) {
+            // Preview with search enabled
+            AppDropdown(
+                title: "Searchable Dropdown",
+                placeholder: "Choose an option...",
+                isRequired: true,
+                leftIcon: "list.bullet",
+                rightIcon: "chevron.down",
+                isDisabled: false,
+                choices: [("Option 1", "value1"), ("Option 2", "value2"), ("Option 3", "value3"), ("Option 4", "value4")],
+                description: "This dropdown has search functionality",
+                isSearchEnabled: true,
+                selectedChoice: .constant("")
+            )
+            
+            // Preview with search disabled
+            AppDropdown(
+                title: "Normal Dropdown",
+                placeholder: "Choose an option...",
+                isRequired: true,
+                leftIcon: "list.bullet",
+                rightIcon: "chevron.down",
+                isDisabled: false,
+                choices: [("Option 1", "value1"), ("Option 2", "value2"), ("Option 3", "value3"), ("Option 4", "value4")],
+                description: "This is a normal dropdown without search",
+                isSearchEnabled: false,
+                selectedChoice: .constant("")
+            )
+        }
     }
     .padding()
 }

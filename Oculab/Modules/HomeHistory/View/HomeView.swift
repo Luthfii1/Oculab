@@ -47,7 +47,7 @@ struct HomeView: View {
 
                         if authentication.user.role == .ADMIN {
                             AppButton(title: "Pemeriksaan Baru", leftIcon: "doc.badge.plus") {
-                                Router.shared.navigateTo(.inputPatientData)
+                                Router.shared.navigateTo(.inputPatientData())
                             }
                         }
 
@@ -94,7 +94,7 @@ struct HomeView: View {
                                             patientName: exam.patientName,
                                             patientDOB: exam.patientDob.toFormattedDate(),
                                             picName: exam.picName,
-                                            isLab: authentication.user.role == .LAB
+                                            viewType: .lab
                                         )
                                     }
                                 }

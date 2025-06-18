@@ -16,6 +16,9 @@ packages:
   Alamofire:
     url: https://github.com/Alamofire/Alamofire
     from: 5.9.1
+  Lottie:
+    url: https://github.com/airbnb/lottie-ios
+    from: 4.5.1
   
 targets:
   Oculab:
@@ -48,18 +51,21 @@ targets:
       ENABLE_TESTABILITY: YES
     dependencies:
       - package: Alamofire
+      - package: Lottie
 #      - package: SwiftPM
-    postCompileScripts:
-      - script: |
-          export PATH="$PATH:/opt/homebrew/bin"
-          if which swiftformat >/dev/null; then
-            swiftformat .
-          else
-            echo "warning: Swiftformat not installed"
-          fi
-        name: SwiftFormat
-        showEnvVars: true
-        basedOnDependencyAnalysis: false
+    # postCompileScripts:
+    #   - script: |
+    #       export PATH="$PATH:/opt/homebrew/bin"
+    #       if which swiftformat >/dev/null; then
+    #         # Only format files that are staged in git
+    #         git diff --cached --name-only --diff-filter=ACMR | grep ".swift$" | xargs swiftformat
+    #       else
+    #         echo "warning: Swiftformat not installed"
+    #       fi
+    #     name: SwiftFormat
+    #     showEnvVars: true
+    #     basedOnDependencyAnalysis: true
+    #     runOnlyWhenInstalling: true
   OculabTests:
     type: bundle.unit-test
     supportedDestinations: [iOS]

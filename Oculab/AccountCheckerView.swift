@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AccountCheckerView: View {
     @AppStorage(UserDefaultType.isUserLoggedIn.rawValue) var isUserLoggedIn: Bool = false
+    
     @EnvironmentObject var authPresenter: AuthenticationPresenter
     @State private var isSplashScreenVisible = true
 

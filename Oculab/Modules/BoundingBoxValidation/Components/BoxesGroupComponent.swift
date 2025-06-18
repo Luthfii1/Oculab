@@ -76,7 +76,7 @@ struct BoxesGroupComponentView: View {
             boxes[index].status = status
 
             Task {
-                await presenter.updateStatus(boxId: id, newStatus: status)
+                await presenter.updateBoxStatus(boxId: id, newStatus: status)
             }
         }
     }

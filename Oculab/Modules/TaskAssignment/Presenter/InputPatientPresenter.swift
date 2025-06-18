@@ -54,11 +54,8 @@ class InputPatientPresenter: ObservableObject {
                 } else if patient.sex == .FEMALE {
                     selectedSex = "Perempuan"
                 }
-                if patient.BPJS != nil {
-                    BPJSnumber = String(describing: patient.BPJS)
-                } else {
-                    BPJSnumber = "Doesn't have BPJS"
-                }
+                
+                BPJSnumber = patient.BPJS ?? ""
             }
         }
     }

@@ -36,4 +36,12 @@ extension String {
             return "Invalid Date"
         }
     }
+
+    func toLowercase() -> String {
+        return lowercased()
+    }
+
+    func toUppercase() -> String {
+        return uppercased()
+    }
 }

@@ -15,7 +15,7 @@ class Router: ObservableObject {
     enum Route: Equatable, Hashable {
         case home
         case videoRecord
-        case pdf
+        case pdf(examinationId: String)
         case analysisResult(examinationId: String)
         case instructionRecord
         case examDetail(examId: String, patientId: String)
@@ -28,9 +28,16 @@ class Router: ObservableObject {
         case detailedPhoto(slideId: String, fovData: FOVData, order: Int, total: Int)
         case profile
         case editPassword
-        case inputPatientData
+        case inputPatientData(patientId: String? = nil)
         case informationInterpretation
         case kebijakanPrivasi
+        case analyzingStatusProgress(examinationId: String)
+        case accountManagement
+        case newAccount
+        case editAccount(account: Account)
+        case patientList
+        case patientForm(patientId: String? = nil)
+        case patientDetail(patientId: String)
     }
 
     @Published var path: NavigationPath = .init()
@@ -42,8 +49,8 @@ class Router: ObservableObject {
             HomeView()
         case .videoRecord:
             VideoRecordView()
-        case .pdf:
-            PDFPageView()
+        case let .pdf(examinationId):
+            PDFPageView(examinationId: examinationId)
         case let .analysisResult(examinationId):
             AnalysisResultView(examinationId: examinationId)
         case .instructionRecord:
@@ -72,12 +79,26 @@ class Router: ObservableObject {
         case .editPassword:
             EditPasswordView()
                 .environmentObject(DependencyInjection.shared.createProfilePresenter())
-        case .inputPatientData:
-            InputPatientData()
+        case .inputPatientData(let patientId):
+            InputPatientData(patientId: patientId)
         case .informationInterpretation:
             InformationPage()
         case .kebijakanPrivasi:
             KebijakanPrivasiView()
+        case let .analyzingStatusProgress(examinationId):
+            AnalyzingExaminationProgressView(examinationId: examinationId)
+        case .accountManagement:
+            UserManagementView()
+        case .newAccount:
+            NewUserFormView()
+        case let .editAccount(account):
+            EditUserFormView(account: account)
+        case .patientList:
+            PatientListView()
+        case .patientForm(let patientId):
+            PatientForm(patientId: patientId)
+        case let .patientDetail(patientId):
+            PatientDetail(patientId: patientId)
         }
     }
 

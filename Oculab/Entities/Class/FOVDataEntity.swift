@@ -23,6 +23,7 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
     var comment: [String]?
     var systemCount: Int
     var confidenceLevel: Double
+    var verified: Bool
 
     init(
         _id: UUID = UUID(),
@@ -31,7 +32,8 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
         order: Int,
         comment: [String]? = nil,
         systemCount: Int,
-        confidenceLevel: Double
+        confidenceLevel: Double,
+        verified: Bool = false
     ) {
         self._id = _id
         self.image = image
@@ -40,6 +42,7 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
         self.comment = comment
         self.systemCount = systemCount
         self.confidenceLevel = confidenceLevel
+        self.verified = verified
     }
 
     enum CodingKeys: CodingKey {
@@ -50,6 +53,7 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
         case comment
         case systemCount
         case confidenceLevel
+        case verified
     }
 
     required init(from decoder: any Decoder) throws {
@@ -61,6 +65,7 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
         self.comment = try container.decodeIfPresent([String].self, forKey: .comment)
         self.systemCount = try container.decode(Int.self, forKey: .systemCount)
         self.confidenceLevel = try container.decode(Double.self, forKey: .confidenceLevel)
+        self.verified = try container.decodeIfPresent(Bool.self, forKey: .verified) ?? false
     }
 
     func encode(to encoder: Encoder) throws {
@@ -72,5 +77,6 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
         try container.encodeIfPresent(comment, forKey: .comment)
         try container.encode(systemCount, forKey: .systemCount)
         try container.encode(confidenceLevel, forKey: .confidenceLevel)
+        try container.encodeIfPresent(verified, forKey: .verified)
     }
 }

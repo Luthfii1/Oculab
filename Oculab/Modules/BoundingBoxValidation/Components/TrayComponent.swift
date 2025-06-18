@@ -100,6 +100,7 @@ struct TrayView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .presentationDetents([.medium])
             .presentationDragIndicator(.visible)
+            .background(AppColors.slate0)
         }
     }
 }
