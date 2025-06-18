@@ -23,7 +23,9 @@ struct FOVDetail: View {
 
                 if presenter.fovDetail != nil {
                     ZoomableImageComponent(
-                        imageURL: URL(string: fovData.image)
+                        imageURL: URL(string: fovData.image),
+                        zoomScale: $presenter.zoomScale,
+                        offset: $presenter.offset
                     )
                     .environmentObject(presenter)
                     .edgesIgnoringSafeArea([.top, .bottom])

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct BoxesGroupComponentView: View {
     @EnvironmentObject var presenter: FOVDetailPresenter
+    var zoomScale: CGFloat
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -16,18 +17,18 @@ struct BoxesGroupComponentView: View {
                 BoxComponentView(
                     box: box,
                     selectedBox: presenter.selectedBox,
-                    zoomScale: presenter.zoomScale
+                    zoomScale: zoomScale
                 )
                 .position(
-                    x: box.x * presenter.zoomScale,
-                    y: box.y * presenter.zoomScale
+                    x: box.x * zoomScale,
+                    y: box.y * zoomScale
                 )
                 .onTapGesture {
                     presenter.selectedBox = box
                 }
             }
         }
-        .frame(width: Double(presenter.fovDetail?.frameWidth ?? 0) * presenter.zoomScale, height: Double(presenter.fovDetail?.frameHeight ?? 0) * presenter.zoomScale)
+        .frame(width: Double(presenter.fovDetail?.frameWidth ?? 0) * zoomScale, height: Double(presenter.fovDetail?.frameHeight ?? 0) * zoomScale)
         .sheet(item: $presenter.selectedBox) { selected in
             TrayView(
                 selectedBox: $presenter.selectedBox,

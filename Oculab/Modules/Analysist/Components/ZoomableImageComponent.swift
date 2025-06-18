@@ -11,6 +11,8 @@ import UIKit
 struct ZoomableImageComponent: UIViewRepresentable {
     let imageURL: URL?
     @EnvironmentObject var presenter: FOVDetailPresenter
+    @Binding var zoomScale: CGFloat
+    @Binding var offset: CGSize
 
     func makeUIView(context: Context) -> UIScrollView {
         let scrollView = UIScrollView()
@@ -87,13 +89,15 @@ struct ZoomableImageComponent: UIViewRepresentable {
                         scrollView.contentSize = containerView.frame.size
 
                         // Set initial zoom and offset
-                        scrollView.zoomScale = presenter.zoomScale
-                        scrollView.contentOffset = CGPoint(x: presenter.offset.width, y: presenter.offset.height)
+                        scrollView.zoomScale = zoomScale
+                        scrollView.contentOffset = CGPoint(x: offset.width, y: offset.height)
 
                         // Add BoxesGroupComponentView
                         let hostingController = UIHostingController(
-                            rootView: BoxesGroupComponentView()
-                                .environmentObject(presenter)
+                            rootView: BoxesGroupComponentView(
+                                zoomScale: zoomScale
+                            )
+                            .environmentObject(presenter)
                         )
                         hostingController.view.backgroundColor = .clear
                         hostingController.view.frame = imageView.frame
@@ -102,6 +106,37 @@ struct ZoomableImageComponent: UIViewRepresentable {
                 }
             }.resume()
         }
+
+         // TODO: ZOOM TO SELECTED BOX LOGIC
+//         if let selectedBox = presenter.selectedBox, let _ = presenter.fovDetail {
+//             let newZoom: CGFloat = 2.0
+//             let boxCenterX = selectedBox.x + selectedBox.width / 2
+//             let boxCenterY = selectedBox.y + selectedBox.height / 2
+//             let screenWidth = scrollView.bounds.width
+//             let screenHeight = scrollView.bounds.height
+//             let offsetX = screenWidth / 2 - boxCenterX * newZoom
+//             let offsetY = screenHeight / 2 - boxCenterY * newZoom
+//
+//             // Only animate if not already zoomed to this box
+//             if abs(scrollView.zoomScale - newZoom) > 0.01 || abs(scrollView.contentOffset.x - offsetX) > 0.5 || abs(scrollView.contentOffset.y - offsetY) > 0.5 {
+//                 UIView.animate(withDuration: 0.35) {
+//                     scrollView.zoomScale = newZoom
+//                     scrollView.contentOffset = CGPoint(x: offsetX, y: offsetY)
+//                 }
+//             }
+//         }
+
+         // TODO: RESET ZOOM/OFFSET WHEN NO BOX IS SELECTED 
+        // if presenter.selectedBox == nil {
+        //     let defaultZoom: CGFloat = 1.0
+        //     let defaultOffset = CGPoint(x: 0, y: 0)
+        //     if abs(scrollView.zoomScale - defaultZoom) > 0.01 || abs(scrollView.contentOffset.x - defaultOffset.x) > 0.5 || abs(scrollView.contentOffset.y - defaultOffset.y) > 0.5 {
+        //         UIView.animate(withDuration: 0.35) {
+        //             scrollView.zoomScale = defaultZoom
+        //             scrollView.contentOffset = defaultOffset
+        //         }
+        //     }
+        // }
     }
 
     func makeCoordinator() -> Coordinator {
@@ -125,7 +160,7 @@ struct ZoomableImageComponent: UIViewRepresentable {
         }
 
         func scrollViewDidZoom(_ scrollView: UIScrollView) {
-            parent.presenter.zoomScale = scrollView.zoomScale
+            parent.zoomScale = scrollView.zoomScale
 
             // Center the image when zoomed out
             if let containerView = scrollView.viewWithTag(1),
@@ -151,12 +186,12 @@ struct ZoomableImageComponent: UIViewRepresentable {
 
         func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
             isZooming = false
-            parent.presenter.zoomScale = scale
+            parent.zoomScale = scale
         }
 
         func scrollViewDidScroll(_ scrollView: UIScrollView) {
             if !isZooming {
-                parent.presenter.offset = CGSize(
+                parent.offset = CGSize(
                     width: scrollView.contentOffset.x,
                     height: scrollView.contentOffset.y
                 )
