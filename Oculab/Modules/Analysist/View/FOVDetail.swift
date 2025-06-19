@@ -29,6 +29,26 @@ struct FOVDetail: View {
                     )
                     .environmentObject(presenter)
                     .edgesIgnoringSafeArea([.top, .bottom])
+                    .overlay(
+                        Group {
+                            if let newBoxRect = presenter.newBoxRect {
+                                let rectBinding = Binding<CGRect>(
+                                    get: { newBoxRect },
+                                    set: { presenter.newBoxRect = $0 }
+                                )
+                                ResizableBoundingBoxView(
+                                    rect: rectBinding,
+                                    zoomScale: presenter.zoomScale,
+                                    onConfirm: { finalRect in
+                                        presenter.confirmNewBox(finalRect, fovId: fovData._id)
+                                    },
+                                    onCancel: {
+                                        presenter.cancelNewBox()
+                                    }
+                                )
+                            }
+                        }
+                    )
                 } else {
                     // view with information that the data is loading because the data is not yet fetched
                     Text("Data is loading...")
@@ -55,31 +75,32 @@ struct FOVDetail: View {
                         VStack(spacing: Decimal.d4) {
                             Text("Jumlah Bakteri: \(fovData.systemCount) BTA")
                                 .font(AppTypography.h3)
-                                .foregroundColor(.white)
+                                .foregroundColor(AppColors.slate0)
+
+                            Text(presenter.getInstructionText())
+                                .font(AppTypography.p2)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, Decimal.d20)
+                                .foregroundColor(AppColors.slate0)
                         }
                         .padding(.horizontal, Decimal.d16)
                         .padding(.vertical, Decimal.d12)
 
                         HStack(spacing: Decimal.d16) {
                             Button(action: {
-                                // Add contrast adjustment
+                                presenter.setInteractionMode(presenter.interactionMode == .verify ? .panAndZoom : .verify)
                             }) {
-                                Image("Contrast")
-                                    .foregroundColor(.white)
+                                Image("verify")
+                                    .background(presenter.interactionMode == .verify ? Color.purple.opacity(0.4) : Color.clear)
+                                    .clipShape(Circle())
                             }
 
                             Button(action: {
-                                // Add brightness adjustment
+                                presenter.setInteractionMode(presenter.interactionMode == .add ? .panAndZoom : .add)
                             }) {
-                                Image("Brightness")
-                                    .foregroundColor(.white)
-                            }
-
-                            Button(action: {
-                                // Add comment functionality
-                            }) {
-                                Image("Comment")
-                                    .foregroundColor(.white)
+                                Image("add")
+                                    .background(presenter.interactionMode == .add ? Color.purple.opacity(0.4) : Color.clear)
+                                    .clipShape(Circle())
                             }
                         }
                         .padding(.horizontal, Decimal.d16)
@@ -91,19 +112,33 @@ struct FOVDetail: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    VStack {
-                        Text("Gambar \(order + 1) dari \(total)")
-                            .font(AppTypography.s4_1)
-                            .foregroundColor(.white)
-                        Text("ID \(slideId)")
-                            .font(AppTypography.p3)
-                            .foregroundColor(.white.opacity(0.8))
+                    Group {
+                        if presenter.interactionMode == .panAndZoom {
+                            VStack {
+                                Text("Gambar \(order + 1) dari \(total)")
+                                    .font(AppTypography.h3)
+                                Text("ID \(slideId)")
+                                    .font(AppTypography.p3)
+                            }
+                        } else if presenter.interactionMode == .verify {
+                            Text("Verifikasi Bakteri")
+                                .font(AppTypography.h3)
+                        } else {
+                            Text("Anotasi Bakteri")
+                                .font(AppTypography.h3)
+                        }
                     }
+                    .id(presenter.interactionMode)
+                    .foregroundStyle(Color.white)
                 }
 
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
-                        Router.shared.navigateBack()
+                        if presenter.interactionMode == .panAndZoom {
+                            Router.shared.navigateBack()
+                        } else {
+                            presenter.setInteractionMode(.panAndZoom)
+                        }
                     }) {
                         HStack {
                             Image("back_white")

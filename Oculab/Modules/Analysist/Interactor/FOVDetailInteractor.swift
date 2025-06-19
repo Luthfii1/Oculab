@@ -37,10 +37,22 @@ class FOVDetailInteractor {
         let fovURL = API.BE + "/boundingBox/get-bounding-box-data/"
         let url = fovURL + fovId.uuidString.toLowercase()
 
-        let response: APIResponse<FOVDetailData> = try await NetworkHelper.shared
-            .get(urlString: url)
+        let response: APIResponse<FOVDetailData> = try await NetworkHelper.shared.get(urlString: url)
 
         return response.data
+    }
+
+    func addBox(fovId: UUID, x: Double, y: Double, width: Double, height: Double) async throws -> APIResponse<BoxModel> {
+        let fovURL = API.BE + "/boundingBox/add-bounding-box/"
+        let url = fovURL + fovId.uuidString.toLowercase()
+        let body = AddBoxRequest(x: x, y: y, width: width, height: height)
+
+        let response: APIResponse<BoxModel> = try await NetworkHelper.shared.post(
+            urlString: url, 
+            body: body
+        )
+
+        return response
     }
 }
 
@@ -52,4 +64,11 @@ struct FOVDetailData: Decodable {
     var frameWidth: Int
     var frameHeight: Int
     var boxes: [BoxModel]
+}
+
+struct AddBoxRequest: Codable {
+    let x: Double
+    let y: Double
+    let width: Double
+    let height: Double
 }

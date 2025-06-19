@@ -24,8 +24,11 @@ struct BoxesGroupComponentView: View {
                     y: box.y * zoomScale
                 )
                 .onTapGesture {
-                    presenter.selectedBox = box
+                    if presenter.interactionMode == .verify {
+                        presenter.selectedBox = box
+                    }
                 }
+                .disabled(presenter.interactionMode != .verify)
             }
         }
         .frame(width: Double(presenter.fovDetail?.frameWidth ?? 0) * zoomScale, height: Double(presenter.fovDetail?.frameHeight ?? 0) * zoomScale)
@@ -93,5 +96,14 @@ struct BoxModel: Identifiable, Equatable, Decodable {
         case x = "xCoordinate"
         case y = "yCoordinate"
         case status
+    }
+    
+    init(id: String, width: Double, height: Double, x: Double, y: Double, status: BoxStatus = .none) {
+        self.id = id
+        self.width = width
+        self.height = height
+        self.x = x
+        self.y = y
+        self.status = status
     }
 }

@@ -46,12 +46,23 @@ struct ZoomableImageComponent: UIViewRepresentable {
         doubleTapGesture.numberOfTapsRequired = 2
         imageView.addGestureRecognizer(doubleTapGesture)
 
+        // Add single tap gesture for box creation
+        let singleTapGesture = UITapGestureRecognizer(
+            target: context.coordinator,
+            action: #selector(Coordinator.handleSingleTap(_:))
+        )
+        singleTapGesture.numberOfTapsRequired = 1
+        imageView.addGestureRecognizer(singleTapGesture)
+
         return scrollView
     }
 
     func updateUIView(_ scrollView: UIScrollView, context: Context) {
         guard let containerView = scrollView.viewWithTag(1),
               let imageView = containerView.viewWithTag(2) as? UIImageView else { return }
+
+        // Disable scrolling when in add mode
+        scrollView.isScrollEnabled = presenter.interactionMode != .add
 
         // Only load image if it hasn't been loaded yet
         if imageView.image == nil, let url = imageURL {
@@ -210,6 +221,22 @@ struct ZoomableImageComponent: UIViewRepresentable {
                 let point = gesture.location(in: imageView)
                 let rect = CGRect(x: point.x - 50, y: point.y - 50, width: 100, height: 100)
                 scrollView.zoom(to: rect, animated: true)
+            }
+        }
+
+        @objc func handleSingleTap(_ gesture: UITapGestureRecognizer) {
+            guard let imageView = gesture.view as? UIImageView else { return }
+            
+            if parent.presenter.interactionMode == .add && parent.presenter.newBoxRect == nil {
+                let location = gesture.location(in: imageView)
+                let initialSize = CGSize(width: 100, height: 100)
+                parent.presenter.newBoxRect = CGRect(
+                    origin: CGPoint(
+                        x: location.x - initialSize.width / 2,
+                        y: location.y - initialSize.height / 2
+                    ),
+                    size: initialSize
+                )
             }
         }
     }
