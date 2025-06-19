@@ -52,12 +52,20 @@ struct ZoomableImageComponent: UIViewRepresentable {
             action: #selector(Coordinator.handleSingleTap(_:))
         )
         singleTapGesture.numberOfTapsRequired = 1
-        imageView.addGestureRecognizer(singleTapGesture)
+        containerView.addGestureRecognizer(singleTapGesture)
 
         return scrollView
     }
 
     func updateUIView(_ scrollView: UIScrollView, context: Context) {
+        print("=== UPDATE UI VIEW DEBUG ===")
+        print("Interaction mode: \(presenter.interactionMode)")
+        print("Zoom scale: \(zoomScale)")
+        print("Offset: \(offset)")
+        print("New box rect: \(String(describing: presenter.newBoxRect))")
+        print("ScrollView isScrollEnabled: \(scrollView.isScrollEnabled)")
+        print("============================")
+        
         guard let containerView = scrollView.viewWithTag(1),
               let imageView = containerView.viewWithTag(2) as? UIImageView else { return }
 
@@ -95,6 +103,21 @@ struct ZoomableImageComponent: UIViewRepresentable {
                             width: viewSize.width,
                             height: scaledHeight
                         )
+                        
+                        // Store frame information in presenter for coordinate transformation
+                        presenter.imageFrame = imageView.frame
+                        presenter.containerFrame = containerView.frame
+                        presenter.originalImageSize = imageSize
+                        
+                        print("=== IMAGE FRAME DEBUG ===")
+                        print("Image size: \(imageSize)")
+                        print("View size: \(viewSize)")
+                        print("Scale: \(scale)")
+                        print("Scaled height: \(scaledHeight)")
+                        print("Container frame: \(containerView.frame)")
+                        print("Image view frame: \(imageView.frame)")
+                        print("ScrollView bounds: \(scrollView.bounds)")
+                        print("========================")
 
                         // Set content size to allow proper scrolling
                         scrollView.contentSize = containerView.frame.size
@@ -225,18 +248,37 @@ struct ZoomableImageComponent: UIViewRepresentable {
         }
 
         @objc func handleSingleTap(_ gesture: UITapGestureRecognizer) {
-            guard let imageView = gesture.view as? UIImageView else { return }
+            print("Single tap detected! Interaction mode: \(parent.presenter.interactionMode)")
+            guard let containerView = gesture.view,
+                  let imageView = containerView.viewWithTag(2) as? UIImageView else { 
+                print("Failed to get containerView or imageView from gesture")
+                return 
+            }
+            
+            print("=== TAP DEBUG ===")
+            print("Container frame: \(containerView.frame)")
+            print("Image view frame: \(imageView.frame)")
+            print("Tap location in container: \(gesture.location(in: containerView))")
+            print("Tap location in image: \(gesture.location(in: imageView))")
+            print("==================")
             
             if parent.presenter.interactionMode == .add && parent.presenter.newBoxRect == nil {
-                let location = gesture.location(in: imageView)
+                let containerLocation = gesture.location(in: containerView)
+                let imageLocation = gesture.location(in: imageView)
+                
+                // Use the location relative to the image view for accurate positioning
+                print("Creating new box at container location: \(containerLocation), image location: \(imageLocation)")
                 let initialSize = CGSize(width: 100, height: 100)
                 parent.presenter.newBoxRect = CGRect(
                     origin: CGPoint(
-                        x: location.x - initialSize.width / 2,
-                        y: location.y - initialSize.height / 2
+                        x: imageLocation.x - initialSize.width / 2,
+                        y: imageLocation.y - initialSize.height / 2
                     ),
                     size: initialSize
                 )
+                print("New box rect set: \(String(describing:(parent.presenter.newBoxRect)) ?? "nil")")
+            } else {
+                print("Not in add mode or box already exists. Mode: \(parent.presenter.interactionMode), newBoxRect: \(String(describing:(parent.presenter.newBoxRect)) ?? "nil")")
             }
         }
     }

@@ -11,6 +11,8 @@ struct BoxComponentView: View {
     var box: BoxModel
     var selectedBox: BoxModel?
     var zoomScale: CGFloat
+    var transformedWidth: Double
+    var transformedHeight: Double
 
     private var borderColor: Color {
         let noSelection = selectedBox == nil
@@ -31,12 +33,12 @@ struct BoxComponentView: View {
     var body: some View {
         Rectangle()
             .fill(Color.clear)
-            .frame(width: box.width * zoomScale, height: box.height * zoomScale)
+            .frame(width: transformedWidth, height: transformedHeight)
             .cornerRadius(2)
             .overlay(
                 RoundedRectangle(cornerRadius: 2)
                     .inset(by: 3.13)
-                    .stroke(borderColor, lineWidth: 3 * zoomScale)
+                    .stroke(borderColor, lineWidth: 1 * zoomScale)
             )
     }
 }

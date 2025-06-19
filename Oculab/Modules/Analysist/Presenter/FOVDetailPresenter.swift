@@ -20,6 +20,11 @@ class FOVDetailPresenter: ObservableObject {
     @Published var fovDetail: FOVDetailData?
     @Published var interactionMode: InteractionMode = .panAndZoom
     @Published var newBoxRect: CGRect?
+    
+    // Frame information for coordinate transformation
+    @Published var imageFrame: CGRect = .zero
+    @Published var containerFrame: CGRect = .zero
+    @Published var originalImageSize: CGSize = .zero
 
     func resetView() {
         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
@@ -125,6 +130,7 @@ class FOVDetailPresenter: ObservableObject {
                 fovDetail = result
                 boxes = result.boxes
             }
+            print("fovDetail: \(String(describing: fovDetail))")
         } catch {
             switch error {
             case let NetworkError.apiError(apiResponse):

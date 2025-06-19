@@ -17,11 +17,13 @@ struct BoxesGroupComponentView: View {
                 BoxComponentView(
                     box: box,
                     selectedBox: presenter.selectedBox,
-                    zoomScale: zoomScale
+                    zoomScale: zoomScale,
+                    transformedWidth: getTransformedWidth(box.width),
+                    transformedHeight: getTransformedHeight(box.height)
                 )
                 .position(
-                    x: box.x * zoomScale,
-                    y: box.y * zoomScale
+                    x: getTransformedX(box.x),
+                    y: getTransformedY(box.y)
                 )
                 .onTapGesture {
                     if presenter.interactionMode == .verify {
@@ -31,7 +33,11 @@ struct BoxesGroupComponentView: View {
                 .disabled(presenter.interactionMode != .verify)
             }
         }
-        .frame(width: Double(presenter.fovDetail?.frameWidth ?? 0) * zoomScale, height: Double(presenter.fovDetail?.frameHeight ?? 0) * zoomScale)
+        .frame(
+            width: presenter.imageFrame.width * zoomScale,
+            height: presenter.imageFrame.height * zoomScale
+        )
+        .allowsHitTesting(presenter.interactionMode != .add) // Disable hit testing when in add mode
         .sheet(item: $presenter.selectedBox) { selected in
             TrayView(
                 selectedBox: $presenter.selectedBox,
@@ -53,6 +59,87 @@ struct BoxesGroupComponentView: View {
                 }
             )
         }
+    }
+    
+    // MARK: - Coordinate Transformation
+    
+    /// Transform X coordinate from original image space to display space
+    private func getTransformedX(_ originalX: Double) -> Double {
+        // Calculate the scale factor based on actual display dimensions
+        let scale = presenter.imageFrame.width / presenter.originalImageSize.width
+        
+        // Transform the coordinate
+        let transformedX = originalX * scale * zoomScale
+        
+        print("=== COORDINATE TRANSFORM DEBUG ===")
+        print("Original X: \(originalX)")
+        print("Image frame width: \(presenter.imageFrame.width)")
+        print("Original image width: \(presenter.originalImageSize.width)")
+        print("Scale: \(scale)")
+        print("Zoom scale: \(zoomScale)")
+        print("Transformed X: \(transformedX)")
+        print("================================")
+        
+        return transformedX
+    }
+    
+    /// Transform Y coordinate from original image space to display space
+    private func getTransformedY(_ originalY: Double) -> Double {
+        // Calculate the scale factor and centering offset
+        let scale = presenter.imageFrame.width / presenter.originalImageSize.width
+        let scaledHeight = presenter.originalImageSize.height * scale
+        let centeringOffset = (presenter.containerFrame.height - scaledHeight) / 2
+        
+        // Transform the coordinate
+        let transformedY = (originalY * scale + centeringOffset) * zoomScale
+        
+        print("=== COORDINATE TRANSFORM DEBUG ===")
+        print("Original Y: \(originalY)")
+        print("Container frame height: \(presenter.containerFrame.height)")
+        print("Scale: \(scale)")
+        print("Scaled height: \(scaledHeight)")
+        print("Centering offset: \(centeringOffset)")
+        print("Zoom scale: \(zoomScale)")
+        print("Transformed Y: \(transformedY)")
+        print("================================")
+        
+        return transformedY
+    }
+    
+    private func getTransformedWidth(_ originalWidth: Double) -> Double {
+        // Calculate the scale factor based on actual display dimensions
+        let scale = presenter.imageFrame.width / presenter.originalImageSize.width
+        
+        // Transform the width
+        let transformedWidth = originalWidth * scale * zoomScale
+        
+        print("=== WIDTH TRANSFORM DEBUG ===")
+        print("Original width: \(originalWidth)")
+        print("Image frame width: \(presenter.imageFrame.width)")
+        print("Scale: \(scale)")
+        print("Zoom scale: \(zoomScale)")
+        print("Transformed width: \(transformedWidth)")
+        print("=============================")
+        
+        return transformedWidth
+    }
+
+    private func getTransformedHeight(_ originalHeight: Double) -> Double {
+        // Calculate the scale factor based on actual display dimensions
+        let scale = presenter.imageFrame.width / presenter.originalImageSize.width
+        
+        // Transform the height
+        let transformedHeight = originalHeight * scale * zoomScale
+        
+        print("=== HEIGHT TRANSFORM DEBUG ===")
+        print("Original height: \(originalHeight)")
+        print("Image frame width: \(presenter.imageFrame.width)")
+        print("Scale: \(scale)")
+        print("Zoom scale: \(zoomScale)")
+        print("Transformed height: \(transformedHeight)")
+        print("==============================")
+        
+        return transformedHeight
     }
 }
 
