@@ -29,6 +29,7 @@ class AuthenticationPresenter: ObservableObject {
     @Published var descriptionPIN: String = ""
     @Published var isFaceIdAvailable: Bool = false
     @Published var isFaceIdEnabled: Bool = false
+    @Published var isFaceIdEnabledFromUserDefaults: Bool = UserDefaults.standard.bool(forKey: UserDefaultType.isFaceIdEnabled.rawValue)
     @Published var inputPin = "" {
         didSet {
             if !inputPin.isEmpty {
@@ -36,6 +37,12 @@ class AuthenticationPresenter: ObservableObject {
             }
         }
     }
+    let numbers = [
+        ["1", "2", "3"],
+        ["4", "5", "6"],
+        ["7", "8", "9"],
+        ["!", "0", "delete.left.fill"]
+    ]
 
     @Published var isLoading = false {
         didSet { buttonText = isLoading ? "Loading..." : "Login" }
