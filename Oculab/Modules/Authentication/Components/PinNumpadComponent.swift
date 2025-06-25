@@ -67,6 +67,10 @@ struct PinNumpadComponent: View {
 
         switch input {
         case "!":
+            guard authPresenter.isFaceIdEnabledFromUserDefaults && state == .authenticate else {
+                return
+            }
+            
             print("face id pressed")
             pin.removeAll()
 
