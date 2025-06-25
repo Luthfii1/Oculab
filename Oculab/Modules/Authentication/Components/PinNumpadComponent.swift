@@ -10,6 +10,7 @@ import SwiftUI
 struct PinNumpadComponent: View {
     @EnvironmentObject var authPresenter: AuthenticationPresenter
     @Binding var pin: String
+    let state: PinMode
 
     var body: some View {
         VStack(spacing: 16) {
@@ -21,7 +22,7 @@ struct PinNumpadComponent: View {
                         }) {
                             switch item {
                             case "!":
-                                if authPresenter.isFaceIdEnabledFromUserDefaults {
+                                if authPresenter.isFaceIdEnabledFromUserDefaults && state == .authenticate {
                                     Image(systemName: "faceid")
                                         .font(.title)
                                         .frame(width: 92, height: 92)
@@ -101,6 +102,6 @@ struct PinNumpadComponent: View {
 }
 
 #Preview {
-    PinNumpadComponent(pin: .constant("12"))
+    PinNumpadComponent(pin: .constant("12"), state: .authenticate)
         .environmentObject(DependencyInjection.shared.createAuthPresenter())
 }
