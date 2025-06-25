@@ -10,17 +10,10 @@ import SwiftUI
 struct PinNumpadComponent: View {
     @EnvironmentObject var authPresenter: AuthenticationPresenter
     @Binding var pin: String
-    @State var isOpeningApp: Bool? = false
-    private let numbers = [
-        ["1", "2", "3"],
-        ["4", "5", "6"],
-        ["7", "8", "9"],
-        ["!", "0", "delete.left.fill"]
-    ]
 
     var body: some View {
         VStack(spacing: 16) {
-            ForEach(numbers, id: \.self) { row in
+            ForEach(authPresenter.numbers, id: \.self) { row in
                 HStack(spacing: 16) {
                     ForEach(row, id: \.self) { item in
                         Button(action: {
@@ -28,7 +21,7 @@ struct PinNumpadComponent: View {
                         }) {
                             switch item {
                             case "!":
-                                if isOpeningApp != nil {
+                                if authPresenter.isFaceIdEnabledFromUserDefaults {
                                     Image(systemName: "faceid")
                                         .font(.title)
                                         .frame(width: 92, height: 92)

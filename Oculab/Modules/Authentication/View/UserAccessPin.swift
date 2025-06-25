@@ -58,8 +58,7 @@ struct UserAccessPin: View {
                         
                         // Numpad
                         PinNumpadComponent(
-                            pin: $securityPresenter.inputPin,
-                            isOpeningApp: state == .authenticate
+                            pin: $securityPresenter.inputPin
                         )
                         .environmentObject(securityPresenter)
                         
