@@ -87,7 +87,15 @@ struct ProfileView: View {
                             .foregroundColor(AppColors.purple500)
                         Toggle("Face ID", isOn: Binding(
                             get: { authPresenter.isFaceIdEnabled },
-                            set: { authPresenter.updateFaceIdPreference($0) }
+                            set: { newValue in
+                                Task {
+                                    if newValue {
+                                        await authPresenter.requestFaceIDActivation()
+                                    } else {
+                                        authPresenter.updateFaceIdPreference(false)
+                                    }
+                                }
+                            }
                         ))
                         .toggleStyle(SwitchToggleStyle(tint: AppColors.purple500))
                         .font(AppTypography.s5)

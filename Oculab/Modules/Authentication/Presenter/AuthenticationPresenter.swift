@@ -431,4 +431,38 @@ class AuthenticationPresenter: ObservableObject {
         isFaceIdEnabled = isEnabled
         UserDefaults.standard.set(isEnabled, forKey: "isFaceIdEnabled")
     }
+    
+    @MainActor
+    func requestFaceIDActivation() async {
+        let context = LAContext()
+        var error: NSError?
+
+        guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
+            isError = true
+            description = "Perangkat Anda tidak mendukung Face ID"
+            return
+        }
+
+        do {
+            try await withCheckedThrowingContinuation { continuation in
+                context.evaluatePolicy(
+                    .deviceOwnerAuthenticationWithBiometrics,
+                    localizedReason: "Aktifkan Face ID untuk keamanan aplikasi"
+                ) { success, authenticationError in
+                    if success {
+                        continuation.resume()
+                    } else {
+                        continuation.resume(throwing: authenticationError ?? NSError(domain: "FaceID", code: -1))
+                    }
+                }
+            }
+
+            updateFaceIdPreference(true)
+        } catch {
+            isError = true
+            description = "Gagal mengaktifkan Face ID: \(error.localizedDescription)"
+            // Reset toggle ke `false` secara manual
+            isFaceIdEnabled = false
+        }
+    }
 }
