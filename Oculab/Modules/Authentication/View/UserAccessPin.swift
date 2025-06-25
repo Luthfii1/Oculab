@@ -58,7 +58,8 @@ struct UserAccessPin: View {
                         
                         // Numpad
                         PinNumpadComponent(
-                            pin: $securityPresenter.inputPin
+                            pin: $securityPresenter.inputPin,
+                            state: state
                         )
                         .environmentObject(securityPresenter)
                         
