@@ -86,7 +86,7 @@ struct ProfileView: View {
                         Image(systemName: "faceid")
                             .foregroundColor(AppColors.purple500)
                         Toggle("Face ID", isOn: Binding(
-                            get: { authPresenter.isFaceIdEnabled },
+                            get: { authPresenter.isFaceIdEnabledFromUserDefaults },
                             set: { newValue in
                                 Task {
                                     if newValue {

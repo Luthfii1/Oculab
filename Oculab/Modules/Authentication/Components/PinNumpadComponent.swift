@@ -22,7 +22,7 @@ struct PinNumpadComponent: View {
                         }) {
                             switch item {
                             case "!":
-                                if authPresenter.isFaceIdEnabledFromUserDefaults && state == .authenticate {
+                                if authPresenter.isFaceIdEnabled(state: state) {
                                     Image(systemName: "faceid")
                                         .font(.title)
                                         .frame(width: 92, height: 92)
@@ -67,31 +67,13 @@ struct PinNumpadComponent: View {
 
         switch input {
         case "!":
-            guard authPresenter.isFaceIdEnabledFromUserDefaults && state == .authenticate else {
+            guard authPresenter.isFaceIdEnabled(state: state) else {
                 return
             }
             
-            print("face id pressed")
             pin.removeAll()
-
-            // Only attempt Face ID if it's enabled and available
-            if authPresenter.isFaceIdEnabled && authPresenter.isFaceIdAvailable {
-                print("face id is available")
-                Task {
-                    await authPresenter.authenticateWithFaceID()
-                }
-            } else {
-                print("error here")
-                // Provide specific error feedback
-                if !authPresenter.isFaceIdAvailable {
-                    print("face id is not available")
-                    authPresenter.isError = true
-                    authPresenter.descriptionPIN = "Perangkat Anda tidak mendukung Face ID"
-                } else if !authPresenter.isFaceIdEnabled {
-                    print("face id is not enabled")
-                    authPresenter.isError = true
-                    authPresenter.descriptionPIN = "Face ID belum diaktifkan. Silakan aktifkan di Pengaturan Profil"
-                }
+            Task {
+                await authPresenter.authenticateWithFaceID()
             }
         case "delete.left.fill":
             if !pin.isEmpty {
