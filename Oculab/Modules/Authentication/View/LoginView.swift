@@ -36,6 +36,7 @@ struct LoginView: View {
                             isRequired: true,
                             placeholder: "Contoh: indrikla24@gmail.com",
                             isError: presenter.isError,
+                            isDisabled: presenter.isLoading,
                             text: $presenter.email
                         )
                         AppTextField(
@@ -45,6 +46,7 @@ struct LoginView: View {
                             description: presenter.description,
                             rightIcon: "eye",
                             isError: presenter.isError,
+                            isDisabled: presenter.isLoading,
                             text: $presenter.password
                         )
                     }
