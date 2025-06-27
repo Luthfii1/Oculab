@@ -18,7 +18,7 @@ struct VideoInput: View {
     @Binding var showOnboardingGuidelines: Bool
     @Binding var didFinishOnboarding: Bool
     @Binding var selectedURL: URL?
-    
+
     @State private var showFullScreenPlayer = false
     @State private var showVideoErrorAlert = false
 
@@ -42,13 +42,17 @@ struct VideoInput: View {
                         if !UserDefaults.standard.bool(forKey: UserDefaultType.hasSeenOnboarding.rawValue) {
                             showOnboardingGuidelines = true
                             UserDefaults.standard.set(true, forKey: UserDefaultType.hasSeenOnboarding.rawValue)
-                            
                         } else {
-                            selectFile()
                             videoPresenter.previewURL = nil
+                            examPresenter.recordVideo = nil
+
+                            print("VideoInput: Initiating new video record. videoPresenter.previewURL is now \(videoPresenter.previewURL?.lastPathComponent ?? "nil")")
+                            print("VideoInput: examPresenter.recordVideo is now \(examPresenter.recordVideo?.lastPathComponent ?? "nil")")
+
                             examPresenter.newVideoRecord()
                         }
                     }
+
                 } else {
                     VideoPlayer(player: AVPlayer(url: selectedURL!))
                         .aspectRatio(contentMode: .fill)
@@ -73,7 +77,7 @@ struct VideoInput: View {
                     dismissButton: .default(Text("Kembali"))
                 )
             }
-            
+
             // Full-screen video preview overlay
             .fullScreenCover(isPresented: $showFullScreenPlayer) {
                 if let url = selectedURL {
@@ -95,6 +99,7 @@ struct VideoInput: View {
                     .foregroundColor(AppColors.slate100)
             )
         }
+        .onAppear(perform: selectFile)
         .onChange(of: didFinishOnboarding) {
             if didFinishOnboarding {
                 selectFile()
@@ -106,6 +111,12 @@ struct VideoInput: View {
 
     private func selectFile() {
         selectedURL = videoPresenter.previewURL
+
+        if let url = selectedURL {
+            print("VideoInput appeared or updated. Found URL: \(url.lastPathComponent)")
+        } else {
+            print("VideoInput appeared or updated. No URL found in presenter.")
+        }
     }
 
     private func previewVideo() {

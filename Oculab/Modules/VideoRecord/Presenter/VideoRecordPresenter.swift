@@ -11,7 +11,8 @@ import Photos
 import SwiftUI
 
 class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate,
-AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelegate {
+    AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelegate
+{
     static let shared = VideoRecordPresenter(interactor: VideoInteractor())
 
     private let interactor: VideoInteractor
@@ -70,35 +71,62 @@ AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelega
     }
 
     func setUp() {
-        session.beginConfiguration()
+        DispatchQueue.main.async {
+            self.session.beginConfiguration()
 
-        guard let cameraDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
-              let videoInput = try? AVCaptureDeviceInput(device: cameraDevice),
-              let audioDevice = AVCaptureDevice.default(for: .audio),
-              let audioInput = try? AVCaptureDeviceInput(device: audioDevice)
-        else {
-            print("Error setting up camera inputs")
-            return
+            guard let cameraDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
+                  let videoInput = try? AVCaptureDeviceInput(device: cameraDevice),
+                  let audioDevice = AVCaptureDevice.default(for: .audio),
+                  let audioInput = try? AVCaptureDeviceInput(device: audioDevice)
+            else {
+                print("Error setting up camera inputs")
+                return
+            }
+
+            for input in self.session.inputs {
+                self.session.removeInput(input)
+            }
+            for output in self.session.outputs {
+                self.session.removeOutput(output)
+            }
+
+            if self.session.canAddInput(videoInput) { self.session.addInput(videoInput) }
+            if self.session.canAddInput(audioInput) { self.session.addInput(audioInput) }
+
+            if self.session.canAddOutput(self.output) { self.session.addOutput(self.output) }
+
+            self.videoDataOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "videoFrameQueue"))
+            if self.session.canAddOutput(self.videoDataOutput) { self.session.addOutput(self.videoDataOutput) }
+
+            // Configure zoom
+            do {
+                try cameraDevice.lockForConfiguration()
+                cameraDevice.videoZoomFactor = self.zoomFactor
+                cameraDevice.unlockForConfiguration()
+            } catch {
+                print("Error setting zoom: \(error.localizedDescription)")
+            }
+
+            self.session.commitConfiguration()
+
+            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                guard let self = self else { return }
+                if !self.session.isRunning {
+                    self.session.startRunning()
+                    print("AVCaptureSession started.")
+                }
+            }
         }
+    }
 
-        if session.canAddInput(videoInput) { session.addInput(videoInput) }
-        if session.canAddInput(audioInput) { session.addInput(audioInput) }
-
-        // Set up the movie output
-        if session.canAddOutput(output) { session.addOutput(output) }
-
-        // Set up the video data output for frame extraction
-        videoDataOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "videoFrameQueue"))
-        if session.canAddOutput(videoDataOutput) { session.addOutput(videoDataOutput) }
-
-        // Configure zoom
-        try? cameraDevice.lockForConfiguration()
-        cameraDevice.videoZoomFactor = zoomFactor
-        cameraDevice.unlockForConfiguration()
-
-        session.commitConfiguration()
-
-        session.startRunning()
+    func stopCameraSession() {
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self = self else { return }
+            if self.session.isRunning {
+                self.session.stopRunning()
+                print("AVCaptureSession stopped.")
+            }
+        }
     }
 
     func startRecording() {
@@ -119,13 +147,34 @@ AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelega
         error: Error?
     ) {
         if let error = error {
-            print("Recording error: \(error.localizedDescription)")
+            print("VideoRecordPresenter: Recording error: \(error.localizedDescription)")
+            DispatchQueue.main.async {
+                self.previewURL = nil
+            }
             return
         }
 
-        previewURL = outputFileURL
+        DispatchQueue.main.async {
+            self.previewURL = outputFileURL
+            print("VideoRecordPresenter: Recording finished. previewURL set to: \(outputFileURL.lastPathComponent)")
+            self.stopCameraSession()
+        }
     }
 
+//    func fileOutput(
+//        _ output: AVCaptureFileOutput,
+//        didFinishRecordingTo outputFileURL: URL,
+//        from connections: [AVCaptureConnection],
+//        error: Error?
+//    ) {
+//        if let error = error {
+//            print("Recording error: \(error.localizedDescription)")
+//            return
+//        }
+//
+//        previewURL = outputFileURL
+//    }
+//
     func handleButtonRecording() {
         isRecording ? stopRecording() : startRecording()
     }

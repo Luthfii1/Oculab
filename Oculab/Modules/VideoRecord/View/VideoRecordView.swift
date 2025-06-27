@@ -10,6 +10,7 @@ import SwiftUI
 
 struct VideoRecordView: View {
     @StateObject private var videoRecordPresenter = VideoRecordPresenter.shared
+    @Environment(\.dismiss) var dismiss // To handle dismissing the view if needed, e.g., on permission denial.
 
     var body: some View {
         NavigationView {
@@ -80,6 +81,33 @@ struct VideoRecordView: View {
             }
         }
         .navigationBarBackButtonHidden(true)
+        .onAppear {
+            print("VideoRecordView appeared. Checking camera permission and setting up.")
+            videoRecordPresenter.checkPermission()
+        }
+        .onDisappear {
+            print("VideoRecordView disappeared. Stopping camera session.")
+            videoRecordPresenter.stopCameraSession()
+
+            videoRecordPresenter.isRecording = false
+            videoRecordPresenter.showPlayerView = false
+            videoRecordPresenter.stitchedImage = nil
+            videoRecordPresenter.progressImage = nil
+        }
+        .alert(isPresented: $videoRecordPresenter.alert) {
+            Alert(
+                title: Text("Camera Access Denied"),
+                message: Text("Please enable camera access for Oculab in Settings to record video."),
+                primaryButton: .default(Text("Go to Settings")) {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                },
+                secondaryButton: .cancel(Text("Cancel")) {
+                    dismiss()
+                }
+            )
+        }
     }
 }
 
