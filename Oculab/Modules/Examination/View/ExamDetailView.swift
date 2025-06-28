@@ -14,7 +14,6 @@ struct ExamDetailView: View {
     @StateObject private var videoRecordPresenter = VideoRecordPresenter.shared
     @StateObject var presenter = ExamDataPresenter(interactor: ExamInteractor())
     @State private var showGuidelines = false
-//    @Environment(\.presentationMode) var presentationMode
     @State private var didFinishOnboarding = false
 
     var body: some View {
@@ -97,6 +96,9 @@ struct ExamDetailView: View {
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: {
+                            presenter.recordVideo = nil
+                            presenter.videoPresenter.previewURL = nil
+
                             Router.shared.navigateBack()
                         }) {
                             HStack {

@@ -54,20 +54,40 @@ class ExamDataPresenter: ObservableObject {
         isLoading = true
         defer { isLoading = false }
 
-        if let fileURL = recordVideo {
+        guard let fileURL = recordVideo else {
+            print("Submit button was pressed but recordVideo URL is nil.")
+            return
+        }
+
+        do {
+            let videoData = try Data(contentsOf: fileURL)
+            print("Video data loaded successfully with size: \(videoData.count) bytes")
+
+            let response = try await interactor.submitExamination(
+                examVideo: videoData,
+                examinationId: examDetailData.examinationId,
+                patientId: patientDetailData.patientId
+            )
+
+            print("Examination submitted successfully with response: \(response)")
+
+            recordVideo = nil
+            videoPresenter.previewURL = nil
+            deleteTemporaryFile(at: fileURL)
+
+        } catch {
+            print("Error submitting or loading video data: \(error)")
+        }
+    }
+
+    func deleteTemporaryFile(at url: URL) {
+        let fileManager = FileManager.default
+        if fileManager.fileExists(atPath: url.path) {
             do {
-                let videoData = try Data(contentsOf: fileURL)
-                print("Video data loaded successfully with size: \(videoData.count) bytes")
-
-                let response = try await interactor.submitExamination(
-                    examVideo: videoData,
-                    examinationId: examDetailData.examinationId,
-                    patientId: patientDetailData.patientId
-                )
-
-                print("Examination submitted successfully with response: \(response)")
+                try fileManager.removeItem(at: url)
+                print("Successfully deleted temporary video file at: \(url.path)")
             } catch {
-                print("Error loading video data: \(error)")
+                print("Error deleting temporary video file: \(error.localizedDescription)")
             }
         }
     }
