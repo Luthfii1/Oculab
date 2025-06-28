@@ -28,7 +28,6 @@ class AuthenticationPresenter: ObservableObject {
     @Published var isPinAuthorized: Bool = false
     @Published var descriptionPIN: String = ""
     @Published var isFaceIdAvailable: Bool = false
-    @Published var isFaceIdEnabled: Bool = false
     @Published var isFaceIdEnabledFromUserDefaults: Bool = UserDefaults.standard.bool(forKey: UserDefaultType.isFaceIdEnabled.rawValue)
     @Published var inputPin = "" {
         didSet {
@@ -372,11 +371,15 @@ class AuthenticationPresenter: ObservableObject {
 
         if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
             isFaceIdAvailable = true
-            isFaceIdEnabled = UserDefaults.standard.bool(forKey: UserDefaultType.isFaceIdEnabled.rawValue)
+            isFaceIdEnabledFromUserDefaults = UserDefaults.standard.bool(forKey: UserDefaultType.isFaceIdEnabled.rawValue)
         } else {
             isFaceIdAvailable = false
-            isFaceIdEnabled = false
+            isFaceIdEnabledFromUserDefaults = false
         }
+    }
+    
+    func isFaceIdEnabled(state: PinMode) -> Bool {
+        return isFaceIdEnabledFromUserDefaults && state == .authenticate && isFaceIdAvailable
     }
 
     @MainActor
@@ -393,7 +396,7 @@ class AuthenticationPresenter: ObservableObject {
         }
 
         // Check if Face ID is enabled in app settings
-        guard isFaceIdEnabled else {
+        guard isFaceIdEnabledFromUserDefaults else {
             isError = true
             description = "Face ID belum diaktifkan. Silakan aktifkan di Pengaturan Profil"
             return
@@ -428,7 +431,7 @@ class AuthenticationPresenter: ObservableObject {
     }
 
     func updateFaceIdPreference(_ isEnabled: Bool) {
-        isFaceIdEnabled = isEnabled
+        isFaceIdEnabledFromUserDefaults = isEnabled
         UserDefaults.standard.set(isEnabled, forKey: "isFaceIdEnabled")
     }
     
@@ -462,7 +465,7 @@ class AuthenticationPresenter: ObservableObject {
             isError = true
             description = "Gagal mengaktifkan Face ID: \(error.localizedDescription)"
             // Reset toggle ke `false` secara manual
-            isFaceIdEnabled = false
+            isFaceIdEnabledFromUserDefaults = false
         }
     }
 }

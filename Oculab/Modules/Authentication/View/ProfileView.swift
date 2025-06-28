@@ -82,32 +82,34 @@ struct ProfileView: View {
                             .stroke(AppColors.slate100)
                     )
 
-                    HStack {
-                        Image(systemName: "faceid")
-                            .foregroundColor(AppColors.purple500)
-                        Toggle("Face ID", isOn: Binding(
-                            get: { authPresenter.isFaceIdEnabled },
-                            set: { newValue in
-                                Task {
-                                    if newValue {
-                                        await authPresenter.requestFaceIDActivation()
-                                    } else {
-                                        authPresenter.updateFaceIdPreference(false)
+                    if authPresenter.isFaceIdEnabled(state: .create) {
+                        HStack {
+                            Image(systemName: "faceid")
+                                .foregroundColor(AppColors.purple500)
+                            Toggle("Face ID", isOn: Binding(
+                                get: { authPresenter.isFaceIdEnabledFromUserDefaults },
+                                set: { newValue in
+                                    Task {
+                                        if newValue {
+                                            await authPresenter.requestFaceIDActivation()
+                                        } else {
+                                            authPresenter.updateFaceIdPreference(false)
+                                        }
                                     }
                                 }
-                            }
-                        ))
-                        .toggleStyle(SwitchToggleStyle(tint: AppColors.purple500))
-                        .font(AppTypography.s5)
+                            ))
+                            .toggleStyle(SwitchToggleStyle(tint: AppColors.purple500))
+                            .font(AppTypography.s5)
+                        }
+                        .padding(.vertical, Decimal.d16)
+                        .padding(.horizontal, 16)
+                        .background(.white)
+                        .cornerRadius(Decimal.d12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: Decimal.d12)
+                                .stroke(AppColors.slate100)
+                        )
                     }
-                    .padding(.vertical, Decimal.d16)
-                    .padding(.horizontal, 16)
-                    .background(.white)
-                    .cornerRadius(Decimal.d12)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: Decimal.d12)
-                            .stroke(AppColors.slate100)
-                    )
 
                     AppButton(
                         title: "Kebijakan Privasi",
