@@ -81,6 +81,3 @@ struct BottomSheetMenu: View {
     }
 }
 
-#Preview {
-    BottomSheetMenu(presenter: AccountPresenter())
-}

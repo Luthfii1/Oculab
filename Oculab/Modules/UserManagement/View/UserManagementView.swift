@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct UserManagementView: View {
-    @StateObject private var presenter = AccountPresenter()
+    @EnvironmentObject var presenter: AccountPresenter
     
     var body: some View {
         NavigationView {
@@ -133,4 +133,5 @@ struct UserManagementView: View {
 
 #Preview {
     UserManagementView()
+        .environmentObject(DependencyInjection.shared.createAccountPresenter())
 }

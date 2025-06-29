@@ -12,6 +12,13 @@ class AccountInteractor: ObservableObject {
     private let apiRegisterAccount = API.BE + "/user/register"
     private let apiDeleteAccount = API.BE + "/user/delete-user/"
     private let apiEditAccount = API.BE + "/user/update-user/"
+    private var authInteractor: AuthenticationInteractor
+    private var authPresenter: AuthenticationPresenter?
+    
+    init(authInteractor: AuthenticationInteractor, authPresenter: AuthenticationPresenter? = nil) {
+        self.authInteractor = authInteractor
+        self.authPresenter = authPresenter
+    }
     
     func getAllAccount() async throws -> [Account] {
         guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
@@ -98,6 +105,22 @@ class AccountInteractor: ObservableObject {
             body: requestBody,
             headers: headers
         )
+        
+        // Update SwiftData with edited user info
+        let updatedUser = User(
+            _id: response.data.id,
+            name: response.data.name,
+            role: response.data.role,
+            email: response.data.email,
+            accessPin: "" // Keep existing or use empty  
+        )
+        await authInteractor.updateUserLocalData(user: updatedUser)
+        
+        // Refresh AuthenticationPresenter if the edited user is the currently logged in user
+        if let currentUserId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue),
+           currentUserId == userId {
+            await authPresenter?.refreshUserFromSwiftData()
+        }
         
         return EditAccountResponse(
             id: response.data.id,

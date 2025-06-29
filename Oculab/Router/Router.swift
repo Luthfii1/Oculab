@@ -89,10 +89,13 @@ class Router: ObservableObject {
             AnalyzingExaminationProgressView(examinationId: examinationId)
         case .accountManagement:
             UserManagementView()
+                .environmentObject(DependencyInjection.shared.createAccountPresenter())
         case .newAccount:
             NewUserFormView()
+                .environmentObject(DependencyInjection.shared.createAccountPresenter())
         case let .editAccount(account):
             EditUserFormView(account: account)
+                .environmentObject(DependencyInjection.shared.createAccountPresenter())
         case .patientList:
             PatientListView()
         case .patientForm(let patientId):

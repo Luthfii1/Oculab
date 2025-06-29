@@ -37,4 +37,11 @@ class DependencyInjection: ObservableObject {
     func createProfilePresenter() -> ProfilePresenter {
         return ProfilePresenter(interactor: profileInteractor, authInteractor: authenticationInteractor)
     }
+    
+    // MARK: Create Account Presenter
+    
+    lazy var accountInteractor: AccountInteractor = .init(authInteractor: authenticationInteractor, authPresenter: createAuthPresenter())
+    func createAccountPresenter() -> AccountPresenter {
+        return AccountPresenter(interactor: accountInteractor)
+    }
 }
