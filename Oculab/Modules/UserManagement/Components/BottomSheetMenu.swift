@@ -45,25 +45,29 @@ struct BottomSheetMenu: View {
             .padding(.vertical, 4)
             .opacity(isLoaded ? 1 : 0)
 
-            Button {
-                presenter.showDeleteConfirmation()
-                dismiss()
-            } label: {
-                HStack {
-                    if presenter.isDeleting {
-                        ProgressView()
-                            .foregroundColor(AppColors.red500)
-                    } else {
-                        Image(systemName: "trash")
-                        Text("Hapus Akun")
-                            .font(AppTypography.p3)
+            // Only show delete button if user is not trying to delete themselves
+            if let selectedUserId = presenter.selectedUser?.id,
+               !presenter.isCurrentUser(selectedUserId) {
+                Button {
+                    presenter.showDeleteConfirmation()
+                    dismiss()
+                } label: {
+                    HStack {
+                        if presenter.isDeleting {
+                            ProgressView()
+                                .foregroundColor(AppColors.red500)
+                        } else {
+                            Image(systemName: "trash")
+                            Text("Hapus Akun")
+                                .font(AppTypography.p3)
+                        }
                     }
+                    .foregroundColor(AppColors.red500)
                 }
-                .foregroundColor(AppColors.red500)
+                .padding(.vertical, 4)
+                .opacity(isLoaded ? 1 : 0)
+                .disabled(presenter.isDeleting)
             }
-            .padding(.vertical, 4)
-            .opacity(isLoaded ? 1 : 0)
-            .disabled(presenter.isDeleting)
 
             Spacer()
         }

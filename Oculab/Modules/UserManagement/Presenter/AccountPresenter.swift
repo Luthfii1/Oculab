@@ -372,7 +372,22 @@ class AccountPresenter: ObservableObject {
         deletionSuccess = nil
     }
     
+    func isCurrentUser(_ userId: String) -> Bool {
+        guard let currentUserId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
+            return false
+        }
+        return currentUserId == userId
+    }
+    
     func showDeleteConfirmation() {
+        guard let selectedUser = selectedUser else { return }
+        
+        // Check if user is trying to delete themselves
+        if let currentUserId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue),
+           currentUserId == selectedUser.id {
+            return
+        }
+        
         userToDelete = selectedUser
         showDeleteConfirmationPopup = true
     }
