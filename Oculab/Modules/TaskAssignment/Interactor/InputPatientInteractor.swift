@@ -8,21 +8,44 @@
 import Foundation
 
 class InputPatientInteractor {
-    private let apiGetAllUser = API.BE + "/user/get-all-pics"
-    private let apiGetAllPatient = API.BE + "/patient/get-all-patients"
+    private let apiGetAllUser = API.BE + "/user/get-all-pics/"
+    private let apiGetAllPatient = API.BE + "/patient/get-all-patients/"
     let urlGetDataPatient = API.BE + "/patient/get-patient-by-id/"
     let urlGetDataUser = API.BE + "/user/get-user-data-by-id/"
     let urlCreatePatient = API.BE + "/patient/create-new-patient/"
     let urlCreateExam = API.BE + "/examination/create-examination/"
 
     func getAllUser() async throws -> [User] {
-        let response: APIResponse<[User]> = try await NetworkHelper.shared.get(urlString: apiGetAllUser)
+        guard let adminUserId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
+            throw NSError(
+                domain: "UserIdNotFound",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "User ID not found"]
+            )
+        }
+        
+        guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
+            throw URLError(.userAuthenticationRequired)
+        }
+
+        let headers = [
+            "Authorization": "Bearer \(token)"
+        ]
+        
+        let response: APIResponse<[User]> = try await NetworkHelper.shared
+            .get(urlString: apiGetAllUser + adminUserId.lowercased(),
+                 headers: headers)
 
         return response.data
     }
 
     func getAllPatient() async throws -> [Patient] {
-        let response: APIResponse<[Patient]> = try await NetworkHelper.shared.get(urlString: apiGetAllPatient)
+        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
+            throw NSError(domain: "UserIdNotFound", code: -1, userInfo: [:])
+        }
+        
+        let response: APIResponse<[Patient]> = try await NetworkHelper.shared
+            .get(urlString: apiGetAllPatient + userId.lowercased())
 
         return response.data
     }
@@ -48,28 +71,64 @@ class InputPatientInteractor {
     func addNewPatient(
         patient: Patient
     ) async throws -> Patient {
+        guard let adminUserId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
+            throw NSError(domain: "UserIdNotFound", code: -1, userInfo: [:])
+        }
+        
         let response: APIResponse<Patient> = try await NetworkHelper.shared.post(
-            urlString: urlCreatePatient,
+            urlString: urlCreatePatient + adminUserId.lowercased(),
             body: patient
         )
 
         return response.data
     }
 
+//    func addNewExamination(
+//        patientId: String,
+//        examinations: [ExaminationRequest]
+//    ) async throws -> AddExaminationResponseWrapper {
+//        let response: APIResponse<AddExaminationResponseWrapper> = try await NetworkHelper.shared.post(
+//            urlString: urlCreateExam + patientId,
+//            body: examinations
+//        )
+//        print("response: \(response.code)")
+//        print("response: \(response.status)")
+//        print("response: \(response.message)")
+//
+//        return response.data
+//    }
     func addNewExamination(
         patientId: String,
-        examination: ExaminationRequest
-    ) async throws -> AddExaminationResponse {
-        let response: APIResponse<AddExaminationResponse> = try await NetworkHelper.shared.post(
+        examinations: [ExaminationRequest]
+    ) async throws -> ExaminationDataResponse {
+        let response: APIResponse<ExaminationDataResponse> = try await NetworkHelper.shared.post(
             urlString: urlCreateExam + patientId,
-            body: examination
+            body: examinations
         )
-        print("response: \(response.code)")
-        print("response: \(response.status)")
-        print("response: \(response.message)")
-
+        
+        let createdExams = response.data.examinations
+        print("✅ Successfully created \(createdExams.count) examination(s)")
+        for exam in createdExams {
+            print("- ID: \(exam._id), Slide: \(exam.slideId), Type: \(exam.preparationType)")
+        }
+        
         return response.data
     }
+//    func addNewExamination(
+//        patientId: String,
+//        examinations: [ExaminationRequest]
+//    ) async throws -> [AddExaminationResponse] {
+//        let response: APIResponse<[AddExaminationResponse]> = try await NetworkHelper.shared.post(
+//            urlString: urlCreateExam + patientId,
+//            body: examinations
+//        )
+//        print("response: \(response.code)")
+//        print("response: \(response.status)")
+//        print("response: \(response.message)")
+//
+//        return response.data
+//    }
+
 }
 
 struct ErrorMessage: Decodable {
@@ -87,4 +146,32 @@ struct AddExaminationResponse: Decodable {
     var PIC: String
     var examinationPlanDate: String
     var DPJP: String
+}
+
+enum ExaminationDataResponse: Decodable {
+    case single(AddExaminationResponse)
+    case multiple([AddExaminationResponse])
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        
+        if let multipleExams = try? container.decode([AddExaminationResponse].self) {
+            self = .multiple(multipleExams)
+        } else if let singleExam = try? container.decode(AddExaminationResponse.self) {
+            self = .single(singleExam)
+        } else {
+            throw DecodingError.typeMismatch(ExaminationDataResponse.self,
+                DecodingError.Context(codingPath: decoder.codingPath,
+                debugDescription: "Expected single examination or array of examinations"))
+        }
+    }
+    
+    var examinations: [AddExaminationResponse] {
+        switch self {
+        case .single(let exam):
+            return [exam]
+        case .multiple(let exams):
+            return exams
+        }
+    }
 }

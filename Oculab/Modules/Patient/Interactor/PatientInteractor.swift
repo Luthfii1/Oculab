@@ -8,14 +8,19 @@
 import Foundation
 
 class PatientInteractor: ObservableObject {
-    private let apiGetAllPatient = API.BE + "/patient/get-all-patients"
+    private let apiGetAllPatient = API.BE + "/patient/get-all-patients/"
     let urlGetDataPatient = API.BE + "/patient/get-patient-by-id/"
     let urlGetAllExamByPatientId = API.BE + "/examination/get-examination-card-by-patient/"
     let urlCreatePatient = API.BE + "/patient/create-new-patient/"
     let urlUpdatePatient = API.BE + "/patient/update-data/"
     
     func getAllPatient() async throws -> [Patient] {
-        let response: APIResponse<[Patient]> = try await NetworkHelper.shared.get(urlString: apiGetAllPatient)
+        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
+            throw NSError(domain: "UserIdNotFound", code: -1, userInfo: [:])
+        }
+        
+        let response: APIResponse<[Patient]> = try await NetworkHelper.shared
+            .get(urlString: apiGetAllPatient + userId.lowercased())
 
         return response.data
     }
@@ -36,8 +41,12 @@ class PatientInteractor: ObservableObject {
     }
     
     func addNewPatient(patient: Patient) async throws -> Patient {
+        guard let adminUserId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
+            throw NSError(domain: "UserIdNotFound", code: -1, userInfo: [:])
+        }
+        
         let response: APIResponse<Patient> = try await NetworkHelper.shared.post(
-            urlString: urlCreatePatient,
+            urlString: urlCreatePatient + adminUserId.lowercased(),
             body: patient
         )
 

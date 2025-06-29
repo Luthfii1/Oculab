@@ -276,37 +276,102 @@ class InputPatientPresenter: ObservableObject {
     @MainActor
     func submitExamination() async {
         let DPJPId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue)
-
-        let examReq = ExaminationRequest(
-            _id: examination._id,
-            goal: examination.goal,
-            preparationType: examination.preparationType,
-            slideId: examination.slideId,
-            examinationDate: examination.examinationDate,
-            PIC: pic._id,
-            DPJP: DPJPId,
-            examinationPlanDate: examination.examinationPlanDate
-        )
-
-        let examReq2 = ExaminationRequest(
-            _id: examination2._id,
-            goal: examination2.goal,
-            preparationType: examination2.preparationType,
-            slideId: examination2.slideId,
-            examinationDate: examination2.examinationDate,
-            PIC: pic._id,
-            DPJP: DPJPId,
-            examinationPlanDate: examination2.examinationPlanDate
-        )
+        
+        var examinationsToSend: [ExaminationRequest] = []
+        
+        let exam2HasData = examination2.preparationType != nil || !examination2.slideId.isEmpty
+        if exam2HasData {
+            guard let prepType1 = examination.preparationType,
+                  !examination.slideId.isEmpty else {
+                isError = true
+                errorMessage = "If creating 2 examinations, the first examination must be completely filled out."
+                return
+            }
+            
+            guard let prepType2 = examination2.preparationType,
+                  !examination2.slideId.isEmpty else {
+                isError = true
+                errorMessage = "If creating 2 examinations, the second examination must be completely filled out."
+                return
+            }
+            
+            guard examination.slideId != examination2.slideId else {
+                isError = true
+                errorMessage = "Slide IDs must be different for the two examinations."
+                return
+            }
+            
+            let examReq1 = ExaminationRequest(
+                _id: examination._id,
+                goal: examination.goal,
+                preparationType: prepType1,
+                slideId: examination.slideId,
+                examinationDate: examination.examinationDate,
+                PIC: pic._id,
+                DPJP: DPJPId,
+                examinationPlanDate: examination.examinationPlanDate
+            )
+            
+            let examReq2 = ExaminationRequest(
+                _id: examination2._id,
+                goal: examination.goal,  // Same goal
+                preparationType: prepType2,
+                slideId: examination2.slideId,
+                examinationDate: examination2.examinationDate,
+                PIC: pic._id,
+                DPJP: DPJPId,
+                examinationPlanDate: examination2.examinationPlanDate
+            )
+            examinationsToSend.append(examReq1)
+            examinationsToSend.append(examReq2)
+        } else {
+            guard let goal1 = examination.goal,
+                  let prepType1 = examination.preparationType,
+                  !examination.slideId.isEmpty else {
+                isError = true
+                errorMessage = "Examination must be completely filled out."
+                return
+            }
+            
+            let examReq1 = ExaminationRequest(
+                _id: examination._id,
+                goal: goal1,
+                preparationType: prepType1,
+                slideId: examination.slideId,
+                examinationDate: examination.examinationDate,
+                PIC: pic._id,
+                DPJP: DPJPId,
+                examinationPlanDate: examination.examinationPlanDate
+            )
+            examinationsToSend.append(examReq1)
+        }
 
         do {
-            let response1 = try await interactor?.addNewExamination(patientId: patient._id, examination: examReq)
-            let response2 = try await interactor?.addNewExamination(patientId: patient._id, examination: examReq2)
-
-            if (response1 != nil) && (response2 != nil) {
-                print("Examination added successfully")
-                Router.shared.popToRoot()
+            guard let response = try await interactor?.addNewExamination(
+                patientId: patient._id,
+                examinations: examinationsToSend
+            ) else {
+                isError = true
+                errorMessage = "Failed to get response from server."
+                return
             }
+
+            let createdExaminations = response.examinations
+            let expectedCount = examinationsToSend.count
+
+            guard createdExaminations.count == expectedCount else {
+                isError = true
+                errorMessage = "Not all examinations were created successfully."
+                return
+            }
+
+            guard createdExaminations.allSatisfy({ !$0._id.isEmpty && !$0.slideId.isEmpty }) else {
+                isError = true
+                errorMessage = "Examinations were created but contain invalid data."
+                return
+            }
+
+            Router.shared.popToRoot()
         } catch {
             isError = true
             // Handle error
