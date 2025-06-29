@@ -37,6 +37,7 @@ class AccountPresenter: ObservableObject {
     @Published var isDeleting = false
     @Published var deletionError: String? = nil
     @Published var deletionSuccess: (userName: String, message: String)? = nil
+    @Published var showDeleteSuccessAlert = false
     
     @Published var isEditing = false
     @Published var editError: String? = nil
@@ -326,17 +327,25 @@ class AccountPresenter: ObservableObject {
             let result = try await interactor?.deleteAccount(userId: userId)
             
             if let result = result {
-                deletionSuccess = (userName: result.name, message: "\(result.name) has been successfully deleted.")
+                deletionSuccess = (userName: result.name, message: "\(result.name) telah berhasil dihapus.")
                 clearSelection()
                 
-                Task {
-                    await fetchAllAccount()
-                }
+                await fetchAllAccount()
+                
+                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                impactFeedback.impactOccurred()
+                
+                showDeleteSuccessAlert = true
             } else {
+                let errorFeedback = UINotificationFeedbackGenerator()
+                errorFeedback.notificationOccurred(.error)
                 deletionError = "Failed to delete account: No response from server"
             }
             
         } catch {
+            let errorFeedback = UINotificationFeedbackGenerator()
+            errorFeedback.notificationOccurred(.error)
+            
             switch error {
             case let NetworkError.apiError(apiResponse):
                 deletionError = apiResponse.data.description
@@ -362,6 +371,11 @@ class AccountPresenter: ObservableObject {
         self.name = account.name
         self.role = account.role.rawValue
         self.userId = account.id
+    }
+    
+    func dismissDeleteAlert() {
+        showDeleteSuccessAlert = false
+        deletionSuccess = nil
     }
 }
 

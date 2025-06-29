@@ -74,35 +74,10 @@ struct BottomSheetMenu: View {
         .presentationDetents([.fraction(0.2)])
         .presentationDragIndicator(.visible)
         .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            withAnimation(.easeInOut(duration: 0.3)) {
                 isLoaded = true
             }
         }
-        .alert(
-            presenter.deletionSuccess != nil ? "Deletion Successful" : "Deletion Failed",
-            isPresented: Binding(
-                get: { presenter.deletionSuccess != nil || presenter.deletionError != nil },
-                set: {
-                    if !$0 {
-                        presenter.deletionSuccess = nil
-                        presenter.deletionError = nil
-                    }
-                }
-            ),
-            actions: {
-                Button("OK") {
-                    presenter.deletionSuccess = nil
-                    presenter.deletionError = nil
-                }
-            },
-            message: {
-                if let successInfo = presenter.deletionSuccess {
-                    Text(successInfo.message)
-                } else {
-                    Text(presenter.deletionError ?? "Unknown error")
-                }
-            }
-        )
     }
 }
 
