@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct NewUserFormView: View {
-    @StateObject private var presenter = AccountPresenter()
-    
+    @EnvironmentObject var presenter: AccountPresenter
+
     var body: some View {
         NavigationView {
             ZStack {
@@ -152,4 +152,5 @@ struct NewUserFormView: View {
 
 #Preview {
     NewUserFormView()
+        .environmentObject(DependencyInjection.shared.createAccountPresenter())
 }

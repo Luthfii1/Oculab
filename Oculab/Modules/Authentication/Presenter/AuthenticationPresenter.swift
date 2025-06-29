@@ -468,4 +468,16 @@ class AuthenticationPresenter: ObservableObject {
             isFaceIdEnabledFromUserDefaults = false
         }
     }
+    
+    // MARK: - SwiftData Refresh
+    @MainActor
+    func refreshUserFromSwiftData() async {
+        do {
+            if let userData = await interactor.getUserLocalData() {
+                user = userData
+            }
+        } catch {
+            print("Error refreshing user from SwiftData: \(error.localizedDescription)")
+        }
+    }
 }

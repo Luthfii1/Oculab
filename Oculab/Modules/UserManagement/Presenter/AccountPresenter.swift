@@ -9,8 +9,12 @@ import Foundation
 import SwiftUI
 
 class AccountPresenter: ObservableObject {
-    var interactor: AccountInteractor? = AccountInteractor()
+    private var interactor: AccountInteractor
     private var searchTimer: Timer?
+    
+    init(interactor: AccountInteractor) {
+        self.interactor = interactor
+    }
 
     @Published var isUserLoading = false
     
@@ -37,6 +41,9 @@ class AccountPresenter: ObservableObject {
     @Published var isDeleting = false
     @Published var deletionError: String? = nil
     @Published var deletionSuccess: (userName: String, message: String)? = nil
+    @Published var showDeleteSuccessAlert = false
+    @Published var showDeleteConfirmationPopup = false
+    @Published var userToDelete: SelectedUser? = nil
     
     @Published var isEditing = false
     @Published var editError: String? = nil
@@ -113,16 +120,14 @@ class AccountPresenter: ObservableObject {
         defer { isUserLoading = false }
 
         do {
-            let response = try await interactor?.getAllAccount()
+            let response = try await interactor.getAllAccount()
 
-            if let response {
-                groupedAccounts = groupAccountsByName(accounts: response)
-                sortedGroupedAccounts = groupedAccounts.keys.sorted()
-                
-                // If there was an active search, apply it to the new data
-                if !searchText.isEmpty {
-                    searchAccounts(query: searchText)
-                }
+            groupedAccounts = groupAccountsByName(accounts: response)
+            sortedGroupedAccounts = groupedAccounts.keys.sorted()
+            
+            // If there was an active search, apply it to the new data
+            if !searchText.isEmpty {
+                searchAccounts(query: searchText)
             }
 
         } catch {
@@ -205,7 +210,7 @@ class AccountPresenter: ObservableObject {
         do {
             let roleType = getRoleType(from: role)
             
-            let result = try await interactor?.registerAccount(
+            let result = try await interactor.registerAccount(
                 roleType: roleType,
                 name: name,
                 email: email
@@ -283,22 +288,18 @@ class AccountPresenter: ObservableObject {
         defer { isEditing = false }
         
         do {
-            let result = try await interactor?.editAccount(
+            let result = try await interactor.editAccount(
                 userId: userId,
                 name: name,
                 role: getRoleType(from: role)
             )
             
-            if let result = result {
-                selectedUser = SelectedUser(id: result.id, name: result.name)
-                editSuccess = (name: name, role: role)
-                showSuccessPopup = true
-                
-                Task {
-                    await fetchAllAccount()
-                }
-            } else {
-                editError = "Failed to edit account: No response from server"
+            selectedUser = SelectedUser(id: result.id, name: result.name)
+            editSuccess = (name: name, role: role)
+            showSuccessPopup = true
+            
+            Task {
+                await fetchAllAccount()
             }
             
         } catch {
@@ -323,20 +324,22 @@ class AccountPresenter: ObservableObject {
         defer { isDeleting = false }
         
         do {
-            let result = try await interactor?.deleteAccount(userId: userId)
+            let result = try await interactor.deleteAccount(userId: userId)
             
-            if let result = result {
-                deletionSuccess = (userName: result.name, message: "\(result.name) has been successfully deleted.")
-                clearSelection()
-                
-                Task {
-                    await fetchAllAccount()
-                }
-            } else {
-                deletionError = "Failed to delete account: No response from server"
-            }
+            deletionSuccess = (userName: result.name, message: "\(result.name) telah berhasil dihapus.")
+            clearSelection()
+            
+            await fetchAllAccount()
+            
+            let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+            impactFeedback.impactOccurred()
+            
+            showDeleteSuccessAlert = true
             
         } catch {
+            let errorFeedback = UINotificationFeedbackGenerator()
+            errorFeedback.notificationOccurred(.error)
+            
             switch error {
             case let NetworkError.apiError(apiResponse):
                 deletionError = apiResponse.data.description
@@ -362,6 +365,77 @@ class AccountPresenter: ObservableObject {
         self.name = account.name
         self.role = account.role.rawValue
         self.userId = account.id
+    }
+    
+    func dismissDeleteAlert() {
+        showDeleteSuccessAlert = false
+        deletionSuccess = nil
+    }
+    
+    func isCurrentUser(_ userId: String) -> Bool {
+        guard let currentUserId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
+            return false
+        }
+        return currentUserId == userId
+    }
+    
+    func showDeleteConfirmation() {
+        guard let selectedUser = selectedUser else { return }
+        
+        // Check if user is trying to delete themselves
+        if let currentUserId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue),
+           currentUserId == selectedUser.id {
+            return
+        }
+        
+        userToDelete = selectedUser
+        showDeleteConfirmationPopup = true
+    }
+    
+    func dismissDeleteConfirmation() {
+        showDeleteConfirmationPopup = false
+        userToDelete = nil
+    }
+    
+    @MainActor
+    func confirmDeleteSelectedUser() async {
+        showDeleteConfirmationPopup = false
+        
+        guard let userToDelete = userToDelete else { return }
+        
+        isDeleting = true
+        defer { isDeleting = false }
+        
+        do {
+            let result = try await interactor.deleteAccount(userId: userToDelete.id)
+            
+            deletionSuccess = (userName: result.name, message: "\(result.name) telah berhasil dihapus.")
+            clearSelection()
+            
+            await fetchAllAccount()
+            
+            let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+            impactFeedback.impactOccurred()
+            
+            showDeleteSuccessAlert = true
+            
+        } catch {
+            let errorFeedback = UINotificationFeedbackGenerator()
+            errorFeedback.notificationOccurred(.error)
+            
+            switch error {
+            case let NetworkError.apiError(apiResponse):
+                deletionError = apiResponse.data.description
+                
+            case let NetworkError.networkError(message):
+                deletionError = message
+                
+            default:
+                deletionError = error.localizedDescription
+            }
+        }
+        
+        self.userToDelete = nil
     }
 }
 

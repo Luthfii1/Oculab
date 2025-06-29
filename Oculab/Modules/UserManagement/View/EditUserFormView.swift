@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct EditUserFormView: View {
-    @StateObject private var presenter = AccountPresenter()
+    @EnvironmentObject var presenter: AccountPresenter
     let account: Account
     
     var body: some View {
@@ -151,4 +151,5 @@ struct EditUserFormView: View {
 #Preview {
     EditUserFormView(account:
                         Account(id: "xxxx", name: "ddd", role: RolesType.LAB, email: RolesType.LAB.rawValue, username: "ssSss.com", accessPin: "1111"))
+        .environmentObject(DependencyInjection.shared.createAccountPresenter())
 }

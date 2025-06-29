@@ -45,27 +45,29 @@ struct BottomSheetMenu: View {
             .padding(.vertical, 4)
             .opacity(isLoaded ? 1 : 0)
 
-            Button {
-                Task {
-                    await presenter.deleteSelectedUser()
+            // Only show delete button if user is not trying to delete themselves
+            if let selectedUserId = presenter.selectedUser?.id,
+               !presenter.isCurrentUser(selectedUserId) {
+                Button {
+                    presenter.showDeleteConfirmation()
                     dismiss()
-                }
-            } label: {
-                HStack {
-                    if presenter.isDeleting {
-                        ProgressView()
-                            .foregroundColor(AppColors.red500)
-                    } else {
-                        Image(systemName: "trash")
-                        Text("Hapus Akun")
-                            .font(AppTypography.p3)
+                } label: {
+                    HStack {
+                        if presenter.isDeleting {
+                            ProgressView()
+                                .foregroundColor(AppColors.red500)
+                        } else {
+                            Image(systemName: "trash")
+                            Text("Hapus Akun")
+                                .font(AppTypography.p3)
+                        }
                     }
+                    .foregroundColor(AppColors.red500)
                 }
-                .foregroundColor(AppColors.red500)
+                .padding(.vertical, 4)
+                .opacity(isLoaded ? 1 : 0)
+                .disabled(presenter.isDeleting)
             }
-            .padding(.vertical, 4)
-            .opacity(isLoaded ? 1 : 0)
-            .disabled(presenter.isDeleting)
 
             Spacer()
         }
@@ -74,38 +76,10 @@ struct BottomSheetMenu: View {
         .presentationDetents([.fraction(0.2)])
         .presentationDragIndicator(.visible)
         .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            withAnimation(.easeInOut(duration: 0.3)) {
                 isLoaded = true
             }
         }
-        .alert(
-            presenter.deletionSuccess != nil ? "Deletion Successful" : "Deletion Failed",
-            isPresented: Binding(
-                get: { presenter.deletionSuccess != nil || presenter.deletionError != nil },
-                set: {
-                    if !$0 {
-                        presenter.deletionSuccess = nil
-                        presenter.deletionError = nil
-                    }
-                }
-            ),
-            actions: {
-                Button("OK") {
-                    presenter.deletionSuccess = nil
-                    presenter.deletionError = nil
-                }
-            },
-            message: {
-                if let successInfo = presenter.deletionSuccess {
-                    Text(successInfo.message)
-                } else {
-                    Text(presenter.deletionError ?? "Unknown error")
-                }
-            }
-        )
     }
 }
 
-#Preview {
-    BottomSheetMenu(presenter: AccountPresenter())
-}
