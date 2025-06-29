@@ -14,6 +14,7 @@ class User: Codable, Identifiable {
     var name: String
     var role: RolesType
     var token: String?
+    var healthFacilityName: String?
     var email: String?
     var password: String?
     var accessPin: String?
@@ -25,6 +26,7 @@ class User: Codable, Identifiable {
         name: String = "No name",
         role: RolesType = .ADMIN,
         token: String? = nil,
+        healthFacilityName: String? = nil,
         email: String? = "noName@example.com",
         password: String? = nil,
         previousPassword: String? = nil,
@@ -35,6 +37,7 @@ class User: Codable, Identifiable {
         self.name = name
         self.role = role
         self.token = token
+        self.healthFacilityName = healthFacilityName
         self.email = email
         self.password = password
         self.previousPassword = previousPassword
@@ -47,6 +50,7 @@ class User: Codable, Identifiable {
         case name
         case role
         case token
+        case healthFacilityName
         case email
         case password
         case accessPin
@@ -59,6 +63,7 @@ class User: Codable, Identifiable {
         self.name = try container.decode(String.self, forKey: .name)
         self.role = try container.decode(RolesType.self, forKey: .role)
         self.token = try container.decodeIfPresent(String.self, forKey: .token)
+        self.healthFacilityName = try container.decodeIfPresent(String.self, forKey: .healthFacilityName)
         self.email = try container.decodeIfPresent(String.self, forKey: .email)
         self.password = try container.decodeIfPresent(String.self, forKey: .password)
         self.accessPin = try container.decodeIfPresent(String.self, forKey: .accessPin)
@@ -71,6 +76,7 @@ class User: Codable, Identifiable {
         try container.encode(name, forKey: .name)
         try container.encode(role, forKey: .role)
         try container.encodeIfPresent(token, forKey: .token)
+        try container.encodeIfPresent(healthFacilityName, forKey: .healthFacilityName)
         try container.encodeIfPresent(email, forKey: .email)
         try container.encodeIfPresent(password, forKey: .password)
         try container.encodeIfPresent(accessPin, forKey: .accessPin)

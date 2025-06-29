@@ -24,6 +24,7 @@ struct ProfileView: View {
                             (key: "Email", value: authPresenter.user.email ?? authPresenter.user.name),
                             (key: "Role", value: authPresenter.user.role.rawValue.capitalized),
                             (key: "Jabatan Pekerjaan", value: "Ahli Teknologi Laboratorium Medik"),
+                            (key: "Fasyankes", value: authPresenter.user.healthFacilityName ?? "-"),
                         ],
                         titleSize: AppTypography.s4_1,
                         titleCard: authPresenter.user.name
