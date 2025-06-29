@@ -50,8 +50,25 @@ class AccountInteractor: ObservableObject {
     }
     
     func registerAccount(roleType: RolesType, name: String, email: String) async throws -> RegisterAccountResponse {
+        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
+            throw NSError(
+                domain: "UserIdNotFound",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "User ID not found"]
+            )
+        }
+        
+        guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
+            throw URLError(.userAuthenticationRequired)
+        }
+
+        let headers = [
+            "Authorization": "Bearer \(token)"
+        ]
+        
         let response: APIResponse<RegisterAccountResponse> = try await NetworkHelper.shared.post(
-            urlString: apiRegisterAccount,
+            urlString: apiRegisterAccount + "/\(userId)",
+            headers: headers,
             body: RegisterAccountBody(role: roleType, name: name, email: email)
         )
         
