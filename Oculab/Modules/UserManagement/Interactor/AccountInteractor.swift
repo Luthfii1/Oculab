@@ -14,6 +14,14 @@ class AccountInteractor: ObservableObject {
     private let apiEditAccount = API.BE + "/user/update-user/"
     
     func getAllAccount() async throws -> [Account] {
+        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
+            throw NSError(
+                domain: "UserIdNotFound",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "User ID not found"]
+            )
+        }
+
         guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
             throw URLError(.userAuthenticationRequired)
         }
@@ -23,7 +31,7 @@ class AccountInteractor: ObservableObject {
         ]
 
         let response: APIResponse<[Account]> = try await NetworkHelper.shared.get(
-            urlString: apiGetAllAccount,
+            urlString: apiGetAllAccount + "/\(userId)",
             headers: headers
         )
 
