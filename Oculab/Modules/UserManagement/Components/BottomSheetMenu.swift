@@ -46,10 +46,8 @@ struct BottomSheetMenu: View {
             .opacity(isLoaded ? 1 : 0)
 
             Button {
-                Task {
-                    await presenter.deleteSelectedUser()
-                    dismiss()
-                }
+                presenter.showDeleteConfirmation()
+                dismiss()
             } label: {
                 HStack {
                     if presenter.isDeleting {

@@ -13,6 +13,33 @@ struct UserManagementView: View {
     var body: some View {
         NavigationView {
             ZStack {
+                // Delete confirmation popup
+                if presenter.showDeleteConfirmationPopup {
+                    AppPopup(
+                        image: "Confirm",
+                        title: "Hapus akun \(presenter.userToDelete?.name ?? "")?",
+                        description: "Akun yang sudah dihapus tidak dapat dikembalikan lagi.",
+                        buttons: [
+                            AppButton(
+                                title: "Hapus Akun",
+                                colorType: .destructive(.primary),
+                                isEnabled: !presenter.isDeleting
+                            ) {
+                                Task {
+                                    await presenter.confirmDeleteSelectedUser()
+                                }
+                            },
+                            AppButton(
+                                title: "Kembali",
+                                colorType: .destructive(.secondary)
+                            ) {
+                                presenter.dismissDeleteConfirmation()
+                            }
+                        ],
+                        isVisible: $presenter.showDeleteConfirmationPopup
+                    )
+                }
+                
                 // Delete success popup
                 if presenter.showDeleteSuccessAlert {
                     AppPopup(

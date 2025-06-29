@@ -42,6 +42,8 @@ class AccountPresenter: ObservableObject {
     @Published var deletionError: String? = nil
     @Published var deletionSuccess: (userName: String, message: String)? = nil
     @Published var showDeleteSuccessAlert = false
+    @Published var showDeleteConfirmationPopup = false
+    @Published var userToDelete: SelectedUser? = nil
     
     @Published var isEditing = false
     @Published var editError: String? = nil
@@ -368,6 +370,57 @@ class AccountPresenter: ObservableObject {
     func dismissDeleteAlert() {
         showDeleteSuccessAlert = false
         deletionSuccess = nil
+    }
+    
+    func showDeleteConfirmation() {
+        userToDelete = selectedUser
+        showDeleteConfirmationPopup = true
+    }
+    
+    func dismissDeleteConfirmation() {
+        showDeleteConfirmationPopup = false
+        userToDelete = nil
+    }
+    
+    @MainActor
+    func confirmDeleteSelectedUser() async {
+        showDeleteConfirmationPopup = false
+        
+        guard let userToDelete = userToDelete else { return }
+        
+        isDeleting = true
+        defer { isDeleting = false }
+        
+        do {
+            let result = try await interactor.deleteAccount(userId: userToDelete.id)
+            
+            deletionSuccess = (userName: result.name, message: "\(result.name) telah berhasil dihapus.")
+            clearSelection()
+            
+            await fetchAllAccount()
+            
+            let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+            impactFeedback.impactOccurred()
+            
+            showDeleteSuccessAlert = true
+            
+        } catch {
+            let errorFeedback = UINotificationFeedbackGenerator()
+            errorFeedback.notificationOccurred(.error)
+            
+            switch error {
+            case let NetworkError.apiError(apiResponse):
+                deletionError = apiResponse.data.description
+                
+            case let NetworkError.networkError(message):
+                deletionError = message
+                
+            default:
+                deletionError = error.localizedDescription
+            }
+        }
+        
+        self.userToDelete = nil
     }
 }
 
