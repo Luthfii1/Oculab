@@ -6,11 +6,6 @@
 //
 
 struct ExaminationStatistic: Decodable {
-//    var totalFinished: Int = 0
-//    var totalNotFinished: Int = 0
-//    var totalPositive: Int = 0
-//    var totalNegative: Int = 0
-//    var totalPending: Int = 0
     var totalFinished: Int?
     var totalNotFinished: Int?
     
