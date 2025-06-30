@@ -29,9 +29,10 @@ struct StatisticComponent: View {
                         .offset(y: 35)
 
                     VStack(alignment: .leading, spacing: Decimal.d4) {
-                        Text("\(presenter.statisticExam.totalFinished) Tugas Selesai").font(AppTypography.h4_1)
+                        Text("\(presenter.statisticExam.totalFinished ?? 0) Tugas Selesai").font(AppTypography.h4_1)
                         Text(
-                            "dari \(presenter.statisticExam.totalFinished + presenter.statisticExam.totalNotFinished) Tugas"
+                            "dari \((presenter.statisticExam.totalFinished ?? 0) + (presenter.statisticExam.totalNotFinished ?? 0)) Tugas"
+
                         )
                         .font(AppTypography.p3).foregroundStyle(AppColors.slate300)
                     }
@@ -41,7 +42,7 @@ struct StatisticComponent: View {
             else {
                 HStack(alignment: .center, spacing: 16) {
                     VStack(alignment: .center, spacing: 4) {
-                        Text(String(presenter.statisticExam.totalFinished))
+                        Text(String(presenter.statisticExam.totalPositive ?? 0))
                             .foregroundStyle(AppColors.red500)
                             .font(AppTypography.h1)
 
@@ -55,7 +56,7 @@ struct StatisticComponent: View {
                     .clipShape(RoundedRectangle(cornerRadius: 8))
 
                     VStack(alignment: .center, spacing: 4) {
-                        Text(String(presenter.statisticExam.totalNotFinished))
+                        Text(String(presenter.statisticExam.totalNegative ?? 0))
                             .foregroundStyle(AppColors.purple500)
                             .font(AppTypography.h1)
 
@@ -69,7 +70,7 @@ struct StatisticComponent: View {
                     .clipShape(RoundedRectangle(cornerRadius: 8))
 
                     VStack(alignment: .center, spacing: 4) {
-                        Text(String("0"))
+                        Text(String(presenter.statisticExam.totalPending ?? 0))
                             .foregroundStyle(AppColors.blue500)
                             .font(AppTypography.h1)
 

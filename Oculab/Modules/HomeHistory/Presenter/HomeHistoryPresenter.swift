@@ -19,6 +19,7 @@ class HomeHistoryPresenter: ObservableObject {
     @Published var filteredExaminationByDate: [ExaminationCardData] = []
     
     @Published var finishedExaminationsByDate: [FinishedExaminationCardData] = []
+    @Published var unfinishedExaminationsByDate: [FinishedExaminationCardData] = []
 
     @Published var statisticExam: ExaminationStatistic = .init()
     @Published var progress: CGFloat = 0.0
@@ -38,15 +39,22 @@ class HomeHistoryPresenter: ObservableObject {
                 statisticExam = data
             }
 
-            if statisticExam.totalFinished + statisticExam.totalNotFinished > 0 {
-                progress = CGFloat(
-                    Double(statisticExam.totalFinished) /
-                        Double(statisticExam.totalFinished + statisticExam.totalNotFinished)
-                )
-
-            } else if statisticExam.totalFinished != 0 && statisticExam.totalNotFinished == 0 {
-                progress = 1.0
+            // Calculate progress only for Lab users (when totalFinished and totalNotFinished are available)
+            if statisticExam.totalFinished != nil && statisticExam.totalNotFinished != nil {
+                let totalFinished = statisticExam.totalFinished ?? 0
+                let totalNotFinished = statisticExam.totalNotFinished ?? 0
+                
+                if totalFinished + totalNotFinished > 0 {
+                    progress = CGFloat(
+                        Double(totalFinished) / Double(totalFinished + totalNotFinished)
+                    )
+                } else if totalFinished != 0 && totalNotFinished == 0 {
+                    progress = 1.0
+                } else {
+                    progress = 0.0
+                }
             }
+            
         } catch {
             // Handle error
             switch error {
@@ -135,7 +143,6 @@ class HomeHistoryPresenter: ObservableObject {
                 latestExamination = response
                 await filterLatestActivity(typeActivity: selectedLatestActivity)
             }
-
         } catch {
             // Handle error
             switch error {
