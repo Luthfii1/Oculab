@@ -94,7 +94,7 @@ struct HomeView: View {
                                             patientName: exam.patientName,
                                             patientDOB: exam.patientDob.toFormattedDate(),
                                             picName: exam.picName,
-                                            viewType: .lab
+                                            viewType: authentication.user.role == .ADMIN ? .admin : .lab
                                         )
                                     }
                                 }

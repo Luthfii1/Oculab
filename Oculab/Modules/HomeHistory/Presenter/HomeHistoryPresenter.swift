@@ -19,6 +19,7 @@ class HomeHistoryPresenter: ObservableObject {
     @Published var filteredExaminationByDate: [ExaminationCardData] = []
     
     @Published var finishedExaminationsByDate: [FinishedExaminationCardData] = []
+    @Published var unfinishedExaminationsByDate: [FinishedExaminationCardData] = []
 
     @Published var statisticExam: ExaminationStatistic = .init()
     @Published var progress: CGFloat = 0.0
@@ -26,6 +27,42 @@ class HomeHistoryPresenter: ObservableObject {
     @Published var isAllExamsLoading: Bool = false
     @Published var isStatisticLoading: Bool = false
 
+//    @MainActor
+//    func getStatisticData() async {
+//        isStatisticLoading = true
+//        defer { isStatisticLoading = false }
+//
+//        do {
+//            let data = try await interactor?.getStatisticExamination()
+//
+//            if let data {
+//                statisticExam = data
+//            }
+//
+//            if statisticExam.totalFinished + statisticExam.totalNotFinished > 0 {
+//                progress = CGFloat(
+//                    Double(statisticExam.totalFinished) /
+//                        Double(statisticExam.totalFinished + statisticExam.totalNotFinished)
+//                )
+//
+//            } else if statisticExam.totalFinished != 0 && statisticExam.totalNotFinished == 0 {
+//                progress = 1.0
+//            }
+//        } catch {
+//            // Handle error
+//            switch error {
+//            case let NetworkError.apiError(apiResponse):
+//                print("Error type: \(apiResponse.data.errorType)")
+//                print("Error description: \(apiResponse.data.description)")
+//
+//            case let NetworkError.networkError(message):
+//                print("Network error getStatisticData: \(message)")
+//
+//            default:
+//                print("Unknown error: \(error.localizedDescription)")
+//            }
+//        }
+//    }
     @MainActor
     func getStatisticData() async {
         isStatisticLoading = true
@@ -38,15 +75,22 @@ class HomeHistoryPresenter: ObservableObject {
                 statisticExam = data
             }
 
-            if statisticExam.totalFinished + statisticExam.totalNotFinished > 0 {
-                progress = CGFloat(
-                    Double(statisticExam.totalFinished) /
-                        Double(statisticExam.totalFinished + statisticExam.totalNotFinished)
-                )
-
-            } else if statisticExam.totalFinished != 0 && statisticExam.totalNotFinished == 0 {
-                progress = 1.0
+            // Calculate progress only for Lab users (when totalFinished and totalNotFinished are available)
+            if statisticExam.totalFinished != nil && statisticExam.totalNotFinished != nil {
+                let totalFinished = statisticExam.totalFinished ?? 0
+                let totalNotFinished = statisticExam.totalNotFinished ?? 0
+                
+                if totalFinished + totalNotFinished > 0 {
+                    progress = CGFloat(
+                        Double(totalFinished) / Double(totalFinished + totalNotFinished)
+                    )
+                } else if totalFinished != 0 && totalNotFinished == 0 {
+                    progress = 1.0
+                } else {
+                    progress = 0.0
+                }
             }
+            
         } catch {
             // Handle error
             switch error {
@@ -135,6 +179,15 @@ class HomeHistoryPresenter: ObservableObject {
                 latestExamination = response
                 await filterLatestActivity(typeActivity: selectedLatestActivity)
             }
+//            let response = try await interactor?.getAllData()
+//            
+//            if let response {
+//                unfinishedExaminationsByDate = response
+//                print("Successfully loaded \(response.count) examinations")
+//            } else {
+//                unfinishedExaminationsByDate = []
+//                print("No response from interactor")
+//            }
 
         } catch {
             // Handle error

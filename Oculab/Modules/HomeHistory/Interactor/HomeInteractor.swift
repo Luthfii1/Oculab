@@ -12,6 +12,7 @@ class HomeInteractor {
     private let apiURL = API.BE + "/examination/get-number-of-examinations"
     private let apiGetAllData = API.BE + "/examination/get-all-examinations/"
     private let apiGetFinishedExaminationCardData = API.BE + "/examination/get-finished-examination-card-data/"
+    private let apiGetUnfinishedExaminationCardData = API.BE + "/examination/get-unfinished-examination-card-data/"
 
     func getStatisticExamination() async throws -> ExaminationStatistic {
         guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
@@ -36,34 +37,47 @@ class HomeInteractor {
                 userInfo: [NSLocalizedDescriptionKey: "User ID not found"]
             )
         }
+        let fullURL = apiGetUnfinishedExaminationCardData + userId
 
-        let response: APIResponse<[Examination]> = try await NetworkHelper.shared
-            .get(urlString: apiGetAllData + userId)
+        let response: APIResponse<[UnfinishedExaminationCardData]> = try await NetworkHelper.shared.get(urlString: fullURL)
 
-        let examinationDataCard = response.data.map { exam -> ExaminationCardData in
+        let unfinishedExaminationResponse = response.data.map { exam in
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "dd MMMM yyyy"
-
-            let formattedDate = dateFormatter.string(from: exam.examinationPlanDate ?? Date())
-            let formattedDate2 = dateFormatter.string(from: exam.examinationDate ?? Date())
-
+            
+            var formattedDate = ""
+            if let dateString = exam.examinationPlanDate {
+                let isoFormatter = ISO8601DateFormatter()
+                isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+                
+                if let date = isoFormatter.date(from: dateString) {
+                    formattedDate = date.formattedDayMonthYearTime()
+                } else {
+                    // Fallback for basic ISO format
+                    let basicFormatter = ISO8601DateFormatter()
+                    if let date = basicFormatter.date(from: dateString) {
+                        formattedDate = date.formattedDayMonthYearTime()
+                    } else {
+                        formattedDate = "Invalid Date"
+                    }
+                }
+            }
             return ExaminationCardData(
-                examinationId: exam._id,
+                examinationId: exam.id,
                 statusExamination: exam.statusExamination,
                 datePlan: formattedDate,
-                date: formattedDate2,
+                date: "",
                 slideId: exam.slideId,
-                patientName: exam.patientName ?? "",
-                patientDob: exam.patientDoB ?? "",
-                patientId: exam.patientId ?? "",
+                patientName: exam.patientName,
+                patientDob: exam.patientDob ?? "",
+                patientId: exam.patientId,
                 picName: exam.picName ?? "",
-                picId: exam.picId ?? "",
-                finalGradingResult: exam.expertResult?.finalGrading.rawValue ?? GradingType.unknown.rawValue,
+                picId: "",
+                finalGradingResult: GradingType.unknown.rawValue,
                 dpjpName: exam.dpjpName ?? ""
             )
         }
-
-        return examinationDataCard
+        return unfinishedExaminationResponse
     }
     
     func getFinishedDataCard(date: String) async throws -> [FinishedExaminationCardData] {
