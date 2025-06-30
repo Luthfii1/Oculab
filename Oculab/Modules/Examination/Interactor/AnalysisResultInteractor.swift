@@ -64,8 +64,9 @@ class AnalysisResultInteractor {
 //        return response.data
 //    }
 
-    func submitTrackingDuration(examId: String, body: TrackingDurationRequest) async throws -> ExpertExamResult {
-        let response: APIResponse<ExpertExamResult> = try await NetworkHelper.shared.post(
+    func submitTrackingDuration(examId: String, body: TrackingDurationRequest) async throws -> TrackingDurationRequest {
+        print(examId)
+        let response: APIResponse<TrackingDurationRequest> = try await NetworkHelper.shared.post(
             urlString: API.BE + "/examinationAnalysisDuration/create-analysis-duration/" + examId,
             body: body)
 
@@ -73,10 +74,11 @@ class AnalysisResultInteractor {
     }
 }
 
-struct TrackingDurationRequest: Encodable {
+struct TrackingDurationRequest: Encodable, Decodable {
+    var examinationId: String?
     var analysisSourceType = "MOBILE"
-    var startTimestamp: Date
-    var endTimestamp: Date
+    var startTimestamp: String
+    var endTimestamp: String
 }
 
 struct ExaminationResultData: Decodable {

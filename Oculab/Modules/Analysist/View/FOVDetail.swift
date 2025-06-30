@@ -121,6 +121,8 @@ struct FOVDetail: View {
             }
             .toolbarBackground(.hidden, for: .navigationBar)
             .onAppear {
+                albumPresenter.setStartTime()
+
                 Task {
                     await presenter.fetchData(fovId: fovData._id)
                     await presenter.verifyingFOV(fovId: fovData._id)

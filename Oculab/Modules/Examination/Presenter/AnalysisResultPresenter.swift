@@ -37,6 +37,19 @@ class AnalysisResultPresenter: ObservableObject {
 
     func setStartTime() {
         startTime = Date()
+        print(startTime)
+    }
+
+    func formatDateToISO8601(date: Date) -> String {
+        let formatter = DateFormatter()
+
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+
+        formatter.timeZone = TimeZone(identifier: "UTC")
+
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+
+        return formatter.string(from: date)
     }
 
     func submitTrackingDuration(examinationId: String) async {
@@ -46,11 +59,13 @@ class AnalysisResultPresenter: ObservableObject {
         }
 
         do {
+            print("\(validStartTime)")
+            print("\(Date())")
             _ = try await interactor?.submitTrackingDuration(
                 examId: examinationId,
                 body: TrackingDurationRequest(
-                    startTimestamp: validStartTime,
-                    endTimestamp: Date()
+                    startTimestamp: formatDateToISO8601(date: validStartTime),
+                    endTimestamp: formatDateToISO8601(date: Date())
                 )
             )
 

@@ -35,7 +35,6 @@ struct FOVAlbum: View {
                 LazyVGrid(columns: columns, spacing: 10) {
                     ForEach(Array(selectedFOVs.enumerated()), id: \.element._id) { index, fov in
                         Button {
-                            presenter.setStartTime()
                             presenter.navigateToDetailed(fovData: fov, order: index, total: selectedFOVs.count, examId: examId)
                         } label: {
                             AsyncImage(url: URL(string: fov.image)) { phase in
