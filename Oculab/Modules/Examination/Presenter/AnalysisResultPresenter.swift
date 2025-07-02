@@ -29,8 +29,62 @@ class AnalysisResultPresenter: ObservableObject {
     @Published var buttonTitle: String = "Simpan Hasil Pemeriksaan"
     @Published var isAllFOVsVerified: Bool = false
 
+    @Published var startTime: Date?
+
     func popToRoot() {
         Router.shared.popToRoot()
+    }
+
+    func setStartTime() {
+        startTime = Date()
+        print(startTime)
+    }
+
+    func formatDateToISO8601(date: Date) -> String {
+        let formatter = DateFormatter()
+
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+
+        formatter.timeZone = TimeZone(identifier: "UTC")
+
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+
+        return formatter.string(from: date)
+    }
+
+    func submitTrackingDuration(examinationId: String) async {
+        guard let validStartTime = startTime else {
+            print("Error: startTime is nil, cannot submit tracking duration.")
+            return
+        }
+
+        do {
+            print("\(validStartTime)")
+            print("\(Date())")
+            _ = try await interactor?.submitTrackingDuration(
+                examId: examinationId,
+                body: TrackingDurationRequest(
+                    startTimestamp: formatDateToISO8601(date: validStartTime),
+                    endTimestamp: formatDateToISO8601(date: Date())
+                )
+            )
+
+            print("Tracking duration submitted successfully.")
+
+        } catch {
+            // Handle error
+            switch error {
+            case let NetworkError.apiError(apiResponse):
+                print("Error type: \(apiResponse.data.errorType)")
+                print("Error description: \(apiResponse.data.description)")
+
+            case let NetworkError.networkError(message):
+                print("Network error: \(message)")
+
+            default:
+                print("Unknown error: \(error.localizedDescription)")
+            }
+        }
     }
 
     @MainActor
@@ -108,22 +162,22 @@ class AnalysisResultPresenter: ObservableObject {
         Router.shared.navigateTo(.photoAlbum(fovGroup: fovGroup, examId: examinationResult?.examinationId ?? ""))
     }
 
-    func navigateToDetailed(fovData: FOVData, order: Int, total: Int) {
+    func navigateToDetailed(fovData: FOVData, order: Int, total: Int, examId: String?) {
         Router.shared.navigateTo(.detailedPhoto(
             slideId: examinationResult?.slideId ?? "",
             fovData: fovData,
             order: order,
-            total: total
+            total: total,
+            examId: examId
         ))
     }
-    
+
     func isEnableToSubmit() -> Bool {
-        
         // TODO: Need to discuss is it should check all FOVs Verified or not
 //        if !isAllFOVsVerified {
 //            return false
 //        }
-        
+
         // check if the interpretation already chosen from user
         if selectedTBGrade == GradingType.SCANTY.rawValue {
             return !numOfBTA.isEmpty && Int(numOfBTA) != nil
@@ -131,33 +185,33 @@ class AnalysisResultPresenter: ObservableObject {
             return selectedTBGrade != ""
         }
     }
-    
+
     func navigateToPDFView() {
         guard let examId = examinationResult?.examinationId else { return }
         Router.shared.navigateTo(.pdf(examinationId: examId))
     }
-    
+
     func checkIsAllFOVsVerified() {
         guard let groupedFOVs = groupedFOVs else {
-            self.isAllFOVsVerified = false
-            self.buttonTitle = "Verikasi Semua Lapang Pandang"
+            isAllFOVsVerified = false
+            buttonTitle = "Verikasi Semua Lapang Pandang"
             return
         }
-        
+
         // Check each group
         let bta0Verified = groupedFOVs.bta0.allSatisfy { $0.verified }
         let bta1to9Verified = groupedFOVs.bta1to9.allSatisfy { $0.verified }
         let btaAbove9Verified = groupedFOVs.btaabove9.allSatisfy { $0.verified }
-        
+
         // All groups must be verified
         let isAllVerified = bta0Verified && bta1to9Verified && btaAbove9Verified
-        self.isAllFOVsVerified = isAllVerified
-        
+        isAllFOVsVerified = isAllVerified
+
         // Update button title based on verification status
         if isAllVerified {
-            self.buttonTitle = "Simpan Hasil Pemeriksaan"
+            buttonTitle = "Simpan Hasil Pemeriksaan"
         } else {
-            self.buttonTitle = "Verikasi Semua Lapang Pandang"
+            buttonTitle = "Verikasi Semua Lapang Pandang"
         }
     }
 }

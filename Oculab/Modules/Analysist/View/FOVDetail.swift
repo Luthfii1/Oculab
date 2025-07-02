@@ -13,8 +13,10 @@ struct FOVDetail: View {
     var fovData: FOVData
     var order: Int
     var total: Int
+    var examId: String?
 
     @StateObject private var presenter = FOVDetailPresenter()
+    @StateObject private var albumPresenter = AnalysisResultPresenter()
 
     var body: some View {
         NavigationView {
@@ -103,6 +105,11 @@ struct FOVDetail: View {
 
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
+                        if let id = examId, !id.isEmpty {
+                            Task {
+                                await albumPresenter.submitTrackingDuration(examinationId: id)
+                            }
+                        }
                         Router.shared.navigateBack()
                     }) {
                         HStack {
@@ -114,6 +121,8 @@ struct FOVDetail: View {
             }
             .toolbarBackground(.hidden, for: .navigationBar)
             .onAppear {
+                albumPresenter.setStartTime()
+
                 Task {
                     await presenter.fetchData(fovId: fovData._id)
                     await presenter.verifyingFOV(fovId: fovData._id)
