@@ -81,27 +81,6 @@ class AuthenticationPresenter: ObservableObject {
     
     // MARK: ACCESS PIN
     
-//    @MainActor
-//    func isValidPin() async -> Bool {
-//        // For PIN change flow, we should check against oldAccessPin, not the stored PIN
-//        if isAccessPinChangeInProgress {
-//            if oldAccessPin != inputPin {
-//                isError = true
-//                description = "PIN saat ini salah"
-//                return false
-//            }
-//        } else {
-//            // Normal authentication - check against stored PIN
-//            if await interactor.getUserLocalData()?.accessPin != inputPin {
-//                isError = true
-//                description = "PIN salah, silakan coba lagi"
-//                return false
-//            }
-//        }
-//        
-//        isError = false
-//        return true
-//    }
     @MainActor
     func isValidPin() async -> Bool {
         // For PIN change flow, we should check against oldAccessPin, not the stored PIN
@@ -113,16 +92,7 @@ class AuthenticationPresenter: ObservableObject {
             }
         } else {
             // Normal authentication - check against stored PIN
-            let localUser = await interactor.getUserLocalData()
-            let storedPin = localUser?.accessPin ?? user.accessPin
-            
-            guard let storedPin = storedPin, !storedPin.isEmpty else {
-                isError = true
-                description = "PIN tidak ditemukan, silakan atur PIN terlebih dahulu"
-                return false
-            }
-            
-            if storedPin != inputPin {
+            if await interactor.getUserLocalData()?.accessPin != inputPin {
                 isError = true
                 description = "PIN salah, silakan coba lagi"
                 return false
@@ -311,129 +281,36 @@ class AuthenticationPresenter: ObservableObject {
     
     // MARK: USER AUTHENTICATION
 
-//    @MainActor
-//    func getAccountById() async {
-//        do {
-//            let getAccountResponse = try await interactor.getAccountById()
-//            user = getAccountResponse
-//
-//            // Reset the pin input state before navigation
-//            inputPin = ""
-//            firstPin = ""
-//            secondPin = ""
-//
-//            if getAccountResponse.accessPin == nil {
-//                state = .create
-//                Router.shared.navigateTo(.userAccessPin(state: .create))
-//            } else {
-//                state = .authenticate
-//                Router.shared.navigateTo(.userAccessPin(state: .authenticate))
-//            }
-//        } catch {
-//            // Handle error
-//            switch error {
-//            case let NetworkError.apiError(apiResponse):
-//                print("Error type: \(apiResponse.data.errorType)")
-//                print("Error description: \(apiResponse.data.description)")
-//
-//            case let NetworkError.networkError(message):
-//                print("Network error: \(message)")
-//
-//            default:
-//                print("Unknown error: \(error.localizedDescription)")
-//            }
-//        }
-//    }
     @MainActor
     func getAccountById() async {
         do {
             let getAccountResponse = try await interactor.getAccountById()
-            
+            user = getAccountResponse
+
             // Reset the pin input state before navigation
             inputPin = ""
             firstPin = ""
             secondPin = ""
 
-            // DEBUG: Check what we have
-            let localUser = await interactor.getUserLocalData()
-            let hasLocalPin = localUser?.accessPin != nil && !(localUser?.accessPin?.isEmpty ?? true)
-            let hasServerPin = getAccountResponse.accessPin != nil && !(getAccountResponse.accessPin?.isEmpty ?? true)
-            
-            print("🔍 DEBUG PIN CHECK:")
-            print("   Local PIN exists: \(hasLocalPin)")
-            print("   Local PIN value: \(localUser?.accessPin ?? "nil")")
-            print("   Server PIN exists: \(hasServerPin)")
-            print("   Server PIN value: \(getAccountResponse.accessPin ?? "nil")")
-            
-            // Update user data
-            user = getAccountResponse
-            
-            // Decision logic for PIN state
-            if hasLocalPin || hasServerPin {
-                // User has a PIN set (either locally or on server), go to authenticate
-                print("✅ PIN found - going to authenticate mode")
-                state = .authenticate
-                Router.shared.navigateTo(.userAccessPin(state: .authenticate))
-            } else {
-                // No PIN found anywhere, user needs to create one
-                print("❌ No PIN found - going to create mode")
+            if getAccountResponse.accessPin == nil {
                 state = .create
                 Router.shared.navigateTo(.userAccessPin(state: .create))
+            } else {
+                state = .authenticate
+                Router.shared.navigateTo(.userAccessPin(state: .authenticate))
             }
-            
         } catch {
-            print("🚨 ERROR in getAccountById: \(error)")
-            
             // Handle error
             switch error {
             case let NetworkError.apiError(apiResponse):
                 print("Error type: \(apiResponse.data.errorType)")
                 print("Error description: \(apiResponse.data.description)")
-                
-                // On API error, check if we have local PIN and use that
-                let localUser = await interactor.getUserLocalData()
-                print("🔍 Fallback check - Local PIN: \(localUser?.accessPin ?? "nil")")
-                
-                if let localPin = localUser?.accessPin, !localPin.isEmpty {
-                    user = localUser ?? user
-                    state = .authenticate
-                    Router.shared.navigateTo(.userAccessPin(state: .authenticate))
-                } else {
-                    // No local PIN either, show error or fallback
-                    handleErrorState(isError: true, errorData: apiResponse.data)
-                }
 
             case let NetworkError.networkError(message):
                 print("Network error: \(message)")
-                
-                // On network error, check if we have local PIN and use that
-                let localUser = await interactor.getUserLocalData()
-                if let localPin = localUser?.accessPin, !localPin.isEmpty {
-                    user = localUser ?? user
-                    state = .authenticate
-                    Router.shared.navigateTo(.userAccessPin(state: .authenticate))
-                } else {
-                    handleErrorState(
-                        isError: true,
-                        errorData: ApiErrorData(errorType: "NETWORK_ERROR", description: message)
-                    )
-                }
 
             default:
                 print("Unknown error: \(error.localizedDescription)")
-                
-                // On unknown error, check if we have local PIN and use that
-                let localUser = await interactor.getUserLocalData()
-                if let localPin = localUser?.accessPin, !localPin.isEmpty {
-                    user = localUser ?? user
-                    state = .authenticate
-                    Router.shared.navigateTo(.userAccessPin(state: .authenticate))
-                } else {
-                    handleErrorState(
-                        isError: true,
-                        errorData: ApiErrorData(errorType: "UNKNOWN_ERROR", description: error.localizedDescription)
-                    )
-                }
             }
         }
     }
