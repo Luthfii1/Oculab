@@ -10,6 +10,8 @@ import SwiftUI
 struct HistoryView: View {
     @ObservedObject private var presenter = HomeHistoryPresenter()
     @State var selectedDate: Date
+    
+    @State private var currentlyLoadedDate: Date?
 
     var body: some View {
         NavigationView {
@@ -25,7 +27,7 @@ struct HistoryView: View {
                         }
                         .frame(maxWidth: .infinity)
 
-                    } else if presenter.finishedExaminationsByDate.isEmpty {
+                    } else if shouldShowEmptyState() {
                         VStack(alignment: .center) {
                             Image("Empty")
                             Text("Tidak ada pemeriksaan diselesaikan pada \(formatDate(selectedDate))")
@@ -61,16 +63,29 @@ struct HistoryView: View {
         }
         .ignoresSafeArea()
         .onAppear {
-            Task {
-                await presenter.fetchFinishedExaminationsByDate(date: selectedDate)
-            }
+            loadDataForDate(selectedDate)
         }
-        .onChange(of: selectedDate) {
-            Task {
-                await presenter.fetchFinishedExaminationsByDate(date: selectedDate)
+        .onChange(of: selectedDate) { oldValue, newValue in
+            if !Calendar.current.isDate(oldValue, inSameDayAs: newValue) {
+                loadDataForDate(newValue)
             }
         }
         .navigationBarBackButtonHidden(true)
+    }
+    
+    private func shouldShowEmptyState() -> Bool {
+        return presenter.finishedExaminationsByDate.isEmpty &&
+               !presenter.isAllExamsLoading &&
+               currentlyLoadedDate != nil &&
+               Calendar.current.isDate(currentlyLoadedDate!, inSameDayAs: selectedDate)
+    }
+    
+    private func loadDataForDate(_ date: Date) {
+        currentlyLoadedDate = date
+        
+        Task {
+            await presenter.fetchFinishedExaminationsByDate(date: date)
+        }
     }
 
     private func formatDate(_ date: Date) -> String {

@@ -99,35 +99,40 @@ class HomeHistoryPresenter: ObservableObject {
     
     @MainActor
     func fetchFinishedExaminationsByDate(date: Date) async {
+        let dateString = date.formattedYearMonthDay()
+        
         isAllExamsLoading = true
-        defer { isAllExamsLoading = false }
+        finishedExaminationsByDate.removeAll()
+        
+        defer {
+            isAllExamsLoading = false
+        }
         
         do {
-            let response = try await interactor?.getFinishedDataCard(date: date.formattedYearMonthDay())
+            let response = try await interactor?.getFinishedDataCard(date: dateString)
             
-            if let response {
+            if let response = response, !response.isEmpty {
                 finishedExaminationsByDate = response
-                print("Successfully loaded \(response.count) examinations")
+                print("📊 Successfully loaded \(response.count) examinations for date: \(dateString)")
             } else {
                 finishedExaminationsByDate = []
-                print("No response from interactor")
+                print("📭 No examinations found for date: \(dateString)")
             }
             
         } catch {
-            // Handle different types of errors
+            finishedExaminationsByDate = []
+            
             switch error {
-                case let NetworkError.apiError(apiResponse):
-                    if apiResponse.data.errorType == "VALIDATION_ERROR" &&
-                       apiResponse.data.description.contains("No finished examinations found") {
-                        finishedExaminationsByDate = []
-                    }
-                    
-                case let NetworkError.networkError(message):
-                    print("Network error: \(message)")
-                    
-                default:
-                    print("Unknown error: \(error.localizedDescription)")
-                }
+            case let NetworkError.apiError(apiResponse):
+                print("Error type: \(apiResponse.data.errorType)")
+                print("Error description: \(apiResponse.data.description)")
+
+            case let NetworkError.networkError(message):
+                print("Network error getStatisticData: \(message)")
+
+            default:
+                print("Unknown error: \(error.localizedDescription)")
+            }
         }
     }
     
