@@ -22,6 +22,8 @@
 	<string>1</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.medical</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Kami menggunakan Face ID untuk mengamankan akses ke aplikasi.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
