@@ -30,6 +30,10 @@ struct UserUpdateAccessPinBody: Codable {
     var previousAccessPin: String
 }
 
+struct CreateAccessPinResponse: Codable {
+    var accessPin: String
+}
+
 
 class AuthenticationInteractor: ObservableObject {
     private var modelContext: ModelContext
@@ -151,8 +155,9 @@ class AuthenticationInteractor: ObservableObject {
         }
         
         guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
-                throw URLError(.userAuthenticationRequired)
-            }
+            throw URLError(.userAuthenticationRequired)
+        }
+        
         let headers = [
             "Authorization": "Bearer \(token)",
             "Content-Type": "application/json"
@@ -172,5 +177,28 @@ class AuthenticationInteractor: ObservableObject {
             email: response.data.email,
             newAccessPin: response.data.newAccessPin
         )
+    }
+    
+    func createAccessPin(accessPin: String) async throws -> CreateAccessPinResponse {
+        guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
+        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
+        let headers = [
+            "Authorization": "Bearer \(token)",
+            "Content-Type": "application/json"
+        ]
+        
+        let response: APIResponse<CreateAccessPinResponse> = try await NetworkHelper.shared.post(
+            urlString: apiAuthenticationService + "/create-user-accessPin/\(String(describing: userId))",
+            headers: headers,
+            body: CreateAccessPinResponse(accessPin: accessPin)
+        )
+        
+        return CreateAccessPinResponse(accessPin: response.data.accessPin)
     }
 }

@@ -125,6 +125,7 @@ class AuthenticationPresenter: ObservableObject {
                 } else {
                     // This is initial PIN setup - just update locally and authorize
                     user.accessPin = secondPin
+                    await createAccessPin()
                     await interactor.updateUserLocalData(user: user)
                     isPinAuthorized = true
                     Router.shared.popToRoot()
@@ -187,6 +188,42 @@ class AuthenticationPresenter: ObservableObject {
             showAccessPinSuccessPopup = true
             resetPinChangeFlow()
             
+        } catch {
+            isError = true
+            switch error {
+            case let NetworkError.apiError(apiResponse):
+                print("Error type: \(apiResponse.data.errorType)")
+                print("Error description: \(apiResponse.data.description)")
+                description = apiResponse.data.description
+
+            case let NetworkError.networkError(message):
+                print("Network error: \(message)")
+                description = message
+
+            default:
+                print("Unknown error: \(error.localizedDescription)")
+                description = error.localizedDescription
+            }
+        }
+    }
+    
+    @MainActor
+    func createAccessPin() async {
+        guard !firstPin.isEmpty, !secondPin.isEmpty else {
+            isError = true
+            return
+        }
+        
+        if firstPin != secondPin {
+            isError = true
+        }
+        
+        do {
+            _ = try await interactor.createAccessPin(accessPin: secondPin)
+            
+            // Show success and reset
+            showAccessPinSuccessPopup = true
+            resetPinChangeFlow()
         } catch {
             isError = true
             switch error {
