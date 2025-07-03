@@ -83,7 +83,7 @@ struct ProfileView: View {
                             .stroke(AppColors.slate100)
                     )
 
-                    if authPresenter.isFaceIdEnabled(state: .create) {
+                    if authPresenter.isFaceIdAvailable {
                         HStack {
                             Image(systemName: "faceid")
                                 .foregroundColor(AppColors.purple500)
