@@ -9,6 +9,8 @@ import Foundation
 import Alamofire
 
 class AlamofireNetworkService: NetworkService {
+    private static let decoder = JSONDecoder()
+    
     func get<T: Decodable>(urlString: String, headers: [String: String]?) async throws -> APIResponse<T> {
         let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
         let request = AF.request(urlString, method: .get, headers: afHeaders)
@@ -49,15 +51,15 @@ class AlamofireNetworkService: NetworkService {
         switch dataResponse.result {
         case .success(let data):
             do {
-                let decodedResponse = try JSONDecoder().decode(APIResponse<T>.self, from: data)
+                let decodedResponse = try Self.decoder.decode(APIResponse<T>.self, from: data)
                 if decodedResponse.status == StatusResponseType.ERROR.rawValue {
-                    if let errorResponse = try? JSONDecoder().decode(APIResponse<ApiErrorData>.self, from: data) {
+                    if let errorResponse = try? Self.decoder.decode(APIResponse<ApiErrorData>.self, from: data) {
                         throw NetworkError.apiError(errorResponse)
                     }
                 }
                 return decodedResponse
             } catch {
-                if let decodedError = try? JSONDecoder().decode(APIResponse<ApiErrorData>.self, from: data) {
+                if let decodedError = try? Self.decoder.decode(APIResponse<ApiErrorData>.self, from: data) {
                     throw NetworkError.apiError(decodedError)
                 }
                 throw NetworkError.networkError("Decoding error: \(error.localizedDescription)")
