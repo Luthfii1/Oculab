@@ -34,7 +34,7 @@ struct BoxesGroupComponentView: View {
                 }
             }
         }
-        
+        }
         .sheet(item: $presenter.selectedBox) { selected in
             TrayView(
                 selectedBox: $presenter.selectedBox,
@@ -58,7 +58,6 @@ struct BoxesGroupComponentView: View {
         }
     }
 }
-
 
 enum BoxStatus: String, Decodable {
     case none = "UNVERIFIED"

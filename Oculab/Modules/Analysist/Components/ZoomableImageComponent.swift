@@ -95,9 +95,6 @@ struct ZoomableImageComponent: UIViewRepresentable {
 
                         // Calculate the frame of the image within the image view
                         let imageRect = AVMakeRect(aspectRatio: image.size, insideRect: imageView.bounds)
-                        
-                        // Convert the imageRect to the containerView's coordinate system
-                        let imageFrameInContainer = imageView.convert(imageRect, to: containerView)
 
                         // Add BoxesGroupComponentView
                         let hostingController = UIHostingController(
@@ -107,8 +104,8 @@ struct ZoomableImageComponent: UIViewRepresentable {
                             .environmentObject(presenter)
                         )
                         hostingController.view.backgroundColor = .clear
-                        hostingController.view.frame = imageFrameInContainer
-                        containerView.addSubview(hostingController.view)
+                        hostingController.view.frame = imageRect
+                        imageView.addSubview(hostingController.view)
                     }
                 }
             }.resume()
