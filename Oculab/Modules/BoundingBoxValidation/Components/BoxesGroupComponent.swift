@@ -12,31 +12,29 @@ struct BoxesGroupComponentView: View {
     var zoomScale: CGFloat
 
     var body: some View {
-        GeometryReader { geometry in
-            let imageSize = geometry.size
-            let scaleX = imageSize.width / Double(presenter.fovDetail?.frameWidth ?? 1)
-            let scaleY = imageSize.height / Double(presenter.fovDetail?.frameHeight ?? 1)
+        ZStack(alignment: .topLeading) {
+            if let fovDetail = presenter.fovDetail {
+                let scaleX = 1.0 / Double(fovDetail.frameWidth > 0 ? fovDetail.frameWidth : 1)
+                let scaleY = 1.0 / Double(fovDetail.frameHeight > 0 ? fovDetail.frameHeight : 1)
 
-            ZStack(alignment: .topLeading) {
-                if presenter.fovDetail != nil {
-                    ForEach(presenter.boxes) { box in
-                        BoxComponentView(
-                            box: box,
-                            selectedBox: presenter.selectedBox,
-                            zoomScale: zoomScale
-                        )
-                        .frame(width: box.width * scaleX, height: box.height * scaleY)
-                        .position(
-                            x: (box.x + box.width / 2) * scaleX,
-                            y: (box.y + box.height / 2) * scaleY
-                        )
-                        .onTapGesture {
-                            presenter.selectedBox = box
-                        }
+                ForEach(presenter.boxes) { box in
+                    BoxComponentView(
+                        box: box,
+                        selectedBox: presenter.selectedBox,
+                        zoomScale: zoomScale
+                    )
+                    .frame(width: box.width * scaleX, height: box.height * scaleY)
+                    .position(
+                        x: (box.x + box.width / 2) * scaleX,
+                        y: (box.y + box.height / 2) * scaleY
+                    )
+                    .onTapGesture {
+                        presenter.selectedBox = box
                     }
                 }
             }
         }
+        
         .sheet(item: $presenter.selectedBox) { selected in
             TrayView(
                 selectedBox: $presenter.selectedBox,
@@ -60,6 +58,7 @@ struct BoxesGroupComponentView: View {
         }
     }
 }
+
 
 enum BoxStatus: String, Decodable {
     case none = "UNVERIFIED"
