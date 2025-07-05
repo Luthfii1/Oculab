@@ -12,21 +12,27 @@ struct BoxesGroupComponentView: View {
     var zoomScale: CGFloat
 
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            if presenter.fovDetail != nil {
-                ForEach(presenter.boxes) { box in
-                    BoxComponentView(
-                        box: box,
-                        selectedBox: presenter.selectedBox,
-                        zoomScale: zoomScale
-                    )
-                    .frame(width: box.width, height: box.height)
-                    .position(
-                        x: box.x + (box.width / 2),
-                        y: box.y + (box.height / 2)
-                    )
-                    .onTapGesture {
-                        presenter.selectedBox = box
+        GeometryReader { geometry in
+            let imageSize = geometry.size
+            let scaleX = imageSize.width / Double(presenter.fovDetail?.frameWidth ?? 1)
+            let scaleY = imageSize.height / Double(presenter.fovDetail?.frameHeight ?? 1)
+
+            ZStack(alignment: .topLeading) {
+                if presenter.fovDetail != nil {
+                    ForEach(presenter.boxes) { box in
+                        BoxComponentView(
+                            box: box,
+                            selectedBox: presenter.selectedBox,
+                            zoomScale: zoomScale
+                        )
+                        .frame(width: box.width * scaleX, height: box.height * scaleY)
+                        .position(
+                            x: (box.x + box.width / 2) * scaleX,
+                            y: (box.y + box.height / 2) * scaleY
+                        )
+                        .onTapGesture {
+                            presenter.selectedBox = box
+                        }
                     }
                 }
             }

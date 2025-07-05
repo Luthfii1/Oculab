@@ -7,6 +7,7 @@
 
 import SwiftUI
 import UIKit
+import AVFoundation
 
 struct ZoomableImageComponent: UIViewRepresentable {
     let imageURL: URL?
@@ -101,8 +102,7 @@ struct ZoomableImageComponent: UIViewRepresentable {
                         )
                         hostingController.view.backgroundColor = .clear
                         hostingController.view.frame = imageView.frame
-                        hostingController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-                        imageView.addSubview(hostingController.view)
+                        containerView.addSubview(hostingController.view)
                     }
                 }
             }.resume()
