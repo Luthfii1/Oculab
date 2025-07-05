@@ -93,9 +93,6 @@ struct ZoomableImageComponent: UIViewRepresentable {
                         scrollView.zoomScale = zoomScale
                         scrollView.contentOffset = CGPoint(x: offset.width, y: offset.height)
 
-                        // Calculate the frame of the image within the image view
-                        let imageRect = AVMakeRect(aspectRatio: image.size, insideRect: imageView.bounds)
-
                         // Add BoxesGroupComponentView
                         let hostingController = UIHostingController(
                             rootView: BoxesGroupComponentView(
@@ -104,8 +101,8 @@ struct ZoomableImageComponent: UIViewRepresentable {
                             .environmentObject(presenter)
                         )
                         hostingController.view.backgroundColor = .clear
-                        hostingController.view.frame = imageRect
-                        imageView.addSubview(hostingController.view)
+                        hostingController.view.frame = imageView.frame
+                        containerView.addSubview(hostingController.view)
                     }
                 }
             }.resume()
