@@ -13,22 +13,24 @@ struct BoxesGroupComponentView: View {
 
     var body: some View {
         ZStack(alignment: .topLeading) {
-            ForEach(presenter.boxes) { box in
-                BoxComponentView(
-                    box: box,
-                    selectedBox: presenter.selectedBox,
-                    zoomScale: zoomScale
-                )
-                .position(
-                    x: box.x * zoomScale,
-                    y: box.y * zoomScale
-                )
-                .onTapGesture {
-                    presenter.selectedBox = box
+            if presenter.fovDetail != nil {
+                ForEach(presenter.boxes) { box in
+                    BoxComponentView(
+                        box: box,
+                        selectedBox: presenter.selectedBox,
+                        zoomScale: zoomScale
+                    )
+                    .frame(width: box.width, height: box.height)
+                    .position(
+                        x: box.x + (box.width / 2),
+                        y: box.y + (box.height / 2)
+                    )
+                    .onTapGesture {
+                        presenter.selectedBox = box
+                    }
                 }
             }
         }
-        .frame(width: Double(presenter.fovDetail?.frameWidth ?? 0) * zoomScale, height: Double(presenter.fovDetail?.frameHeight ?? 0) * zoomScale)
         .sheet(item: $presenter.selectedBox) { selected in
             TrayView(
                 selectedBox: $presenter.selectedBox,

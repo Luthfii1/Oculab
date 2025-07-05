@@ -101,7 +101,8 @@ struct ZoomableImageComponent: UIViewRepresentable {
                         )
                         hostingController.view.backgroundColor = .clear
                         hostingController.view.frame = imageView.frame
-                        containerView.addSubview(hostingController.view)
+                        hostingController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                        imageView.addSubview(hostingController.view)
                     }
                 }
             }.resume()

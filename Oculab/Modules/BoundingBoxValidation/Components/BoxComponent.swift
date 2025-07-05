@@ -31,12 +31,11 @@ struct BoxComponentView: View {
     var body: some View {
         Rectangle()
             .fill(Color.clear)
-            .frame(width: box.width * zoomScale, height: box.height * zoomScale)
             .cornerRadius(2)
             .overlay(
                 RoundedRectangle(cornerRadius: 2)
-                    .inset(by: 3.13)
-                    .stroke(borderColor, lineWidth: 3 * zoomScale)
+                    .inset(by: 3.13 / zoomScale)
+                    .stroke(borderColor, lineWidth: 3 / zoomScale)
             )
     }
 }
