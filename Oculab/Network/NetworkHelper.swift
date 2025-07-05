@@ -7,11 +7,14 @@
 
 import Foundation
 
+@available(*, deprecated, message: "Use NetworkService protocol instead")
 class NetworkHelper {
     static let shared = NetworkHelper()
     private init() {}
 
     // Function to create the basic request
+    // Function to create the basic request
+    @available(*, deprecated, message: "Use a class conforming to NetworkService instead")
     func createRequest(urlString: String, httpMethod: String, body: Data?) -> URLRequest? {
         guard let url = URL(string: urlString) else { return nil }
         var request = URLRequest(url: url)
@@ -21,6 +24,7 @@ class NetworkHelper {
         return request
     }
 
+    @available(*, deprecated, message: "Use a class conforming to NetworkService instead")
     func handleAsyncResponse<T: Decodable>(data: Data, response: URLResponse) throws -> APIResponse<T> {
         guard response is HTTPURLResponse else {
             throw NetworkError.networkError("Invalid response type")
@@ -48,6 +52,7 @@ class NetworkHelper {
     }
 
     // Function to create a multipart request
+    @available(*, deprecated, message: "Use a class conforming to NetworkService instead")
     func createMultipartRequest(
         urlString: String,
         httpMethod: String,
@@ -79,6 +84,7 @@ class NetworkHelper {
     }
 
     // Function to create errorSystem from FE
+    @available(*, deprecated, message: "This function should not be part of the network layer")
     func createErrorSystem(errorType: String, errorMessage: String) -> APIResponse<ApiErrorData> {
         let apiErrorData = ApiErrorData(errorType: errorType, description: errorMessage)
 
@@ -92,6 +98,7 @@ class NetworkHelper {
     }
 
     // Function to debug response
+    @available(*, deprecated, message: "Use a proper logging framework instead")
     func debugResponse(data: Data) {
         if let jsonString = String(data: data, encoding: .utf8) {
             print("Response data: \(jsonString)") // For debugging

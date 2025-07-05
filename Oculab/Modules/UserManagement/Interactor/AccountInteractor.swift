@@ -8,6 +8,7 @@
 import Foundation
 
 class AccountInteractor: ObservableObject {
+    private let networkService: NetworkService
     private let apiGetAllAccount = API.BE + "/user/get-all-user-data"
     private let apiRegisterAccount = API.BE + "/user/register"
     private let apiDeleteAccount = API.BE + "/user/delete-user/"
@@ -15,9 +16,14 @@ class AccountInteractor: ObservableObject {
     private var authInteractor: AuthenticationInteractor
     private var authPresenter: AuthenticationPresenter?
     
-    init(authInteractor: AuthenticationInteractor, authPresenter: AuthenticationPresenter? = nil) {
+    init(
+        authInteractor: AuthenticationInteractor,
+        authPresenter: AuthenticationPresenter? = nil,
+        networkService: NetworkService = AlamofireNetworkService()
+    ) {
         self.authInteractor = authInteractor
         self.authPresenter = authPresenter
+        self.networkService = networkService
     }
     
     func getAllAccount() async throws -> [Account] {
@@ -37,7 +43,7 @@ class AccountInteractor: ObservableObject {
             "Authorization": "Bearer \(token)"
         ]
 
-        let response: APIResponse<[Account]> = try await NetworkHelper.shared.get(
+        let response: APIResponse<[Account]> = try await networkService.get(
             urlString: apiGetAllAccount + "/\(userId)",
             headers: headers
         )
@@ -73,7 +79,7 @@ class AccountInteractor: ObservableObject {
             "Authorization": "Bearer \(token)"
         ]
         
-        let response: APIResponse<RegisterAccountResponse> = try await NetworkHelper.shared.post(
+        let response: APIResponse<RegisterAccountResponse> = try await networkService.post(
             urlString: apiRegisterAccount + "/\(userId)",
             headers: headers,
             body: RegisterAccountBody(role: roleType, name: name, email: email)
@@ -100,10 +106,10 @@ class AccountInteractor: ObservableObject {
             "Authorization": "Bearer \(token)"
         ]
         
-        let response: APIResponse<EditAccountResponse> = try await NetworkHelper.shared.update(
+        let response: APIResponse<EditAccountResponse> = try await networkService.update(
             urlString: apiEditAccount + userId.lowercased(),
-            body: requestBody,
-            headers: headers
+            headers: headers,
+            body: requestBody
         )
         
         // Update SwiftData with edited user info
@@ -139,10 +145,10 @@ class AccountInteractor: ObservableObject {
             "Authorization": "Bearer \(token)"
         ]
         
-        let response: APIResponse<DeleteAccountResponse> = try await NetworkHelper.shared.delete(
+        let response: APIResponse<DeleteAccountResponse> = try await networkService.delete(
             urlString: apiDeleteAccount + userId.lowercased(),
-            body: EmptyBody(),
-            headers: headers
+            headers: headers,
+            body: EmptyBody()
         )
         
         return DeleteAccountResponse(

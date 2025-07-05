@@ -8,6 +8,12 @@
 import Foundation
 
 class HomeInteractor {
+    private let networkService: NetworkService
+
+    init(networkService: NetworkService = AlamofireNetworkService()) {
+        self.networkService = networkService
+    }
+    
     private let examinationURL = API.BE + "/examination"
     private let apiURL = API.BE + "/examination/get-number-of-examinations"
     private let apiGetAllData = API.BE + "/examination/get-all-examinations/"
@@ -23,8 +29,8 @@ class HomeInteractor {
             )
         }
 
-        let response: APIResponse<ExaminationStatistic> = try await NetworkHelper.shared
-            .get(urlString: examinationURL + "/get-statistics-todo-lab/" + userId)
+        let response: APIResponse<ExaminationStatistic> = try await networkService
+            .get(urlString: examinationURL + "/get-statistics-todo-lab/" + userId, headers: nil)
 
         return response.data
     }
@@ -39,7 +45,7 @@ class HomeInteractor {
         }
         let fullURL = apiGetUnfinishedExaminationCardData + userId
 
-        let response: APIResponse<[UnfinishedExaminationCardData]> = try await NetworkHelper.shared.get(urlString: fullURL)
+        let response: APIResponse<[UnfinishedExaminationCardData]> = try await networkService.get(urlString: fullURL, headers: nil)
 
         let unfinishedExaminationResponse = response.data.map { exam in
             let dateFormatter = DateFormatter()
@@ -87,7 +93,7 @@ class HomeInteractor {
 
         let fullURL = apiGetFinishedExaminationCardData + userId + "/" + date
 
-        let response: APIResponse<[FinishedExaminationCardData]> = try await NetworkHelper.shared.get(urlString: fullURL)
+        let response: APIResponse<[FinishedExaminationCardData]> = try await networkService.get(urlString: fullURL, headers: nil)
 
         let finishedExaminationResponse = response.data.map { exam in
             return FinishedExaminationCardData(
@@ -103,4 +109,3 @@ class HomeInteractor {
         return finishedExaminationResponse
     }
 }
-

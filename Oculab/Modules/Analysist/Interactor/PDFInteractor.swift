@@ -9,10 +9,16 @@ import Foundation
 
 class PDFInteractor {
     private var endpoint = API.BE
+    private let networkService: NetworkService
+
+    init(networkService: NetworkService = AlamofireNetworkService()) {
+        self.networkService = networkService
+    }
 
     func getPDFData(examinationId: String) async throws -> PDFEntity {
-        let response: APIResponse<PDFEntity> = try await NetworkHelper.shared.get(
-            urlString: endpoint + "/pdf/get-data-for-pdf-by-id/" + examinationId
+        let response: APIResponse<PDFEntity> = try await networkService.get(
+            urlString: endpoint + "/pdf/get-data-for-pdf-by-id/" + examinationId,
+            headers: nil
         )
         
         return response.data

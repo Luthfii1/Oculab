@@ -11,10 +11,16 @@ struct EmptyBody: Encodable {}
 
 class FOVDetailInteractor {
     private var endpoint = API.BE
+    private let networkService: NetworkService
+
+    init(networkService: NetworkService = AlamofireNetworkService()) {
+        self.networkService = networkService
+    }
 
     func verifyingFOV(fovId: UUID) async throws -> FOVData {
-        let response: APIResponse<FOVData> = try await NetworkHelper.shared.update(
+        let response: APIResponse<FOVData> = try await networkService.update(
             urlString: endpoint + "/fov/update-verified-field/" + fovId.uuidString.toLowercase(),
+            headers: nil,
             body: EmptyBody()
         )
 
@@ -25,8 +31,9 @@ class FOVDetailInteractor {
         let body = StatusBody(boxStatus: newStatus)
         let url = endpoint + "/boundingBox/update-box-status/" + boxId.lowercased()
         
-        let response: APIResponse<BoxModel> = try await NetworkHelper.shared.put(
+        let response: APIResponse<BoxModel> = try await networkService.update(
             urlString: url,
+            headers: nil,
             body: body
         )
         
@@ -37,8 +44,8 @@ class FOVDetailInteractor {
         let fovURL = API.BE + "/boundingBox/get-bounding-box-data/"
         let url = fovURL + fovId.uuidString.toLowercase()
 
-        let response: APIResponse<FOVDetailData> = try await NetworkHelper.shared
-            .get(urlString: url)
+        let response: APIResponse<FOVDetailData> = try await networkService
+            .get(urlString: url, headers: nil)
 
         return response.data
     }
