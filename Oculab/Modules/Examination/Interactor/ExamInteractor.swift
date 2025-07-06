@@ -8,14 +8,20 @@
 import Foundation
 
 class ExamInteractor {
+    private let networkService: NetworkService
+
+    init(networkService: NetworkService = AlamofireNetworkService()) {
+        self.networkService = networkService
+    }
+    
     let urlString = API.BE + "/examination/create-examination/2t3g4837-13da-4335-97c1-dd5e7eaba549"
     let urlGetData = API.BE + "/examination/get-examination-by-id/"
     let urlGetDataPatient = API.BE + "/patient/get-patient-by-id/"
     let urlForwardVideo = API.BE + "/examination/forward-video-to-ml/"
 
     func getExamById(examId: String) async throws -> ExaminationDetailData {
-        let response: APIResponse<Examination> = try await NetworkHelper.shared
-            .get(urlString: urlGetData + examId.lowercased())
+        let response: APIResponse<Examination> = try await networkService
+            .get(urlString: urlGetData + examId.lowercased(), headers: nil)
 
         let examinationDetail = ExaminationDetailData(
             examinationId: response.data._id,
@@ -32,8 +38,9 @@ class ExamInteractor {
     func getPatientById(
         patientId: String
     ) async throws -> PatientDetailData {
-        let response: APIResponse<Patient> = try await NetworkHelper.shared.get(
-            urlString: urlGetDataPatient + patientId.lowercased()
+        let response: APIResponse<Patient> = try await networkService.get(
+            urlString: urlGetDataPatient + patientId.lowercased(),
+            headers: nil
         )
 
         return PatientDetailData(
@@ -54,9 +61,11 @@ class ExamInteractor {
         let urlString = urlForwardVideo + "\(examinationId.lowercased())"
         let parameters = ["video": examVideo]
 
-        return try await NetworkHelper.shared.multipart(
+        return try await networkService.multipart(
             urlString: urlString,
-            parameters: parameters
+            headers: nil,
+            parameters: parameters,
+            boundary: nil
         )
     }
 }

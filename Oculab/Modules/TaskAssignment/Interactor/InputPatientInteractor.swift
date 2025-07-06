@@ -8,6 +8,12 @@
 import Foundation
 
 class InputPatientInteractor {
+    private let networkService: NetworkService
+
+    init(networkService: NetworkService = AlamofireNetworkService()) {
+        self.networkService = networkService
+    }
+    
     private let apiGetAllUser = API.BE + "/user/get-all-pics/"
     private let apiGetAllPatient = API.BE + "/patient/get-all-patients/"
     let urlGetDataPatient = API.BE + "/patient/get-patient-by-id/"
@@ -32,7 +38,7 @@ class InputPatientInteractor {
             "Authorization": "Bearer \(token)"
         ]
         
-        let response: APIResponse<[User]> = try await NetworkHelper.shared
+        let response: APIResponse<[User]> = try await networkService
             .get(urlString: apiGetAllUser + adminUserId.lowercased(),
                  headers: headers)
 
@@ -44,8 +50,8 @@ class InputPatientInteractor {
             throw NSError(domain: "UserIdNotFound", code: -1, userInfo: [:])
         }
         
-        let response: APIResponse<[Patient]> = try await NetworkHelper.shared
-            .get(urlString: apiGetAllPatient + userId.lowercased())
+        let response: APIResponse<[Patient]> = try await networkService
+            .get(urlString: apiGetAllPatient + userId.lowercased(), headers: nil)
 
         return response.data
     }
@@ -53,8 +59,8 @@ class InputPatientInteractor {
     func getPatientById(
         patientId: String
     ) async throws -> Patient {
-        let response: APIResponse<Patient> = try await NetworkHelper.shared
-            .get(urlString: urlGetDataPatient + patientId.lowercased())
+        let response: APIResponse<Patient> = try await networkService
+            .get(urlString: urlGetDataPatient + patientId.lowercased(), headers: nil)
 
         return response.data
     }
@@ -62,8 +68,8 @@ class InputPatientInteractor {
     func getUserById(
         userId: String
     ) async throws -> User {
-        let response: APIResponse<User> = try await NetworkHelper.shared
-            .get(urlString: urlGetDataUser + userId.lowercased())
+        let response: APIResponse<User> = try await networkService
+            .get(urlString: urlGetDataUser + userId.lowercased(), headers: nil)
 
         return response.data
     }
@@ -75,8 +81,9 @@ class InputPatientInteractor {
             throw NSError(domain: "UserIdNotFound", code: -1, userInfo: [:])
         }
         
-        let response: APIResponse<Patient> = try await NetworkHelper.shared.post(
+        let response: APIResponse<Patient> = try await networkService.post(
             urlString: urlCreatePatient + adminUserId.lowercased(),
+            headers: nil,
             body: patient
         )
 
@@ -101,8 +108,9 @@ class InputPatientInteractor {
         patientId: String,
         examinations: [ExaminationRequest]
     ) async throws -> ExaminationDataResponse {
-        let response: APIResponse<ExaminationDataResponse> = try await NetworkHelper.shared.post(
+        let response: APIResponse<ExaminationDataResponse> = try await networkService.post(
             urlString: urlCreateExam + patientId,
+            headers: nil,
             body: examinations
         )
         

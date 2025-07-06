@@ -22,8 +22,6 @@
 	<string>1</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.medical</string>
-	<key>NSFaceIDUsageDescription</key>
-	<string>Kami menggunakan Face ID untuk mengamankan akses ke aplikasi.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
@@ -39,6 +37,8 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>We would like to access your camera to record video</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>We use Face ID to secure and unlock the app.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>We would like to access your microphone to record video</string>
 	<key>NSPhotoLibraryUsageDescription</key>

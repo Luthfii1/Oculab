@@ -8,6 +8,12 @@
 import Foundation
 
 class PatientInteractor: ObservableObject {
+    private let networkService: NetworkService
+
+    init(networkService: NetworkService = AlamofireNetworkService()) {
+        self.networkService = networkService
+    }
+    
     private let apiGetAllPatient = API.BE + "/patient/get-all-patients/"
     let urlGetDataPatient = API.BE + "/patient/get-patient-by-id/"
     let urlGetAllExamByPatientId = API.BE + "/examination/get-examination-card-by-patient/"
@@ -19,23 +25,23 @@ class PatientInteractor: ObservableObject {
             throw NSError(domain: "UserIdNotFound", code: -1, userInfo: [:])
         }
         
-        let response: APIResponse<[Patient]> = try await NetworkHelper.shared
-            .get(urlString: apiGetAllPatient + userId.lowercased())
+        let response: APIResponse<[Patient]> = try await networkService
+            .get(urlString: apiGetAllPatient + userId.lowercased(), headers: nil)
 
         return response.data
     }
     
     func getPatientById(patientId: String) async throws -> Patient {
-        let response: APIResponse<Patient> = try await NetworkHelper.shared
-            .get(urlString: urlGetDataPatient + patientId.lowercased())
+        let response: APIResponse<Patient> = try await networkService
+            .get(urlString: urlGetDataPatient + patientId.lowercased(), headers: nil)
 
         return response.data
     }
     
     func getAllExamByPatientId(patientId: String) async throws -> [ExaminationResultCardData] {
 
-        let response: APIResponse<[ExaminationResultCardData]> = try await NetworkHelper.shared
-            .get(urlString: urlGetAllExamByPatientId + patientId)
+        let response: APIResponse<[ExaminationResultCardData]> = try await networkService
+            .get(urlString: urlGetAllExamByPatientId + patientId, headers: nil)
         
         return response.data
     }
@@ -45,8 +51,9 @@ class PatientInteractor: ObservableObject {
             throw NSError(domain: "UserIdNotFound", code: -1, userInfo: [:])
         }
         
-        let response: APIResponse<Patient> = try await NetworkHelper.shared.post(
+        let response: APIResponse<Patient> = try await networkService.post(
             urlString: urlCreatePatient + adminUserId.lowercased(),
+            headers: nil,
             body: patient
         )
 
@@ -54,8 +61,9 @@ class PatientInteractor: ObservableObject {
     }
     
     func updatePatient(patient: Patient, patientId: String) async throws -> Patient {
-        let response: APIResponse<Patient> = try await NetworkHelper.shared.update(
+        let response: APIResponse<Patient> = try await networkService.update(
             urlString: urlUpdatePatient + patientId.lowercased(),
+            headers: nil,
             body: patient
         )
 

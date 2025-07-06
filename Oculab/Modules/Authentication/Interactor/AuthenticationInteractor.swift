@@ -37,15 +37,19 @@ struct CreateAccessPinResponse: Codable {
 
 class AuthenticationInteractor: ObservableObject {
     private var modelContext: ModelContext
-    init(modelContext: ModelContext) {
+    private let networkService: NetworkService
+
+    init(modelContext: ModelContext, networkService: NetworkService = AlamofireNetworkService()) {
         self.modelContext = modelContext
+        self.networkService = networkService
     }
 
     private let apiAuthenticationService = API.BE + "/user"
 
     func login(email: String, password: String) async throws -> LoginResponse {
-        let response: APIResponse<LoginResponse> = try await NetworkHelper.shared.post(
+        let response: APIResponse<LoginResponse> = try await networkService.post(
             urlString: apiAuthenticationService + "/login",
+            headers: nil,
             body: UserBody(email: email, password: password)
         )
 
@@ -67,8 +71,9 @@ class AuthenticationInteractor: ObservableObject {
             )
         }
 
-        let response: APIResponse<User> = try await NetworkHelper.shared.get(
-            urlString: apiAuthenticationService + "/get-user-data-by-id/\(userId)"
+        let response: APIResponse<User> = try await networkService.get(
+            urlString: apiAuthenticationService + "/get-user-data-by-id/\(userId)",
+            headers: nil
         )
 
         // save to swiftdata
@@ -86,8 +91,9 @@ class AuthenticationInteractor: ObservableObject {
             )
         }
 
-        let response: APIResponse<User> = try await NetworkHelper.shared.update(
+        let response: APIResponse<User> = try await networkService.update(
             urlString: apiAuthenticationService + "/update-user/\(userId)",
+            headers: nil,
             body: user
         )
 
@@ -163,13 +169,13 @@ class AuthenticationInteractor: ObservableObject {
             "Content-Type": "application/json"
         ]
         
-        let response: APIResponse<UserUpdateAccessPinResponse> = try await NetworkHelper.shared.update(
+        let response: APIResponse<UserUpdateAccessPinResponse> = try await networkService.update(
             urlString: apiAuthenticationService + "/update-user-accessPin/\(String(describing: userId))",
+            headers: headers,
             body: UserUpdateAccessPinBody(
                 newAccessPin: newAccessPin,
                 previousAccessPin: previousAccessPin
-            ),
-            headers: headers
+            )
         )
 
         return UserUpdateAccessPinResponse(
@@ -193,7 +199,7 @@ class AuthenticationInteractor: ObservableObject {
             "Content-Type": "application/json"
         ]
         
-        let response: APIResponse<CreateAccessPinResponse> = try await NetworkHelper.shared.post(
+        let response: APIResponse<CreateAccessPinResponse> = try await networkService.post(
             urlString: apiAuthenticationService + "/create-user-accessPin/\(String(describing: userId))",
             headers: headers,
             body: CreateAccessPinResponse(accessPin: accessPin)

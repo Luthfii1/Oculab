@@ -25,6 +25,12 @@ protocol ProfileInteractorProtocol {
 }
 
 class ProfileInteractor: ProfileInteractorProtocol {
+    private let networkService: NetworkService
+
+    init(networkService: NetworkService = AlamofireNetworkService()) {
+        self.networkService = networkService
+    }
+    
     private let apiAuthenticationService = API.BE + "/user"
 
     func editNewPassword(newPassword: String, previousPassword: String) async throws -> UserUpdatePasswordResponse {
@@ -40,13 +46,13 @@ class ProfileInteractor: ProfileInteractorProtocol {
             "Content-Type": "application/json"
         ]
         
-        let response: APIResponse<UserUpdatePasswordResponse> = try await NetworkHelper.shared.update(
+        let response: APIResponse<UserUpdatePasswordResponse> = try await networkService.update(
             urlString: apiAuthenticationService + "/update-user-password/\(String(describing: userId))",
+            headers: headers,
             body: UserUpdatePasswordBody(
                 newPassword: newPassword,
                 previousPassword: previousPassword
-            ),
-            headers: headers
+            )
         )
 
         return UserUpdatePasswordResponse(

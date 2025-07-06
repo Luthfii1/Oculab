@@ -14,13 +14,20 @@ struct ContactResponse: Decodable {
 }
 
 class ContactInteractor {
+    private let networkService: NetworkService
+
+    init(networkService: NetworkService = AlamofireNetworkService()) {
+        self.networkService = networkService
+    }
+    
     let urlGetWhatsappLink = API.BE + "/contact/get-whatsapp-link/"
 
     func getWhatsappLinkById(contactId: String) async throws -> ContactResponse {
         let urlString = "\(urlGetWhatsappLink)\(contactId)"
 
-        let response: APIResponse<ContactResponse> = try await NetworkHelper.shared.get(
-            urlString: urlString
+        let response: APIResponse<ContactResponse> = try await networkService.get(
+            urlString: urlString,
+            headers: nil
         )
 
         return ContactResponse(

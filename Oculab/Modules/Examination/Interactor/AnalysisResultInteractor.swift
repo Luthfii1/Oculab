@@ -8,6 +8,12 @@
 import Foundation
 
 class AnalysisResultInteractor {
+    private let networkService: NetworkService
+
+    init(networkService: NetworkService = AlamofireNetworkService()) {
+        self.networkService = networkService
+    }
+    
     private func createURL(with examinationId: String) -> URL? {
         let examinationURL = API.BE + "/examination/get-examination-by-id/"
         print(examinationURL + examinationId.lowercased())
@@ -15,16 +21,17 @@ class AnalysisResultInteractor {
     }
 
     func submitExpertResult(examId: String, expertResult: ExpertExamResult) async throws -> ExpertExamResult {
-        let response: APIResponse<ExpertExamResult> = try await NetworkHelper.shared.post(
+        let response: APIResponse<ExpertExamResult> = try await networkService.post(
             urlString: API.BE + "/expertResult/post-expert-result/" + examId,
+            headers: nil,
             body: expertResult)
 
         return response.data
     }
 
     func fetchData(examId: String) async throws -> ExaminationResultData {
-        let response: APIResponse<Examination> = try await NetworkHelper.shared
-            .get(urlString: API.BE + "/examination/get-examination-by-id/" + examId.lowercased())
+        let response: APIResponse<Examination> = try await networkService
+            .get(urlString: API.BE + "/examination/get-examination-by-id/" + examId.lowercased(), headers: nil)
 
         let examinationDetail = ExaminationResultData(
             examinationId: response.data._id,
@@ -48,9 +55,9 @@ class AnalysisResultInteractor {
     }
 
     func fetchFOVData(examId: String) async throws -> FOVGrouping {
-        let response: APIResponse<FOVGrouping> = try await NetworkHelper.shared.get(
+        let response: APIResponse<FOVGrouping> = try await networkService.get(
             urlString: API.BE + "/fov/get-all-fov-by-examination-id/" +
-                examId.lowercased())
+                examId.lowercased(), headers: nil)
         return response.data
     }
 
@@ -66,8 +73,9 @@ class AnalysisResultInteractor {
 
     func submitTrackingDuration(examId: String, body: TrackingDurationRequest) async throws -> TrackingDurationRequest {
         print(examId)
-        let response: APIResponse<TrackingDurationRequest> = try await NetworkHelper.shared.post(
+        let response: APIResponse<TrackingDurationRequest> = try await networkService.post(
             urlString: API.BE + "/examinationAnalysisDuration/create-analysis-duration/" + examId,
+            headers: nil,
             body: body)
 
         return response.data
