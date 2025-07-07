@@ -64,10 +64,12 @@ struct VideoRecordView: View {
                 }
 
                 ToolbarItem(placement: .principal) {
-                    Text(videoRecordPresenter.videoRecordingTitle)
-                        .foregroundStyle(AppColors.slate0)
-                        .shadow(color: Color.black.opacity(0.4), radius: 2, x: 1, y: 1)
-                        .font(AppTypography.s4)
+                    if videoRecordPresenter.showRecordingTitle {
+                        Text(videoRecordPresenter.videoRecordingTitle)
+                            .foregroundStyle(AppColors.slate0)
+                            .shadow(color: Color.black.opacity(0.4), radius: 2, x: 1, y: 1)
+                            .font(AppTypography.s4)
+                    }
                 }
 
                 ToolbarItem(placement: .navigationBarTrailing) {
