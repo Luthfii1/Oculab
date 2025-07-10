@@ -130,6 +130,35 @@ struct InputExaminationData: View {
                                         presenter.examination2.preparationType = .SPS
                                     }
                                 }
+                                
+                                Spacer()
+                                
+                                
+                                HStack {
+                                    AppButton(
+                                        title: "Kembali",
+                                        leftIcon: "arrow.left",
+                                        colorType: .tertiary,
+                                        isEnabled: true
+                                    ) {
+                                        Router.shared.navigateBack()
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .frame(width: UIScreen.main.bounds.width / 3.5)
+
+                                    Spacer()
+                                    AppButton(
+                                        title: "Buat Tugas",
+                                        rightIcon: "arrow.right",
+                                        size: .large,
+                                        isEnabled: (goalString != "" && typeString != "" && presenter.examination.slideId != "" && typeString2 != "" && presenter.examination2.slideId != "")
+                                    ) {
+                                        presenter.isError = false
+                                        presenter.errorMessage = ""
+                                        isSubmitPopUpVisible = true
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                }
                             }
 
                             .padding(.horizontal, Decimal.d20)
@@ -150,32 +179,7 @@ struct InputExaminationData: View {
                         }
                     }
 
-                    HStack {
-                        AppButton(
-                            title: "Kembali",
-                            leftIcon: "arrow.left",
-                            colorType: .tertiary,
-                            isEnabled: true
-                        ) {
-                            Router.shared.navigateBack()
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(width: UIScreen.main.bounds.width / 3.5)
-
-                        Spacer()
-                        AppButton(
-                            title: "Buat Tugas",
-                            rightIcon: "arrow.right",
-                            size: .large,
-                            isEnabled: true
-                        ) {
-                            presenter.isError = false
-                            presenter.errorMessage = ""
-                            isSubmitPopUpVisible = true
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                    .padding(.horizontal, Decimal.d20)
+                    
                 }
             }
             .onAppear {
