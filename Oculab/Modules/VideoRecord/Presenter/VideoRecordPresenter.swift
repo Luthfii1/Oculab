@@ -32,6 +32,7 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     @Published var recordedURLs: [URL] = []
     @Published var previewURL: URL?
     @Published var showPreview: Bool = false
+    @Published var showRecordingTitle: Bool = false
     @Published var stitchedImage: UIImage? // For stitched images
     @Published var progressImage: UIImage?
     @Published var progressImageChecker: String = ""
