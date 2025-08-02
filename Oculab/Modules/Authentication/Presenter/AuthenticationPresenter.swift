@@ -14,6 +14,7 @@ enum PinMode {
 }
 
 class AuthenticationPresenter: ObservableObject {
+    @Published var isSplashScreenVisible = true
     @Published var description: String = ""
     @Published var textColor: Color = AppColors.slate900
     @Published var pinColor: Color = AppColors.purple500
