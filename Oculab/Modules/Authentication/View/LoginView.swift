@@ -24,23 +24,23 @@ struct LoginView: View {
                     if presenter.isKeyboardVisible {
                         Spacer()
                     }
-                    Text("Revolusi Deteksi Bakteri dengan Teknologi AI")
+                    Text(presenter.authText.loginTitle)
                         .font(AppTypography.h1)
                         .foregroundStyle(AppColors.slate900)
                         .multilineTextAlignment(.center)
                     VStack(spacing: 8) {
                         AppTextField(
-                            title: "Email",
+                            title: presenter.authText.loginEmailTitle,
                             isRequired: true,
-                            placeholder: "Contoh: indrikla24@gmail.com",
+                            placeholder: presenter.authText.loginEmailPlaceholder,
                             isError: presenter.isError,
                             isDisabled: presenter.isLoading,
                             text: $presenter.email
                         )
                         AppTextField(
-                            title: "Kata Sandi",
+                            title: presenter.authText.loginPasswordTitle,
                             isRequired: true,
-                            placeholder: "Masukkan Kata Sandi",
+                            placeholder: presenter.authText.loginPasswordPlaceholder,
                             description: presenter.description,
                             rightIcon: "eye",
                             isError: presenter.isError,
@@ -52,7 +52,7 @@ struct LoginView: View {
                     .padding(.top, 12)
                     VStack(alignment: .center, spacing: 16) {
                         AppButton(
-                            title: presenter.buttonText,
+                            title: presenter.authText.loginButtonText,
                             colorType: .primary,
                             size: .large,
                             isEnabled: presenter.isFilled
@@ -64,11 +64,11 @@ struct LoginView: View {
                         }
                         HStack {
                             Spacer()
-                            Text("Faskes belum terdaftar?")
+                            Text(presenter.authText.loginFaskesNotRegisteredYet)
                                 .font(AppTypography.p3)
                                 .foregroundStyle(AppColors.slate900)
                             AppButton(
-                                title: "Daftarkan Faskes",
+                                title: presenter.authText.loginRegisterFaskesButtonText,
                                 colorType: .tertiary,
                                 size: .large,
                                 isEnabled: true
