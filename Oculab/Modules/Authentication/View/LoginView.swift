@@ -11,8 +11,6 @@ struct LoginView: View {
     @EnvironmentObject var presenter: AuthenticationPresenter
     @StateObject private var contactPresenter = ContactPresenter(interactor: ContactInteractor())
 
-    @State private var contactId: String = "7b4e28ba-23a1-1cd4-183f-0016d3cca420"
-
     var body: some View {
         NavigationView {
             VStack {
@@ -76,8 +74,6 @@ struct LoginView: View {
                                 isEnabled: true
                             ) {
                                 Task {
-                                    await contactPresenter.fetchData(contactId: contactId)
-
                                     if let url = URL(string: contactPresenter.contactData.whatsappLink) {
                                         await MainActor.run {
                                             UIApplication.shared.open(url)
