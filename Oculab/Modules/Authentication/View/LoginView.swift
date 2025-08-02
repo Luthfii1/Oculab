@@ -74,14 +74,7 @@ struct LoginView: View {
                                 isEnabled: true
                             ) {
                                 Task {
-                                    if let url = URL(string: contactPresenter.contactData.whatsappLink) {
-                                        await MainActor.run {
-                                            UIApplication.shared.open(url)
-                                            print("Fetched WhatsApp URL: \(url)")
-                                        }
-                                    } else {
-                                        print("Invalid WhatsApp URL: ", contactPresenter.contactData.whatsappLink)
-                                    }
+                                    await contactPresenter.directToWhatsapp()
                                 }
                             }
                             .multilineTextAlignment(.leading)

@@ -40,4 +40,12 @@ class ContactPresenter: ObservableObject {
             }
         }
     }
+    
+    func directToWhatsapp() async {
+        if let url = URL(string: contactData.whatsappLink) {
+            await MainActor.run {
+                UIApplication.shared.open(url)
+            }
+        }
+    }
 }
