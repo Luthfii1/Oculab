@@ -141,12 +141,18 @@ class HomeHistoryPresenter: ObservableObject {
     }
     
     @MainActor
-    func fetchData() async {
+    func fetchData(userRole: RolesType) async {
         isAllExamsLoading = true
         defer { isAllExamsLoading = false }
 
         do {
-            let response = try await interactor?.getAllData()
+            let response: [ExaminationCardData]?
+            
+            if userRole == .ADMIN {
+                response = try await interactor?.getAllDataAdmin()
+            } else {
+                response = try await interactor?.getAllData()
+            }
 
             if let response {
                 latestExamination = response

@@ -117,7 +117,7 @@ struct ExamDetailView: View {
         .navigationBarBackButtonHidden(true)
         .onAppear {
             Task {
-                await presenter.fetchData(examId: examId, patientId: patientId)
+                await presenter.fetchData(examId: examId, patientId: patientId, userRole: .LAB)
                 print(presenter.isLoading)
             }
         }

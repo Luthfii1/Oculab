@@ -18,6 +18,7 @@ class ExamInteractor {
     let urlGetData = API.BE + "/examination/get-examination-by-id/"
     let urlGetDataPatient = API.BE + "/patient/get-patient-by-id/"
     let urlForwardVideo = API.BE + "/examination/forward-video-to-ml/"
+    let urlGetAdminDetail = API.BE + "/examination/get-examination-detail-admin/"
 
     func getExamById(examId: String) async throws -> ExaminationDetailData {
         let response: APIResponse<Examination> = try await networkService
@@ -33,6 +34,13 @@ class ExamInteractor {
         )
 
         return examinationDetail
+    }
+
+    func getAdminExamDetail(observationId: String) async throws -> AdminExaminationDetailData {
+        let response: APIResponse<AdminExaminationDetailData> = try await networkService
+            .get(urlString: urlGetAdminDetail + observationId, headers: nil)
+        
+        return response.data
     }
 
     func getPatientById(

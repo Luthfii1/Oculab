@@ -38,6 +38,8 @@ class ExamDataPresenter: ObservableObject {
         sex: "",
         bpjs: ""
     )
+    
+    @Published var examinations: [AdminExaminationData] = []
 
     private let interactor: ExamInteractor
 
@@ -105,16 +107,35 @@ class ExamDataPresenter: ObservableObject {
     }
 
     @MainActor
-    func fetchData(examId: String, patientId: String) async {
+    func fetchData(examId: String, patientId: String, userRole: RolesType) async {
         isLoading = true
         defer { isLoading = false }
 
         do {
-            let examinationResponse = try await interactor.getExamById(examId: examId)
             let patientResponse = try await interactor.getPatientById(patientId: patientId)
-
-            examDetailData = examinationResponse
             patientDetailData = patientResponse
+            
+            if userRole == .ADMIN {
+                // Fetch admin examination detail data
+                let examinationResponse = try await interactor.getAdminExamDetail(observationId: examId)
+                examinations = examinationResponse.examinations
+                
+                // Map admin data to examDetailData for compatibility
+                examDetailData = ExaminationDetailData(
+                    examinationId: examinationResponse.observationId,
+                    pic: examinationResponse.picName,
+                    slideId: examinationResponse.examinations.first?.slideId ?? "",
+                    examinationGoal: examinationResponse.goal,
+                    type: examinationResponse.examinations.first?.preparationType ?? "",
+                    dpjp: examinationResponse.dpjpName
+                )
+            } else {
+                // Fetch regular examination data for LAB users
+                let examinationResponse = try await interactor.getExamById(examId: examId)
+                examDetailData = examinationResponse
+                examinations = []
+            }
+            
         } catch {
             // Handle error
             switch error {

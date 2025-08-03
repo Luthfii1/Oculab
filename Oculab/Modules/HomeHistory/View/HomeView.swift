@@ -71,6 +71,7 @@ struct HomeView: View {
                                     .frame(maxWidth: 254)
                                     .multilineTextAlignment(.center)
                             }.frame(maxWidth: .infinity)
+                            
                         } else {
                             VStack(spacing: Decimal.d12) {
                                 ForEach(presenter.filteredExamination) { exam in
@@ -87,7 +88,9 @@ struct HomeView: View {
                                                     patientId: exam.patientId
                                                 ))
                                             } else {
-                                                Router.shared.navigateTo(.analysisResult(examinationId: exam.id))
+                                                Router.shared.navigateTo(.analysisResult(
+                                                    examinationId: exam.id
+                                                ))
                                             }
                                         }
                                     } label: {
@@ -112,7 +115,7 @@ struct HomeView: View {
             .refreshable {
                 Task {
                     await presenter.getStatisticData()
-                    await presenter.fetchData()
+                    await presenter.fetchData(userRole: authentication.user.role)
                 }
             }
             .navigationTitle("Tugas Pemeriksaan")
@@ -121,7 +124,7 @@ struct HomeView: View {
         .onAppear {
             Task {
                 await presenter.getStatisticData()
-                await presenter.fetchData()
+                await presenter.fetchData(userRole: authentication.user.role)
             }
         }
         .navigationBarBackButtonHidden(true)

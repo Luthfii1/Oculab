@@ -202,7 +202,7 @@ struct SavedResultView: View {
             }
             .onAppear {
                 Task {
-                    await presenter.fetchData(examId: examId, patientId: patientId)
+                    await presenter.fetchData(examId: examId, patientId: patientId, userRole: .LAB)
                     await resultPresenter.fetchData(examinationId: examId)
                 }
             }
