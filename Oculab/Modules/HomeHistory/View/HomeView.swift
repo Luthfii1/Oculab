@@ -31,7 +31,11 @@ struct HomeView: View {
                         }
 
                         HStack(alignment: .center, spacing: 8) {
-                            ForEach(LatestActivityType.allCases, id: \.self) { activityType in
+                            let activityTypes = authentication.user.role == .ADMIN
+                                ? [LatestActivityType.semua, .butuhVerifikasi]
+                                : [LatestActivityType.belumDimulai, .belumDisimpulkan]
+                            
+                            ForEach(activityTypes, id: \.self) { activityType in
                                 ButtonActivity(
                                     labelButton: activityType.rawValue,
                                     isSelected: presenter.selectedLatestActivity == activityType,

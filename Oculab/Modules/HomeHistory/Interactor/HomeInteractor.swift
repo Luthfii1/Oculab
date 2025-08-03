@@ -17,6 +17,7 @@ class HomeInteractor {
     private let examinationURL = API.BE + "/examination"
     private let apiURL = API.BE + "/examination/get-number-of-examinations"
     private let apiGetAllData = API.BE + "/examination/get-all-examinations/"
+    private let apiGetAllDataAdmin = API.BE_LOCAL + "/examination/get-examination-card-data-admin/"
     private let apiGetFinishedExaminationCardData = API.BE + "/examination/get-finished-examination-card-data/"
     private let apiGetUnfinishedExaminationCardData = API.BE + "/examination/get-unfinished-examination-card-data/"
 

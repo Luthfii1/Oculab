@@ -40,31 +40,31 @@ struct ExamDetailAdmin: View {
                     )
 
                     // hide dulu
-//                    AppCard(
-//                        icon: "doc.text.magnifyingglass",
-//                        title: "Hasil Pemeriksaan Sediaan 1",
-//                        spacing: Decimal.d16
-//                    ) {
-//                        ExtendedCard(data: [
-//                            ("Interpretasi Petugas", ""),
-//                            ("ID Sediaan", ""),
-//                            ("Jenis Sediaan", ""),
-//
-//                        ], titleSize: AppTypography.s5)
-//                    }
-//
-//                    AppCard(
-//                        icon: "doc.text.magnifyingglass",
-//                        title: "Hasil Pemeriksaan Sediaan 2",
-//                        spacing: Decimal.d16
-//                    ) {
-//                        ExtendedCard(data: [
-//                            ("Interpretasi Petugas", ""),
-//                            ("ID Sediaan", ""),
-//                            ("Jenis Sediaan", ""),
-//
-//                        ], titleSize: AppTypography.s5)
-//                    }
+                    AppCard(
+                        icon: "doc.text.magnifyingglass",
+                        title: "Hasil Pemeriksaan Sediaan 1",
+                        spacing: Decimal.d16
+                    ) {
+                        ExtendedCard(data: [
+                            ("Interpretasi Petugas", ""),
+                            ("ID Sediaan", ""),
+                            ("Jenis Sediaan", ""),
+
+                        ], titleSize: AppTypography.s5)
+                    }
+
+                    AppCard(
+                        icon: "doc.text.magnifyingglass",
+                        title: "Hasil Pemeriksaan Sediaan 2",
+                        spacing: Decimal.d16
+                    ) {
+                        ExtendedCard(data: [
+                            ("Interpretasi Petugas", ""),
+                            ("ID Sediaan", ""),
+                            ("Jenis Sediaan", ""),
+
+                        ], titleSize: AppTypography.s5)
+                    }
 
                     VStack(spacing: Decimal.d16) {
                         AppButton(
