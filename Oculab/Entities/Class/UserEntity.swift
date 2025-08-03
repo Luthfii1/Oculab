@@ -20,6 +20,7 @@ class User: Codable, Identifiable {
     var accessPin: String?
     var previousPassword: String?
     var isFaceIdEnabled: Bool = false
+    var businessModel: BusinessModelType?
 
     init(
         _id: String = UUID().uuidString,
@@ -31,7 +32,8 @@ class User: Codable, Identifiable {
         password: String? = nil,
         previousPassword: String? = nil,
         accessPin: String? = "8888",
-        isFaceIdEnabled: Bool = false
+        isFaceIdEnabled: Bool = false,
+        businessModel: BusinessModelType? = nil
     ) {
         self._id = _id
         self.name = name
@@ -43,6 +45,7 @@ class User: Codable, Identifiable {
         self.previousPassword = previousPassword
         self.accessPin = accessPin
         self.isFaceIdEnabled = isFaceIdEnabled
+        self.businessModel = businessModel
     }
 
     enum CodingKeys: CodingKey {
@@ -55,6 +58,7 @@ class User: Codable, Identifiable {
         case password
         case accessPin
         case previousPassword
+        case businessModel
     }
 
     required init(from decoder: Decoder) throws {
@@ -68,6 +72,7 @@ class User: Codable, Identifiable {
         self.password = try container.decodeIfPresent(String.self, forKey: .password)
         self.accessPin = try container.decodeIfPresent(String.self, forKey: .accessPin)
         self.previousPassword = try container.decodeIfPresent(String.self, forKey: .previousPassword)
+        self.businessModel = try container.decodeIfPresent(BusinessModelType.self, forKey: .businessModel)
     }
 
     func encode(to encoder: Encoder) throws {
@@ -81,5 +86,6 @@ class User: Codable, Identifiable {
         try container.encodeIfPresent(password, forKey: .password)
         try container.encodeIfPresent(accessPin, forKey: .accessPin)
         try container.encodeIfPresent(previousPassword, forKey: .previousPassword)
+        try container.encodeIfPresent(businessModel, forKey: .businessModel)
     }
 }

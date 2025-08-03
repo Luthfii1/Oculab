@@ -53,6 +53,10 @@ struct HomeView: View {
                             AppButton(title: "Pemeriksaan Baru", leftIcon: "doc.badge.plus") {
                                 Router.shared.navigateTo(.inputPatientData())
                             }
+                        }  else if authentication.user.role == .LAB && authentication.user.businessModel == .B2C {
+                            AppButton(title: "Pemeriksaan Baru", leftIcon: "doc.badge.plus") {
+                                Router.shared.navigateTo(.inputPatientData())
+                            }
                         }
 
                         if presenter.isAllExamsLoading {
