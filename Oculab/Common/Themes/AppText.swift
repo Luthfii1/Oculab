@@ -23,6 +23,7 @@ enum AppText {
         static let docTextMagnifyingglass = "doc.text.magnifyingglass"
         static let docText = "doc.text"
         static let paperplane = "paperplane"
+        static let chevronRightIcon = "chevron.right"
     }
 
     enum Common {
@@ -163,6 +164,35 @@ enum AppText {
             static let slideDetailTitle = "Detail Sediaan"
             static let examinationGoalKey = "Tujuan Pemeriksaan"
             static let slideImageTitle = "Gambar Sediaan"
+        }
+        
+        enum GuidelinesOnboarding {
+            static let navigationTitle = "Persiapan Pemeriksaan"
+            static let continueButton = "Lanjutkan"
+            
+            struct GuidelineContent {
+                let imageName: String
+                let title: String
+                let description: String
+            }
+            
+            static let guidelines: [GuidelineContent] = [
+                GuidelineContent(
+                    imageName: "Guideline1",
+                    title: "Temukan Lapang Pandang pada Mikroskop",
+                    description: "Teteskan minyak imersi pada kaca sediaan dan atur lensa objektif ke perbesaran 100x"
+                ),
+                GuidelineContent(
+                    imageName: "Guideline2",
+                    title: "Pasang Handphone pada Adapter",
+                    description: "Bersihkan lensa kamera utama dan sejajarkan dengan lubang adapter"
+                ),
+                GuidelineContent(
+                    imageName: "Guideline3",
+                    title: "Pasang Adapter pada Mikroskop",
+                    description: "Pasang adapter ke lensa okuler dan atur fokus antara mikroskop dan kamera"
+                )
+            ]
         }
     }
 }
