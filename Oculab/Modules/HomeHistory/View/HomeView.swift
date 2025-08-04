@@ -22,10 +22,10 @@ struct HomeView: View {
 
                     VStack(alignment: .leading, spacing: 16) {
                         HStack(alignment: .center, spacing: 8) {
-                            Image(systemName: "doc.on.doc.fill")
+                            Image(systemName: AppText.Icon.docOnDocFillIcon)
                                 .foregroundStyle(AppColors.purple500)
 
-                            Text("Tugas Pemeriksaan")
+                            Text(AppText.Home.taskSectionTitle)
                                 .foregroundStyle(AppColors.slate900)
                                 .font(AppTypography.s4_1)
                         }
@@ -50,11 +50,11 @@ struct HomeView: View {
                         }
 
                         if authentication.user.role == .ADMIN {
-                            AppButton(title: "Pemeriksaan Baru", leftIcon: "doc.badge.plus") {
+                            AppButton(title: AppText.Home.newExaminationButton, leftIcon: AppText.Icon.docBadgePlusIcon) {
                                 Router.shared.navigateTo(.inputPatientData())
                             }
                         }  else if authentication.user.role == .LAB && authentication.user.businessModel == .B2C {
-                            AppButton(title: "Pemeriksaan Baru", leftIcon: "doc.badge.plus") {
+                            AppButton(title: AppText.Home.newExaminationButton, leftIcon: AppText.Icon.docBadgePlusIcon) {
                                 Router.shared.navigateTo(.inputPatientData())
                             }
                         }
@@ -62,15 +62,15 @@ struct HomeView: View {
                         if presenter.isAllExamsLoading {
                             Spacer().frame(height: Decimal.d24)
                             VStack(alignment: .center) {
-                                ProgressView("Memuat data pemeriksaan anda")
+                                ProgressView(AppText.Home.loadingMessage)
                                     .progressViewStyle(CircularProgressViewStyle())
                             }
                             .frame(maxWidth: .infinity)
 
                         } else if presenter.filteredExamination.isEmpty {
                             VStack(alignment: .center) {
-                                Image("Empty")
-                                Text("Anda belum ditugaskan untuk melakukan pemeriksaan").font(AppTypography.p3)
+                                Image(AppText.Home.emptyStateImageName)
+                                Text(AppText.Home.noTaskMessage).font(AppTypography.p3)
                                     .foregroundStyle(AppColors.slate300)
                                     .frame(maxWidth: 254)
                                     .multilineTextAlignment(.center)
@@ -122,7 +122,7 @@ struct HomeView: View {
                     await presenter.fetchData(userRole: authentication.user.role)
                 }
             }
-            .navigationTitle("Tugas Pemeriksaan")
+            .navigationTitle(AppText.Home.navigationTitle)
         }
         .ignoresSafeArea()
         .onAppear {

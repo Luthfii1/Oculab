@@ -27,6 +27,8 @@ enum AppText {
         static let photo = "photo"
         static let textBadgeCheckmark = "text.badge.checkmark"
         static let exclamationmarkTriangleFill = "exclamationmark.triangle.fill"
+        static let docOnDocFillIcon = "doc.on.doc.fill"
+        static let docBadgePlusIcon = "doc.badge.plus"
     }
 
     enum Common {
@@ -208,5 +210,19 @@ enum AppText {
             static let systemInterpretationTitle = "Interpretasi Sistem"
             static let systemInterpretationWarning = "Interpretasi sistem bukan merupakan hasil akhir untuk pasien"
         }
+    }
+    
+    enum HomeHistory {
+        static let navigationTitle = "Riwayat"
+        static let loadingMessage = "Memuat data pemeriksaan anda"
+        static let emptyStateImageName = "Empty"
+        static let noExaminationMessage = "Tidak ada pemeriksaan diselesaikan pada"
+
+        static let navigationTitle = "Tugas Pemeriksaan"
+        static let taskSectionTitle = "Tugas Pemeriksaan"
+        static let newExaminationButton = "Pemeriksaan Baru"
+        static let loadingMessage = "Memuat data pemeriksaan anda"
+        static let emptyStateImageName = "Empty"
+        static let noTaskMessage = "Anda belum ditugaskan untuk melakukan pemeriksaan"
     }
 }
