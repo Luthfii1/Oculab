@@ -10,6 +10,7 @@ import SwiftUI
 struct InputPatientData: View {
     let patientId: String?
     @ObservedObject var presenter = InputPatientPresenter()
+    @EnvironmentObject private var authentication: AuthenticationPresenter
     @FocusState private var focusedField: FormField?
     
     init(patientId: String? = nil) {
@@ -27,12 +28,12 @@ struct InputPatientData: View {
                     VStack(alignment: .leading, spacing: Decimal.d24) {
                         // PIC Dropdown
                         AppDropdown(
-                            title: "Petugas Pemeriksaan",
-                            placeholder: "Pilih Petugas",
-                            leftIcon: "person.fill",
-                            choices: presenter.picName,
-                            selectedChoice: $presenter.selectedPIC
-                        )
+                                title: "Petugas Pemeriksaan",
+                                placeholder: "Pilih Petugas",
+                                leftIcon: "person.fill",
+                                choices: presenter.picName,
+                                selectedChoice: $presenter.selectedPIC
+                            )
                         
                         // Patient Search Dropdown
                         AppDropdown(
@@ -55,7 +56,11 @@ struct InputPatientData: View {
                             AppButton(
                                 title: "Isi Detail Sediaan",
                                 rightIcon: "arrow.forward",
-                                isEnabled: !(presenter.patient.NIK == "" || presenter.patient.DoB == nil || presenter.selectedPIC == "")
+                                isEnabled: {
+                                    let hasPatientData = !(presenter.patient.NIK == "" || presenter.patient.DoB == nil)
+                                    let hasPIC = (authentication.user.role == .LAB && authentication.user.businessModel == .B2C) || presenter.selectedPIC != ""
+                                    return hasPatientData && hasPIC
+                                }()
                             ) {
                                 presenter.newExam()
                             }
@@ -84,6 +89,11 @@ struct InputPatientData: View {
                 Task {
                     await presenter.getAllUser()
                     await presenter.getAllPatient()
+                    
+                    // Auto-fill PIC for B2C LAB users
+                    if authentication.user.role == .LAB && authentication.user.businessModel == .B2C {
+                        presenter.selectedPIC = authentication.user._id
+                    }
                     
                     // Auto-fill patient if patientId is provided
                     if let patientId = patientId, !patientId.isEmpty {

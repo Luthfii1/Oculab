@@ -31,7 +31,11 @@ struct HomeView: View {
                         }
 
                         HStack(alignment: .center, spacing: 8) {
-                            ForEach(LatestActivityType.allCases, id: \.self) { activityType in
+                            let activityTypes = authentication.user.role == .ADMIN
+                                ? [LatestActivityType.semua, .butuhVerifikasi]
+                                : [LatestActivityType.belumDimulai, .belumDisimpulkan]
+                            
+                            ForEach(activityTypes, id: \.self) { activityType in
                                 ButtonActivity(
                                     labelButton: activityType.rawValue,
                                     isSelected: presenter.selectedLatestActivity == activityType,
@@ -46,6 +50,10 @@ struct HomeView: View {
                         }
 
                         if authentication.user.role == .ADMIN {
+                            AppButton(title: "Pemeriksaan Baru", leftIcon: "doc.badge.plus") {
+                                Router.shared.navigateTo(.inputPatientData())
+                            }
+                        }  else if authentication.user.role == .LAB && authentication.user.businessModel == .B2C {
                             AppButton(title: "Pemeriksaan Baru", leftIcon: "doc.badge.plus") {
                                 Router.shared.navigateTo(.inputPatientData())
                             }
@@ -67,6 +75,7 @@ struct HomeView: View {
                                     .frame(maxWidth: 254)
                                     .multilineTextAlignment(.center)
                             }.frame(maxWidth: .infinity)
+                            
                         } else {
                             VStack(spacing: Decimal.d12) {
                                 ForEach(presenter.filteredExamination) { exam in
@@ -83,7 +92,9 @@ struct HomeView: View {
                                                     patientId: exam.patientId
                                                 ))
                                             } else {
-                                                Router.shared.navigateTo(.analysisResult(examinationId: exam.id))
+                                                Router.shared.navigateTo(.analysisResult(
+                                                    examinationId: exam.id
+                                                ))
                                             }
                                         }
                                     } label: {
@@ -108,7 +119,7 @@ struct HomeView: View {
             .refreshable {
                 Task {
                     await presenter.getStatisticData()
-                    await presenter.fetchData()
+                    await presenter.fetchData(userRole: authentication.user.role)
                 }
             }
             .navigationTitle("Tugas Pemeriksaan")
@@ -117,7 +128,7 @@ struct HomeView: View {
         .onAppear {
             Task {
                 await presenter.getStatisticData()
-                await presenter.fetchData()
+                await presenter.fetchData(userRole: authentication.user.role)
             }
         }
         .navigationBarBackButtonHidden(true)
