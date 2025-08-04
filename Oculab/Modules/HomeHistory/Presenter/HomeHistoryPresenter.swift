@@ -76,11 +76,15 @@ class HomeHistoryPresenter: ObservableObject {
         selectedLatestActivity = typeActivity
 
         switch typeActivity {
-        case .belumDimulai:
-            filteredExamination = latestExamination.filter { $0.statusExamination == .NOTSTARTED }
-        case .belumDisimpulkan:
-            filteredExamination = latestExamination
-                .filter { $0.statusExamination == .NEEDVALIDATION || $0.statusExamination == .INPROGRESS }
+            case .semua:
+                filteredExamination = latestExamination
+            case .butuhVerifikasi:
+                filteredExamination = latestExamination.filter { $0.statusExamination == .NEEDVALIDATION }
+            case .belumDimulai:
+                filteredExamination = latestExamination.filter { $0.statusExamination == .NOTSTARTED }
+            case .belumDisimpulkan:
+                filteredExamination = latestExamination
+                    .filter { $0.statusExamination == .NEEDVALIDATION || $0.statusExamination == .INPROGRESS }
         }
     }
 
@@ -137,12 +141,18 @@ class HomeHistoryPresenter: ObservableObject {
     }
     
     @MainActor
-    func fetchData() async {
+    func fetchData(userRole: RolesType) async {
         isAllExamsLoading = true
         defer { isAllExamsLoading = false }
 
         do {
-            let response = try await interactor?.getAllData()
+            let response: [ExaminationCardData]?
+            
+            if userRole == .ADMIN {
+                response = try await interactor?.getAllDataAdmin()
+            } else {
+                response = try await interactor?.getAllData()
+            }
 
             if let response {
                 latestExamination = response

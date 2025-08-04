@@ -39,33 +39,71 @@ struct ExamDetailAdmin: View {
                         dpjp: presenter.examDetailData.dpjp
                     )
 
-                    // hide dulu
-//                    AppCard(
-//                        icon: "doc.text.magnifyingglass",
-//                        title: "Hasil Pemeriksaan Sediaan 1",
-//                        spacing: Decimal.d16
-//                    ) {
-//                        ExtendedCard(data: [
-//                            ("Interpretasi Petugas", ""),
-//                            ("ID Sediaan", ""),
-//                            ("Jenis Sediaan", ""),
-//
-//                        ], titleSize: AppTypography.s5)
-//                    }
-//
-//                    AppCard(
-//                        icon: "doc.text.magnifyingglass",
-//                        title: "Hasil Pemeriksaan Sediaan 2",
-//                        spacing: Decimal.d16
-//                    ) {
-//                        ExtendedCard(data: [
-//                            ("Interpretasi Petugas", ""),
-//                            ("ID Sediaan", ""),
-//                            ("Jenis Sediaan", ""),
-//
-//                        ], titleSize: AppTypography.s5)
-//                    }
+                    AppCard(
+                        icon: "doc.text.magnifyingglass",
+                        title: "Hasil Pemeriksaan Sediaan 1",
+                        spacing: Decimal.d16
+                    ) {
+                        VStack(alignment: .leading) {
+                            Text("Interpretasi Petugas")
+                                .font(AppTypography.s5)
+                                .foregroundColor(AppColors.slate300)
+                                
+                                let interpretasiPetugas = presenter.examinations.first?.expertResult ?? "Belum Tersedia"
+                                
+                                if interpretasiPetugas != "Belum Tersedia" {
+                                    GradingCardComponent(
+                                        type: GradingType(rawValue: interpretasiPetugas) ?? .unknown,
+                                        confidenceLevel: .lowConfidence,
+                                        isExpert: true
+                                    )
+                                } else {
+                                    Text("Belum Tersedia")
+                                        .font(AppTypography.p4)
+                                        .padding(.vertical, 8)
+                                        .padding(.horizontal, 16)
+                                        .background(AppColors.slate50)
+                                        .cornerRadius(20)
+                                }
+                        }
+                        ExtendedCard(data: [
+                            ("ID Sediaan", presenter.examinations.first?.slideId ?? ""),
+                            ("Jenis Sediaan", presenter.examinations.first?.preparationType ?? "")
+                        ], titleSize: AppTypography.s5)
+                    }
 
+                    AppCard(
+                        icon: "doc.text.magnifyingglass",
+                        title: "Hasil Pemeriksaan Sediaan 2",
+                        spacing: Decimal.d16
+                    ) {
+                        VStack(alignment: .leading) {
+                            Text("Interpretasi Petugas")
+                                .font(AppTypography.s5)
+                                .foregroundColor(AppColors.slate300)
+                            
+                            let interpretasiPetugas = presenter.examinations.count > 1 ? (presenter.examinations[1].expertResult ?? "Belum Tersedia") : "Belum Tersedia"
+                            
+                            if interpretasiPetugas != "Belum Tersedia" {
+                                GradingCardComponent(
+                                    type: GradingType(rawValue: interpretasiPetugas) ?? .unknown,
+                                    confidenceLevel: .lowConfidence,
+                                    isExpert: true
+                                )
+                            } else {
+                                Text("Belum Tersedia")
+                                    .font(AppTypography.p4)
+                                    .padding(.vertical, 8)
+                                    .padding(.horizontal, 16)
+                                    .background(AppColors.slate50)
+                                    .cornerRadius(20)
+                            }
+                        }
+                        ExtendedCard(data: [
+                            ("ID Sediaan", presenter.examinations.count > 1 ? presenter.examinations[1].slideId : ""),
+                            ("Jenis Sediaan", presenter.examinations.count > 1 ? presenter.examinations[1].preparationType : "")
+                        ], titleSize: AppTypography.s5)
+                    }
                     VStack(spacing: Decimal.d16) {
                         AppButton(
                             title: "Lihat PDF",
@@ -76,7 +114,7 @@ struct ExamDetailAdmin: View {
                         ) {
                             resultPresenter.navigateToPDFView()
                         }
-
+                        
                         AppButton(
                             title: "Laporkan ke SITB",
                             rightIcon: "paperplane",
@@ -104,7 +142,7 @@ struct ExamDetailAdmin: View {
             }
             .onAppear {
                 Task {
-                    await presenter.fetchData(examId: examId, patientId: patientId)
+                    await presenter.fetchData(examId: examId, patientId: patientId, userRole: .ADMIN)
                     await resultPresenter.fetchData(examinationId: examId)
                 }
             }
