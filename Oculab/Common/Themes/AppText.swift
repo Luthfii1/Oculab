@@ -20,6 +20,21 @@ enum AppText {
         static let lockCircleDotted = "lock.circle.dotted"
         static let lockShield = "lock.shield"
         static let doorRightHandOpen = "door.right.hand.open"
+        static let docTextMagnifyingglass = "doc.text.magnifyingglass"
+        static let docText = "doc.text"
+        static let paperplane = "paperplane"
+    }
+
+    enum Common {
+        static let okButton = "OK"
+        static let cancelButton = "Batal"
+        static let closeButton = "Tutup"
+        static let saveButton = "Simpan"
+        static let deleteButton = "Hapus"
+        static let editButton = "Ubah"
+        static let nextButton = "Lanjutkan"
+        static let backButton = "Kembali"
+        static let emptyString = ""
     }
     
     enum Authentication {
@@ -122,6 +137,24 @@ enum AppText {
             static let loadingAnimationName = "loadingPaperplane"
             static let analyzingTitle = "Menginterpretasikan data"
             static let refreshInstruction = "Please scroll down to refresh to update the data"
+        }
+        
+        enum Detail {
+            static let navigationTitle = "Detail Pemeriksaan"
+            static let patientDataTitle = "Data Pasien"
+            static let patientNameKey = "Nama"
+            static let patientNikKey = "NIK"
+            static let patientDobKey = "Tanggal Lahir"
+            static let patientSexKey = "Jenis Kelamin"
+            static let patientBpjsKey = "Nomor BPJS"
+            static let examinationResult1Title = "Hasil Pemeriksaan Sediaan 1"
+            static let examinationResult2Title = "Hasil Pemeriksaan Sediaan 2"
+            static let staffInterpretationTitle = "Interpretasi Petugas"
+            static let notAvailable = "Belum Tersedia"
+            static let slideIdKey = "ID Sediaan"
+            static let preparationTypeKey = "Jenis Sediaan"
+            static let viewPdfButton = "Lihat PDF"
+            static let reportToSitbButton = "Laporkan ke SITB"
         }
     }
 }
