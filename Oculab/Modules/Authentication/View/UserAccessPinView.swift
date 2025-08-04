@@ -1,5 +1,5 @@
 //
-//  UserAccessPin.swift
+//  UserAccessPinView.swift
 //  Oculab
 //
 //  Created by Luthfi Misbachul Munir on 06/11/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct UserAccessPin: View {
+struct UserAccessPinView: View {
     @EnvironmentObject var securityPresenter: AuthenticationPresenter
     var state: PinMode
     
@@ -17,11 +17,11 @@ struct UserAccessPin: View {
                 if securityPresenter.showAccessPinSuccessPopup {
                     AppPopup(
                         image: AppText.Icon.success,
-                        title: AppText.Authentication.UserAccessPin.successTitle,
-                        description: AppText.Authentication.UserAccessPin.successDescription,
+                        title: AppTextAuthUserAccessPin.successTitle,
+                        description: AppTextAuthUserAccessPin.successDescription,
                         buttons: [
                             AppButton(
-                                title: AppText.Authentication.UserAccessPin.successButton,
+                                title: AppTextAuthUserAccessPin.successButton,
                                 colorType: .secondary,
                                 size: .large,
                                 isEnabled: true
@@ -105,6 +105,6 @@ struct UserAccessPin: View {
 
 // Preview
 #Preview {
-    UserAccessPin(state: .authenticate)
+    UserAccessPinView(state: .authenticate)
         .environmentObject(DependencyInjection.shared.createAuthPresenter())
 }

@@ -17,12 +17,12 @@ struct WeeklyCalendarView: View {
             VStack(alignment: .center, spacing: Decimal.d16) {
                 HStack(alignment: .center) {
                     HStack {
-                        Image(systemName: "text.badge.checkmark")
+                        Image(systemName: AppText.Icon.textBadgeCheckmark)
                             .resizable()
                             .frame(width: Decimal.d16 + Decimal.d2, height: Decimal.d16 + Decimal.d2)
                             .foregroundColor(AppColors.purple500)
 
-                        Text("Pemeriksaan Selesai")
+                        Text(AppTextHomeHistCompWeeklyCalendar.title)
                             .padding(.leading, Decimal.d8)
                             .font(AppTypography.s4_1)
                     }
@@ -37,7 +37,7 @@ struct WeeklyCalendarView: View {
                             isDatePickerVisible.toggle()
                         }
                     }) {
-                        Image(systemName: "calendar")
+                        Image(systemName: AppText.Icon.calendar)
                             .resizable()
                             .frame(width: Decimal.d16 + Decimal.d2, height: Decimal.d16 + Decimal.d2)
                             .font(.title)
@@ -105,7 +105,7 @@ struct WeeklyCalendarView: View {
 
                 VStack {
                     DatePicker(
-                        "Select a Date",
+                        AppTextHomeHistCompWeeklyCalendar.selectDatePickerTitle,
                         selection: $selectedDate,
                         displayedComponents: [.date]
                     )

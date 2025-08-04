@@ -1,5 +1,5 @@
 //
-//  KebijakanPrivasiView.swift
+//  PrivacyPolicyView.swift
 //  Oculab
 //
 //  Created by Luthfi Misbachul Munir on 03/12/24.
@@ -7,26 +7,26 @@
 
 import SwiftUI
 
-struct KebijakanPrivasiView: View {
+struct PrivacyPolicyView: View {
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     Rectangle().hidden()
 
-                    Text(AppText.Authentication.PrivacyPolicy.intro)
+                    Text(AppTextAuthPrivacyPolicy.intro)
                         .font(AppTypography.p3)
                         .foregroundStyle(AppColors.slate900)
 
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(AppText.Authentication.PrivacyPolicy.generalTitle)
+                        Text(AppTextAuthPrivacyPolicy.generalTitle)
                             .font(AppTypography.s5)
                             .foregroundStyle(AppColors.slate900)
 
                         VStack(alignment: .leading, spacing: 0) {
-                            ForEach(AppText.Authentication.PrivacyPolicy.generalPoints, id: \ .self) { point in
+                            ForEach(AppTextAuthPrivacyPolicy.generalPoints, id: \ .self) { point in
                                 HStack(alignment: .top) {
-                                    Text(AppText.Authentication.PrivacyPolicy.definitionBullet)
+                                    Text(AppTextAuthPrivacyPolicy.definitionBullet)
                                     Text(point)
                                 }
                             }
@@ -37,16 +37,16 @@ struct KebijakanPrivasiView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(AppText.Authentication.PrivacyPolicy.definitionTitle)
+                        Text(AppTextAuthPrivacyPolicy.definitionTitle)
                             .font(AppTypography.s5)
                             .foregroundStyle(AppColors.slate900)
 
-                        Text(AppText.Authentication.PrivacyPolicy.definitionIntro)
+                        Text(AppTextAuthPrivacyPolicy.definitionIntro)
                             .font(AppTypography.p3)
                             .foregroundStyle(AppColors.slate900)
 
                         VStack(alignment: .leading, spacing: 8) {
-                            ForEach(AppText.Authentication.PrivacyPolicy.definitions, id: \ .self) { def in
+                            ForEach(AppTextAuthPrivacyPolicy.definitions, id: \ .self) { def in
                                 if let subpoints = def.subpoints {
                                     VStack(alignment: .leading, spacing: 4) {
                                         HStack(alignment: .top) {
@@ -79,7 +79,7 @@ struct KebijakanPrivasiView: View {
                 .padding(.horizontal, 20)
             }
             .navigationBarTitleDisplayMode(.inline)
-            .navigationTitle(AppText.Authentication.PrivacyPolicy.navigationTitle)
+            .navigationTitle(AppTextAuthPrivacyPolicy.navigationTitle)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
@@ -97,5 +97,5 @@ struct KebijakanPrivasiView: View {
 }
 
 #Preview {
-    KebijakanPrivasiView()
+    PrivacyPolicyView()
 }

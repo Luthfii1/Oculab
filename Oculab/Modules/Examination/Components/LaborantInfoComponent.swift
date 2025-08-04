@@ -14,14 +14,14 @@ struct LaborantInfoComponent: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Decimal.d16) {
             VStack(alignment: .leading, spacing: Decimal.d8) {
-                Text("Petugas Pemeriksaan")
+                Text(AppTextExamCompLabInfo.examinationOfficerTitle)
                     .font(AppTypography.h5)
                 Text(pic)
                     .font(AppTypography.p3)
             }
 
             VStack(alignment: .leading, spacing: Decimal.d8) {
-                Text("Ditugaskan Oleh")
+                Text(AppTextExamCompLabInfo.assignedByTitle)
                     .font(AppTypography.h5)
                 Text(dpjp)
                     .font(AppTypography.p3)

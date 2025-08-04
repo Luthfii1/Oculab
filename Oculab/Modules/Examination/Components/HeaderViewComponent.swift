@@ -19,7 +19,7 @@ struct HeaderViewComponent: View {
                     Circle()
                         .stroke(AppColors.slate100, lineWidth: 1)
                         .frame(width: 36, height: 36)
-                    Image(systemName: "xmark")
+                    Image(systemName: AppText.Icon.xmark)
                         .font(.system(size: 18, weight: .medium))
                         .foregroundColor(AppColors.slate900)
                 }
@@ -27,7 +27,7 @@ struct HeaderViewComponent: View {
 
             Spacer()
 
-            Text("Pemeriksaan Baru")
+            Text(AppTextExamCompHeaderView.newExaminationTitle)
                 .font(AppTypography.s4_1)
                 .foregroundColor(AppColors.slate900)
 

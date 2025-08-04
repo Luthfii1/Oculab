@@ -14,22 +14,22 @@ struct PatientListView: View {
         NavigationView {
             VStack(alignment: .leading, spacing: 24) {
                 HStack {
-                    Text("Riwayat")
+                    Text(AppTextPatientList.navigationTitle)
                         .font(AppTypography.h1)
                         .foregroundColor(AppColors.slate900)
                 }
                 
                 AppSearchBar(
                     searchText: $presenter.searchText,
-                    placeholder: "Cari nama pasien",
+                    placeholder: AppTextPatientList.searchPlaceholder,
                     onSearch: {
                         presenter.searchPatients()
                     }
                 )
 
                 AppButton(
-                    title: "Tambah Pasien Baru",
-                    leftIcon: "plus",
+                    title: AppTextPatientList.addNewPatientButton,
+                    leftIcon: AppText.Icon.plus,
                     colorType: .secondary,
                     action: {
                         presenter.navigateTo(.patientForm())
@@ -42,11 +42,11 @@ struct PatientListView: View {
                         .padding(.top, 40)
                 } else if !presenter.searchText.isEmpty && presenter.filteredPatientNameDoB.isEmpty {
                     VStack(spacing: 20) {
-                        Image(systemName: "magnifyingglass")
+                        Image(systemName: AppText.Icon.magnifyingglass)
                             .font(.system(size: 48))
                             .foregroundColor(AppColors.slate300)
                         
-                        Text("Tidak ada hasil untuk \"\(presenter.searchText)\"")
+                        Text("\(AppTextPatientList.noResultsPrefix) \"\(presenter.searchText)\"")
                             .font(AppTypography.s3)
                             .foregroundColor(AppColors.slate700)
                             .multilineTextAlignment(.center)
@@ -54,7 +54,7 @@ struct PatientListView: View {
                         Button(action: {
                             presenter.clearSearch()
                         }) {
-                            Text("Hapus Pencarian")
+                            Text(AppTextPatientList.clearSearchButton)
                                 .font(AppTypography.p2)
                                 .foregroundColor(AppColors.purple600)
                         }
@@ -71,8 +71,8 @@ struct PatientListView: View {
                                     presenter.navigateTo(.patientDetail(patientId: patientId))
                                 } label: {
                                     PatientCard(
-                                        name: nameWithDoB.components(separatedBy: " (").first ?? "",
-                                        birthDate: nameWithDoB.components(separatedBy: " (").last?.replacingOccurrences(of: ")", with: "") ?? ""
+                                        name: nameWithDoB.components(separatedBy: " (").first ?? AppText.Common.emptyString,
+                                        birthDate: nameWithDoB.components(separatedBy: " (").last?.replacingOccurrences(of: ")", with: "") ?? AppText.Common.emptyString
                                     )
                                 }
                             }

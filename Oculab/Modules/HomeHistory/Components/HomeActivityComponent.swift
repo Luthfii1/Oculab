@@ -30,7 +30,7 @@ struct HomeActivityComponent: View {
                 StatusTagComponent(type: status)
             }
             HStack(spacing: Decimal.d8) {
-                Image(systemName: "doc.text.fill")
+                Image(systemName: AppText.Icon.docTextFill)
                     .padding(Decimal.d8)
                     .background(AppColors.purple50)
                     .foregroundStyle(AppColors.purple500)
@@ -44,7 +44,7 @@ struct HomeActivityComponent: View {
             case .lab:
                 Text(patientName + " (\(patientDOB))").font(AppTypography.p4).foregroundStyle(AppColors.slate900)
             case .admin, .adminPatientDetail:
-                Text("Petugas Pemeriksaan").font(AppTypography.s6).foregroundStyle(AppColors.slate300)
+                Text(AppTextHomeHistCompHomeActivity.examinationOfficerLabel).font(AppTypography.s6).foregroundStyle(AppColors.slate300)
                 Text(picName).font(AppTypography.p2).foregroundStyle(AppColors.slate900)
             }
         }

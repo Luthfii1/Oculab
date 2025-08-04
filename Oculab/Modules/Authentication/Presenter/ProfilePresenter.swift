@@ -44,7 +44,7 @@ class ProfilePresenter: ObservableObject {
     @Published var descriptionOldPassword: String = ""
     @Published var isLoading = false {
         didSet {
-            AppText.Authentication.Profile.saveChangesButton = isLoading ? "Loading..." : "Simpan Perubahan"
+            AppText.Authentication.ProfileView.saveChangesButton = isLoading ? "Loading..." : "Simpan Perubahan"
         }
     }
 

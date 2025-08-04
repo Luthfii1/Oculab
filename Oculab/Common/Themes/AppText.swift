@@ -7,6 +7,44 @@
 
 import Foundation
 
+// NOTE: Authentication Module Texts
+typealias AppTextAuthLogin = AppText.Authentication.LoginView
+typealias AppTextAuthEditPassword = AppText.Authentication.EditPasswordView
+typealias AppTextAuthUserAccessPin = AppText.Authentication.UserAccessPinView
+typealias AppTextAuthProfile = AppText.Authentication.ProfileView
+typealias AppTextAuthPrivacyPolicy = AppText.Authentication.PrivacyPolicyView
+typealias AppTextAuthCompPin = AppText.Authentication.PinComponent
+
+// NOTE: Examination Module Texts
+typealias AppTextExamProgress = AppText.Examination.ProgressView
+typealias AppTextExamDetail = AppText.Examination.DetailViews
+typealias AppTextExamGuidelines = AppText.Examination.GuidelinesOnboardingView
+typealias AppTextExamSavedResult = AppText.Examination.SavedResultView
+typealias AppTextExamCompConfirmPopups = AppText.Examination.ConfirmationPopupsComponent
+typealias AppTextExamCompGradingCard = AppText.Examination.GradingCardComponent
+typealias AppTextExamCompImageSection = AppText.Examination.ImageSectionComponent
+typealias AppTextExamCompInterpretationSection = AppText.Examination.InterpretationSectionComponent
+typealias AppTextExamCompLabInfo = AppText.Examination.LaborantInfoComponent
+typealias AppTextExamCompHeaderView = AppText.Examination.HeaderViewComponent
+typealias AppTextExamCompFolderCard = AppText.Examination.FolderCardComponent
+typealias AppTextExamCompExtendableCard = AppText.Examination.ExtendableCardComponent
+
+// Note: HomeHistory Module Texts
+typealias AppTextHomeHistory = AppText.HomeHistory
+typealias AppTextHomeHistCompFinishedExamCard = AppText.HomeHistory.FinishedExaminationCardComponent
+typealias AppTextHomeHistCompStatistic = AppText.HomeHistory.StatisticComponent
+typealias AppTextHomeHistCompWeeklyCalendar = AppText.HomeHistory.WeeklyCalendarComponent
+typealias AppTextHomeHistCompHomeActivity = AppText.HomeHistory.HomeActivityComponent
+typealias AppTextHomeHistCompButtonActivity = AppText.HomeHistory.ButtonActivityComponent
+typealias AppTextHomeHistCompHalfCircleProgress = AppText.HomeHistory.HalfCircleProgressComponent
+
+// NOTE: Patient Module Texts
+typealias AppTextPatientDetail = AppText.Patient.DetailView
+typealias AppTextPatientForm = AppText.Patient.FormView
+typealias AppTextPatientList = AppText.Patient.ListView
+typealias AppTextPatientCompCard = AppText.Patient.PatientCardComponent
+typealias AppTextPatientCompFormField = AppText.Patient.PatientFormFieldComponent
+
 enum AppText {
     enum Icon {
         static let back = "back"
@@ -22,11 +60,27 @@ enum AppText {
         static let doorRightHandOpen = "door.right.hand.open"
         static let docTextMagnifyingglass = "doc.text.magnifyingglass"
         static let docText = "doc.text"
+        static let docTextFill = "doc.text.fill"
         static let paperplane = "paperplane"
         static let chevronRightIcon = "chevron.right"
         static let photo = "photo"
         static let textBadgeCheckmark = "text.badge.checkmark"
         static let exclamationmarkTriangleFill = "exclamationmark.triangle.fill"
+        static let docOnDocFillIcon = "doc.on.doc.fill"
+        static let docBadgePlusIcon = "doc.badge.plus"
+        static let plus = "plus"
+        static let magnifyingglass = "magnifyingglass"
+        static let deleteLeftFill = "delete.left.fill"
+        static let robot = "robot"
+        static let rectangleStackFill = "rectangle.stack.fill"
+        static let infoCircle = "info.circle"
+        static let xmark = "xmark"
+        static let chevronDown = "chevron.down"
+        static let chevronUp = "chevron.up"
+        static let confirmLeave = "Confirm-Leave"
+        static let confirm = "Confirm"
+        static let trayFullFill = "tray.full.fill"
+        static let calendar = "calendar"
     }
 
     enum Common {
@@ -39,10 +93,11 @@ enum AppText {
         static let nextButton = "Lanjutkan"
         static let backButton = "Kembali"
         static let emptyString = ""
+        static let errorAlertTitle = "Error"
     }
     
     enum Authentication {
-        enum Login {
+        enum LoginView {
             static let title = "Revolusi Deteksi Bakteri dengan Teknologi AI"
             static let emailTitle = "Email"
             static let emailPlaceholder = "Contoh: your.name@gmail.com"
@@ -53,7 +108,7 @@ enum AppText {
             static let registerFaskesButtonText = "Daftarkan Faskes"
         }
         
-        enum EditPassword {
+        enum EditPasswordView {
             static let successUpdatePasswordTitle = "Berhasil mengubah Password"
             static let successUpdatePasswordMessage = "Anda telah berhasil mengubah password akun anda"
             static let successUpdatePasswordButtonText = "Kembali ke profile"
@@ -67,13 +122,13 @@ enum AppText {
             static let confirmPasswordPlaceholder = "Masukkan Konfirmasi Password Baru"
         }
 
-        enum UserAccessPin {
+        enum UserAccessPinView {
             static let successTitle = "PIN Berhasil Diubah"
             static let successDescription = "PIN akses Anda telah berhasil diperbarui"
             static let successButton = "Kembali ke Profile"
         }
 
-        enum Profile {
+        enum ProfileView {
             static let accountInfoTitle = "Informasi Akun"
             static let emailKey = "Email"
             static let roleKey = "Role"
@@ -91,7 +146,7 @@ enum AppText {
             static var saveChangesButton = "Simpan Perubahan"
         }
 
-        enum PrivacyPolicy {
+        enum PrivacyPolicyView {
             static let navigationTitle = "Kebijakan Privasi Oculab"
             static let intro = "Mohon untuk membaca seluruh kebijakan privasi yang terlampir dengan cermat dan seksama sebelum menggunakan setiap fitur dan/atau layanan yang tersedia dalam Oculab"
             static let generalTitle = "Ketentuan Umum"
@@ -134,6 +189,11 @@ enum AppText {
                 Definition(label: "h.", text: "“Pengendali Data” adalah setiap orang, badan publik, dan/atau organisasi internasional yang bertindak sendiri-sendiri atau bersama-sama dalam menentukan tujuan dan melakukan kendali pemrosesan Data Pribadi atau Data Kesehatan atau informasi lainnya. “Prosesor Data” adalah setiap orang, badan publik, dan/atau organisasi internasional yang bertindak sendiri-sendiri atau bersama-sama dalam melakukan pemrosesan Data Pribadi atau Data Kesehatan atau informasi lainnya yang ditunjuk Pengendali Data.")
             ]
         }
+
+        enum PinComponent {
+            static let forgotPinText = "Lupa PIN?"
+            static let usePasswordButton = "Gunakan Password"
+        }
     }
 
     enum Examination {
@@ -143,7 +203,7 @@ enum AppText {
             static let refreshInstruction = "Please scroll down to refresh to update the data"
         }
         
-        enum Detail {
+        enum DetailViews {
             static let navigationTitle = "Detail Pemeriksaan"
             static let patientDataTitle = "Data Pasien"
             static let patientNameKey = "Nama"
@@ -169,7 +229,7 @@ enum AppText {
             static let slideImageTitle = "Gambar Sediaan"
         }
         
-        enum GuidelinesOnboarding {
+        enum GuidelinesOnboardingView {
             static let navigationTitle = "Persiapan Pemeriksaan"
             static let continueButton = "Lanjutkan"
             
@@ -198,7 +258,7 @@ enum AppText {
             ]
         }
         
-        enum SavedResult {
+        enum SavedResultView {
             static let examinationDetailTitle = "Detail Pemeriksaan"
             static let examinationReasonKey = "Alasan Pemeriksaan"
             static let imageResultTitle = "Hasil Gambar"
@@ -207,6 +267,153 @@ enum AppText {
             static let staffInterpretationTitle = "Interpretasi Petugas"
             static let systemInterpretationTitle = "Interpretasi Sistem"
             static let systemInterpretationWarning = "Interpretasi sistem bukan merupakan hasil akhir untuk pasien"
+        }
+        
+        enum ConfirmationPopupsComponent {
+            static let unfinishedExaminationTitle = "Pemeriksaan Belum Selesai"
+            static let unfinishedExaminationDescription = "Pemeriksaan disimpan sebagai draft dan dapat diakses di halaman riwayat"
+            static let exitButton = "Keluar"
+            static let reviewAgainButton = "Periksa Kembali"
+            static let saveResultTitle = "Simpan Hasil Pemeriksaan"
+            static let saveResultDescription = "Hasil pemeriksaan yang sudah disimpan tidak dapat diubah kembali"
+            static let saveButton = "Simpan"
+        }
+        
+        enum GradingCardComponent {
+            static let confidenceLevelText = "confidence level"
+        }
+        
+        enum ImageSectionComponent {
+            static let imageResultTitle = "Hasil Gambar"
+            static let imageResultInstruction = "Ketuk untuk lihat detail gambar"
+        }
+        
+        enum InterpretationSectionComponent {
+            static let interpretationResultTitle = "Hasil Interpretasi"
+            static let staffInterpretationTitle = "Interpretasi Petugas"
+            static let selectCategoryPlaceholder = "Pilih kategori"
+            static let btaCountTitle = "Jumlah BTA"
+            static let btaCountPlaceholder = "Contoh: 8"
+            static let staffNotesTitle = "Catatan Petugas"
+            static let staffNotesPlaceholder = "Contoh: Hanya terdapat 20 bakteri dari 60 lapangan pandang yang terkumpul"
+            static let doneButton = "Selesai"
+        }
+        
+        enum LaborantInfoComponent {
+            static let examinationOfficerTitle = "Petugas Pemeriksaan"
+            static let assignedByTitle = "Ditugaskan Oleh"
+        }
+        
+        enum FolderCardComponent {
+            static let imageCountSuffix = "Gambar"
+        }
+        
+        enum HeaderViewComponent {
+            static let newExaminationTitle = "Pemeriksaan Baru"
+        }
+        
+        enum ExtendableCardComponent {
+            static let unknownTitle = "Unknown"
+        }
+    }
+    
+    enum HomeHistory {
+        static let navigationTitleHistory = "Riwayat"
+        static let loadingMessage = "Memuat data pemeriksaan anda"
+        static let emptyStateImageName = "Empty"
+        static let noExaminationMessage = "Tidak ada pemeriksaan diselesaikan pada"
+
+        static let navigationTitleHome = "Tugas Pemeriksaan"
+        static let taskSectionTitle = "Tugas Pemeriksaan"
+        static let newExaminationButton = "Pemeriksaan Baru"
+        static let noTaskMessage = "Anda belum ditugaskan untuk melakukan pemeriksaan"
+        
+        enum FinishedExaminationCardComponent {
+            static let patientLabel = "Pasien"
+            static let dpjpLabel = "DPJP"
+            static let positiveKeyword = "positif"
+            static let positiveAltKeyword = "positive"
+        }
+        
+        enum StatisticComponent {
+            static let title = "Statistik Pemeriksaan"
+            static let tasksCompletedSuffix = "Tugas Selesai"
+            static let fromTasksPrefix = "dari"
+            static let tasksInTotalSuffix = "Tugas"
+            static let positiveLabel = "Positif"
+            static let negativeLabel = "Negatif"
+            static let pendingLabel = "Pending"
+        }
+        
+        enum WeeklyCalendarComponent {
+            static let title = "Pemeriksaan Selesai"
+            static let selectDatePickerTitle = "Select a Date"
+        }
+        
+        enum HomeActivityComponent {
+            static let examinationOfficerLabel = "Petugas Pemeriksaan"
+        }
+        
+        enum ButtonActivityComponent {
+            // This component doesn't have hardcoded strings, but keeping for consistency
+        }
+        
+        enum HalfCircleProgressComponent {
+            static let percentageSuffix = "%"
+        }
+    }
+    
+    enum Patient {
+        enum FormView {
+            static let newPatientNavigationTitle = "Data Pasien Baru"
+            static let editPatientNavigationTitle = "Ubah Data Pasien"
+            static let addNewPatientButton = "Tambahkan Pasien Baru"
+            static let savePatientButton = "Simpan Data Pasien"
+            static let errorAlertTitle = "Error"
+        }
+        
+        enum ListView {
+            static let navigationTitle = "Riwayat"
+            static let searchPlaceholder = "Cari nama pasien"
+            static let addNewPatientButton = "Tambah Pasien Baru"
+            static let noResultsPrefix = "Tidak ada hasil untuk"
+            static let clearSearchButton = "Hapus Pencarian"
+            static let magnifyingglassIcon = "magnifyingglass"
+        }
+        
+        enum DetailView {
+            static let navigationTitle = "Riwayat Pemeriksaan"
+            static let patientDataTitle = "Data Pasien"
+            static let examinationResultTitle = "Hasil Pemeriksaan"
+            static let newExaminationButton = "Pemeriksaan Baru"
+            static let loadingPatientMessage = "Loading patient data..."
+            static let loadingExaminationsMessage = "Loading examinations..."
+            static let noExaminationsMessage = "Belum ada pemeriksaan"
+            static let notDeterminedMessage = "Belum ditentukan"
+            static let patientNameKey = "Nama"
+            static let patientNikKey = "NIK"
+            static let patientDobKey = "Tanggal Lahir"
+            static let patientSexKey = "Jenis Kelamin"
+            static let patientBpjsKey = "Nomor BPJS"
+        }
+        
+        enum PatientCardComponent {
+            static let birthDatePrefix = "Tanggal Lahir: "
+        }
+        
+        enum PatientFormFieldComponent {
+            static let nameTitle = "Nama"
+            static let namePlaceholder = "John Doe"
+            static let nikTitle = "NIK"
+            static let nikPlaceholder = "Contoh: 167012039484700"
+            static let birthDateTitle = "Tanggal Lahir"
+            static let birthDatePlaceholder = "Pilih Tanggal"
+            static let genderTitle = "Jenis Kelamin"
+            static let femaleChoice = "Perempuan"
+            static let maleChoice = "Laki-laki"
+            static let bpjsTitle = "Nomor BPJS (opsional)"
+            static let bpjsPlaceholder = "Contoh: 1240630077675"
+            static let doneButton = "Selesai"
         }
     }
 }

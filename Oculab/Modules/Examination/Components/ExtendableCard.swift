@@ -27,7 +27,7 @@ struct ExtendableCard: View {
 
                 // Show chevron only if isExtendable is true
                 if isExtendable {
-                    Image(systemName: isExtended ? "chevron.up" : "chevron.down")
+                    Image(systemName: isExtended ? AppText.Icon.chevronUp : AppText.Icon.chevronDown)
                         .onTapGesture {
                             withAnimation {
                                 isExtended.toggle()
@@ -40,7 +40,7 @@ struct ExtendableCard: View {
             if isExtendable && isExtended {
                 ExtendedCard(data: data, titleSize: titleSize)
             } else if !isExtendable {
-                Text(titleCard ?? "Unknown")
+                Text(titleCard ?? AppTextExamCompExtendableCard.unknownTitle)
                     .font(AppTypography.h3)
                     .foregroundStyle(AppColors.slate900)
                     .padding(.top, 16)

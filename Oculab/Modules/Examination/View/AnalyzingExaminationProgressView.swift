@@ -17,15 +17,15 @@ struct AnalyzingExaminationProgressView: View {
                 Spacer()
                     .frame(height: UIScreen.main.bounds.height * 0.2)
 
-                LottieHelper(animationName: AppText.Examination.ProgressView.loadingAnimationName)
+                LottieHelper(animationName: AppTextExamProgress.loadingAnimationName)
                     .frame(width: 84, height: 84)
                     .padding(.bottom, 72)
 
-                Text(AppText.Examination.ProgressView.analyzingTitle)
+                Text(AppTextExamProgress.analyzingTitle)
                     .font(AppTypography.h2)
                     .padding(.bottom, 12)
 
-                Text(AppText.Examination.ProgressView.refreshInstruction)
+                Text(AppTextExamProgress.refreshInstruction)
                     .font(AppTypography.p3)
 
                 Spacer()

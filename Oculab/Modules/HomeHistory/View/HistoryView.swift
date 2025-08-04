@@ -22,15 +22,15 @@ struct HistoryView: View {
                     if presenter.isAllExamsLoading {
                         Spacer().frame(height: Decimal.d24)
                         VStack(alignment: .center) {
-                            ProgressView("Memuat data pemeriksaan anda")
+                            ProgressView(AppText.HomeHistory.loadingMessage)
                                 .progressViewStyle(CircularProgressViewStyle())
                         }
                         .frame(maxWidth: .infinity)
 
                     } else if shouldShowEmptyState() {
                         VStack(alignment: .center) {
-                            Image("Empty")
-                            Text("Tidak ada pemeriksaan diselesaikan pada \(formatDate(selectedDate))")
+                            Image(AppText.HomeHistory.emptyStateImageName)
+                            Text("\(AppText.HomeHistory.noExaminationMessage) \(formatDate(selectedDate))")
                                 .font(AppTypography.p3)
                                 .foregroundStyle(AppColors.slate300)
                                 .frame(maxWidth: 254)
@@ -50,7 +50,7 @@ struct HistoryView: View {
                                         result: exam.finalGradingResult.rawValue,
                                         patientName: exam.patientName,
                                         patientDOB: exam.patientDob.toFormattedDate(),
-                                        dpjpName: exam.dpjpName ?? ""
+                                        dpjpName: exam.dpjpName ?? AppText.Common.emptyString
                                     )
                                 }
                             }
@@ -59,7 +59,7 @@ struct HistoryView: View {
                 }
             }
             .padding(.horizontal, Decimal.d20)
-            .navigationTitle("Riwayat")
+            .navigationTitle(AppText.HomeHistory.navigationTitleHistory)
         }
         .ignoresSafeArea()
         .onAppear {

@@ -1,5 +1,5 @@
 //
-//  PatientForm.swift
+//  PatientFormView.swift
 //  Oculab
 //
 //  Created by Alifiyah Ariandri on 08/11/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct PatientForm: View {
+struct PatientFormView: View {
     let patientId: String?
     @StateObject private var presenter = PatientPresenter()
     
@@ -36,8 +36,8 @@ struct PatientForm: View {
                     Spacer()
 
                     AppButton(
-                        title: isAddingNewPatient ? "Tambahkan Pasien Baru" : "Simpan Data Pasien",
-                        leftIcon: isAddingNewPatient ? "plus" : "checkmark"
+                        title: isAddingNewPatient ? AppTextPatientForm.addNewPatientButton : AppTextPatientForm.savePatientButton,
+                        leftIcon: isAddingNewPatient ? AppText.Icon.plus : AppText.Icon.checkmark
                     ) {
                         Task {
                             if isAddingNewPatient {
@@ -51,7 +51,7 @@ struct PatientForm: View {
             }
             .padding(.horizontal, Decimal.d20)
             .padding(.vertical, Decimal.d24)
-            .navigationTitle(isAddingNewPatient ? "Data Pasien Baru" : "Ubah Data Pasien")
+            .navigationTitle(isAddingNewPatient ? AppTextPatientForm.newPatientNavigationTitle : AppTextPatientForm.editPatientNavigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -59,7 +59,7 @@ struct PatientForm: View {
                         Router.shared.navigateBack()
                     }) {
                         HStack {
-                            Image("back")
+                            Image(AppText.Icon.back)
                         }
                     }
                 }
@@ -71,8 +71,8 @@ struct PatientForm: View {
                     }
                 }
             }
-            .alert("Error", isPresented: .constant(presenter.errorMessage != nil)) {
-                Button("OK") {
+            .alert(AppText.Common.errorAlertTitle, isPresented: .constant(presenter.errorMessage != nil)) {
+                Button(AppText.Common.okButton) {
                     presenter.errorMessage = nil
                 }
             } message: {
@@ -85,10 +85,6 @@ struct PatientForm: View {
     }
 }
 
-#Preview {
-    PatientForm()
-}
-
 #Preview("Edit Patient") {
-    PatientForm(patientId: "d0c1a2b3-4f5e-6789-91ab-cdef12345678")
+    PatientFormView(patientId: "d0c1a2b3-4f5e-6789-91ab-cdef12345678")
 }
