@@ -16,12 +16,12 @@ struct UserManagementView: View {
                 // Delete confirmation popup
                 if presenter.showDeleteConfirmationPopup {
                     AppPopup(
-                        image: "Confirm",
-                        title: "Hapus akun \(presenter.userToDelete?.name ?? "")?",
-                        description: "Akun yang sudah dihapus tidak dapat dikembalikan lagi.",
+                        image: AppText.Icon.confirm,
+                        title: "\(AppTextUserMgmtView.deleteAccountTitle) \(presenter.userToDelete?.name ?? AppText.Common.emptyString)?",
+                        description: AppTextUserMgmtView.deleteAccountDescription,
                         buttons: [
                             AppButton(
-                                title: "Hapus Akun",
+                                title: AppTextUserMgmtView.deleteAccountButton,
                                 colorType: .destructive(.primary),
                                 isEnabled: !presenter.isDeleting
                             ) {
@@ -30,7 +30,7 @@ struct UserManagementView: View {
                                 }
                             },
                             AppButton(
-                                title: "Kembali",
+                                title: AppTextUserMgmtView.backButton,
                                 colorType: .destructive(.secondary)
                             ) {
                                 presenter.dismissDeleteConfirmation()
@@ -43,12 +43,12 @@ struct UserManagementView: View {
                 // Delete success popup
                 if presenter.showDeleteSuccessAlert {
                     AppPopup(
-                        image: "Success",
-                        title: "Berhasil Menghapus Akun",
-                        description: presenter.deletionSuccess?.message ?? "Akun berhasil dihapus",
+                        image: AppText.Icon.success,
+                        title: AppTextUserMgmtView.deleteSuccessTitle,
+                        description: presenter.deletionSuccess?.message ?? AppTextUserMgmtView.deleteSuccessDescription,
                         buttons: [
                             AppButton(
-                                title: "OK",
+                                title: AppText.Common.okButton,
                                 colorType: .primary,
                                 size: .large,
                                 isEnabled: true
@@ -66,15 +66,15 @@ struct UserManagementView: View {
                     VStack(spacing: 24) {
                         AppSearchBar(
                             searchText: $presenter.searchText,
-                            placeholder: "Cari akun",
+                            placeholder: AppTextUserMgmtView.searchPlaceholder,
                             onSearch: {
                                 presenter.searchAccounts(query: presenter.searchText)
                             }
                         )
 
                         AppButton(
-                            title: "Tambah Akun Baru",
-                            leftIcon: "plus",
+                            title: AppTextUserMgmtView.addNewAccountButton,
+                            leftIcon: AppText.Icon.plus,
                             colorType: .secondary,
                             action: {
                                 presenter.navigateTo(.newAccount)
@@ -83,11 +83,11 @@ struct UserManagementView: View {
                         
                         if !presenter.searchText.isEmpty && presenter.displayedSortedGroupedAccounts.isEmpty {
                             VStack(spacing: 20) {
-                                Image(systemName: "magnifyingglass")
+                                Image(systemName: AppText.Icon.magnifyingglass)
                                     .font(.system(size: 48))
                                     .foregroundColor(AppColors.slate300)
                                 
-                                Text("Tidak ada hasil untuk \"\(presenter.searchText)\"")
+                                Text("\(AppTextUserMgmtView.noResultsPrefix) \"\(presenter.searchText)\"")
                                     .font(AppTypography.s3)
                                     .foregroundColor(AppColors.slate600)
                                     .multilineTextAlignment(.center)
@@ -95,7 +95,7 @@ struct UserManagementView: View {
                                 Button(action: {
                                     presenter.clearSearch()
                                 }) {
-                                    Text("Hapus Pencarian")
+                                    Text(AppTextUserMgmtView.clearSearchButton)
                                         .font(AppTypography.p2)
                                         .foregroundColor(AppColors.purple600)
                                 }
@@ -116,14 +116,14 @@ struct UserManagementView: View {
                         }
                     }
                     .padding(.horizontal, Decimal.d20)
-                    .navigationTitle("Manajemen Akun")
+                    .navigationTitle(AppTextUserMgmtView.navigationTitle)
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarLeading) {
                             Button(action: {
                                 presenter.navigateBack()
                             }) {
-                                Image("back")
+                                Image(AppText.Icon.back)
                             }
                         }
                     }
@@ -133,18 +133,18 @@ struct UserManagementView: View {
                     BottomSheetMenu(presenter: presenter)
                 }
                 .alert(
-                    "Deletion Failed",
+                    AppTextUserMgmtView.deletionFailedTitle,
                     isPresented: Binding(
                         get: { presenter.deletionError != nil },
                         set: { if !$0 { presenter.deletionError = nil } }
                     ),
                     actions: {
-                        Button("OK") {
+                        Button(AppText.Common.okButton) {
                             presenter.deletionError = nil
                         }
                     },
                     message: {
-                        Text(presenter.deletionError ?? "Unknown error")
+                        Text(presenter.deletionError ?? AppTextUserMgmtView.unknownErrorMessage)
                     }
                 )
                 .onAppear {

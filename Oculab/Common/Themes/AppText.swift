@@ -45,6 +45,13 @@ typealias AppTextPatientList = AppText.Patient.ListView
 typealias AppTextPatientCompCard = AppText.Patient.PatientCardComponent
 typealias AppTextPatientCompFormField = AppText.Patient.PatientFormFieldComponent
 
+// NOTE: UserManagement Module Texts
+typealias AppTextUserMgmtView = AppText.UserManagement.UserManagementView
+typealias AppTextUserMgmtNewUserForm = AppText.UserManagement.NewUserFormView
+typealias AppTextUserMgmtEditUserForm = AppText.UserManagement.EditUserFormView
+typealias AppTextUserMgmtUserListView = AppText.UserManagement.UserListView
+typealias AppTextUserMgmtCompBottomSheet = AppText.UserManagement.BottomSheetMenuComponent
+
 enum AppText {
     enum Icon {
         static let back = "back"
@@ -81,6 +88,11 @@ enum AppText {
         static let confirm = "Confirm"
         static let trayFullFill = "tray.full.fill"
         static let calendar = "calendar"
+        static let ellipsis = "ellipsis"
+        static let pencil = "pencil"
+        static let trash = "trash"
+        static let chevronLeft = "chevron.left"
+        static let addAccount = "AddAccount"
     }
 
     enum Common {
@@ -414,6 +426,70 @@ enum AppText {
             static let bpjsTitle = "Nomor BPJS (opsional)"
             static let bpjsPlaceholder = "Contoh: 1240630077675"
             static let doneButton = "Selesai"
+        }
+    }
+    
+    enum UserManagement {
+        enum UserManagementView {
+            static let navigationTitle = "Manajemen Akun"
+            static let searchPlaceholder = "Cari akun"
+            static let addNewAccountButton = "Tambah Akun Baru"
+            static let noResultsPrefix = "Tidak ada hasil untuk"
+            static let clearSearchButton = "Hapus Pencarian"
+            static let deleteAccountTitle = "Hapus akun"
+            static let deleteAccountDescription = "Akun yang sudah dihapus tidak dapat dikembalikan lagi."
+            static let deleteAccountButton = "Hapus Akun"
+            static let backButton = "Kembali"
+            static let deleteSuccessTitle = "Berhasil Menghapus Akun"
+            static let deleteSuccessDescription = "Akun berhasil dihapus"
+            static let deletionFailedTitle = "Deletion Failed"
+            static let unknownErrorMessage = "Unknown error"
+        }
+        
+        enum NewUserFormView {
+            static let navigationTitle = "Buat Akun Baru"
+            static let successTitle = "Berhasil membuat Akun"
+            static let successDescriptionPrefix = "Anda telah berhasil menambahkan akun baru untuk"
+            static let successDescriptionSuffix = "dengan role"
+            static let createAnotherAccountButton = "Buat Akun Lain"
+            static let backToAccountListButton = "Kembali ke Daftar Akun"
+            static let roleTitle = "Role"
+            static let roleLabPlaceholder = "Laboran"
+            static let roleAdminChoice = "Admin"
+            static let nameTitle = "Nama"
+            static let namePlaceholder = "John Doe"
+            static let emailTitle = "Email"
+            static let emailPlaceholder = "john@gmail.com"
+            static let registerAccountButton = "Daftarkan Akun"
+            static let registrationFailedTitle = "Registration Failed"
+            static let unknownErrorMessage = "Unknown error"
+        }
+        
+        enum EditUserFormView {
+            static let navigationTitle = "Edit Akun"
+            static let successTitle = "Berhasil mengubah Akun"
+            static let successDescriptionPrefix = "Anda telah berhasil mengubah akun untuk"
+            static let successDescriptionSuffix = "dengan role"
+            static let backToAccountListButton = "Kembali ke Daftar Akun"
+            static let roleTitle = "Role"
+            static let nameTitle = "Nama"
+            static let namePlaceholder = "Masukkan nama"
+            static let emailTitle = "Email"
+            static let emailPlaceholder = "Email"
+            static let emailDisabledDescription = "Email tidak dapat diubah"
+            static let saveChangesButton = "Simpan Perubahan"
+            static let cancelButton = "Batal"
+            static let editFailedTitle = "Edit Failed"
+            static let unknownErrorMessage = "Unknown error"
+        }
+        
+        enum UserListView {
+            // This component doesn't have specific hardcoded strings, but keeping for consistency
+        }
+        
+        enum BottomSheetMenuComponent {
+            static let editAccountDetailsButton = "Ubah Detail Akun"
+            static let deleteAccountButton = "Hapus Akun"
         }
     }
 }
