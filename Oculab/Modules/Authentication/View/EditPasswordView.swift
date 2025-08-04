@@ -15,12 +15,12 @@ struct EditPasswordView: View {
             ZStack {
                 if profilePresenter.showSuccessPopup {
                     AppPopup(
-                        image: "Success",
-                        title: "Berhasil mengubah Password",
-                        description: "Anda telah berhasil mengubah password akun anda",
+                        image: AppText.Icon.success,
+                        title: AppText.Authentication.EditPassword.successUpdatePasswordTitle,
+                        description: AppText.Authentication.EditPassword.successUpdatePasswordMessage,
                         buttons: [
                             AppButton(
-                                title: "Kembali ke profile",
+                                title: AppText.Authentication.EditPassword.successUpdatePasswordButtonText,
                                 colorType: .secondary,
                                 size: .large,
                                 isEnabled: true
@@ -42,35 +42,35 @@ struct EditPasswordView: View {
                     VStack(spacing: 52) {
                         VStack(alignment: .leading, spacing: 24) {
                             AppTextField(
-                                title: "Password Saat Ini",
-                                placeholder: "Masukkan Password",
+                                title: AppText.Authentication.EditPassword.currentPasswordTitle,
+                                placeholder: AppText.Authentication.EditPassword.currentPasswordPlaceholder,
                                 description: profilePresenter.descriptionOldPassword,
-                                rightIcon: "eye",
+                                rightIcon: AppText.Icon.eye,
                                 isError: profilePresenter.isOldPasswordError,
                                 text: $profilePresenter.oldPassword
                             )
 
                             AppTextField(
-                                title: "Password Baru",
-                                placeholder: "Masukkan Password Baru",
-                                description: "Password harus terdiri dari minimal 8 karakter",
-                                rightIcon: "eye",
+                                title: AppText.Authentication.EditPassword.newPasswordTitle,
+                                placeholder: AppText.Authentication.EditPassword.newPasswordPlaceholder,
+                                description: AppText.Authentication.EditPassword.newPasswordDescription,
+                                rightIcon: AppText.Icon.eye,
                                 text: $profilePresenter.inputPassword
                             )
 
                             AppTextField(
-                                title: "Konfirmasi Password Baru",
-                                placeholder: "Masukkan Konfirmasi Password Baru",
+                                title: AppText.Authentication.EditPassword.confirmPasswordTitle,
+                                placeholder: AppText.Authentication.EditPassword.confirmPasswordPlaceholder,
                                 description: profilePresenter.descriptionPasswordConfirm,
-                                rightIcon: "eye",
+                                rightIcon: AppText.Icon.eye,
                                 isError: profilePresenter.isError,
                                 text: $profilePresenter.confirmPassword
                             )
                         }
 
                         AppButton(
-                            title: profilePresenter.buttonText,
-                            rightIcon: "checkmark",
+                            title: AppText.Authentication.Profile.saveChangesButton,
+                            rightIcon: AppText.Icon.checkmark,
                             isEnabled: profilePresenter.isPasswordEditButtonEnabled()
                         ) {
                             Task {
@@ -84,14 +84,14 @@ struct EditPasswordView: View {
                     .padding(20)
                 }
                 .navigationBarTitleDisplayMode(.inline)
-                .navigationTitle("Atur Password")
+                .navigationTitle(AppText.Authentication.EditPassword.navigationTitle)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: {
                             Router.shared.navigateBack()
                         }) {
                             HStack {
-                                Image("back")
+                                Image(AppText.Icon.back)
                             }
                         }
                     }

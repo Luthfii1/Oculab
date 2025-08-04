@@ -21,15 +21,15 @@ struct ExamDetailAdmin: View {
 
                 VStack(alignment: .leading, spacing: Decimal.d24) {
                     ExtendableCard(
-                        icon: "person.fill",
-                        title: "Data Pasien",
+                        icon: AppText.Icon.personFill,
+                        title: AppText.Examination.Detail.patientDataTitle,
                         isExtendable: true,
                         data: [
-                            (key: "Nama", value: presenter.patientDetailData.name),
-                            (key: "NIK", value: presenter.patientDetailData.nik),
-                            (key: "Tanggal Lahir", value: presenter.patientDetailData.dob),
-                            (key: "Jenis Kelamin", value: presenter.patientDetailData.sex),
-                            (key: "Nomor BPJS", value: presenter.patientDetailData.bpjs),
+                            (key: AppText.Examination.Detail.patientNameKey, value: presenter.patientDetailData.name),
+                            (key: AppText.Examination.Detail.patientNikKey, value: presenter.patientDetailData.nik),
+                            (key: AppText.Examination.Detail.patientDobKey, value: presenter.patientDetailData.dob),
+                            (key: AppText.Examination.Detail.patientSexKey, value: presenter.patientDetailData.sex),
+                            (key: AppText.Examination.Detail.patientBpjsKey, value: presenter.patientDetailData.bpjs),
                         ],
                         titleSize: AppTypography.s5
                     )
@@ -40,25 +40,25 @@ struct ExamDetailAdmin: View {
                     )
 
                     AppCard(
-                        icon: "doc.text.magnifyingglass",
-                        title: "Hasil Pemeriksaan Sediaan 1",
+                        icon: AppText.Icon.docTextMagnifyingglass,
+                        title: AppText.Examination.Detail.examinationResult1Title,
                         spacing: Decimal.d16
                     ) {
                         VStack(alignment: .leading) {
-                            Text("Interpretasi Petugas")
+                            Text(AppText.Examination.Detail.staffInterpretationTitle)
                                 .font(AppTypography.s5)
                                 .foregroundColor(AppColors.slate300)
                                 
-                                let interpretasiPetugas = presenter.examinations.first?.expertResult ?? "Belum Tersedia"
+                                let interpretasiPetugas = presenter.examinations.first?.expertResult ?? AppText.Examination.Detail.notAvailable
                                 
-                                if interpretasiPetugas != "Belum Tersedia" {
+                                if interpretasiPetugas != AppText.Examination.Detail.notAvailable {
                                     GradingCardComponent(
                                         type: GradingType(rawValue: interpretasiPetugas) ?? .unknown,
                                         confidenceLevel: .lowConfidence,
                                         isExpert: true
                                     )
                                 } else {
-                                    Text("Belum Tersedia")
+                                    Text(AppText.Examination.Detail.notAvailable)
                                         .font(AppTypography.p4)
                                         .padding(.vertical, 8)
                                         .padding(.horizontal, 16)
@@ -67,31 +67,31 @@ struct ExamDetailAdmin: View {
                                 }
                         }
                         ExtendedCard(data: [
-                            ("ID Sediaan", presenter.examinations.first?.slideId ?? ""),
-                            ("Jenis Sediaan", presenter.examinations.first?.preparationType ?? "")
+                            (AppText.Examination.Detail.slideIdKey, presenter.examinations.first?.slideId ?? AppText.Common.emptyString),
+                            (AppText.Examination.Detail.preparationTypeKey, presenter.examinations.first?.preparationType ?? AppText.Common.emptyString)
                         ], titleSize: AppTypography.s5)
                     }
 
                     AppCard(
-                        icon: "doc.text.magnifyingglass",
-                        title: "Hasil Pemeriksaan Sediaan 2",
+                        icon: AppText.Icon.docTextMagnifyingglass,
+                        title: AppText.Examination.Detail.examinationResult2Title,
                         spacing: Decimal.d16
                     ) {
                         VStack(alignment: .leading) {
-                            Text("Interpretasi Petugas")
+                            Text(AppText.Examination.Detail.staffInterpretationTitle)
                                 .font(AppTypography.s5)
                                 .foregroundColor(AppColors.slate300)
                             
-                            let interpretasiPetugas = presenter.examinations.count > 1 ? (presenter.examinations[1].expertResult ?? "Belum Tersedia") : "Belum Tersedia"
+                            let interpretasiPetugas = presenter.examinations.count > 1 ? (presenter.examinations[1].expertResult ?? AppText.Examination.Detail.notAvailable) : AppText.Examination.Detail.notAvailable
                             
-                            if interpretasiPetugas != "Belum Tersedia" {
+                            if interpretasiPetugas != AppText.Examination.Detail.notAvailable {
                                 GradingCardComponent(
                                     type: GradingType(rawValue: interpretasiPetugas) ?? .unknown,
                                     confidenceLevel: .lowConfidence,
                                     isExpert: true
                                 )
                             } else {
-                                Text("Belum Tersedia")
+                                Text(AppText.Examination.Detail.notAvailable)
                                     .font(AppTypography.p4)
                                     .padding(.vertical, 8)
                                     .padding(.horizontal, 16)
@@ -100,14 +100,14 @@ struct ExamDetailAdmin: View {
                             }
                         }
                         ExtendedCard(data: [
-                            ("ID Sediaan", presenter.examinations.count > 1 ? presenter.examinations[1].slideId : ""),
-                            ("Jenis Sediaan", presenter.examinations.count > 1 ? presenter.examinations[1].preparationType : "")
+                            (AppText.Examination.Detail.slideIdKey, presenter.examinations.count > 1 ? presenter.examinations[1].slideId : AppText.Common.emptyString),
+                            (AppText.Examination.Detail.preparationTypeKey, presenter.examinations.count > 1 ? presenter.examinations[1].preparationType : AppText.Common.emptyString)
                         ], titleSize: AppTypography.s5)
                     }
                     VStack(spacing: Decimal.d16) {
                         AppButton(
-                            title: "Lihat PDF",
-                            rightIcon: "doc.text",
+                            title: AppText.Examination.Detail.viewPdfButton,
+                            rightIcon: AppText.Icon.docText,
                             colorType: .secondary,
                             size: .small,
                             isEnabled: true
@@ -116,8 +116,8 @@ struct ExamDetailAdmin: View {
                         }
                         
                         AppButton(
-                            title: "Laporkan ke SITB",
-                            rightIcon: "paperplane",
+                            title: AppText.Examination.Detail.reportToSitbButton,
+                            rightIcon: AppText.Icon.paperplane,
                             size: .small,
                             isEnabled: true
                         ) {
@@ -127,7 +127,7 @@ struct ExamDetailAdmin: View {
                 }
             }
             .padding(.horizontal, Decimal.d16)
-            .navigationTitle("Detail Pemeriksaan")
+            .navigationTitle(AppText.Examination.Detail.navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -135,7 +135,7 @@ struct ExamDetailAdmin: View {
                         Router.shared.navigateBack()
                     }) {
                         HStack {
-                            Image("back")
+                            Image(AppText.Icon.back)
                         }
                     }
                 }

@@ -14,7 +14,6 @@ enum PinMode {
 }
 
 class AuthenticationPresenter: ObservableObject {
-    @Published var authText = TextAuthentication()
     @Published var isSplashScreenVisible = true
     @Published var description: String = ""
     @Published var textColor: Color = AppColors.slate900
@@ -45,7 +44,7 @@ class AuthenticationPresenter: ObservableObject {
     ]
 
     @Published var isLoading = false {
-        didSet { authText.loginButtonText = isLoading ? "Loading..." : "Login" }
+        didSet { AppText.Authentication.Login.buttonText = isLoading ? "Loading..." : "Login" }
     }
 
     @Published var isError: Bool = false {

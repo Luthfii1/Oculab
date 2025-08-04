@@ -20,7 +20,7 @@ struct ExamDetailView: View {
         NavigationView {
             VStack {
                 AppStepper(
-                    stepTitles: ["Data Pemeriksaan", "Hasil Pemeriksaan"],
+                    stepTitles: [AppText.Examination.Detail.dataPemeriksaanStep, AppText.Examination.Detail.hasilPemeriksaanStep],
                     currentStep: 0
                 ).padding(.top, Decimal.d12)
 
@@ -38,35 +38,35 @@ struct ExamDetailView: View {
                             )
 
                             AppCard(
-                                icon: "person.fill",
-                                title: "Data Pasien",
+                                icon: AppText.Icon.personFill,
+                                title: AppText.Examination.Detail.patientDataTitle,
                                 spacing: Decimal.d8,
                                 isBorderDisabled: true
                             ) {
                                 ExtendedCard(data: [
-                                    (key: "Nama", value: presenter.patientDetailData.name),
-                                    (key: "NIK", value: presenter.patientDetailData.nik),
-                                    (key: "Tanggal Lahir", value: presenter.patientDetailData.dob),
-                                    (key: "Jenis Kelamin", value: presenter.patientDetailData.sex),
-                                    (key: "Nomor BPJS", value: presenter.patientDetailData.bpjs)
+                                    (key: AppText.Examination.Detail.patientNameKey, value: presenter.patientDetailData.name),
+                                    (key: AppText.Examination.Detail.patientNikKey, value: presenter.patientDetailData.nik),
+                                    (key: AppText.Examination.Detail.patientDobKey, value: presenter.patientDetailData.dob),
+                                    (key: AppText.Examination.Detail.patientSexKey, value: presenter.patientDetailData.sex),
+                                    (key: AppText.Examination.Detail.patientBpjsKey, value: presenter.patientDetailData.bpjs)
                                 ], titleSize: AppTypography.s5)
                             }
 
                             AppCard(
-                                icon: "doc.text.magnifyingglass",
-                                title: "Detail Sediaan",
+                                icon: AppText.Icon.docTextMagnifyingglass,
+                                title: AppText.Examination.Detail.slideDetailTitle,
                                 spacing: Decimal.d8,
                                 isBorderDisabled: true
                             ) {
                                 ExtendedCard(data: [
-                                    (key: "ID Sediaan", value: presenter.examDetailData.slideId),
-                                    (key: "Tujuan Pemeriksaan", value: presenter.examDetailData.examinationGoal),
-                                    (key: "Jenis Sediaan", value: presenter.examDetailData.type)
+                                    (key: AppText.Examination.Detail.slideIdKey, value: presenter.examDetailData.slideId),
+                                    (key: AppText.Examination.Detail.examinationGoalKey, value: presenter.examDetailData.examinationGoal),
+                                    (key: AppText.Examination.Detail.preparationTypeKey, value: presenter.examDetailData.type)
                                 ], titleSize: AppTypography.s5)
                             }
 
                             VideoInput(
-                                title: "Gambar Sediaan",
+                                title: AppText.Examination.Detail.slideImageTitle,
                                 isRequired: true,
                                 isEmpty: false,
                                 showOnboardingGuidelines: $showGuidelines,
@@ -80,7 +80,7 @@ struct ExamDetailView: View {
 
                     AppButton(
                         title: presenter.buttonTitle,
-                        rightIcon: "arrow.right",
+                        rightIcon: AppText.Icon.arrowRight,
                         size: .large,
                         isEnabled: presenter.buttonEnabled()
                     ) {
@@ -91,7 +91,7 @@ struct ExamDetailView: View {
                     }
                 }
                 .padding(.horizontal, Decimal.d20)
-                .navigationTitle("Pemeriksaan Baru")
+                .navigationTitle(AppText.Examination.Detail.newExaminationTitle)
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
@@ -102,7 +102,7 @@ struct ExamDetailView: View {
                             Router.shared.navigateBack()
                         }) {
                             HStack {
-                                Image("back")
+                                Image(AppText.Icon.back)
                             }
                         }
                     }

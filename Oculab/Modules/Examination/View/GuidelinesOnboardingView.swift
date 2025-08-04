@@ -11,23 +11,13 @@ struct GuidelinesOnboardingView: View {
     @Environment(\.dismiss) var dismiss
     @State private var currentPage = 0
 
-    let pages: [GuidelinePage] = [
+    let pages: [GuidelinePage] = AppText.Examination.GuidelinesOnboarding.guidelines.map { guideline in
         GuidelinePage(
-            imageName: "Guideline1",
-            title: "Temukan Lapang Pandang pada Mikroskop",
-            description: "Teteskan minyak imersi pada kaca sediaan dan atur lensa objektif ke perbesaran 100x"
-        ),
-        GuidelinePage(
-            imageName: "Guideline2",
-            title: "Pasang Handphone pada Adapter",
-            description: "Bersihkan lensa kamera utama dan sejajarkan dengan lubang adapter"
-        ),
-        GuidelinePage(
-            imageName: "Guideline3",
-            title: "Pasang Adapter pada Mikroskop",
-            description: "Pasang adapter ke lensa okuler dan atur fokus antara mikroskop dan kamera"
+            imageName: guideline.imageName,
+            title: guideline.title,
+            description: guideline.description
         )
-    ]
+    }
 
     var body: some View {
         NavigationStack {
@@ -66,8 +56,8 @@ struct GuidelinesOnboardingView: View {
                     .padding(.bottom, 24)
 
                 AppButton(
-                    title: "Lanjutkan",
-                    rightIcon: "chevron.right",
+                    title: AppText.Examination.GuidelinesOnboarding.continueButton,
+                    rightIcon: AppText.Icon.arrowRight,
                     isEnabled: currentPage == pages.count - 1,
                     action: {
                         if currentPage < pages.count - 1 {
@@ -80,14 +70,14 @@ struct GuidelinesOnboardingView: View {
                 .padding(.horizontal)
                 .padding(.bottom)
             }
-            .navigationTitle("Persiapan Pemeriksaan")
+            .navigationTitle(AppText.Examination.GuidelinesOnboarding.navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
                         Router.shared.navigateBack()
                     }) {
-                        Image("back")
+                        Image(AppText.Icon.back)
                     }
                 }
             }
