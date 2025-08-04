@@ -20,7 +20,7 @@ struct ExamDetailView: View {
         NavigationView {
             VStack {
                 AppStepper(
-                    stepTitles: [AppText.Examination.Detail.dataPemeriksaanStep, AppText.Examination.Detail.hasilPemeriksaanStep],
+                    stepTitles: [AppText.Examination.DetailViews.dataPemeriksaanStep, AppText.Examination.DetailViews.hasilPemeriksaanStep],
                     currentStep: 0
                 ).padding(.top, Decimal.d12)
 
@@ -39,34 +39,34 @@ struct ExamDetailView: View {
 
                             AppCard(
                                 icon: AppText.Icon.personFill,
-                                title: AppText.Examination.Detail.patientDataTitle,
+                                title: AppText.Examination.DetailViews.patientDataTitle,
                                 spacing: Decimal.d8,
                                 isBorderDisabled: true
                             ) {
                                 ExtendedCard(data: [
-                                    (key: AppText.Examination.Detail.patientNameKey, value: presenter.patientDetailData.name),
-                                    (key: AppText.Examination.Detail.patientNikKey, value: presenter.patientDetailData.nik),
-                                    (key: AppText.Examination.Detail.patientDobKey, value: presenter.patientDetailData.dob),
-                                    (key: AppText.Examination.Detail.patientSexKey, value: presenter.patientDetailData.sex),
-                                    (key: AppText.Examination.Detail.patientBpjsKey, value: presenter.patientDetailData.bpjs)
+                                    (key: AppText.Examination.DetailViews.patientNameKey, value: presenter.patientDetailData.name),
+                                    (key: AppText.Examination.DetailViews.patientNikKey, value: presenter.patientDetailData.nik),
+                                    (key: AppText.Examination.DetailViews.patientDobKey, value: presenter.patientDetailData.dob),
+                                    (key: AppText.Examination.DetailViews.patientSexKey, value: presenter.patientDetailData.sex),
+                                    (key: AppText.Examination.DetailViews.patientBpjsKey, value: presenter.patientDetailData.bpjs)
                                 ], titleSize: AppTypography.s5)
                             }
 
                             AppCard(
                                 icon: AppText.Icon.docTextMagnifyingglass,
-                                title: AppText.Examination.Detail.slideDetailTitle,
+                                title: AppText.Examination.DetailViews.slideDetailTitle,
                                 spacing: Decimal.d8,
                                 isBorderDisabled: true
                             ) {
                                 ExtendedCard(data: [
-                                    (key: AppText.Examination.Detail.slideIdKey, value: presenter.examDetailData.slideId),
-                                    (key: AppText.Examination.Detail.examinationGoalKey, value: presenter.examDetailData.examinationGoal),
-                                    (key: AppText.Examination.Detail.preparationTypeKey, value: presenter.examDetailData.type)
+                                    (key: AppText.Examination.DetailViews.slideIdKey, value: presenter.examDetailData.slideId),
+                                    (key: AppText.Examination.DetailViews.examinationGoalKey, value: presenter.examDetailData.examinationGoal),
+                                    (key: AppText.Examination.DetailViews.preparationTypeKey, value: presenter.examDetailData.type)
                                 ], titleSize: AppTypography.s5)
                             }
 
                             VideoInput(
-                                title: AppText.Examination.Detail.slideImageTitle,
+                                title: AppText.Examination.DetailViews.slideImageTitle,
                                 isRequired: true,
                                 isEmpty: false,
                                 showOnboardingGuidelines: $showGuidelines,
@@ -91,7 +91,7 @@ struct ExamDetailView: View {
                     }
                 }
                 .padding(.horizontal, Decimal.d20)
-                .navigationTitle(AppText.Examination.Detail.newExaminationTitle)
+                .navigationTitle(AppText.Examination.DetailViews.newExaminationTitle)
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {

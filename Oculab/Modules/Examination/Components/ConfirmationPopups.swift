@@ -14,14 +14,14 @@ struct ConfirmationPopups: View {
     var body: some View {
         VStack {
             AppPopup(
-                image: "Confirm-Leave",
-                title: "Pemeriksaan Belum Selesai",
-                description: "Pemeriksaan disimpan sebagai draft dan dapat diakses di halaman riwayat",
+                image: AppText.Icon.confirmLeave,
+                title: AppText.Examination.ConfirmationPopupsComponent.unfinishedExaminationTitle,
+                description: AppText.Examination.ConfirmationPopupsComponent.unfinishedExaminationDescription,
                 buttons: [
-                    AppButton(title: "Keluar", colorType: .destructive(.primary)) {
+                    AppButton(title: AppText.Examination.ConfirmationPopupsComponent.exitButton, colorType: .destructive(.primary)) {
                         presenter.popToRoot()
                     },
-                    AppButton(title: "Periksa Kembali", colorType: .destructive(.secondary)) {
+                    AppButton(title: AppText.Examination.ConfirmationPopupsComponent.reviewAgainButton, colorType: .destructive(.secondary)) {
                         presenter.isLeavePopUpVisible = false
                     }
                 ],
@@ -29,16 +29,16 @@ struct ConfirmationPopups: View {
             )
 
             AppPopup(
-                image: "Confirm",
-                title: "Simpan Hasil Pemeriksaan",
-                description: "Hasil pemeriksaan yang sudah disimpan tidak dapat diubah kembali",
+                image: AppText.Icon.confirm,
+                title: AppText.Examination.ConfirmationPopupsComponent.saveResultTitle,
+                description: AppText.Examination.ConfirmationPopupsComponent.saveResultDescription,
                 buttons: [
-                    AppButton(title: "Simpan", colorType: .primary) {
+                    AppButton(title: AppText.Examination.ConfirmationPopupsComponent.saveButton, colorType: .primary) {
                         Task {
                             await presenter.submitExpertResult(examinationId: examinationId)
                         }
                     },
-                    AppButton(title: "Periksa Kembali", colorType: .tertiary) {
+                    AppButton(title: AppText.Examination.ConfirmationPopupsComponent.reviewAgainButton, colorType: .tertiary) {
                         presenter.isVerifPopUpVisible = false
                     }
                 ],

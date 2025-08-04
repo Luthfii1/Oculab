@@ -14,21 +14,21 @@ struct PatientListView: View {
         NavigationView {
             VStack(alignment: .leading, spacing: 24) {
                 HStack {
-                    Text(AppText.Patient.List.navigationTitle)
+                    Text(AppText.Patient.ListComponent.navigationTitle)
                         .font(AppTypography.h1)
                         .foregroundColor(AppColors.slate900)
                 }
                 
                 AppSearchBar(
                     searchText: $presenter.searchText,
-                    placeholder: AppText.Patient.List.searchPlaceholder,
+                    placeholder: AppText.Patient.ListComponent.searchPlaceholder,
                     onSearch: {
                         presenter.searchPatients()
                     }
                 )
 
                 AppButton(
-                    title: AppText.Patient.List.addNewPatientButton,
+                    title: AppText.Patient.ListComponent.addNewPatientButton,
                     leftIcon: AppText.Icon.plus,
                     colorType: .secondary,
                     action: {
@@ -46,7 +46,7 @@ struct PatientListView: View {
                             .font(.system(size: 48))
                             .foregroundColor(AppColors.slate300)
                         
-                        Text("\(AppText.Patient.List.noResultsPrefix) \"\(presenter.searchText)\"")
+                        Text("\(AppText.Patient.ListComponent.noResultsPrefix) \"\(presenter.searchText)\"")
                             .font(AppTypography.s3)
                             .foregroundColor(AppColors.slate700)
                             .multilineTextAlignment(.center)
@@ -54,7 +54,7 @@ struct PatientListView: View {
                         Button(action: {
                             presenter.clearSearch()
                         }) {
-                            Text(AppText.Patient.List.clearSearchButton)
+                            Text(AppText.Patient.ListComponent.clearSearchButton)
                                 .font(AppTypography.p2)
                                 .foregroundColor(AppColors.purple600)
                         }

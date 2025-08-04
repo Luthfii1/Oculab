@@ -36,7 +36,7 @@ struct PatientForm: View {
                     Spacer()
 
                     AppButton(
-                        title: isAddingNewPatient ? AppText.Patient.Form.addNewPatientButton : AppText.Patient.Form.savePatientButton,
+                        title: isAddingNewPatient ? AppText.Patient.FormComponent.addNewPatientButton : AppText.Patient.FormComponent.savePatientButton,
                         leftIcon: isAddingNewPatient ? AppText.Icon.plus : AppText.Icon.checkmark
                     ) {
                         Task {
@@ -51,7 +51,7 @@ struct PatientForm: View {
             }
             .padding(.horizontal, Decimal.d20)
             .padding(.vertical, Decimal.d24)
-            .navigationTitle(isAddingNewPatient ? AppText.Patient.Form.newPatientNavigationTitle : AppText.Patient.Form.editPatientNavigationTitle)
+            .navigationTitle(isAddingNewPatient ? AppText.Patient.FormComponent.newPatientNavigationTitle : AppText.Patient.FormComponent.editPatientNavigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

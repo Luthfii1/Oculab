@@ -32,6 +32,14 @@ enum AppText {
         static let plus = "plus"
         static let magnifyingglass = "magnifyingglass"
         static let deleteLeftFill = "delete.left.fill"
+        static let robot = "robot"
+        static let rectangleStackFill = "rectangle.stack.fill"
+        static let infoCircle = "info.circle"
+        static let xmark = "xmark"
+        static let chevronDown = "chevron.down"
+        static let chevronUp = "chevron.up"
+        static let confirmLeave = "Confirm-Leave"
+        static let confirm = "Confirm"
     }
 
     enum Common {
@@ -48,7 +56,7 @@ enum AppText {
     }
     
     enum Authentication {
-        enum Login {
+        enum LoginView {
             static let title = "Revolusi Deteksi Bakteri dengan Teknologi AI"
             static let emailTitle = "Email"
             static let emailPlaceholder = "Contoh: your.name@gmail.com"
@@ -59,7 +67,7 @@ enum AppText {
             static let registerFaskesButtonText = "Daftarkan Faskes"
         }
         
-        enum EditPassword {
+        enum EditPasswordView {
             static let successUpdatePasswordTitle = "Berhasil mengubah Password"
             static let successUpdatePasswordMessage = "Anda telah berhasil mengubah password akun anda"
             static let successUpdatePasswordButtonText = "Kembali ke profile"
@@ -73,18 +81,13 @@ enum AppText {
             static let confirmPasswordPlaceholder = "Masukkan Konfirmasi Password Baru"
         }
 
-        enum UserAccessPin {
+        enum UserAccessPinView {
             static let successTitle = "PIN Berhasil Diubah"
             static let successDescription = "PIN akses Anda telah berhasil diperbarui"
             static let successButton = "Kembali ke Profile"
         }
-        
-        enum PinComponents {
-            static let forgotPinText = "Lupa PIN?"
-            static let usePasswordButton = "Gunakan Password"
-        }
 
-        enum Profile {
+        enum ProfileView {
             static let accountInfoTitle = "Informasi Akun"
             static let emailKey = "Email"
             static let roleKey = "Role"
@@ -102,7 +105,7 @@ enum AppText {
             static var saveChangesButton = "Simpan Perubahan"
         }
 
-        enum PrivacyPolicy {
+        enum PrivacyPolicyView {
             static let navigationTitle = "Kebijakan Privasi Oculab"
             static let intro = "Mohon untuk membaca seluruh kebijakan privasi yang terlampir dengan cermat dan seksama sebelum menggunakan setiap fitur dan/atau layanan yang tersedia dalam Oculab"
             static let generalTitle = "Ketentuan Umum"
@@ -145,6 +148,11 @@ enum AppText {
                 Definition(label: "h.", text: "“Pengendali Data” adalah setiap orang, badan publik, dan/atau organisasi internasional yang bertindak sendiri-sendiri atau bersama-sama dalam menentukan tujuan dan melakukan kendali pemrosesan Data Pribadi atau Data Kesehatan atau informasi lainnya. “Prosesor Data” adalah setiap orang, badan publik, dan/atau organisasi internasional yang bertindak sendiri-sendiri atau bersama-sama dalam melakukan pemrosesan Data Pribadi atau Data Kesehatan atau informasi lainnya yang ditunjuk Pengendali Data.")
             ]
         }
+
+        enum PinComponent {
+            static let forgotPinText = "Lupa PIN?"
+            static let usePasswordButton = "Gunakan Password"
+        }
     }
 
     enum Examination {
@@ -154,7 +162,7 @@ enum AppText {
             static let refreshInstruction = "Please scroll down to refresh to update the data"
         }
         
-        enum Detail {
+        enum DetailViews {
             static let navigationTitle = "Detail Pemeriksaan"
             static let patientDataTitle = "Data Pasien"
             static let patientNameKey = "Nama"
@@ -180,7 +188,7 @@ enum AppText {
             static let slideImageTitle = "Gambar Sediaan"
         }
         
-        enum GuidelinesOnboarding {
+        enum GuidelinesOnboardingView {
             static let navigationTitle = "Persiapan Pemeriksaan"
             static let continueButton = "Lanjutkan"
             
@@ -209,7 +217,7 @@ enum AppText {
             ]
         }
         
-        enum SavedResult {
+        enum SavedResultView {
             static let examinationDetailTitle = "Detail Pemeriksaan"
             static let examinationReasonKey = "Alasan Pemeriksaan"
             static let imageResultTitle = "Hasil Gambar"
@@ -218,6 +226,53 @@ enum AppText {
             static let staffInterpretationTitle = "Interpretasi Petugas"
             static let systemInterpretationTitle = "Interpretasi Sistem"
             static let systemInterpretationWarning = "Interpretasi sistem bukan merupakan hasil akhir untuk pasien"
+        }
+        
+        enum ConfirmationPopupsComponent {
+            static let unfinishedExaminationTitle = "Pemeriksaan Belum Selesai"
+            static let unfinishedExaminationDescription = "Pemeriksaan disimpan sebagai draft dan dapat diakses di halaman riwayat"
+            static let exitButton = "Keluar"
+            static let reviewAgainButton = "Periksa Kembali"
+            static let saveResultTitle = "Simpan Hasil Pemeriksaan"
+            static let saveResultDescription = "Hasil pemeriksaan yang sudah disimpan tidak dapat diubah kembali"
+            static let saveButton = "Simpan"
+        }
+        
+        enum GradingCardComponent {
+            static let confidenceLevelText = "confidence level"
+        }
+        
+        enum ImageSectionComponent {
+            static let imageResultTitle = "Hasil Gambar"
+            static let imageResultInstruction = "Ketuk untuk lihat detail gambar"
+        }
+        
+        enum InterpretationSectionComponent {
+            static let interpretationResultTitle = "Hasil Interpretasi"
+            static let staffInterpretationTitle = "Interpretasi Petugas"
+            static let selectCategoryPlaceholder = "Pilih kategori"
+            static let btaCountTitle = "Jumlah BTA"
+            static let btaCountPlaceholder = "Contoh: 8"
+            static let staffNotesTitle = "Catatan Petugas"
+            static let staffNotesPlaceholder = "Contoh: Hanya terdapat 20 bakteri dari 60 lapangan pandang yang terkumpul"
+            static let doneButton = "Selesai"
+        }
+        
+        enum LaborantInfoComponent {
+            static let examinationOfficerTitle = "Petugas Pemeriksaan"
+            static let assignedByTitle = "Ditugaskan Oleh"
+        }
+        
+        enum FolderCardComponent {
+            static let imageCountSuffix = "Gambar"
+        }
+        
+        enum HeaderViewComponent {
+            static let newExaminationTitle = "Pemeriksaan Baru"
+        }
+        
+        enum ExtendableCardComponent {
+            static let unknownTitle = "Unknown"
         }
     }
     
@@ -234,7 +289,7 @@ enum AppText {
     }
     
     enum Patient {
-        enum Form {
+        enum FormComponent {
             static let newPatientNavigationTitle = "Data Pasien Baru"
             static let editPatientNavigationTitle = "Ubah Data Pasien"
             static let addNewPatientButton = "Tambahkan Pasien Baru"
@@ -242,7 +297,7 @@ enum AppText {
             static let errorAlertTitle = "Error"
         }
         
-        enum List {
+        enum ListComponent {
             static let navigationTitle = "Riwayat"
             static let searchPlaceholder = "Cari nama pasien"
             static let addNewPatientButton = "Tambah Pasien Baru"
@@ -251,7 +306,7 @@ enum AppText {
             static let magnifyingglassIcon = "magnifyingglass"
         }
         
-        enum Detail {
+        enum DetailComponent {
             static let navigationTitle = "Riwayat Pemeriksaan"
             static let patientDataTitle = "Data Pasien"
             static let examinationResultTitle = "Hasil Pemeriksaan"

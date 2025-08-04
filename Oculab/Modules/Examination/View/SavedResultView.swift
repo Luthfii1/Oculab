@@ -22,33 +22,33 @@ struct SavedResultView: View {
                 VStack(alignment: .leading, spacing: Decimal.d24) {
                     ExtendableCard(
                         icon: AppText.Icon.personFill,
-                        title: AppText.Examination.Detail.patientDataTitle,
+                        title: AppText.Examination.DetailViews.patientDataTitle,
                         isExtendable: true,
                         data: [
-                            (key: AppText.Examination.Detail.patientNameKey, value: presenter.patientDetailData.name),
-                            (key: AppText.Examination.Detail.patientNikKey, value: presenter.patientDetailData.nik),
-                            (key: AppText.Examination.Detail.patientDobKey, value: presenter.patientDetailData.dob),
-                            (key: AppText.Examination.Detail.patientSexKey, value: presenter.patientDetailData.sex),
-                            (key: AppText.Examination.Detail.patientBpjsKey, value: presenter.patientDetailData.bpjs),
+                            (key: AppText.Examination.DetailViews.patientNameKey, value: presenter.patientDetailData.name),
+                            (key: AppText.Examination.DetailViews.patientNikKey, value: presenter.patientDetailData.nik),
+                            (key: AppText.Examination.DetailViews.patientDobKey, value: presenter.patientDetailData.dob),
+                            (key: AppText.Examination.DetailViews.patientSexKey, value: presenter.patientDetailData.sex),
+                            (key: AppText.Examination.DetailViews.patientBpjsKey, value: presenter.patientDetailData.bpjs),
                         ],
                         titleSize: AppTypography.s5
                     )
 
                     ExtendableCard(
                         icon: AppText.Icon.docTextMagnifyingglass,
-                        title: AppText.Examination.SavedResult.examinationDetailTitle,
+                        title: AppText.Examination.SavedResultView.examinationDetailTitle,
                         isExtendable: true,
                         data: [
-                            (key: AppText.Examination.Detail.slideIdKey, value: presenter.examDetailData.slideId),
-                            (key: AppText.Examination.SavedResult.examinationReasonKey, value: presenter.examDetailData.examinationGoal),
-                            (key: AppText.Examination.Detail.preparationTypeKey, value: presenter.examDetailData.type),
+                            (key: AppText.Examination.DetailViews.slideIdKey, value: presenter.examDetailData.slideId),
+                            (key: AppText.Examination.SavedResultView.examinationReasonKey, value: presenter.examDetailData.examinationGoal),
+                            (key: AppText.Examination.DetailViews.preparationTypeKey, value: presenter.examDetailData.type),
                         ],
                         titleSize: AppTypography.s6
                     )
 
-                    AppCard(icon: AppText.Icon.photo, title: AppText.Examination.SavedResult.imageResultTitle, spacing: Decimal.d16) {
+                    AppCard(icon: AppText.Icon.photo, title: AppText.Examination.SavedResultView.imageResultTitle, spacing: Decimal.d16) {
                         VStack(alignment: .leading, spacing: Decimal.d16) {
-                            Text(AppText.Examination.SavedResult.imageResultInstruction)
+                            Text(AppText.Examination.SavedResultView.imageResultInstruction)
                                 .font(AppTypography.p3)
                                 .foregroundStyle(AppColors.slate300)
 
@@ -93,12 +93,12 @@ struct SavedResultView: View {
 
                     AppCard(
                         icon: AppText.Icon.textBadgeCheckmark,
-                        title: AppText.Examination.SavedResult.interpretationResultTitle,
+                        title: AppText.Examination.SavedResultView.interpretationResultTitle,
                         spacing: Decimal.d24,
                         isGrading: .FINISHED
                     ) {
                         VStack(alignment: .leading, spacing: Decimal.d8) {
-                            Text(AppText.Examination.SavedResult.staffInterpretationTitle)
+                            Text(AppText.Examination.SavedResultView.staffInterpretationTitle)
                                 .font(AppTypography.s5)
                                 .foregroundColor(AppColors.slate300)
                             GradingCardComponent(
@@ -110,14 +110,14 @@ struct SavedResultView: View {
                         }
 
                         VStack(alignment: .leading, spacing: Decimal.d8) {
-                            Text(AppText.Examination.SavedResult.systemInterpretationTitle)
+                            Text(AppText.Examination.SavedResultView.systemInterpretationTitle)
                                 .font(AppTypography.s5)
                                 .foregroundColor(AppColors.slate300)
                             HStack(alignment: .top) {
                                 Image(systemName: AppText.Icon.exclamationmarkTriangleFill)
                                     .foregroundColor(AppColors.orange500)
 
-                                Text(AppText.Examination.SavedResult.systemInterpretationWarning)
+                                Text(AppText.Examination.SavedResultView.systemInterpretationWarning)
                                     .font(AppTypography.p4)
                             }
 
@@ -165,7 +165,7 @@ struct SavedResultView: View {
 
                         VStack(alignment: .leading, spacing: Decimal.d16) {
                             AppButton(
-                                title: AppText.Examination.Detail.viewPdfButton,
+                                title: AppText.Examination.DetailViews.viewPdfButton,
                                 rightIcon: AppText.Icon.docText,
                                 colorType: .secondary,
                                 size: .small,
@@ -175,7 +175,7 @@ struct SavedResultView: View {
                             }
 
                             AppButton(
-                                title: AppText.Examination.Detail.reportToSitbButton,
+                                title: AppText.Examination.DetailViews.reportToSitbButton,
                                 rightIcon: AppText.Icon.paperplane,
                                 size: .small,
                                 isEnabled: true

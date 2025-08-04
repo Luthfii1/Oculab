@@ -30,7 +30,7 @@ class Router: ObservableObject {
         case editPassword
         case inputPatientData(patientId: String? = nil)
         case informationInterpretation
-        case kebijakanPrivasi
+        case privacyPolicy
         case analyzingStatusProgress(examinationId: String)
         case accountManagement
         case newAccount
@@ -58,13 +58,13 @@ class Router: ObservableObject {
         case let .examDetail(examId, patientId):
             ExamDetailView(examId: examId, patientId: patientId)
         case let .examDetailAdmin(examId: examId, patientId: patientId):
-            ExamDetailAdmin(examId: examId, patientId: patientId)
+            ExamDetailAdminView(examId: examId, patientId: patientId)
         case let .savedResult(examId, patientId):
             SavedResultView(examId: examId, patientId: patientId)
         case let .newExam(patientId, picId):
             InputExaminationData(selectedPIC: picId, selectedPatient: patientId)
         case let .userAccessPin(state):
-            UserAccessPin(state: state)
+            UserAccessPinView(state: state)
                 .environmentObject(DependencyInjection.shared.createAuthPresenter())
         case .login:
             LoginView()
@@ -83,8 +83,8 @@ class Router: ObservableObject {
             InputPatientData(patientId: patientId)
         case .informationInterpretation:
             InformationPage()
-        case .kebijakanPrivasi:
-            KebijakanPrivasiView()
+        case .privacyPolicy:
+            PrivacyPolicyView()
         case let .analyzingStatusProgress(examinationId):
             AnalyzingExaminationProgressView(examinationId: examinationId)
         case .accountManagement:

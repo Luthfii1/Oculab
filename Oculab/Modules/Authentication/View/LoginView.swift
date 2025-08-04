@@ -24,23 +24,23 @@ struct LoginView: View {
                     if presenter.isKeyboardVisible {
                         Spacer()
                     }
-                    Text(AppText.Authentication.Login.title)
+                    Text(AppText.Authentication.LoginView.title)
                         .font(AppTypography.h1)
                         .foregroundStyle(AppColors.slate900)
                         .multilineTextAlignment(.center)
                     VStack(spacing: 8) {
                         AppTextField(
-                            title: AppText.Authentication.Login.emailTitle,
+                            title: AppText.Authentication.LoginView.emailTitle,
                             isRequired: true,
-                            placeholder: AppText.Authentication.Login.emailPlaceholder,
+                            placeholder: AppText.Authentication.LoginView.emailPlaceholder,
                             isError: presenter.isError,
                             isDisabled: presenter.isLoading,
                             text: $presenter.email
                         )
                         AppTextField(
-                            title: AppText.Authentication.Login.passwordTitle,
+                            title: AppText.Authentication.LoginView.passwordTitle,
                             isRequired: true,
-                            placeholder: AppText.Authentication.Login.passwordPlaceholder,
+                            placeholder: AppText.Authentication.LoginView.passwordPlaceholder,
                             description: presenter.description,
                             rightIcon: AppText.Icon.eye,
                             isError: presenter.isError,
@@ -52,7 +52,7 @@ struct LoginView: View {
                     .padding(.top, 12)
                     VStack(alignment: .center, spacing: 16) {
                         AppButton(
-                            title: AppText.Authentication.Login.buttonText,
+                            title: AppText.Authentication.LoginView.buttonText,
                             colorType: .primary,
                             size: .large,
                             isEnabled: presenter.isFilled
@@ -64,11 +64,11 @@ struct LoginView: View {
                         }
                         HStack {
                             Spacer()
-                            Text(AppText.Authentication.Login.faskesNotRegisteredYet)
+                            Text(AppText.Authentication.LoginView.faskesNotRegisteredYet)
                                 .font(AppTypography.p3)
                                 .foregroundStyle(AppColors.slate900)
                             AppButton(
-                                title: AppText.Authentication.Login.registerFaskesButtonText,
+                                title: AppText.Authentication.LoginView.registerFaskesButtonText,
                                 colorType: .tertiary,
                                 size: .large,
                                 isEnabled: true

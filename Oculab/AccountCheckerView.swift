@@ -21,7 +21,7 @@ struct AccountCheckerView: View {
                         ContentView()
                             .environmentObject(authPresenter)
                     } else {
-                        UserAccessPin(state: .authenticate)
+                        UserAccessPinView(state: .authenticate)
                             .environmentObject(authPresenter)
                     }
                 } else {

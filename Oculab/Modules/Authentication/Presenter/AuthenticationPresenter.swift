@@ -44,7 +44,7 @@ class AuthenticationPresenter: ObservableObject {
     ]
 
     @Published var isLoading = false {
-        didSet { AppText.Authentication.Login.buttonText = isLoading ? "Loading..." : "Login" }
+        didSet { AppText.Authentication.LoginView.buttonText = isLoading ? "Loading..." : "Login" }
     }
 
     @Published var isError: Bool = false {

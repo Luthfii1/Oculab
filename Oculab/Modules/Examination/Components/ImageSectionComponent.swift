@@ -14,14 +14,14 @@ struct ImageSectionComponent: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Decimal.d16) {
             HStack {
-                Image(systemName: "photo")
+                Image(systemName: AppText.Icon.photo)
                     .foregroundColor(AppColors.purple500)
-                Text("Hasil Gambar")
+                Text(AppText.Examination.ImageSectionComponent.imageResultTitle)
                     .font(AppTypography.s4_1)
                     .padding(.leading, Decimal.d8)
             }
 
-            Text("Ketuk untuk lihat detail gambar")
+            Text(AppText.Examination.ImageSectionComponent.imageResultInstruction)
                 .font(AppTypography.p3)
                 .foregroundStyle(AppColors.slate300)
 

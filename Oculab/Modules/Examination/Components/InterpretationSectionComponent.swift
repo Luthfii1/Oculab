@@ -21,9 +21,9 @@ struct InterpretationSectionComponent: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Decimal.d24) {
             HStack {
-                Image(systemName: "photo")
+                Image(systemName: AppText.Icon.photo)
                     .foregroundColor(AppColors.purple500)
-                Text("Hasil Interpretasi")
+                Text(AppText.Examination.InterpretationSectionComponent.interpretationResultTitle)
                     .font(AppTypography.s4_1)
                     .padding(.leading, Decimal.d8)
                 Spacer()
@@ -37,10 +37,10 @@ struct InterpretationSectionComponent: View {
             )
 
             AppDropdown(
-                title: "Interpretasi Petugas",
-                placeholder: "Pilih kategori",
+                title: AppText.Examination.InterpretationSectionComponent.staffInterpretationTitle,
+                placeholder: AppText.Examination.InterpretationSectionComponent.selectCategoryPlaceholder,
                 isRequired: false,
-                rightIcon: "chevron.down",
+                rightIcon: AppText.Icon.chevronDown,
                 choices: GradingType.allCases.dropLast().map { ($0.rawValue, $0.rawValue) },
                 selectedChoice: $presenter.selectedTBGrade
             )
@@ -48,8 +48,8 @@ struct InterpretationSectionComponent: View {
 
             if presenter.selectedTBGrade == GradingType.SCANTY.rawValue {
                 AppTextField(
-                    title: "Jumlah BTA",
-                    placeholder: "Contoh: 8",
+                    title: AppText.Examination.InterpretationSectionComponent.btaCountTitle,
+                    placeholder: AppText.Examination.InterpretationSectionComponent.btaCountPlaceholder,
                     isNumberOnly: true,
                     text: $presenter.numOfBTA
                 )
@@ -57,15 +57,15 @@ struct InterpretationSectionComponent: View {
             }
 
             AppTextBox(
-                title: "Catatan Petugas",
-                placeholder: "Contoh: Hanya terdapat 20 bakteri dari 60 lapangan pandang yang terkumpul",
+                title: AppText.Examination.InterpretationSectionComponent.staffNotesTitle,
+                placeholder: AppText.Examination.InterpretationSectionComponent.staffNotesPlaceholder,
                 text: $presenter.inspectorNotes
             )
             .focused($focusedField, equals: .notes)
 
             AppButton(
                 title: presenter.buttonTitle,
-                rightIcon: "checkmark",
+                rightIcon: AppText.Icon.checkmark,
                 isEnabled: presenter.isEnableToSubmit()
             ) {
                 presenter.isVerifPopUpVisible = true
@@ -74,7 +74,7 @@ struct InterpretationSectionComponent: View {
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
                 Spacer()
-                Button("Selesai") {
+                Button(AppText.Examination.InterpretationSectionComponent.doneButton) {
                     focusedField = nil
                 }
             }

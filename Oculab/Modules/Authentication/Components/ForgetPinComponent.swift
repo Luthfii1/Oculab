@@ -12,12 +12,12 @@ struct ForgetPinComponent: View {
     var body: some View {
         if state == .authenticate {
             HStack(alignment: .center, spacing: 8) {
-                Text(AppText.Authentication.PinComponents.forgotPinText)
+                Text(AppText.Authentication.PinComponent.forgotPinText)
                     .font(AppTypography.p3)
                     .foregroundStyle(AppColors.slate900)
 
                 AppButton(
-                    title: AppText.Authentication.PinComponents.usePasswordButton, 
+                    title: AppText.Authentication.PinComponent.usePasswordButton, 
                     colorType: .tertiary
                 ) {
                     print("Use password tapped")
