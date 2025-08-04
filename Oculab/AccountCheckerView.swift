@@ -9,13 +9,11 @@ import SwiftUI
 
 struct AccountCheckerView: View {
     @AppStorage(UserDefaultType.isUserLoggedIn.rawValue) var isUserLoggedIn: Bool = false
-    
     @EnvironmentObject var authPresenter: AuthenticationPresenter
-    @State private var isSplashScreenVisible = true
 
     var body: some View {
         RouterView {
-            if isSplashScreenVisible {
+            if authPresenter.isSplashScreenVisible {
                 SplashScreenView()
             } else {
                 if isUserLoggedIn {
@@ -35,7 +33,7 @@ struct AccountCheckerView: View {
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                 withAnimation {
-                    isSplashScreenVisible = false
+                    authPresenter.isSplashScreenVisible = false
                 }
             }
             Task {

@@ -11,8 +11,6 @@ struct LoginView: View {
     @EnvironmentObject var presenter: AuthenticationPresenter
     @StateObject private var contactPresenter = ContactPresenter(interactor: ContactInteractor())
 
-    @State private var contactId: String = "7b4e28ba-23a1-1cd4-183f-0016d3cca420"
-
     var body: some View {
         NavigationView {
             VStack {
@@ -26,23 +24,23 @@ struct LoginView: View {
                     if presenter.isKeyboardVisible {
                         Spacer()
                     }
-                    Text("Revolusi Deteksi Bakteri dengan Teknologi AI")
+                    Text(presenter.authText.loginTitle)
                         .font(AppTypography.h1)
                         .foregroundStyle(AppColors.slate900)
                         .multilineTextAlignment(.center)
                     VStack(spacing: 8) {
                         AppTextField(
-                            title: "Email",
+                            title: presenter.authText.loginEmailTitle,
                             isRequired: true,
-                            placeholder: "Contoh: indrikla24@gmail.com",
+                            placeholder: presenter.authText.loginEmailPlaceholder,
                             isError: presenter.isError,
                             isDisabled: presenter.isLoading,
                             text: $presenter.email
                         )
                         AppTextField(
-                            title: "Kata Sandi",
+                            title: presenter.authText.loginPasswordTitle,
                             isRequired: true,
-                            placeholder: "Masukkan Kata Sandi",
+                            placeholder: presenter.authText.loginPasswordPlaceholder,
                             description: presenter.description,
                             rightIcon: "eye",
                             isError: presenter.isError,
@@ -54,7 +52,7 @@ struct LoginView: View {
                     .padding(.top, 12)
                     VStack(alignment: .center, spacing: 16) {
                         AppButton(
-                            title: presenter.buttonText,
+                            title: presenter.authText.loginButtonText,
                             colorType: .primary,
                             size: .large,
                             isEnabled: presenter.isFilled
@@ -66,26 +64,17 @@ struct LoginView: View {
                         }
                         HStack {
                             Spacer()
-                            Text("Faskes belum terdaftar?")
+                            Text(presenter.authText.loginFaskesNotRegisteredYet)
                                 .font(AppTypography.p3)
                                 .foregroundStyle(AppColors.slate900)
                             AppButton(
-                                title: "Daftarkan Faskes",
+                                title: presenter.authText.loginRegisterFaskesButtonText,
                                 colorType: .tertiary,
                                 size: .large,
                                 isEnabled: true
                             ) {
                                 Task {
-                                    await contactPresenter.fetchData(contactId: contactId)
-
-                                    if let url = URL(string: contactPresenter.contactData.whatsappLink) {
-                                        await MainActor.run {
-                                            UIApplication.shared.open(url)
-                                            print("Fetched WhatsApp URL: \(url)")
-                                        }
-                                    } else {
-                                        print("Invalid WhatsApp URL: ", contactPresenter.contactData.whatsappLink)
-                                    }
+                                    await contactPresenter.directToWhatsapp()
                                 }
                             }
                             .multilineTextAlignment(.leading)

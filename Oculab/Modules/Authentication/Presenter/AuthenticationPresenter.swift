@@ -14,12 +14,13 @@ enum PinMode {
 }
 
 class AuthenticationPresenter: ObservableObject {
+    @Published var authText = TextAuthentication()
+    @Published var isSplashScreenVisible = true
     @Published var description: String = ""
     @Published var textColor: Color = AppColors.slate900
     @Published var pinColor: Color = AppColors.purple500
     @Published var email = ""
     @Published var password = ""
-    @Published var buttonText = "Login"
     @Published var isKeyboardVisible = false
     @Published var firstPin = ""
     @Published var secondPin = ""
@@ -44,7 +45,7 @@ class AuthenticationPresenter: ObservableObject {
     ]
 
     @Published var isLoading = false {
-        didSet { buttonText = isLoading ? "Loading..." : "Login" }
+        didSet { authText.loginButtonText = isLoading ? "Loading..." : "Login" }
     }
 
     @Published var isError: Bool = false {
