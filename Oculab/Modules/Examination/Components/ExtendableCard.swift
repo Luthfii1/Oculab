@@ -40,7 +40,7 @@ struct ExtendableCard: View {
             if isExtendable && isExtended {
                 ExtendedCard(data: data, titleSize: titleSize)
             } else if !isExtendable {
-                Text(titleCard ?? AppText.Examination.ExtendableCardComponent.unknownTitle)
+                Text(titleCard ?? AppTextExamCompExtendableCard.unknownTitle)
                     .font(AppTypography.h3)
                     .foregroundStyle(AppColors.slate900)
                     .padding(.top, 16)

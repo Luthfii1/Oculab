@@ -22,14 +22,14 @@ struct ExamDetailAdminView: View {
                 VStack(alignment: .leading, spacing: Decimal.d24) {
                     ExtendableCard(
                         icon: AppText.Icon.personFill,
-                        title: AppText.Examination.DetailViews.patientDataTitle,
+                        title: AppTextExamDetail.patientDataTitle,
                         isExtendable: true,
                         data: [
-                            (key: AppText.Examination.DetailViews.patientNameKey, value: presenter.patientDetailData.name),
-                            (key: AppText.Examination.DetailViews.patientNikKey, value: presenter.patientDetailData.nik),
-                            (key: AppText.Examination.DetailViews.patientDobKey, value: presenter.patientDetailData.dob),
-                            (key: AppText.Examination.DetailViews.patientSexKey, value: presenter.patientDetailData.sex),
-                            (key: AppText.Examination.DetailViews.patientBpjsKey, value: presenter.patientDetailData.bpjs),
+                            (key: AppTextExamDetail.patientNameKey, value: presenter.patientDetailData.name),
+                            (key: AppTextExamDetail.patientNikKey, value: presenter.patientDetailData.nik),
+                            (key: AppTextExamDetail.patientDobKey, value: presenter.patientDetailData.dob),
+                            (key: AppTextExamDetail.patientSexKey, value: presenter.patientDetailData.sex),
+                            (key: AppTextExamDetail.patientBpjsKey, value: presenter.patientDetailData.bpjs),
                         ],
                         titleSize: AppTypography.s5
                     )
@@ -41,24 +41,24 @@ struct ExamDetailAdminView: View {
 
                     AppCard(
                         icon: AppText.Icon.docTextMagnifyingglass,
-                        title: AppText.Examination.DetailViews.examinationResult1Title,
+                        title: AppTextExamDetail.examinationResult1Title,
                         spacing: Decimal.d16
                     ) {
                         VStack(alignment: .leading) {
-                            Text(AppText.Examination.DetailViews.staffInterpretationTitle)
+                            Text(AppTextExamDetail.staffInterpretationTitle)
                                 .font(AppTypography.s5)
                                 .foregroundColor(AppColors.slate300)
                                 
-                                let interpretasiPetugas = presenter.examinations.first?.expertResult ?? AppText.Examination.DetailViews.notAvailable
+                                let interpretasiPetugas = presenter.examinations.first?.expertResult ?? AppTextExamDetail.notAvailable
                                 
-                                if interpretasiPetugas != AppText.Examination.DetailViews.notAvailable {
+                                if interpretasiPetugas != AppTextExamDetail.notAvailable {
                                     GradingCardComponent(
                                         type: GradingType(rawValue: interpretasiPetugas) ?? .unknown,
                                         confidenceLevel: .lowConfidence,
                                         isExpert: true
                                     )
                                 } else {
-                                    Text(AppText.Examination.DetailViews.notAvailable)
+                                    Text(AppTextExamDetail.notAvailable)
                                         .font(AppTypography.p4)
                                         .padding(.vertical, 8)
                                         .padding(.horizontal, 16)
@@ -67,31 +67,31 @@ struct ExamDetailAdminView: View {
                                 }
                         }
                         ExtendedCard(data: [
-                            (AppText.Examination.DetailViews.slideIdKey, presenter.examinations.first?.slideId ?? AppText.Common.emptyString),
-                            (AppText.Examination.DetailViews.preparationTypeKey, presenter.examinations.first?.preparationType ?? AppText.Common.emptyString)
+                            (AppTextExamDetail.slideIdKey, presenter.examinations.first?.slideId ?? AppText.Common.emptyString),
+                            (AppTextExamDetail.preparationTypeKey, presenter.examinations.first?.preparationType ?? AppText.Common.emptyString)
                         ], titleSize: AppTypography.s5)
                     }
 
                     AppCard(
                         icon: AppText.Icon.docTextMagnifyingglass,
-                        title: AppText.Examination.DetailViews.examinationResult2Title,
+                        title: AppTextExamDetail.examinationResult2Title,
                         spacing: Decimal.d16
                     ) {
                         VStack(alignment: .leading) {
-                            Text(AppText.Examination.DetailViews.staffInterpretationTitle)
+                            Text(AppTextExamDetail.staffInterpretationTitle)
                                 .font(AppTypography.s5)
                                 .foregroundColor(AppColors.slate300)
                             
-                            let interpretasiPetugas = presenter.examinations.count > 1 ? (presenter.examinations[1].expertResult ?? AppText.Examination.DetailViews.notAvailable) : AppText.Examination.DetailViews.notAvailable
+                            let interpretasiPetugas = presenter.examinations.count > 1 ? (presenter.examinations[1].expertResult ?? AppTextExamDetail.notAvailable) : AppTextExamDetail.notAvailable
                             
-                            if interpretasiPetugas != AppText.Examination.DetailViews.notAvailable {
+                            if interpretasiPetugas != AppTextExamDetail.notAvailable {
                                 GradingCardComponent(
                                     type: GradingType(rawValue: interpretasiPetugas) ?? .unknown,
                                     confidenceLevel: .lowConfidence,
                                     isExpert: true
                                 )
                             } else {
-                                Text(AppText.Examination.DetailViews.notAvailable)
+                                Text(AppTextExamDetail.notAvailable)
                                     .font(AppTypography.p4)
                                     .padding(.vertical, 8)
                                     .padding(.horizontal, 16)
@@ -100,13 +100,13 @@ struct ExamDetailAdminView: View {
                             }
                         }
                         ExtendedCard(data: [
-                            (AppText.Examination.DetailViews.slideIdKey, presenter.examinations.count > 1 ? presenter.examinations[1].slideId : AppText.Common.emptyString),
-                            (AppText.Examination.DetailViews.preparationTypeKey, presenter.examinations.count > 1 ? presenter.examinations[1].preparationType : AppText.Common.emptyString)
+                            (AppTextExamDetail.slideIdKey, presenter.examinations.count > 1 ? presenter.examinations[1].slideId : AppText.Common.emptyString),
+                            (AppTextExamDetail.preparationTypeKey, presenter.examinations.count > 1 ? presenter.examinations[1].preparationType : AppText.Common.emptyString)
                         ], titleSize: AppTypography.s5)
                     }
                     VStack(spacing: Decimal.d16) {
                         AppButton(
-                            title: AppText.Examination.DetailViews.viewPdfButton,
+                            title: AppTextExamDetail.viewPdfButton,
                             rightIcon: AppText.Icon.docText,
                             colorType: .secondary,
                             size: .small,
@@ -116,7 +116,7 @@ struct ExamDetailAdminView: View {
                         }
                         
                         AppButton(
-                            title: AppText.Examination.DetailViews.reportToSitbButton,
+                            title: AppTextExamDetail.reportToSitbButton,
                             rightIcon: AppText.Icon.paperplane,
                             size: .small,
                             isEnabled: true
@@ -127,7 +127,7 @@ struct ExamDetailAdminView: View {
                 }
             }
             .padding(.horizontal, Decimal.d16)
-            .navigationTitle(AppText.Examination.DetailViews.navigationTitle)
+            .navigationTitle(AppTextExamDetail.navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

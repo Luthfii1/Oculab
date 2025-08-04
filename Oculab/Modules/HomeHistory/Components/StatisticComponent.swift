@@ -14,10 +14,10 @@ struct StatisticComponent: View {
     var body: some View {
         VStack(alignment: .center, spacing: 16) {
             HStack(alignment: .center, spacing: 8) {
-                Image(systemName: "tray.full.fill")
+                Image(systemName: AppText.Icon.trayFullFill)
                     .foregroundStyle(AppColors.purple500)
 
-                Text("Statistik Pemeriksaan")
+                Text(AppTextHomeHistCompStatistic.title)
                     .foregroundStyle(AppColors.slate900)
                     .font(AppTypography.s4_1)
                 Spacer()
@@ -29,9 +29,9 @@ struct StatisticComponent: View {
                         .offset(y: 35)
 
                     VStack(alignment: .leading, spacing: Decimal.d4) {
-                        Text("\(presenter.statisticExam.totalFinished ?? 0) Tugas Selesai").font(AppTypography.h4_1)
+                        Text("\(presenter.statisticExam.totalFinished ?? 0) \(AppTextHomeHistCompStatistic.tasksCompletedSuffix)").font(AppTypography.h4_1)
                         Text(
-                            "dari \((presenter.statisticExam.totalFinished ?? 0) + (presenter.statisticExam.totalNotFinished ?? 0)) Tugas"
+                            "\(AppTextHomeHistCompStatistic.fromTasksPrefix) \((presenter.statisticExam.totalFinished ?? 0) + (presenter.statisticExam.totalNotFinished ?? 0)) \(AppTextHomeHistCompStatistic.tasksInTotalSuffix)"
 
                         )
                         .font(AppTypography.p3).foregroundStyle(AppColors.slate300)
@@ -46,7 +46,7 @@ struct StatisticComponent: View {
                             .foregroundStyle(AppColors.red500)
                             .font(AppTypography.h1)
 
-                        Text("Positif")
+                        Text(AppTextHomeHistCompStatistic.positiveLabel)
                             .foregroundStyle(AppColors.slate900)
                             .font(AppTypography.s6)
                     }
@@ -60,7 +60,7 @@ struct StatisticComponent: View {
                             .foregroundStyle(AppColors.purple500)
                             .font(AppTypography.h1)
 
-                        Text("Negatif")
+                        Text(AppTextHomeHistCompStatistic.negativeLabel)
                             .foregroundStyle(AppColors.slate900)
                             .font(AppTypography.s6)
                     }
@@ -74,7 +74,7 @@ struct StatisticComponent: View {
                             .foregroundStyle(AppColors.blue500)
                             .font(AppTypography.h1)
 
-                        Text("Pending")
+                        Text(AppTextHomeHistCompStatistic.pendingLabel)
                             .foregroundStyle(AppColors.slate900)
                             .font(AppTypography.s6)
                     }

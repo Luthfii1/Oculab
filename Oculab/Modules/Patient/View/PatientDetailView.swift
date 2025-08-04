@@ -1,5 +1,5 @@
 //
-//  PatientDetail.swift
+//  PatientDetailView.swift
 //  Oculab
 //
 //  Created by Alifiyah Ariandri on 08/11/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct PatientDetail: View {
+struct PatientDetailView: View {
     let patientId: String
     @StateObject private var presenter = PatientPresenter()
     
@@ -17,13 +17,13 @@ struct PatientDetail: View {
                 if !presenter.isLoadingPatient && !presenter.patient.name.isEmpty {
                     Spacer().frame(height: Decimal.d24)
                     
-                    AppCard(icon: AppText.Icon.personFill, title: AppText.Patient.DetailComponent.patientDataTitle, spacing: Decimal.d16, isEnablingEdit: true) {
+                    AppCard(icon: AppText.Icon.personFill, title: AppTextPatientDetail.patientDataTitle, spacing: Decimal.d16, isEnablingEdit: true) {
                         ExtendedCard(data: [
-                            (AppText.Patient.DetailComponent.patientNameKey, presenter.patient.name),
-                            (AppText.Patient.DetailComponent.patientNikKey, presenter.patient.NIK),
-                            (AppText.Patient.DetailComponent.patientDobKey, presenter.formatDate(presenter.patient.DoB)),
-                            (AppText.Patient.DetailComponent.patientSexKey, presenter.patient.sex.rawValue),
-                            (AppText.Patient.DetailComponent.patientBpjsKey, presenter.patient.BPJS ?? AppText.Common.emptyString),
+                            (AppTextPatientDetail.patientNameKey, presenter.patient.name),
+                            (AppTextPatientDetail.patientNikKey, presenter.patient.NIK),
+                            (AppTextPatientDetail.patientDobKey, presenter.formatDate(presenter.patient.DoB)),
+                            (AppTextPatientDetail.patientSexKey, presenter.patient.sex.rawValue),
+                            (AppTextPatientDetail.patientBpjsKey, presenter.patient.BPJS ?? AppText.Common.emptyString),
                         ], titleSize: AppTypography.s5)
                     } action: {
                         presenter.navigateTo(.patientForm(patientId: patientId))
@@ -31,19 +31,19 @@ struct PatientDetail: View {
                     
                     AppCard(
                         icon: AppText.Icon.textBadgeCheckmark,
-                        title: AppText.Patient.DetailComponent.examinationResultTitle,
+                        title: AppTextPatientDetail.examinationResultTitle,
                         spacing: Decimal.d16,
                         isBorderDisabled: true
                     ) {
-                        AppButton(title: AppText.Patient.DetailComponent.newExaminationButton, leftIcon: AppText.Icon.docBadgePlusIcon) {
+                        AppButton(title: AppTextPatientDetail.newExaminationButton, leftIcon: AppText.Icon.docBadgePlusIcon) {
                             presenter.navigateTo(.inputPatientData(patientId: patientId))
                         }
                         
                         if presenter.isLoadingExaminations {
-                            ProgressView(AppText.Patient.DetailComponent.loadingExaminationsMessage)
+                            ProgressView(AppTextPatientDetail.loadingExaminationsMessage)
                                 .frame(maxWidth: .infinity, minHeight: 60)
                         } else if presenter.examinationList.isEmpty {
-                            Text(AppText.Patient.DetailComponent.noExaminationsMessage)
+                            Text(AppTextPatientDetail.noExaminationsMessage)
                                 .foregroundColor(.gray)
                                 .frame(maxWidth: .infinity, minHeight: 60)
                         } else {
@@ -60,7 +60,7 @@ struct PatientDetail: View {
                                         date: presenter.formatDateTime(examination.examinationDate),
                                         patientName: examination.patientName,
                                         patientDOB: presenter.formatDate(examination.patientDob),
-                                        picName: examination.dpjpName ?? AppText.Patient.DetailComponent.notDeterminedMessage,
+                                        picName: examination.dpjpName ?? AppTextPatientDetail.notDeterminedMessage,
                                         viewType: .adminPatientDetail
                                     )
                                 }
@@ -69,12 +69,12 @@ struct PatientDetail: View {
                         }
                     }
                 } else if presenter.isLoadingPatient {
-                    ProgressView(AppText.Patient.DetailComponent.loadingPatientMessage)
+                    ProgressView(AppTextPatientDetail.loadingPatientMessage)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
             .padding(.horizontal, Decimal.d20)
-            .navigationTitle(AppText.Patient.DetailComponent.navigationTitle)
+            .navigationTitle(AppTextPatientDetail.navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -99,5 +99,5 @@ struct PatientDetail: View {
 }
 
 #Preview {
-    PatientDetail(patientId: "d0c1a2b3-4f5e-6789-91ab-cdef12345678")
+    PatientDetailView(patientId: "d0c1a2b3-4f5e-6789-91ab-cdef12345678")
 }

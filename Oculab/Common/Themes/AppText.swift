@@ -7,6 +7,44 @@
 
 import Foundation
 
+// NOTE: Authentication Module Texts
+typealias AppTextAuthLogin = AppText.Authentication.LoginView
+typealias AppTextAuthEditPassword = AppText.Authentication.EditPasswordView
+typealias AppTextAuthUserAccessPin = AppText.Authentication.UserAccessPinView
+typealias AppTextAuthProfile = AppText.Authentication.ProfileView
+typealias AppTextAuthPrivacyPolicy = AppText.Authentication.PrivacyPolicyView
+typealias AppTextAuthCompPin = AppText.Authentication.PinComponent
+
+// NOTE: Examination Module Texts
+typealias AppTextExamProgress = AppText.Examination.ProgressView
+typealias AppTextExamDetail = AppText.Examination.DetailViews
+typealias AppTextExamGuidelines = AppText.Examination.GuidelinesOnboardingView
+typealias AppTextExamSavedResult = AppText.Examination.SavedResultView
+typealias AppTextExamCompConfirmPopups = AppText.Examination.ConfirmationPopupsComponent
+typealias AppTextExamCompGradingCard = AppText.Examination.GradingCardComponent
+typealias AppTextExamCompImageSection = AppText.Examination.ImageSectionComponent
+typealias AppTextExamCompInterpretationSection = AppText.Examination.InterpretationSectionComponent
+typealias AppTextExamCompLabInfo = AppText.Examination.LaborantInfoComponent
+typealias AppTextExamCompHeaderView = AppText.Examination.HeaderViewComponent
+typealias AppTextExamCompFolderCard = AppText.Examination.FolderCardComponent
+typealias AppTextExamCompExtendableCard = AppText.Examination.ExtendableCardComponent
+
+// Note: HomeHistory Module Texts
+typealias AppTextHomeHistory = AppText.HomeHistory
+typealias AppTextHomeHistCompFinishedExamCard = AppText.HomeHistory.FinishedExaminationCardComponent
+typealias AppTextHomeHistCompStatistic = AppText.HomeHistory.StatisticComponent
+typealias AppTextHomeHistCompWeeklyCalendar = AppText.HomeHistory.WeeklyCalendarComponent
+typealias AppTextHomeHistCompHomeActivity = AppText.HomeHistory.HomeActivityComponent
+typealias AppTextHomeHistCompButtonActivity = AppText.HomeHistory.ButtonActivityComponent
+typealias AppTextHomeHistCompHalfCircleProgress = AppText.HomeHistory.HalfCircleProgressComponent
+
+// NOTE: Patient Module Texts
+typealias AppTextPatientDetail = AppText.Patient.DetailView
+typealias AppTextPatientForm = AppText.Patient.FormView
+typealias AppTextPatientList = AppText.Patient.ListView
+typealias AppTextPatientCompCard = AppText.Patient.PatientCardComponent
+typealias AppTextPatientCompFormField = AppText.Patient.PatientFormFieldComponent
+
 enum AppText {
     enum Icon {
         static let back = "back"
@@ -22,6 +60,7 @@ enum AppText {
         static let doorRightHandOpen = "door.right.hand.open"
         static let docTextMagnifyingglass = "doc.text.magnifyingglass"
         static let docText = "doc.text"
+        static let docTextFill = "doc.text.fill"
         static let paperplane = "paperplane"
         static let chevronRightIcon = "chevron.right"
         static let photo = "photo"
@@ -40,6 +79,8 @@ enum AppText {
         static let chevronUp = "chevron.up"
         static let confirmLeave = "Confirm-Leave"
         static let confirm = "Confirm"
+        static let trayFullFill = "tray.full.fill"
+        static let calendar = "calendar"
     }
 
     enum Common {
@@ -286,10 +327,44 @@ enum AppText {
         static let taskSectionTitle = "Tugas Pemeriksaan"
         static let newExaminationButton = "Pemeriksaan Baru"
         static let noTaskMessage = "Anda belum ditugaskan untuk melakukan pemeriksaan"
+        
+        enum FinishedExaminationCardComponent {
+            static let patientLabel = "Pasien"
+            static let dpjpLabel = "DPJP"
+            static let positiveKeyword = "positif"
+            static let positiveAltKeyword = "positive"
+        }
+        
+        enum StatisticComponent {
+            static let title = "Statistik Pemeriksaan"
+            static let tasksCompletedSuffix = "Tugas Selesai"
+            static let fromTasksPrefix = "dari"
+            static let tasksInTotalSuffix = "Tugas"
+            static let positiveLabel = "Positif"
+            static let negativeLabel = "Negatif"
+            static let pendingLabel = "Pending"
+        }
+        
+        enum WeeklyCalendarComponent {
+            static let title = "Pemeriksaan Selesai"
+            static let selectDatePickerTitle = "Select a Date"
+        }
+        
+        enum HomeActivityComponent {
+            static let examinationOfficerLabel = "Petugas Pemeriksaan"
+        }
+        
+        enum ButtonActivityComponent {
+            // This component doesn't have hardcoded strings, but keeping for consistency
+        }
+        
+        enum HalfCircleProgressComponent {
+            static let percentageSuffix = "%"
+        }
     }
     
     enum Patient {
-        enum FormComponent {
+        enum FormView {
             static let newPatientNavigationTitle = "Data Pasien Baru"
             static let editPatientNavigationTitle = "Ubah Data Pasien"
             static let addNewPatientButton = "Tambahkan Pasien Baru"
@@ -297,7 +372,7 @@ enum AppText {
             static let errorAlertTitle = "Error"
         }
         
-        enum ListComponent {
+        enum ListView {
             static let navigationTitle = "Riwayat"
             static let searchPlaceholder = "Cari nama pasien"
             static let addNewPatientButton = "Tambah Pasien Baru"
@@ -306,7 +381,7 @@ enum AppText {
             static let magnifyingglassIcon = "magnifyingglass"
         }
         
-        enum DetailComponent {
+        enum DetailView {
             static let navigationTitle = "Riwayat Pemeriksaan"
             static let patientDataTitle = "Data Pasien"
             static let examinationResultTitle = "Hasil Pemeriksaan"
@@ -320,6 +395,25 @@ enum AppText {
             static let patientDobKey = "Tanggal Lahir"
             static let patientSexKey = "Jenis Kelamin"
             static let patientBpjsKey = "Nomor BPJS"
+        }
+        
+        enum PatientCardComponent {
+            static let birthDatePrefix = "Tanggal Lahir: "
+        }
+        
+        enum PatientFormFieldComponent {
+            static let nameTitle = "Nama"
+            static let namePlaceholder = "John Doe"
+            static let nikTitle = "NIK"
+            static let nikPlaceholder = "Contoh: 167012039484700"
+            static let birthDateTitle = "Tanggal Lahir"
+            static let birthDatePlaceholder = "Pilih Tanggal"
+            static let genderTitle = "Jenis Kelamin"
+            static let femaleChoice = "Perempuan"
+            static let maleChoice = "Laki-laki"
+            static let bpjsTitle = "Nomor BPJS (opsional)"
+            static let bpjsPlaceholder = "Contoh: 1240630077675"
+            static let doneButton = "Selesai"
         }
     }
 }

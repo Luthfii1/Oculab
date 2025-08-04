@@ -24,7 +24,7 @@ struct GradingCardComponent: View {
                     HStack {
                         Image(AppText.Icon.robot)
                         Spacer().frame(width: 4)
-                        Text("\(confidenceLevel.rawValue) \(AppText.Examination.GradingCardComponent.confidenceLevelText)")
+                        Text("\(confidenceLevel.rawValue) \(AppTextExamCompGradingCard.confidenceLevelText)")
                             .font(AppTypography.p4)
                             .foregroundColor(AppColors.slate300)
 

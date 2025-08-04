@@ -23,7 +23,7 @@ struct InterpretationSectionComponent: View {
             HStack {
                 Image(systemName: AppText.Icon.photo)
                     .foregroundColor(AppColors.purple500)
-                Text(AppText.Examination.InterpretationSectionComponent.interpretationResultTitle)
+                Text(AppTextExamCompInterpretationSection.interpretationResultTitle)
                     .font(AppTypography.s4_1)
                     .padding(.leading, Decimal.d8)
                 Spacer()
@@ -37,8 +37,8 @@ struct InterpretationSectionComponent: View {
             )
 
             AppDropdown(
-                title: AppText.Examination.InterpretationSectionComponent.staffInterpretationTitle,
-                placeholder: AppText.Examination.InterpretationSectionComponent.selectCategoryPlaceholder,
+                title: AppTextExamCompInterpretationSection.staffInterpretationTitle,
+                placeholder: AppTextExamCompInterpretationSection.selectCategoryPlaceholder,
                 isRequired: false,
                 rightIcon: AppText.Icon.chevronDown,
                 choices: GradingType.allCases.dropLast().map { ($0.rawValue, $0.rawValue) },
@@ -48,8 +48,8 @@ struct InterpretationSectionComponent: View {
 
             if presenter.selectedTBGrade == GradingType.SCANTY.rawValue {
                 AppTextField(
-                    title: AppText.Examination.InterpretationSectionComponent.btaCountTitle,
-                    placeholder: AppText.Examination.InterpretationSectionComponent.btaCountPlaceholder,
+                    title: AppTextExamCompInterpretationSection.btaCountTitle,
+                    placeholder: AppTextExamCompInterpretationSection.btaCountPlaceholder,
                     isNumberOnly: true,
                     text: $presenter.numOfBTA
                 )
@@ -57,8 +57,8 @@ struct InterpretationSectionComponent: View {
             }
 
             AppTextBox(
-                title: AppText.Examination.InterpretationSectionComponent.staffNotesTitle,
-                placeholder: AppText.Examination.InterpretationSectionComponent.staffNotesPlaceholder,
+                title: AppTextExamCompInterpretationSection.staffNotesTitle,
+                placeholder: AppTextExamCompInterpretationSection.staffNotesPlaceholder,
                 text: $presenter.inspectorNotes
             )
             .focused($focusedField, equals: .notes)
@@ -74,7 +74,7 @@ struct InterpretationSectionComponent: View {
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
                 Spacer()
-                Button(AppText.Examination.InterpretationSectionComponent.doneButton) {
+                Button(AppTextExamCompInterpretationSection.doneButton) {
                     focusedField = nil
                 }
             }

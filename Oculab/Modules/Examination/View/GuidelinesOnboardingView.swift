@@ -11,7 +11,7 @@ struct GuidelinesOnboardingView: View {
     @Environment(\.dismiss) var dismiss
     @State private var currentPage = 0
 
-    let pages: [GuidelinePage] = AppText.Examination.GuidelinesOnboardingView.guidelines.map { guideline in
+    let pages: [GuidelinePage] = AppTextExamGuidelines.guidelines.map { guideline in
         GuidelinePage(
             imageName: guideline.imageName,
             title: guideline.title,
@@ -56,7 +56,7 @@ struct GuidelinesOnboardingView: View {
                     .padding(.bottom, 24)
 
                 AppButton(
-                    title: AppText.Examination.GuidelinesOnboardingView.continueButton,
+                    title: AppTextExamGuidelines.continueButton,
                     rightIcon: AppText.Icon.arrowRight,
                     isEnabled: currentPage == pages.count - 1,
                     action: {
@@ -70,7 +70,7 @@ struct GuidelinesOnboardingView: View {
                 .padding(.horizontal)
                 .padding(.bottom)
             }
-            .navigationTitle(AppText.Examination.GuidelinesOnboardingView.navigationTitle)
+            .navigationTitle(AppTextExamGuidelines.navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

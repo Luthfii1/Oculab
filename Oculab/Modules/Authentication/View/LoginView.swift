@@ -24,23 +24,23 @@ struct LoginView: View {
                     if presenter.isKeyboardVisible {
                         Spacer()
                     }
-                    Text(AppText.Authentication.LoginView.title)
+                    Text(AppTextAuthLogin.title)
                         .font(AppTypography.h1)
                         .foregroundStyle(AppColors.slate900)
                         .multilineTextAlignment(.center)
                     VStack(spacing: 8) {
                         AppTextField(
-                            title: AppText.Authentication.LoginView.emailTitle,
+                            title: AppTextAuthLogin.emailTitle,
                             isRequired: true,
-                            placeholder: AppText.Authentication.LoginView.emailPlaceholder,
+                            placeholder: AppTextAuthLogin.emailPlaceholder,
                             isError: presenter.isError,
                             isDisabled: presenter.isLoading,
                             text: $presenter.email
                         )
                         AppTextField(
-                            title: AppText.Authentication.LoginView.passwordTitle,
+                            title: AppTextAuthLogin.passwordTitle,
                             isRequired: true,
-                            placeholder: AppText.Authentication.LoginView.passwordPlaceholder,
+                            placeholder: AppTextAuthLogin.passwordPlaceholder,
                             description: presenter.description,
                             rightIcon: AppText.Icon.eye,
                             isError: presenter.isError,
@@ -52,7 +52,7 @@ struct LoginView: View {
                     .padding(.top, 12)
                     VStack(alignment: .center, spacing: 16) {
                         AppButton(
-                            title: AppText.Authentication.LoginView.buttonText,
+                            title: AppTextAuthLogin.buttonText,
                             colorType: .primary,
                             size: .large,
                             isEnabled: presenter.isFilled
@@ -64,11 +64,11 @@ struct LoginView: View {
                         }
                         HStack {
                             Spacer()
-                            Text(AppText.Authentication.LoginView.faskesNotRegisteredYet)
+                            Text(AppTextAuthLogin.faskesNotRegisteredYet)
                                 .font(AppTypography.p3)
                                 .foregroundStyle(AppColors.slate900)
                             AppButton(
-                                title: AppText.Authentication.LoginView.registerFaskesButtonText,
+                                title: AppTextAuthLogin.registerFaskesButtonText,
                                 colorType: .tertiary,
                                 size: .large,
                                 isEnabled: true

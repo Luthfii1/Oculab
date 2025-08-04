@@ -27,7 +27,7 @@ struct HeaderViewComponent: View {
 
             Spacer()
 
-            Text(AppText.Examination.HeaderViewComponent.newExaminationTitle)
+            Text(AppTextExamCompHeaderView.newExaminationTitle)
                 .font(AppTypography.s4_1)
                 .foregroundColor(AppColors.slate900)
 

@@ -16,12 +16,12 @@ struct ImageSectionComponent: View {
             HStack {
                 Image(systemName: AppText.Icon.photo)
                     .foregroundColor(AppColors.purple500)
-                Text(AppText.Examination.ImageSectionComponent.imageResultTitle)
+                Text(AppTextExamCompImageSection.imageResultTitle)
                     .font(AppTypography.s4_1)
                     .padding(.leading, Decimal.d8)
             }
 
-            Text(AppText.Examination.ImageSectionComponent.imageResultInstruction)
+            Text(AppTextExamCompImageSection.imageResultInstruction)
                 .font(AppTypography.p3)
                 .foregroundStyle(AppColors.slate300)
 

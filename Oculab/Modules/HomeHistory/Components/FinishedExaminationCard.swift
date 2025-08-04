@@ -15,7 +15,8 @@ struct FinishedExaminationCard: View {
     var dpjpName: String
     
     private var isPositive: Bool {
-        result.lowercased().contains("positif") || result.lowercased().contains("positive")
+        result.lowercased().contains(AppTextHomeHistCompFinishedExamCard.positiveKeyword) || 
+        result.lowercased().contains(AppTextHomeHistCompFinishedExamCard.positiveAltKeyword)
     }
     
     private var resultBackgroundColor: Color {
@@ -31,7 +32,7 @@ struct FinishedExaminationCard: View {
             // Slide ID with icon and result tag
             HStack {
                 HStack(spacing: Decimal.d8) {
-                    Image(systemName: "doc.text.fill")
+                    Image(systemName: AppText.Icon.docTextFill)
                         .padding(Decimal.d8)
                         .background(AppColors.purple50)
                         .foregroundStyle(AppColors.purple500)
@@ -53,14 +54,14 @@ struct FinishedExaminationCard: View {
                     .cornerRadius(Decimal.d6)
             }
             
-            Text("Pasien")
+            Text(AppTextHomeHistCompFinishedExamCard.patientLabel)
                 .font(AppTypography.s6)
                 .foregroundStyle(AppColors.slate300)
             Text("\(patientName) (\(patientDOB))")
                 .font(AppTypography.p3)
                 .foregroundStyle(AppColors.slate900)
             
-            Text("DPJP")
+            Text(AppTextHomeHistCompFinishedExamCard.dpjpLabel)
                 .font(AppTypography.s6)
                 .foregroundStyle(AppColors.slate300)
             Text(dpjpName)

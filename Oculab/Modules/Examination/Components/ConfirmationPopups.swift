@@ -15,13 +15,13 @@ struct ConfirmationPopups: View {
         VStack {
             AppPopup(
                 image: AppText.Icon.confirmLeave,
-                title: AppText.Examination.ConfirmationPopupsComponent.unfinishedExaminationTitle,
-                description: AppText.Examination.ConfirmationPopupsComponent.unfinishedExaminationDescription,
+                title: AppTextExamCompConfirmPopups.unfinishedExaminationTitle,
+                description: AppTextExamCompConfirmPopups.unfinishedExaminationDescription,
                 buttons: [
-                    AppButton(title: AppText.Examination.ConfirmationPopupsComponent.exitButton, colorType: .destructive(.primary)) {
+                    AppButton(title: AppTextExamCompConfirmPopups.exitButton, colorType: .destructive(.primary)) {
                         presenter.popToRoot()
                     },
-                    AppButton(title: AppText.Examination.ConfirmationPopupsComponent.reviewAgainButton, colorType: .destructive(.secondary)) {
+                    AppButton(title: AppTextExamCompConfirmPopups.reviewAgainButton, colorType: .destructive(.secondary)) {
                         presenter.isLeavePopUpVisible = false
                     }
                 ],
@@ -30,15 +30,15 @@ struct ConfirmationPopups: View {
 
             AppPopup(
                 image: AppText.Icon.confirm,
-                title: AppText.Examination.ConfirmationPopupsComponent.saveResultTitle,
-                description: AppText.Examination.ConfirmationPopupsComponent.saveResultDescription,
+                title: AppTextExamCompConfirmPopups.saveResultTitle,
+                description: AppTextExamCompConfirmPopups.saveResultDescription,
                 buttons: [
-                    AppButton(title: AppText.Examination.ConfirmationPopupsComponent.saveButton, colorType: .primary) {
+                    AppButton(title: AppTextExamCompConfirmPopups.saveButton, colorType: .primary) {
                         Task {
                             await presenter.submitExpertResult(examinationId: examinationId)
                         }
                     },
-                    AppButton(title: AppText.Examination.ConfirmationPopupsComponent.reviewAgainButton, colorType: .tertiary) {
+                    AppButton(title: AppTextExamCompConfirmPopups.reviewAgainButton, colorType: .tertiary) {
                         presenter.isVerifPopUpVisible = false
                     }
                 ],

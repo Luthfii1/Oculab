@@ -16,11 +16,11 @@ struct EditPasswordView: View {
                 if profilePresenter.showSuccessPopup {
                     AppPopup(
                         image: AppText.Icon.success,
-                        title: AppText.Authentication.EditPasswordView.successUpdatePasswordTitle,
-                        description: AppText.Authentication.EditPasswordView.successUpdatePasswordMessage,
+                        title: AppTextAuthEditPassword.successUpdatePasswordTitle,
+                        description: AppTextAuthEditPassword.successUpdatePasswordMessage,
                         buttons: [
                             AppButton(
-                                title: AppText.Authentication.EditPasswordView.successUpdatePasswordButtonText,
+                                title: AppTextAuthEditPassword.successUpdatePasswordButtonText,
                                 colorType: .secondary,
                                 size: .large,
                                 isEnabled: true
@@ -42,8 +42,8 @@ struct EditPasswordView: View {
                     VStack(spacing: 52) {
                         VStack(alignment: .leading, spacing: 24) {
                             AppTextField(
-                                title: AppText.Authentication.EditPasswordView.currentPasswordTitle,
-                                placeholder: AppText.Authentication.EditPasswordView.currentPasswordPlaceholder,
+                                title: AppTextAuthEditPassword.currentPasswordTitle,
+                                placeholder: AppTextAuthEditPassword.currentPasswordPlaceholder,
                                 description: profilePresenter.descriptionOldPassword,
                                 rightIcon: AppText.Icon.eye,
                                 isError: profilePresenter.isOldPasswordError,
@@ -51,16 +51,16 @@ struct EditPasswordView: View {
                             )
 
                             AppTextField(
-                                title: AppText.Authentication.EditPasswordView.newPasswordTitle,
-                                placeholder: AppText.Authentication.EditPasswordView.newPasswordPlaceholder,
-                                description: AppText.Authentication.EditPasswordView.newPasswordDescription,
+                                title: AppTextAuthEditPassword.newPasswordTitle,
+                                placeholder: AppTextAuthEditPassword.newPasswordPlaceholder,
+                                description: AppTextAuthEditPassword.newPasswordDescription,
                                 rightIcon: AppText.Icon.eye,
                                 text: $profilePresenter.inputPassword
                             )
 
                             AppTextField(
-                                title: AppText.Authentication.EditPasswordView.confirmPasswordTitle,
-                                placeholder: AppText.Authentication.EditPasswordView.confirmPasswordPlaceholder,
+                                title: AppTextAuthEditPassword.confirmPasswordTitle,
+                                placeholder: AppTextAuthEditPassword.confirmPasswordPlaceholder,
                                 description: profilePresenter.descriptionPasswordConfirm,
                                 rightIcon: AppText.Icon.eye,
                                 isError: profilePresenter.isError,
@@ -69,7 +69,7 @@ struct EditPasswordView: View {
                         }
 
                         AppButton(
-                            title: AppText.Authentication.ProfileView.saveChangesButton,
+                            title: AppTextAuthProfile.saveChangesButton,
                             rightIcon: AppText.Icon.checkmark,
                             isEnabled: profilePresenter.isPasswordEditButtonEnabled()
                         ) {
@@ -84,7 +84,7 @@ struct EditPasswordView: View {
                     .padding(20)
                 }
                 .navigationBarTitleDisplayMode(.inline)
-                .navigationTitle(AppText.Authentication.EditPasswordView.navigationTitle)
+                .navigationTitle(AppTextAuthEditPassword.navigationTitle)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: {

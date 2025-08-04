@@ -22,7 +22,7 @@ struct FolderCardComponent: View {
                     .font(AppTypography.s4_1).foregroundStyle(AppColors.slate900)
 
                 Spacer()
-                Text("\(numOfImage) \(AppText.Examination.FolderCardComponent.imageCountSuffix)").foregroundStyle(AppColors.slate900)
+                Text("\(numOfImage) \(AppTextExamCompFolderCard.imageCountSuffix)").foregroundStyle(AppColors.slate900)
 
                 Image(systemName: AppText.Icon.chevronRightIcon).foregroundStyle(AppColors.slate900)
             }

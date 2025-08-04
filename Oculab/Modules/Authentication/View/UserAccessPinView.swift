@@ -17,11 +17,11 @@ struct UserAccessPinView: View {
                 if securityPresenter.showAccessPinSuccessPopup {
                     AppPopup(
                         image: AppText.Icon.success,
-                        title: AppText.Authentication.UserAccessPinView.successTitle,
-                        description: AppText.Authentication.UserAccessPinView.successDescription,
+                        title: AppTextAuthUserAccessPin.successTitle,
+                        description: AppTextAuthUserAccessPin.successDescription,
                         buttons: [
                             AppButton(
-                                title: AppText.Authentication.UserAccessPinView.successButton,
+                                title: AppTextAuthUserAccessPin.successButton,
                                 colorType: .secondary,
                                 size: .large,
                                 isEnabled: true

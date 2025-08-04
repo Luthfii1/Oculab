@@ -99,9 +99,9 @@ class Router: ObservableObject {
         case .patientList:
             PatientListView()
         case .patientForm(let patientId):
-            PatientForm(patientId: patientId)
+            PatientFormView(patientId: patientId)
         case let .patientDetail(patientId):
-            PatientDetail(patientId: patientId)
+            PatientDetailView(patientId: patientId)
         }
     }
 

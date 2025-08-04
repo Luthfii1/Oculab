@@ -29,7 +29,7 @@ struct HalfCircleProgress: View {
 
                 // Text Display
                 VStack {
-                    Text("\(Int(progress * 100))%")
+                    Text("\(Int(progress * 100))\(AppTextHomeHistCompHalfCircleProgress.percentageSuffix)")
                         .foregroundStyle(AppColors.slate900)
                         .font(AppTypography.h6)
 

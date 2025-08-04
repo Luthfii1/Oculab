@@ -14,19 +14,19 @@ struct PrivacyPolicyView: View {
                 VStack(alignment: .leading, spacing: 24) {
                     Rectangle().hidden()
 
-                    Text(AppText.Authentication.PrivacyPolicyView.intro)
+                    Text(AppTextAuthPrivacyPolicy.intro)
                         .font(AppTypography.p3)
                         .foregroundStyle(AppColors.slate900)
 
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(AppText.Authentication.PrivacyPolicyView.generalTitle)
+                        Text(AppTextAuthPrivacyPolicy.generalTitle)
                             .font(AppTypography.s5)
                             .foregroundStyle(AppColors.slate900)
 
                         VStack(alignment: .leading, spacing: 0) {
-                            ForEach(AppText.Authentication.PrivacyPolicyView.generalPoints, id: \ .self) { point in
+                            ForEach(AppTextAuthPrivacyPolicy.generalPoints, id: \ .self) { point in
                                 HStack(alignment: .top) {
-                                    Text(AppText.Authentication.PrivacyPolicyView.definitionBullet)
+                                    Text(AppTextAuthPrivacyPolicy.definitionBullet)
                                     Text(point)
                                 }
                             }
@@ -37,16 +37,16 @@ struct PrivacyPolicyView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(AppText.Authentication.PrivacyPolicyView.definitionTitle)
+                        Text(AppTextAuthPrivacyPolicy.definitionTitle)
                             .font(AppTypography.s5)
                             .foregroundStyle(AppColors.slate900)
 
-                        Text(AppText.Authentication.PrivacyPolicyView.definitionIntro)
+                        Text(AppTextAuthPrivacyPolicy.definitionIntro)
                             .font(AppTypography.p3)
                             .foregroundStyle(AppColors.slate900)
 
                         VStack(alignment: .leading, spacing: 8) {
-                            ForEach(AppText.Authentication.PrivacyPolicyView.definitions, id: \ .self) { def in
+                            ForEach(AppTextAuthPrivacyPolicy.definitions, id: \ .self) { def in
                                 if let subpoints = def.subpoints {
                                     VStack(alignment: .leading, spacing: 4) {
                                         HStack(alignment: .top) {
@@ -79,7 +79,7 @@ struct PrivacyPolicyView: View {
                 .padding(.horizontal, 20)
             }
             .navigationBarTitleDisplayMode(.inline)
-            .navigationTitle(AppText.Authentication.PrivacyPolicyView.navigationTitle)
+            .navigationTitle(AppTextAuthPrivacyPolicy.navigationTitle)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
