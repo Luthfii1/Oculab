@@ -24,6 +24,9 @@ enum AppText {
         static let docText = "doc.text"
         static let paperplane = "paperplane"
         static let chevronRightIcon = "chevron.right"
+        static let photo = "photo"
+        static let textBadgeCheckmark = "text.badge.checkmark"
+        static let exclamationmarkTriangleFill = "exclamationmark.triangle.fill"
     }
 
     enum Common {
@@ -193,6 +196,17 @@ enum AppText {
                     description: "Pasang adapter ke lensa okuler dan atur fokus antara mikroskop dan kamera"
                 )
             ]
+        }
+        
+        enum SavedResult {
+            static let examinationDetailTitle = "Detail Pemeriksaan"
+            static let examinationReasonKey = "Alasan Pemeriksaan"
+            static let imageResultTitle = "Hasil Gambar"
+            static let imageResultInstruction = "Ketuk untuk lihat detail gambar"
+            static let interpretationResultTitle = "Hasil Interpretasi"
+            static let staffInterpretationTitle = "Interpretasi Petugas"
+            static let systemInterpretationTitle = "Interpretasi Sistem"
+            static let systemInterpretationWarning = "Interpretasi sistem bukan merupakan hasil akhir untuk pasien"
         }
     }
 }
