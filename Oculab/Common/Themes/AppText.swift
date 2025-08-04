@@ -155,6 +155,14 @@ enum AppText {
             static let preparationTypeKey = "Jenis Sediaan"
             static let viewPdfButton = "Lihat PDF"
             static let reportToSitbButton = "Laporkan ke SITB"
+            
+            // New examination view specific strings
+            static let newExaminationTitle = "Pemeriksaan Baru"
+            static let dataPemeriksaanStep = "Data Pemeriksaan"
+            static let hasilPemeriksaanStep = "Hasil Pemeriksaan"
+            static let slideDetailTitle = "Detail Sediaan"
+            static let examinationGoalKey = "Tujuan Pemeriksaan"
+            static let slideImageTitle = "Gambar Sediaan"
         }
     }
 }
