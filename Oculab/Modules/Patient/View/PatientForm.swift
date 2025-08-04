@@ -36,8 +36,8 @@ struct PatientForm: View {
                     Spacer()
 
                     AppButton(
-                        title: isAddingNewPatient ? "Tambahkan Pasien Baru" : "Simpan Data Pasien",
-                        leftIcon: isAddingNewPatient ? "plus" : "checkmark"
+                        title: isAddingNewPatient ? AppText.Patient.Form.addNewPatientButton : AppText.Patient.Form.savePatientButton,
+                        leftIcon: isAddingNewPatient ? AppText.Icon.plus : AppText.Icon.checkmark
                     ) {
                         Task {
                             if isAddingNewPatient {
@@ -51,7 +51,7 @@ struct PatientForm: View {
             }
             .padding(.horizontal, Decimal.d20)
             .padding(.vertical, Decimal.d24)
-            .navigationTitle(isAddingNewPatient ? "Data Pasien Baru" : "Ubah Data Pasien")
+            .navigationTitle(isAddingNewPatient ? AppText.Patient.Form.newPatientNavigationTitle : AppText.Patient.Form.editPatientNavigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -59,7 +59,7 @@ struct PatientForm: View {
                         Router.shared.navigateBack()
                     }) {
                         HStack {
-                            Image("back")
+                            Image(AppText.Icon.back)
                         }
                     }
                 }
@@ -71,8 +71,8 @@ struct PatientForm: View {
                     }
                 }
             }
-            .alert("Error", isPresented: .constant(presenter.errorMessage != nil)) {
-                Button("OK") {
+            .alert(AppText.Common.errorAlertTitle, isPresented: .constant(presenter.errorMessage != nil)) {
+                Button(AppText.Common.okButton) {
                     presenter.errorMessage = nil
                 }
             } message: {

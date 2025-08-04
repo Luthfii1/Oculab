@@ -29,6 +29,9 @@ enum AppText {
         static let exclamationmarkTriangleFill = "exclamationmark.triangle.fill"
         static let docOnDocFillIcon = "doc.on.doc.fill"
         static let docBadgePlusIcon = "doc.badge.plus"
+        static let plus = "plus"
+        static let checkmark = "checkmark"
+        static let magnifyingglass = "magnifyingglass"
     }
 
     enum Common {
@@ -41,6 +44,7 @@ enum AppText {
         static let nextButton = "Lanjutkan"
         static let backButton = "Kembali"
         static let emptyString = ""
+        static let errorAlertTitle = "Error"
     }
     
     enum Authentication {
@@ -224,5 +228,40 @@ enum AppText {
         static let loadingMessage = "Memuat data pemeriksaan anda"
         static let emptyStateImageName = "Empty"
         static let noTaskMessage = "Anda belum ditugaskan untuk melakukan pemeriksaan"
+    }
+    
+    enum Patient {
+        enum Form {
+            static let newPatientNavigationTitle = "Data Pasien Baru"
+            static let editPatientNavigationTitle = "Ubah Data Pasien"
+            static let addNewPatientButton = "Tambahkan Pasien Baru"
+            static let savePatientButton = "Simpan Data Pasien"
+            static let errorAlertTitle = "Error"
+        }
+        
+        enum List {
+            static let navigationTitle = "Riwayat"
+            static let searchPlaceholder = "Cari nama pasien"
+            static let addNewPatientButton = "Tambah Pasien Baru"
+            static let noResultsPrefix = "Tidak ada hasil untuk"
+            static let clearSearchButton = "Hapus Pencarian"
+            static let magnifyingglassIcon = "magnifyingglass"
+        }
+        
+        enum Detail {
+            static let navigationTitle = "Riwayat Pemeriksaan"
+            static let patientDataTitle = "Data Pasien"
+            static let examinationResultTitle = "Hasil Pemeriksaan"
+            static let newExaminationButton = "Pemeriksaan Baru"
+            static let loadingPatientMessage = "Loading patient data..."
+            static let loadingExaminationsMessage = "Loading examinations..."
+            static let noExaminationsMessage = "Belum ada pemeriksaan"
+            static let notDeterminedMessage = "Belum ditentukan"
+            static let patientNameKey = "Nama"
+            static let patientNikKey = "NIK"
+            static let patientDobKey = "Tanggal Lahir"
+            static let patientSexKey = "Jenis Kelamin"
+            static let patientBpjsKey = "Nomor BPJS"
+        }
     }
 }

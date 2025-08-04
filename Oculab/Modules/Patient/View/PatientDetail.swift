@@ -17,33 +17,33 @@ struct PatientDetail: View {
                 if !presenter.isLoadingPatient && !presenter.patient.name.isEmpty {
                     Spacer().frame(height: Decimal.d24)
                     
-                    AppCard(icon: "person.fill", title: "Data Pasien", spacing: Decimal.d16, isEnablingEdit: true) {
+                    AppCard(icon: AppText.Icon.personFill, title: AppText.Patient.Detail.patientDataTitle, spacing: Decimal.d16, isEnablingEdit: true) {
                         ExtendedCard(data: [
-                            ("Nama", presenter.patient.name),
-                            ("NIK", presenter.patient.NIK),
-                            ("Tanggal Lahir", presenter.formatDate(presenter.patient.DoB)),
-                            ("Jenis Kelamin", presenter.patient.sex.rawValue),
-                            ("Nomor BPJS", presenter.patient.BPJS ?? ""),
+                            (AppText.Patient.Detail.patientNameKey, presenter.patient.name),
+                            (AppText.Patient.Detail.patientNikKey, presenter.patient.NIK),
+                            (AppText.Patient.Detail.patientDobKey, presenter.formatDate(presenter.patient.DoB)),
+                            (AppText.Patient.Detail.patientSexKey, presenter.patient.sex.rawValue),
+                            (AppText.Patient.Detail.patientBpjsKey, presenter.patient.BPJS ?? AppText.Common.emptyString),
                         ], titleSize: AppTypography.s5)
                     } action: {
                         presenter.navigateTo(.patientForm(patientId: patientId))
                     }
                     
                     AppCard(
-                        icon: "text.badge.checkmark",
-                        title: "Hasil Pemeriksaan",
+                        icon: AppText.Icon.textBadgeCheckmark,
+                        title: AppText.Patient.Detail.examinationResultTitle,
                         spacing: Decimal.d16,
                         isBorderDisabled: true
                     ) {
-                        AppButton(title: "Pemeriksaan Baru", leftIcon: "doc.badge.plus") {
+                        AppButton(title: AppText.Patient.Detail.newExaminationButton, leftIcon: AppText.Icon.docBadgePlusIcon) {
                             presenter.navigateTo(.inputPatientData(patientId: patientId))
                         }
                         
                         if presenter.isLoadingExaminations {
-                            ProgressView("Loading examinations...")
+                            ProgressView(AppText.Patient.Detail.loadingExaminationsMessage)
                                 .frame(maxWidth: .infinity, minHeight: 60)
                         } else if presenter.examinationList.isEmpty {
-                            Text("Belum ada pemeriksaan")
+                            Text(AppText.Patient.Detail.noExaminationsMessage)
                                 .foregroundColor(.gray)
                                 .frame(maxWidth: .infinity, minHeight: 60)
                         } else {
@@ -60,7 +60,7 @@ struct PatientDetail: View {
                                         date: presenter.formatDateTime(examination.examinationDate),
                                         patientName: examination.patientName,
                                         patientDOB: presenter.formatDate(examination.patientDob),
-                                        picName: examination.dpjpName ?? "Belum ditentukan",
+                                        picName: examination.dpjpName ?? AppText.Patient.Detail.notDeterminedMessage,
                                         viewType: .adminPatientDetail
                                     )
                                 }
@@ -69,12 +69,12 @@ struct PatientDetail: View {
                         }
                     }
                 } else if presenter.isLoadingPatient {
-                    ProgressView("Loading patient data...")
+                    ProgressView(AppText.Patient.Detail.loadingPatientMessage)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
             .padding(.horizontal, Decimal.d20)
-            .navigationTitle("Riwayat Pemeriksaan")
+            .navigationTitle(AppText.Patient.Detail.navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -82,7 +82,7 @@ struct PatientDetail: View {
                         presenter.navigateBack()
                     }) {
                         HStack {
-                            Image("back")
+                            Image(AppText.Icon.back)
                         }
                     }
                 }
