@@ -55,6 +55,7 @@ enum AppText {
             static let privacyPolicyButton = "Kebijakan Privasi"
             static let logoutButton = "Keluar"
             static let navigationTitle = "Profile"
+            static var saveChangesButton = "Simpan Perubahan"
         }
 
         enum PrivacyPolicy {

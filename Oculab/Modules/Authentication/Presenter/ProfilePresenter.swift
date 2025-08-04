@@ -31,7 +31,6 @@ class ProfilePresenter: ObservableObject {
         }
     }
 
-    @Published var buttonText: String = "Simpan Perubahan"
     @Published var isError: Bool = false
     @Published var isOldPasswordError: Bool = false {
         didSet {
@@ -45,7 +44,7 @@ class ProfilePresenter: ObservableObject {
     @Published var descriptionOldPassword: String = ""
     @Published var isLoading = false {
         didSet {
-            buttonText = isLoading ? "Loading..." : "Simpan Perubahan"
+            AppText.Authentication.Profile.saveChangesButton = isLoading ? "Loading..." : "Simpan Perubahan"
         }
     }
 
@@ -60,7 +59,6 @@ class ProfilePresenter: ObservableObject {
     }
 
     private func validatePasswords() {
-        print("desc: \(descriptionPasswordConfirm)")
         // Only show validation messages if user has started typing the confirmation
         guard !confirmPassword.isEmpty else {
             isError = false

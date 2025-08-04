@@ -69,7 +69,7 @@ struct EditPasswordView: View {
                         }
 
                         AppButton(
-                            title: profilePresenter.buttonText,
+                            title: AppText.Authentication.Profile.saveChangesButton,
                             rightIcon: AppText.Icon.checkmark,
                             isEnabled: profilePresenter.isPasswordEditButtonEnabled()
                         ) {
