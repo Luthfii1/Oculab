@@ -52,6 +52,15 @@ typealias AppTextUserMgmtEditUserForm = AppText.UserManagement.EditUserFormView
 typealias AppTextUserMgmtUserListView = AppText.UserManagement.UserListView
 typealias AppTextUserMgmtCompBottomSheet = AppText.UserManagement.BottomSheetMenuComponent
 
+// NOTE: VideoRecord Module Texts
+typealias AppTextVideoRecordView = AppText.VideoRecord.VideoRecordView
+typealias AppTextVideoRecordInstruction = AppText.VideoRecord.InstructionRecordView
+typealias AppTextVideoRecordStitched = AppText.VideoRecord.StitchedImageView
+typealias AppTextVideoRecordFullScreen = AppText.VideoRecord.FullScreenVideoPlayerView
+typealias AppTextVideoRecordCompCamera = AppText.VideoRecord.CameraViewComponent
+typealias AppTextVideoRecordCompPreview = AppText.VideoRecord.VideoPreviewComponent
+typealias AppTextVideoRecordCompInput = AppText.VideoRecord.VideoInputComponent
+
 enum AppText {
     enum Icon {
         static let back = "back"
@@ -93,6 +102,11 @@ enum AppText {
         static let trash = "trash"
         static let chevronLeft = "chevron.left"
         static let addAccount = "AddAccount"
+        static let xmarkCircleFill = "xmark.circle.fill"
+        static let arrowCounterclockwise = "arrow.counterclockwise"
+        static let camera = "camera"
+        static let cameraFill = "camera.fill"
+        static let preparationSectionIcon = "list.number"
     }
 
     enum Common {
@@ -490,6 +504,52 @@ enum AppText {
         enum BottomSheetMenuComponent {
             static let editAccountDetailsButton = "Ubah Detail Akun"
             static let deleteAccountButton = "Hapus Akun"
+        }
+    }
+    
+    enum VideoRecord {
+        enum VideoRecordView {
+            static let cameraAccessDeniedTitle = "Camera Access Denied"
+            static let cameraAccessDeniedMessage = "Please enable camera access for Oculab in Settings to record video"
+            static let goToSettingsButton = "Go to Settings"
+            static let cancelButton = "Cancel"
+        }
+        
+        enum InstructionRecordView {
+            static let navigationTitle = "Instruksi Pemeriksaan"
+            static let preparationSectionTitle = "Persiapan Pemeriksaan"
+            static let recordingSectionTitle = "Instruksi Pengambilan Gambar"
+            static let startRecordingButton = "Mulai Pengambilan Gambar"
+        }
+        
+        enum StitchedImageView {
+            static let navigationTitle = "Stitched Image"
+            static let noImageAvailableMessage = "No stitched image available"
+        }
+        
+        enum FullScreenVideoPlayerView {
+            // Empty enum for consistency, no specific strings needed
+        }
+        
+        enum CameraViewComponent {
+            static let cameraAccessAlertTitle = "Camera Access"
+            static let cameraAccessAlertMessage = "Please enable camera and microphone access in settings"
+            static let settingsButton = "Settings"
+            static let cancelButton = "Cancel"
+        }
+        
+        enum VideoPreviewComponent {
+            static let saveVideoButton = "Simpan Video"
+            static let retakeVideoButton = "Ambil Ulang"
+        }
+        
+        enum VideoInputComponent {
+            static let requiredFieldIndicator = "*"
+            static let takeVideoButton = "Ambil Gambar"
+            static let previewVideoButton = "Preview Video"
+            static let videoErrorAlertTitle = "Gagal Memutar Video"
+            static let videoErrorAlertMessage = "Video tidak dapat diputar. Silakan rekam ulang sampel."
+            static let videoErrorDismissButton = "Kembali"
         }
     }
 }

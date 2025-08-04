@@ -15,7 +15,7 @@ struct InstructionRecordView: View {
             ScrollView {
                 Spacer().frame(height: Decimal.d12)
                 VStack(spacing: Decimal.d24) {
-                    AppCard(icon: "list.number", title: "Persiapan Pemeriksaan", spacing: Decimal.d16) {
+                    AppCard(icon: AppText.Icon.preparationSectionIcon, title: AppTextVideoRecordInstruction.preparationSectionTitle, spacing: Decimal.d16) {
                         VStack(alignment: .leading, spacing: Decimal.d16) {
                             ForEach(videoRecordPresenter.preRecordingInstructions, id: \.self) { instruction in
                                 HStack(alignment: .top) {
@@ -28,7 +28,7 @@ struct InstructionRecordView: View {
                         .font(AppTypography.p3)
                     }
 
-                    AppCard(icon: "camera.fill", title: "Instruksi Pengambilan Gambar", spacing: Decimal.d16) {
+                    AppCard(icon: AppText.Icon.cameraFill, title: AppTextVideoRecordInstruction.recordingSectionTitle, spacing: Decimal.d16) {
                         VStack(spacing: Decimal.d16) {
                             ForEach(videoRecordPresenter.duringRecordingInstructions.indices, id: \.self) { index in
                                 if index == 2 {
@@ -45,8 +45,8 @@ struct InstructionRecordView: View {
                     }
 
                     AppButton(
-                        title: "Mulai Pengambilan Gambar",
-                        leftIcon: "camera", // Optional left icon
+                        title: AppTextVideoRecordInstruction.startRecordingButton,
+                        leftIcon: AppText.Icon.camera, // Optional left icon
                         colorType: .primary, // Primary button type
                         size: .large,
                         isEnabled: true
@@ -56,7 +56,7 @@ struct InstructionRecordView: View {
                 }
                 .padding(.horizontal, Decimal.d20)
             }
-            .navigationTitle("Instruksi Pemeriksaan")
+            .navigationTitle(AppTextVideoRecordInstruction.navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

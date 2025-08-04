@@ -18,13 +18,13 @@ struct StitchedImageView: View {
                     .aspectRatio(contentMode: .fill)
                     .padding()
             } else {
-                Text("No stitched image available")
+                Text(AppTextVideoRecordStitched.noImageAvailableMessage)
                     .font(.headline)
                     .foregroundColor(.gray)
                     .padding()
             }
         }
-        .navigationTitle("Stitched Image")
+        .navigationTitle(AppTextVideoRecordStitched.navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
     }
 }

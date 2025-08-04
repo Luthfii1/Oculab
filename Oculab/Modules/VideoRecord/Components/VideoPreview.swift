@@ -22,8 +22,8 @@ struct VideoPreview: View {
             VStack(alignment: .center, spacing: Decimal.d16) {
                 // Button to save video
                 AppButton(
-                    title: "Simpan Video",
-                    rightIcon: "checkmark",
+                    title: AppTextVideoRecordCompPreview.saveVideoButton,
+                    rightIcon: AppText.Icon.checkmark,
                     colorType: .neutral(.primary),
                     size: .large,
                     cornerRadius: 8
@@ -33,8 +33,8 @@ struct VideoPreview: View {
 
                 // Button to retake video
                 AppButton(
-                    title: "Ambil Ulang",
-                    leftIcon: "arrow.counterclockwise",
+                    title: AppTextVideoRecordCompPreview.retakeVideoButton,
+                    leftIcon: AppText.Icon.arrowCounterclockwise,
                     colorType: .neutral(.secondary),
                     size: .large
                 ) {
