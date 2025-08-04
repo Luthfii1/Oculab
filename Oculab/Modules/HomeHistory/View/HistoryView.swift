@@ -59,7 +59,7 @@ struct HistoryView: View {
                 }
             }
             .padding(.horizontal, Decimal.d20)
-            .navigationTitle(AppText.HomeHistory.navigationTitle)
+            .navigationTitle(AppText.HomeHistory.navigationTitleHistory)
         }
         .ignoresSafeArea()
         .onAppear {

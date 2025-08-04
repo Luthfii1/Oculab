@@ -30,8 +30,8 @@ enum AppText {
         static let docOnDocFillIcon = "doc.on.doc.fill"
         static let docBadgePlusIcon = "doc.badge.plus"
         static let plus = "plus"
-        static let checkmark = "checkmark"
         static let magnifyingglass = "magnifyingglass"
+        static let deleteLeftFill = "delete.left.fill"
     }
 
     enum Common {
@@ -77,6 +77,11 @@ enum AppText {
             static let successTitle = "PIN Berhasil Diubah"
             static let successDescription = "PIN akses Anda telah berhasil diperbarui"
             static let successButton = "Kembali ke Profile"
+        }
+        
+        enum PinComponents {
+            static let forgotPinText = "Lupa PIN?"
+            static let usePasswordButton = "Gunakan Password"
         }
 
         enum Profile {
@@ -217,16 +222,14 @@ enum AppText {
     }
     
     enum HomeHistory {
-        static let navigationTitle = "Riwayat"
+        static let navigationTitleHistory = "Riwayat"
         static let loadingMessage = "Memuat data pemeriksaan anda"
         static let emptyStateImageName = "Empty"
         static let noExaminationMessage = "Tidak ada pemeriksaan diselesaikan pada"
 
-        static let navigationTitle = "Tugas Pemeriksaan"
+        static let navigationTitleHome = "Tugas Pemeriksaan"
         static let taskSectionTitle = "Tugas Pemeriksaan"
         static let newExaminationButton = "Pemeriksaan Baru"
-        static let loadingMessage = "Memuat data pemeriksaan anda"
-        static let emptyStateImageName = "Empty"
         static let noTaskMessage = "Anda belum ditugaskan untuk melakukan pemeriksaan"
     }
     
