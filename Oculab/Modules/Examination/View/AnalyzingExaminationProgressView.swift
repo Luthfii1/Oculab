@@ -17,15 +17,15 @@ struct AnalyzingExaminationProgressView: View {
                 Spacer()
                     .frame(height: UIScreen.main.bounds.height * 0.2)
 
-                LottieHelper(animationName: "loadingPaperplane")
+                LottieHelper(animationName: AppText.Examination.ProgressView.loadingAnimationName)
                     .frame(width: 84, height: 84)
                     .padding(.bottom, 72)
 
-                Text("Menginterpretasikan data")
+                Text(AppText.Examination.ProgressView.analyzingTitle)
                     .font(AppTypography.h2)
                     .padding(.bottom, 12)
 
-                Text("Please scroll down to refresh to update the data")
+                Text(AppText.Examination.ProgressView.refreshInstruction)
                     .font(AppTypography.p3)
 
                 Spacer()

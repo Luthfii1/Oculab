@@ -116,4 +116,12 @@ enum AppText {
             ]
         }
     }
+
+    enum Examination {
+        enum ProgressView {
+            static let loadingAnimationName = "loadingPaperplane"
+            static let analyzingTitle = "Menginterpretasikan data"
+            static let refreshInstruction = "Please scroll down to refresh to update the data"
+        }
+    }
 }
