@@ -61,6 +61,12 @@ typealias AppTextVideoRecordCompCamera = AppText.VideoRecord.CameraViewComponent
 typealias AppTextVideoRecordCompPreview = AppText.VideoRecord.VideoPreviewComponent
 typealias AppTextVideoRecordCompInput = AppText.VideoRecord.VideoInputComponent
 
+// NOTE: TaskAssignment Module Texts
+typealias AppTextTaskAssignInputPatient = AppText.TaskAssignment.InputPatientDataView
+typealias AppTextTaskAssignInputExam = AppText.TaskAssignment.InputExaminationDataView
+typealias AppTextTaskAssignCompDateField = AppText.TaskAssignment.DateFieldComponent
+typealias AppTextTaskAssignCompPatientDisplay = AppText.TaskAssignment.PatientDisplayFieldComponent
+
 enum AppText {
     enum Icon {
         static let back = "back"
@@ -107,6 +113,7 @@ enum AppText {
         static let camera = "camera"
         static let cameraFill = "camera.fill"
         static let preparationSectionIcon = "list.number"
+        static let destroy = "Destroy"
     }
 
     enum Common {
@@ -550,6 +557,63 @@ enum AppText {
             static let videoErrorAlertTitle = "Gagal Memutar Video"
             static let videoErrorAlertMessage = "Video tidak dapat diputar. Silakan rekam ulang sampel."
             static let videoErrorDismissButton = "Kembali"
+        }
+    }
+    
+    enum TaskAssignment {
+        enum InputPatientDataView {
+            static let navigationTitle = "Pemeriksaan"
+            static let stepTitles = ["Data Pasien", "Data Sediaan", "Hasil"]
+            static let currentStepIndex = 0
+            static let picTitle = "Petugas Pemeriksaan"
+            static let picPlaceholder = "Pilih Petugas"
+            static let patientNameTitle = "Nama"
+            static let patientNamePlaceholder = "Cari nama pasien"
+            static let patientNamePlaceholderAutoSelected = "Pasien dipilih otomatis"
+            static let patientNameDescription = "Pilih atau masukkan data pasien baru"
+            static let patientNameDescriptionAutoSelected = "Pasien telah dipilih dari riwayat"
+            static let fillSpecimenDetailsButton = "Isi Detail Sediaan"
+        }
+        
+        enum InputExaminationDataView {
+            static let navigationTitle = "Pemeriksaan"
+            static let stepTitles = ["Data Pasien", "Data Sediaan", "Hasil"]
+            static let currentStepIndex = 1
+            static let confirmIcon = "Confirm"
+            static let confirmPopupTitle = "Buat Tugas Pemeriksaan?"
+            static let createTaskButton = "Buat Tugas"
+            static let reviewAgainButton = "Periksa Kembali"
+            static let examinationGoalTitle = "Tujuan Pemeriksaan"
+            static let screeningChoice = "Skrinning"
+            static let followUpChoice = "Follow Up"
+            static let slideId1Title = "ID Sediaan 1"
+            static let slideId1Placeholder = "Contoh: 24/11/1/0123A"
+            static let slideType1Title = "Jenis Sediaan 1"
+            static let slideId2Title = "ID Sediaan 2"
+            static let slideId2Placeholder = "Contoh: 24/11/1/0123A"
+            static let slideType2Title = "Jenis Sediaan 2"
+            static let morningChoice = "Pagi"
+            static let anytimeChoice = "Sewaktu"
+            static let backButton = "Kembali"
+            static let createTaskFinalButton = "Buat Tugas"
+        }
+        
+        enum DateFieldComponent {
+            static let requiredFieldIndicator = "*"
+            static let datePickerLabel = "Date of Birth"
+        }
+        
+        enum PatientDisplayFieldComponent {
+            static let nikTitle = "NIK"
+            static let nikPlaceholder = "Contoh: 167012039484700"
+            static let birthDateTitle = "Tanggal Lahir"
+            static let birthDatePlaceholder = "Pilih Tanggal"
+            static let genderTitle = "Jenis Kelamin"
+            static let femaleChoice = "Perempuan"
+            static let maleChoice = "Laki-laki"
+            static let bpjsTitle = "Nomor BPJS (opsional)"
+            static let bpjsPlaceholder = "Contoh: 1240630077675"
+            static let doneButton = "Selesai"
         }
     }
 }

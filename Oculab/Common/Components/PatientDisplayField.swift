@@ -20,9 +20,9 @@ struct PatientDisplayField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
             AppTextField(
-                title: "NIK",
+                title: AppTextTaskAssignCompPatientDisplay.nikTitle,
                 isRequired: true,
-                placeholder: "Contoh: 167012039484700",
+                placeholder: AppTextTaskAssignCompPatientDisplay.nikPlaceholder,
                 isDisabled: presenter.patientFound,
                 isNumberOnly: true,
                 length: 16,
@@ -31,9 +31,9 @@ struct PatientDisplayField: View {
             .focused($focusedField, equals: .nik)
 
             DateField(
-                title: "Tanggal Lahir",
+                title: AppTextTaskAssignCompPatientDisplay.birthDateTitle,
                 isRequired: true,
-                placeholder: "Pilih Tanggal",
+                placeholder: AppTextTaskAssignCompPatientDisplay.birthDatePlaceholder,
                 rightIcon: "calendar",
                 isDisabled: presenter.patientFound,
                 date: $presenter.selectedDoB
@@ -43,9 +43,9 @@ struct PatientDisplayField: View {
             }
 
             AppRadioButton(
-                title: "Jenis Kelamin",
+                title: AppTextTaskAssignCompPatientDisplay.genderTitle,
                 isRequired: true,
-                choices: ["Perempuan", "Laki-laki"],
+                choices: [AppTextTaskAssignCompPatientDisplay.femaleChoice, AppTextTaskAssignCompPatientDisplay.maleChoice],
                 isDisabled: presenter.patientFound,
                 selectedChoice: $presenter.selectedSex
             )
@@ -61,8 +61,8 @@ struct PatientDisplayField: View {
             }
 
             AppTextField(
-                title: "Nomor BPJS (opsional)",
-                placeholder: "Contoh: 1240630077675",
+                title: AppTextTaskAssignCompPatientDisplay.bpjsTitle,
+                placeholder: AppTextTaskAssignCompPatientDisplay.bpjsPlaceholder,
                 isDisabled: presenter.patientFound,
                 isNumberOnly: true,
                 length: 13,
@@ -76,7 +76,7 @@ struct PatientDisplayField: View {
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
                 Spacer()
-                Button("Selesai") {
+                Button(AppTextTaskAssignCompPatientDisplay.doneButton) {
                     focusedField = nil
                 }
             }

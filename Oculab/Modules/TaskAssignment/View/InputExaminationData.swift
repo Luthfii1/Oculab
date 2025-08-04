@@ -25,14 +25,14 @@ struct InputExaminationData: View {
         NavigationView {
             ZStack {
                 AppPopup(
-                    image: "Confirm",
-                    title: "Buat Tugas Pemeriksaan?",
+                    image: AppTextTaskAssignInputExam.confirmIcon,
+                    title: AppTextTaskAssignInputExam.confirmPopupTitle,
                     description: "Sediaan Pasien \(presenter.patient.name) akan diperiksa oleh \(presenter.pic.name)",
                     isError: presenter.isError,
                     errorMessage: presenter.errorMessage,
                     buttons: [
                         AppButton(
-                            title: "Buat Tugas",
+                            title: AppTextTaskAssignInputExam.createTaskButton,
                             colorType: .primary,
                             size: .large,
                             isEnabled: true
@@ -43,7 +43,7 @@ struct InputExaminationData: View {
                         },
 
                         AppButton(
-                            title: "Periksa Kembali",
+                            title: AppTextTaskAssignInputExam.reviewAgainButton,
                             colorType: .tertiary,
                             isEnabled: true
                         ) {
@@ -59,14 +59,14 @@ struct InputExaminationData: View {
                         VStack {
                             Spacer().frame(height: Decimal.d24)
 
-                            AppStepper(stepTitles: ["Data Pasien", "Data Sediaan", "Hasil"], currentStep: 1)
+                            AppStepper(stepTitles: AppTextTaskAssignInputExam.stepTitles, currentStep: AppTextTaskAssignInputExam.currentStepIndex)
                             Spacer().frame(height: Decimal.d24)
 
                             VStack(alignment: .leading, spacing: Decimal.d24) {
                                 AppRadioButton(
-                                    title: "Tujuan Pemeriksaan",
+                                    title: AppTextTaskAssignInputExam.examinationGoalTitle,
                                     isRequired: true,
-                                    choices: ["Skrinning", "Follow Up"],
+                                    choices: [AppTextTaskAssignInputExam.screeningChoice, AppTextTaskAssignInputExam.followUpChoice],
                                     isDisabled: false,
                                     selectedChoice: $goalString
                                 ).onChange(of: goalString) {
@@ -86,15 +86,15 @@ struct InputExaminationData: View {
                                 }
 
                                 AppTextField(
-                                    title: "ID Sediaan 1",
-                                    placeholder: "Contoh: 24/11/1/0123A",
+                                    title: AppTextTaskAssignInputExam.slideId1Title,
+                                    placeholder: AppTextTaskAssignInputExam.slideId1Placeholder,
                                     text: $presenter.examination.slideId
                                 )
 
                                 AppRadioButton(
-                                    title: "Jenis Sediaan 1",
+                                    title: AppTextTaskAssignInputExam.slideType1Title,
                                     isRequired: true,
-                                    choices: ["Pagi", "Sewaktu"],
+                                    choices: [AppTextTaskAssignInputExam.morningChoice, AppTextTaskAssignInputExam.anytimeChoice],
                                     isDisabled: false,
                                     selectedChoice: $typeString
                                 ).onChange(of: typeString) {
@@ -109,15 +109,15 @@ struct InputExaminationData: View {
                                 }
 
                                 AppTextField(
-                                    title: "ID Sediaan 2",
-                                    placeholder: "Contoh: 24/11/1/0123A",
+                                    title: AppTextTaskAssignInputExam.slideId2Title,
+                                    placeholder: AppTextTaskAssignInputExam.slideId2Placeholder,
                                     text: $presenter.examination2.slideId
                                 )
 
                                 AppRadioButton(
-                                    title: "Jenis Sediaan 2",
+                                    title: AppTextTaskAssignInputExam.slideType2Title,
                                     isRequired: true,
-                                    choices: ["Pagi", "Sewaktu"],
+                                    choices: [AppTextTaskAssignInputExam.morningChoice, AppTextTaskAssignInputExam.anytimeChoice],
                                     isDisabled: false,
                                     selectedChoice: $typeString2
                                 ).onChange(of: typeString2) {
@@ -136,7 +136,7 @@ struct InputExaminationData: View {
                                 
                                 HStack {
                                     AppButton(
-                                        title: "Kembali",
+                                        title: AppTextTaskAssignInputExam.backButton,
                                         leftIcon: "arrow.left",
                                         colorType: .tertiary,
                                         isEnabled: true
@@ -148,10 +148,10 @@ struct InputExaminationData: View {
 
                                     Spacer()
                                     AppButton(
-                                        title: "Buat Tugas",
-                                        rightIcon: "arrow.right",
+                                        title: AppTextTaskAssignInputExam.createTaskFinalButton,
+                                        rightIcon: AppText.Icon.arrowRight,
                                         size: .large,
-                                        isEnabled: (goalString != "" && typeString != "" && presenter.examination.slideId != "" && typeString2 != "" && presenter.examination2.slideId != "")
+                                        isEnabled: (goalString != AppText.Common.emptyString && typeString != AppText.Common.emptyString && presenter.examination.slideId != AppText.Common.emptyString && typeString2 != AppText.Common.emptyString && presenter.examination2.slideId != AppText.Common.emptyString)
                                     ) {
                                         presenter.isError = false
                                         presenter.errorMessage = ""
@@ -164,7 +164,7 @@ struct InputExaminationData: View {
                             .padding(.horizontal, Decimal.d20)
                         }
 
-                        .navigationTitle("Pemeriksaan")
+                        .navigationTitle(AppTextTaskAssignInputExam.navigationTitle)
                         .navigationBarTitleDisplayMode(.inline)
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
@@ -172,14 +172,12 @@ struct InputExaminationData: View {
                                     Router.shared.popToRoot()
                                 }) {
                                     HStack {
-                                        Image("Destroy")
+                                        Image(AppText.Icon.destroy)
                                     }
                                 }
                             }
                         }
                     }
-
-                    
                 }
             }
             .onAppear {
