@@ -8,6 +8,20 @@
 import Foundation
 
 enum AppText {
+    enum Icon {
+        static let back = "back"
+        static let eye = "eye"
+        static let faceId = "faceid"
+        static let success = "Success"
+        static let checkmark = "checkmark"
+        static let personFill = "person.fill"
+        static let arrowRight = "arrow.right"
+        static let lock = "lock"
+        static let lockCircleDotted = "lock.circle.dotted"
+        static let lockShield = "lock.shield"
+        static let doorRightHandOpen = "door.right.hand.open"
+    }
+    
     enum Authentication {
         enum Login {
             static let title = "Revolusi Deteksi Bakteri dengan Teknologi AI"
@@ -101,19 +115,5 @@ enum AppText {
                 Definition(label: "h.", text: "“Pengendali Data” adalah setiap orang, badan publik, dan/atau organisasi internasional yang bertindak sendiri-sendiri atau bersama-sama dalam menentukan tujuan dan melakukan kendali pemrosesan Data Pribadi atau Data Kesehatan atau informasi lainnya. “Prosesor Data” adalah setiap orang, badan publik, dan/atau organisasi internasional yang bertindak sendiri-sendiri atau bersama-sama dalam melakukan pemrosesan Data Pribadi atau Data Kesehatan atau informasi lainnya yang ditunjuk Pengendali Data.")
             ]
         }
-    }
-
-    enum Icon {
-        static let back = "back"
-        static let eye = "eye"
-        static let faceId = "faceid"
-        static let success = "Success"
-        static let checkmark = "checkmark"
-        static let personFill = "person.fill"
-        static let arrowRight = "arrow.right"
-        static let lock = "lock"
-        static let lockCircleDotted = "lock.circle.dotted"
-        static let lockShield = "lock.shield"
-        static let doorRightHandOpen = "door.right.hand.open"
     }
 }
