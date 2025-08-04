@@ -18,13 +18,13 @@ struct ProfileView: View {
                 VStack(alignment: .center, spacing: 20) {
                     ExtendableCard(
                         icon: AppText.Icon.personFill,
-                        title: AppText.Profile.accountInfoTitle,
+                        title: AppText.Authentication.Profile.accountInfoTitle,
                         isExtendable: false,
                         data: [
-                            (key: AppText.Profile.emailKey, value: authPresenter.user.email ?? authPresenter.user.name),
-                            (key: AppText.Profile.roleKey, value: authPresenter.user.role.rawValue.capitalized),
-                            (key: AppText.Profile.jobTitleKey, value: AppText.Profile.jobTitleValue),
-                            (key: AppText.Profile.healthFacilityKey, value: authPresenter.user.healthFacilityName ?? AppText.Profile.healthFacilityDefault),
+                            (key: AppText.Authentication.Profile.emailKey, value: authPresenter.user.email ?? authPresenter.user.name),
+                            (key: AppText.Authentication.Profile.roleKey, value: authPresenter.user.role.rawValue.capitalized),
+                            (key: AppText.Authentication.Profile.jobTitleKey, value: AppText.Authentication.Profile.jobTitleValue),
+                            (key: AppText.Authentication.Profile.healthFacilityKey, value: authPresenter.user.healthFacilityName ?? AppText.Authentication.Profile.healthFacilityDefault),
                         ],
                         titleSize: AppTypography.s4_1,
                         titleCard: authPresenter.user.name
@@ -32,7 +32,7 @@ struct ProfileView: View {
 
                     if authPresenter.user.role == .ADMIN {
                         AppButton(
-                            title: AppText.Profile.accountManagementButton,
+                            title: AppText.Authentication.Profile.accountManagementButton,
                             leftIcon: AppText.Icon.personFill,
                             rightIcon: AppText.Icon.arrowRight,
                             colorType: .tertiary,
@@ -50,7 +50,7 @@ struct ProfileView: View {
                     }
 
                     AppButton(
-                        title: AppText.Profile.editPasswordButton,
+                        title: AppText.Authentication.Profile.editPasswordButton,
                         leftIcon: AppText.Icon.lock,
                         rightIcon: AppText.Icon.arrowRight,
                         colorType: .tertiary,
@@ -67,7 +67,7 @@ struct ProfileView: View {
                     )
 
                     AppButton(
-                        title: AppText.Profile.editPinButton,
+                        title: AppText.Authentication.Profile.editPinButton,
                         leftIcon: AppText.Icon.lockCircleDotted,
                         rightIcon: AppText.Icon.arrowRight,
                         colorType: .tertiary,
@@ -87,7 +87,7 @@ struct ProfileView: View {
                         HStack {
                             Image(systemName: AppText.Icon.faceId)
                                 .foregroundColor(AppColors.purple500)
-                            Toggle(AppText.Profile.faceIdToggle, isOn: Binding(
+                            Toggle(AppText.Authentication.Profile.faceIdToggle, isOn: Binding(
                                 get: { authPresenter.isFaceIdEnabledFromUserDefaults },
                                 set: { newValue in
                                     Task {
@@ -113,7 +113,7 @@ struct ProfileView: View {
                     }
 
                     AppButton(
-                        title: AppText.Profile.privacyPolicyButton,
+                        title: AppText.Authentication.Profile.privacyPolicyButton,
                         leftIcon: AppText.Icon.lockShield,
                         rightIcon: AppText.Icon.arrowRight,
                         colorType: .tertiary,
@@ -129,7 +129,7 @@ struct ProfileView: View {
                             .stroke(AppColors.slate100)
                     )
 
-                    AppButton(title: AppText.Profile.logoutButton, rightIcon: AppText.Icon.doorRightHandOpen, colorType: .destructive(.secondary)) {
+                    AppButton(title: AppText.Authentication.Profile.logoutButton, rightIcon: AppText.Icon.doorRightHandOpen, colorType: .destructive(.secondary)) {
                         profilePresenter.logout()
                     }
 
@@ -137,7 +137,7 @@ struct ProfileView: View {
                 }
                 .padding(20)
             }
-            .navigationTitle(AppText.Profile.navigationTitle)
+            .navigationTitle(AppText.Authentication.Profile.navigationTitle)
         }
     }
 }

@@ -33,23 +33,29 @@ enum AppText {
             static let confirmPasswordTitle = "Konfirmasi Password Baru"
             static let confirmPasswordPlaceholder = "Masukkan Konfirmasi Password Baru"
         }
-    }
 
-    enum Profile {
-        static let accountInfoTitle = "Informasi Akun"
-        static let emailKey = "Email"
-        static let roleKey = "Role"
-        static let jobTitleKey = "Jabatan Pekerjaan"
-        static let jobTitleValue = "Ahli Teknologi Laboratorium Medik"
-        static let healthFacilityKey = "Fasyankes"
-        static let healthFacilityDefault = "-"
-        static let accountManagementButton = "Manajemen Akun"
-        static let editPasswordButton = "Atur Kata Sandi"
-        static let editPinButton = "Atur PIN"
-        static let faceIdToggle = "Face ID"
-        static let privacyPolicyButton = "Kebijakan Privasi"
-        static let logoutButton = "Keluar"
-        static let navigationTitle = "Profile"
+        enum UserAccessPin {
+            static let successTitle = "PIN Berhasil Diubah"
+            static let successDescription = "PIN akses Anda telah berhasil diperbarui"
+            static let successButton = "Kembali ke Profile"
+        }
+
+        enum Profile {
+            static let accountInfoTitle = "Informasi Akun"
+            static let emailKey = "Email"
+            static let roleKey = "Role"
+            static let jobTitleKey = "Jabatan Pekerjaan"
+            static let jobTitleValue = "Ahli Teknologi Laboratorium Medik"
+            static let healthFacilityKey = "Fasyankes"
+            static let healthFacilityDefault = "-"
+            static let accountManagementButton = "Manajemen Akun"
+            static let editPasswordButton = "Atur Kata Sandi"
+            static let editPinButton = "Atur PIN"
+            static let faceIdToggle = "Face ID"
+            static let privacyPolicyButton = "Kebijakan Privasi"
+            static let logoutButton = "Keluar"
+            static let navigationTitle = "Profile"
+        }
     }
 
     enum Icon {

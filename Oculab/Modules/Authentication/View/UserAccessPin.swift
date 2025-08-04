@@ -16,12 +16,12 @@ struct UserAccessPin: View {
             ZStack {
                 if securityPresenter.showAccessPinSuccessPopup {
                     AppPopup(
-                        image: "Success",
-                        title: "PIN Berhasil Diubah",
-                        description: "PIN akses Anda telah berhasil diperbarui",
+                        image: AppText.Icon.success,
+                        title: AppText.Authentication.UserAccessPin.successTitle,
+                        description: AppText.Authentication.UserAccessPin.successDescription,
                         buttons: [
                             AppButton(
-                                title: "Kembali ke Profile",
+                                title: AppText.Authentication.UserAccessPin.successButton,
                                 colorType: .secondary,
                                 size: .large,
                                 isEnabled: true
@@ -79,7 +79,7 @@ struct UserAccessPin: View {
                                 Router.shared.navigateBack()
                             }) {
                                 HStack {
-                                    Image("back")
+                                    Image(AppText.Icon.back)
                                 }
                             }
                         }
