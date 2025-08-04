@@ -42,7 +42,7 @@ struct LoginView: View {
                             isRequired: true,
                             placeholder: AppText.Authentication.Login.passwordPlaceholder,
                             description: presenter.description,
-                            rightIcon: "eye",
+                            rightIcon: AppText.Icon.eye,
                             isError: presenter.isError,
                             isDisabled: presenter.isLoading,
                             text: $presenter.password

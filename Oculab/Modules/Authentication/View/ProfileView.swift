@@ -17,14 +17,14 @@ struct ProfileView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .center, spacing: 20) {
                     ExtendableCard(
-                        icon: "person.fill",
-                        title: "Informasi Akun",
+                        icon: AppText.Icon.personFill,
+                        title: AppText.Profile.accountInfoTitle,
                         isExtendable: false,
                         data: [
-                            (key: "Email", value: authPresenter.user.email ?? authPresenter.user.name),
-                            (key: "Role", value: authPresenter.user.role.rawValue.capitalized),
-                            (key: "Jabatan Pekerjaan", value: "Ahli Teknologi Laboratorium Medik"),
-                            (key: "Fasyankes", value: authPresenter.user.healthFacilityName ?? "-"),
+                            (key: AppText.Profile.emailKey, value: authPresenter.user.email ?? authPresenter.user.name),
+                            (key: AppText.Profile.roleKey, value: authPresenter.user.role.rawValue.capitalized),
+                            (key: AppText.Profile.jobTitleKey, value: AppText.Profile.jobTitleValue),
+                            (key: AppText.Profile.healthFacilityKey, value: authPresenter.user.healthFacilityName ?? AppText.Profile.healthFacilityDefault),
                         ],
                         titleSize: AppTypography.s4_1,
                         titleCard: authPresenter.user.name
@@ -32,9 +32,9 @@ struct ProfileView: View {
 
                     if authPresenter.user.role == .ADMIN {
                         AppButton(
-                            title: "Manajemen Akun",
-                            leftIcon: "person.fill",
-                            rightIcon: "arrow.right",
+                            title: AppText.Profile.accountManagementButton,
+                            leftIcon: AppText.Icon.personFill,
+                            rightIcon: AppText.Icon.arrowRight,
                             colorType: .tertiary,
                             titleColor: AppColors.slate900
                         ) {
@@ -50,9 +50,9 @@ struct ProfileView: View {
                     }
 
                     AppButton(
-                        title: "Atur Kata Sandi",
-                        leftIcon: "lock",
-                        rightIcon: "arrow.right",
+                        title: AppText.Profile.editPasswordButton,
+                        leftIcon: AppText.Icon.lock,
+                        rightIcon: AppText.Icon.arrowRight,
                         colorType: .tertiary,
                         titleColor: AppColors.slate900
                     ) {
@@ -67,9 +67,9 @@ struct ProfileView: View {
                     )
 
                     AppButton(
-                        title: "Atur PIN",
-                        leftIcon: "lock.circle.dotted",
-                        rightIcon: "arrow.right",
+                        title: AppText.Profile.editPinButton,
+                        leftIcon: AppText.Icon.lockCircleDotted,
+                        rightIcon: AppText.Icon.arrowRight,
                         colorType: .tertiary,
                         titleColor: AppColors.slate900
                     ) {
@@ -85,9 +85,9 @@ struct ProfileView: View {
 
                     if authPresenter.isFaceIdAvailable {
                         HStack {
-                            Image(systemName: "faceid")
+                            Image(systemName: AppText.Icon.faceId)
                                 .foregroundColor(AppColors.purple500)
-                            Toggle("Face ID", isOn: Binding(
+                            Toggle(AppText.Profile.faceIdToggle, isOn: Binding(
                                 get: { authPresenter.isFaceIdEnabledFromUserDefaults },
                                 set: { newValue in
                                     Task {
@@ -113,9 +113,9 @@ struct ProfileView: View {
                     }
 
                     AppButton(
-                        title: "Kebijakan Privasi",
-                        leftIcon: "lock.shield",
-                        rightIcon: "arrow.right",
+                        title: AppText.Profile.privacyPolicyButton,
+                        leftIcon: AppText.Icon.lockShield,
+                        rightIcon: AppText.Icon.arrowRight,
                         colorType: .tertiary,
                         titleColor: AppColors.slate900
                     ) {
@@ -129,7 +129,7 @@ struct ProfileView: View {
                             .stroke(AppColors.slate100)
                     )
 
-                    AppButton(title: "Keluar", rightIcon: "door.right.hand.open", colorType: .destructive(.secondary)) {
+                    AppButton(title: AppText.Profile.logoutButton, rightIcon: AppText.Icon.doorRightHandOpen, colorType: .destructive(.secondary)) {
                         profilePresenter.logout()
                     }
 
@@ -137,7 +137,7 @@ struct ProfileView: View {
                 }
                 .padding(20)
             }
-            .navigationTitle("Profile")
+            .navigationTitle(AppText.Profile.navigationTitle)
         }
     }
 }

@@ -35,11 +35,34 @@ enum AppText {
         }
     }
 
+    enum Profile {
+        static let accountInfoTitle = "Informasi Akun"
+        static let emailKey = "Email"
+        static let roleKey = "Role"
+        static let jobTitleKey = "Jabatan Pekerjaan"
+        static let jobTitleValue = "Ahli Teknologi Laboratorium Medik"
+        static let healthFacilityKey = "Fasyankes"
+        static let healthFacilityDefault = "-"
+        static let accountManagementButton = "Manajemen Akun"
+        static let editPasswordButton = "Atur Kata Sandi"
+        static let editPinButton = "Atur PIN"
+        static let faceIdToggle = "Face ID"
+        static let privacyPolicyButton = "Kebijakan Privasi"
+        static let logoutButton = "Keluar"
+        static let navigationTitle = "Profile"
+    }
+
     enum Icon {
         static let back = "back"
         static let eye = "eye"
         static let faceId = "faceid"
         static let success = "Success"
         static let checkmark = "checkmark"
+        static let personFill = "person.fill"
+        static let arrowRight = "arrow.right"
+        static let lock = "lock"
+        static let lockCircleDotted = "lock.circle.dotted"
+        static let lockShield = "lock.shield"
+        static let doorRightHandOpen = "door.right.hand.open"
     }
 }
