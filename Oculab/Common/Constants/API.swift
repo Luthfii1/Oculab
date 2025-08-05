@@ -13,8 +13,6 @@ class API {
     static let BE_VERCEL: String = "https://oculab-be.vercel.app"
     static let BE_PROD: String = "https://api.oculab.web.id"
     static let BE_STAGING: String = "https://staging.oculab.ai"
-    
-    static let BE_LOCAL: String = "http://localhost:3000"
 
     static let ML: String = "https://oculab-ml.vercel.app"
 }

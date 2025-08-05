@@ -124,6 +124,10 @@ enum AppText {
         static let destroy = "Destroy"
         static let checkmarkCircleFill = "checkmark.circle.fill"
         static let shareIcon = "square.and.arrow.up"
+        static let logo = "logo"
+        static let phoneIcon = "phoneIcon"
+        static let envelopeIcon = "envelopeIcon"
+        static let line = "line"
     }
 
     enum Common {
@@ -688,6 +692,29 @@ enum AppText {
             static let noNotesDefault = "Tidak ada catatan"
             static let reportingHeaderTitle = "Pelaporan"
             static let observationResultsHeaderTitle = "Hasil Pengamatan"
+            
+            // Table Content
+            static let bacteriologicalExaminationResultTitle = "HASIL PEMERIKSAAN BAKTERIOLOGIS"
+            static let examinationPurposeLabel = "Tujuan Pemeriksaan"
+            static let testTypeLabel = "Jenis Uji"
+            static let specimenIdLabel = "ID Sediaan"
+            static let examinationResultLabel = "Hasil Pemeriksaan"
+            
+            // IUALTD Standard Table Data
+            static let negativeReportLabel = "Negatif"
+            static let negativeResultDescription = "Tidak ditemukan BTA dalam 100 lapang pandang"
+            static let scantyReportLabel = "Scanty"
+            static let scantyResultDescription = "Ditemukan 1-9 BTA dalam 100 lapang pandang"
+            static let positive1ReportLabel = "Positif (1+)"
+            static let positive1ResultDescription = "Ditemukan 10-99 BTA dalam 100 lapang pandang"
+            static let positive2ReportLabel = "Positif (2+)"
+            static let positive2ResultDescription = "Ditemukan 1-9 BTA dalam setiap lapang pandang, minimal dalam 50 lapang pandang"
+            static let positive3ReportLabel = "Positif (3+)"
+            static let positive3ResultDescription = "Ditemukan ≥10 BTA dalam setiap lapang pandang, minimal dalam 20 lapang pandang"
+            
+            // Signature Section
+            static let labOfficerSignatureTitle = "Petugas Lab"
+            static let supervisingDoctorSignatureTitle = "Dokter PJ Pemeriksaan Lab"
         }
         
         enum FOVAlbumView {

@@ -87,7 +87,7 @@ struct InformationPage: View {
                         Router.shared.navigateBack()
                     }) {
                         HStack {
-                            Image("back")
+                            Image(AppText.Icon.back)
                         }
                     }
                 }
