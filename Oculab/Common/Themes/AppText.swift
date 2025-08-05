@@ -162,7 +162,7 @@ enum AppText {
         enum LoginView {
             static let title = "Revolusi Deteksi Bakteri dengan Teknologi AI"
             static let emailTitle = "Email"
-            static let emailPlaceholder = "Contoh: your.name@gmail.com"
+            static let emailPlaceholder = "Contoh: nama.anda@gmail.com"
             static let passwordTitle = "Kata Sandi"
             static let passwordPlaceholder = "Masukkan kata sandi anda"
             static var buttonText = "Login"
@@ -171,23 +171,23 @@ enum AppText {
         }
         
         enum EditPasswordView {
-            static let successUpdatePasswordTitle = "Berhasil mengubah Password"
-            static let successUpdatePasswordMessage = "Anda telah berhasil mengubah password akun anda"
-            static let successUpdatePasswordButtonText = "Kembali ke profile"
-            static let navigationTitle = "Atur Password"
-            static let currentPasswordTitle = "Password Saat Ini"
-            static let currentPasswordPlaceholder = "Masukkan Password"
-            static let newPasswordTitle = "Password Baru"
-            static let newPasswordPlaceholder = "Masukkan Password Baru"
-            static let newPasswordDescription = "Password harus terdiri dari minimal 8 karakter"
-            static let confirmPasswordTitle = "Konfirmasi Password Baru"
-            static let confirmPasswordPlaceholder = "Masukkan Konfirmasi Password Baru"
+            static let successUpdatePasswordTitle = "Berhasil mengubah kata sandi"
+            static let successUpdatePasswordMessage = "Anda telah berhasil mengubah kata sandi akun anda"
+            static let successUpdatePasswordButtonText = "Kembali ke profil"
+            static let navigationTitle = "Atur Kata Sandi"
+            static let currentPasswordTitle = "Kata Sandi Saat Ini"
+            static let currentPasswordPlaceholder = "Masukkan Kata Sandi"
+            static let newPasswordTitle = "Kata Sandi Baru"
+            static let newPasswordPlaceholder = "Masukkan Kata Sandi Baru"
+            static let newPasswordDescription = "Kata sandi harus terdiri dari minimal 8 karakter"
+            static let confirmPasswordTitle = "Konfirmasi Kata Sandi Baru"
+            static let confirmPasswordPlaceholder = "Masukkan Konfirmasi Kata Sandi Baru"
         }
 
         enum UserAccessPinView {
             static let successTitle = "PIN Berhasil Diubah"
             static let successDescription = "PIN akses Anda telah berhasil diperbarui"
-            static let successButton = "Kembali ke Profile"
+            static let successButton = "Kembali ke Profil"
         }
 
         enum ProfileView {
@@ -202,7 +202,7 @@ enum AppText {
             static let editPinButton = "Atur PIN"
             static let faceIdToggle = "Face ID"
             static let privacyPolicyButton = "Kebijakan Privasi"
-            static let navigationTitle = "Profile"
+            static let navigationTitle = "Profil"
         }
 
         enum PrivacyPolicyView {
@@ -212,8 +212,8 @@ enum AppText {
             static let generalPoints = [
                 "Negatif: Tidak ditemukan BTA minimal dalam 100 lapang pandang",
                 "Scanty: 1-9 BTA dalam 100 lapang pandang",
-                "Positif 1+: 10 – 99 BTA dlm 100 lapang pandang",
-                "Positif 2+: 1 – 10 BTA setiap 1 lapang pandang, minimal terdapat di 50 lapang pandang",
+                "Positif 1+: 10 - 99 BTA dlm 100 lapang pandang",
+                "Positif 2+: 1 - 10 BTA setiap 1 lapang pandang, minimal terdapat di 50 lapang pandang",
                 "Positif 3+: ≥ 10 BTA setiap 1 lapang pandang, minimal terdapat di 20 lapang pandang"
             ]
 
@@ -258,7 +258,7 @@ enum AppText {
         enum ProgressView {
             static let loadingAnimationName = "loadingPaperplane"
             static let analyzingTitle = "Menginterpretasikan data"
-            static let refreshInstruction = "Please scroll down to refresh to update the data"
+            static let refreshInstruction = "Tarik ke bawah untuk memuat ulang"
         }
         
         enum DetailViews {
@@ -304,7 +304,7 @@ enum AppText {
                 ),
                 GuidelineContent(
                     imageName: "Guideline2",
-                    title: "Pasang Handphone pada Adapter",
+                    title: "Pasang Smartphone pada Adapter",
                     description: "Bersihkan lensa kamera utama dan sejajarkan dengan lubang adapter"
                 ),
                 GuidelineContent(
@@ -335,7 +335,7 @@ enum AppText {
         }
         
         enum GradingCardComponent {
-            static let confidenceLevelText = "confidence level"
+            static let confidenceLevelText = "Tingkat Keyakinan"
         }
         
         enum ImageSectionComponent {
@@ -385,7 +385,7 @@ enum AppText {
             static let patientLabel = "Pasien"
             static let dpjpLabel = "DPJP"
             static let positiveKeyword = "positif"
-            static let positiveAltKeyword = "positive"
+            static let positiveAltKeyword = "positif"
         }
         
         enum StatisticComponent {
@@ -437,8 +437,8 @@ enum AppText {
             static let patientDataTitle = "Data Pasien"
             static let examinationResultTitle = "Hasil Pemeriksaan"
             static let newExaminationButton = "Pemeriksaan Baru"
-            static let loadingPatientMessage = "Loading patient data..."
-            static let loadingExaminationsMessage = "Loading examinations..."
+            static let loadingPatientMessage = "Memuat data pasien..."
+            static let loadingExaminationsMessage = "Memuat pemeriksaan..."
             static let noExaminationsMessage = "Belum ada pemeriksaan"
             static let notDeterminedMessage = "Belum ditentukan"
             static let patientNameKey = "Nama"
@@ -540,8 +540,8 @@ enum AppText {
         }
         
         enum StitchedImageView {
-            static let navigationTitle = "Stitched Image"
-            static let noImageAvailableMessage = "No stitched image available"
+            static let navigationTitle = "Gambar Stitched"
+            static let noImageAvailableMessage = "Tidak ada gambar yang tersedia"
         }
         
         enum FullScreenVideoPlayerView {
@@ -560,7 +560,7 @@ enum AppText {
         
         enum VideoInputComponent {
             static let takeVideoButton = "Ambil Gambar"
-            static let previewVideoButton = "Preview Video"
+            static let previewVideoButton = "Pratinjau Video"
             static let videoErrorAlertTitle = "Gagal Memutar Video"
             static let videoErrorAlertMessage = "Video tidak dapat diputar. Silakan rekam ulang sampel."
         }
@@ -649,7 +649,7 @@ enum AppText {
         }
         
         enum FOVDetailView {
-            static let loadingDataMessage = "Data is loading..."
+            static let loadingDataMessage = "Memuat data pemeriksaan..."
             static let bacteriaCountPrefix = "Jumlah Bakteri: "
             static let bacteriaCountSuffix = " BTA"
             static let imageCountFormat = "Gambar %d dari %d"
