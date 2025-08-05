@@ -15,34 +15,30 @@ struct InformationPage: View {
                     Rectangle()
                         .frame(width: 0, height: 0)
 
-                    AppCard(icon: "info.circle", title: "Standar Penilaian", spacing: Decimal.d16) {
+                    AppCard(icon: AppText.Icon.infoCircle, title: AppTextAnalysisInformation.assessmentStandardTitle, spacing: Decimal.d16) {
                         VStack(alignment: .leading, spacing: Decimal.d16) {
-                            Text("Sistem ini menghitung bakteri sesuai rekomendasi WHO dan standar IUALTD")
+                            Text(AppTextAnalysisInformation.assessmentStandardDescription)
 
                             VStack(alignment: .leading, spacing: Decimal.d16) {
                                 HStack(alignment: .top) {
-                                    Text("•")
-                                    Text("Negatif: Tidak ditemukan BTA minimal dalam 100 lapang pandang")
+                                    Text(AppTextAnalysisInformation.bulletPoint)
+                                    Text(AppTextAnalysisInformation.negativeDescription)
                                 }
                                 HStack(alignment: .top) {
-                                    Text("•")
-                                    Text("Scanty: 1-9 BTA dalam 100 lapang pandang")
+                                    Text(AppTextAnalysisInformation.bulletPoint)
+                                    Text(AppTextAnalysisInformation.scantyDescription)
                                 }
                                 HStack(alignment: .top) {
-                                    Text("•")
-                                    Text("Positif 1+: 10 – 99 BTA dlm 100 lapang pandang")
+                                    Text(AppTextAnalysisInformation.bulletPoint)
+                                    Text(AppTextAnalysisInformation.positive1Description)
                                 }
                                 HStack(alignment: .top) {
-                                    Text("•")
-                                    Text(
-                                        "Positif 2+: 1 – 10 BTA setiap 1 lapang pandang, minimal terdapat di 50 lapang pandang"
-                                    )
+                                    Text(AppTextAnalysisInformation.bulletPoint)
+                                    Text(AppTextAnalysisInformation.positive2Description)
                                 }
                                 HStack(alignment: .top) {
-                                    Text("•")
-                                    Text(
-                                        "Positif 3+: ≥ 10 BTA setiap 1 lapang pandang, minimal terdapat di 20 lapang pandang"
-                                    )
+                                    Text(AppTextAnalysisInformation.bulletPoint)
+                                    Text(AppTextAnalysisInformation.positive3Description)
                                 }
                             }
                             .padding(.leading, Decimal.d12)
@@ -50,31 +46,31 @@ struct InformationPage: View {
                         .font(AppTypography.p3)
                     }
 
-                    AppCard(icon: "info.circle", title: "Confidence Level", spacing: Decimal.d16) {
+                    AppCard(icon: AppText.Icon.infoCircle, title: AppTextAnalysisInformation.confidenceLevelTitle, spacing: Decimal.d16) {
                         VStack(alignment: .leading, spacing: Decimal.d16) {
                             HStack(alignment: .top) {
-                                Text("•")
-                                Text("100% Confidence: Tidak ada keraguan dari sistem")
+                                Text(AppTextAnalysisInformation.bulletPoint)
+                                Text(AppTextAnalysisInformation.perfectConfidenceDescription)
                             }
                             HStack(alignment: .top) {
-                                Text("•")
-                                Text("High Confidence: 90% - 99%")
+                                Text(AppTextAnalysisInformation.bulletPoint)
+                                Text(AppTextAnalysisInformation.highConfidenceDescription)
                             }
                             HStack(alignment: .top) {
-                                Text("•")
-                                Text("Medium Confidence: 70%-89%")
+                                Text(AppTextAnalysisInformation.bulletPoint)
+                                Text(AppTextAnalysisInformation.mediumConfidenceDescription)
                             }
                             HStack(alignment: .top) {
-                                Text("•")
-                                Text("Low Confidence: 50%-69%")
+                                Text(AppTextAnalysisInformation.bulletPoint)
+                                Text(AppTextAnalysisInformation.lowConfidenceDescription)
                             }
                             HStack(alignment: .top) {
-                                Text("•")
-                                Text("Very Low: 10% - 50%")
+                                Text(AppTextAnalysisInformation.bulletPoint)
+                                Text(AppTextAnalysisInformation.veryLowConfidenceDescription)
                             }
                             HStack(alignment: .top) {
-                                Text("•")
-                                Text("Unpredicted: 0% - 9%")
+                                Text(AppTextAnalysisInformation.bulletPoint)
+                                Text(AppTextAnalysisInformation.unpredictedDescription)
                             }
                         }
                         .padding(.leading, Decimal.d12)
@@ -83,7 +79,7 @@ struct InformationPage: View {
                 }
                 .padding(.horizontal, Decimal.d20)
             }
-            .navigationTitle("Informasi Interpretasi Sistem")
+            .navigationTitle(AppTextAnalysisInformation.navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

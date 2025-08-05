@@ -67,6 +67,14 @@ typealias AppTextTaskAssignInputExam = AppText.TaskAssignment.InputExaminationDa
 typealias AppTextTaskAssignCompDateField = AppText.TaskAssignment.DateFieldComponent
 typealias AppTextTaskAssignCompPatientDisplay = AppText.TaskAssignment.PatientDisplayFieldComponent
 
+// NOTE: Analysist Module Texts
+typealias AppTextAnalysisResult = AppText.Analysist.AnalysisResultView
+typealias AppTextAnalysisInformation = AppText.Analysist.InformationPageView
+typealias AppTextAnalysisFOVDetail = AppText.Analysist.FOVDetailView
+typealias AppTextAnalysisPDF = AppText.Analysist.PDFView
+typealias AppTextAnalysisFOVAlbum = AppText.Analysist.FOVAlbumView
+typealias AppTextAnalysisCompZoomable = AppText.Analysist.ZoomableImageComponent
+
 enum AppText {
     enum Icon {
         static let back = "back"
@@ -114,6 +122,8 @@ enum AppText {
         static let cameraFill = "camera.fill"
         static let preparationSectionIcon = "list.number"
         static let destroy = "Destroy"
+        static let checkmarkCircleFill = "checkmark.circle.fill"
+        static let shareIcon = "square.and.arrow.up"
     }
 
     enum Common {
@@ -614,6 +624,78 @@ enum AppText {
             static let bpjsTitle = "Nomor BPJS (opsional)"
             static let bpjsPlaceholder = "Contoh: 1240630077675"
             static let doneButton = "Selesai"
+        }
+    }
+    
+    enum Analysist {
+        enum AnalysisResultView {
+            static let stepTitles = ["Data Pemeriksaan", "Hasil Pemeriksaan"]
+            static let currentStepIndex = 1
+            static let loadingExaminationMessage = "Loading examination data..."
+        }
+        
+        enum InformationPageView {
+            static let navigationTitle = "Informasi Interpretasi Sistem"
+            static let assessmentStandardTitle = "Standar Penilaian"
+            static let assessmentStandardDescription = "Sistem ini menghitung bakteri sesuai rekomendasi WHO dan standar IUALTD"
+            static let confidenceLevelTitle = "Confidence Level"
+            static let bulletPoint = "•"
+            
+            // Assessment Standard Points
+            static let negativeDescription = "Negatif: Tidak ditemukan BTA minimal dalam 100 lapang pandang"
+            static let scantyDescription = "Scanty: 1-9 BTA dalam 100 lapang pandang"
+            static let positive1Description = "Positif 1+: 10 – 99 BTA dlm 100 lapang pandang"
+            static let positive2Description = "Positif 2+: 1 – 10 BTA setiap 1 lapang pandang, minimal terdapat di 50 lapang pandang"
+            static let positive3Description = "Positif 3+: ≥ 10 BTA setiap 1 lapang pandang, minimal terdapat di 20 lapang pandang"
+            
+            // Confidence Level Points
+            static let perfectConfidenceDescription = "100% Confidence: Tidak ada keraguan dari sistem"
+            static let highConfidenceDescription = "High Confidence: 90% - 99%"
+            static let mediumConfidenceDescription = "Medium Confidence: 70%-89%"
+            static let lowConfidenceDescription = "Low Confidence: 50%-69%"
+            static let veryLowConfidenceDescription = "Very Low: 10% - 50%"
+            static let unpredictedDescription = "Unpredicted: 0% - 9%"
+        }
+        
+        enum FOVDetailView {
+            static let loadingDataMessage = "Data is loading..."
+            static let bacteriaCountPrefix = "Jumlah Bakteri: "
+            static let bacteriaCountSuffix = " BTA"
+            static let imageCountFormat = "Gambar %d dari %d"
+            static let slideIdPrefix = "ID "
+            static let contrastIcon = "Contrast"
+            static let brightnessIcon = "Brightness"
+            static let commentIcon = "Comment"
+            static let backWhiteIcon = "back_white"
+        }
+        
+        enum PDFView {
+            static let loadingAnimationName = "loadingPaperplane"
+            static let downloadingDataMessage = "Mendownload data"
+            
+            // PDF Content Labels
+            static let nikLabel = "NIK"
+            static let ageLabel = "Umur"
+            static let ageSuffix = " Tahun"
+            static let genderLabel = "Jenis Kelamin"
+            static let bpjsLabel = "No. BPJS"
+            static let specimenInfoTitle = "Informasi Sediaan"
+            static let examinationIdLabel = "ID Pemeriksaan"
+            static let takenAtLabel = "Diambil di"
+            static let officerLabel = "Petugas"
+            static let microscopicInterpretationTitle = "Interpretasi Mikroskopis"
+            static let staffNotesTitle = "Catatan Petugas"
+            static let noNotesDefault = "Tidak ada catatan"
+            static let reportingHeaderTitle = "Pelaporan"
+            static let observationResultsHeaderTitle = "Hasil Pengamatan"
+        }
+        
+        enum FOVAlbumView {
+            static let navigationTitleFormat = "Album Gambar %@"
+        }
+        
+        enum ZoomableImageComponent {
+            // This component is mostly UI interaction based, no specific text constants needed
         }
     }
 }

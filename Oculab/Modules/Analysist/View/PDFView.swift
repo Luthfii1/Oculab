@@ -22,7 +22,7 @@ struct PDFPageView: View {
                             Button(action: {
                                 sharePDF()
                             }) {
-                                Image(systemName: "square.and.arrow.up")
+                                Image(systemName: AppText.Icon.shareIcon)
                                     .foregroundColor(.black)
                             }
                         }
@@ -32,11 +32,11 @@ struct PDFPageView: View {
                     Spacer()
                         .frame(height: UIScreen.main.bounds.height * 0.2)
 
-                    LottieHelper(animationName: "loadingPaperplane")
+                    LottieHelper(animationName: AppTextAnalysisPDF.loadingAnimationName)
                         .frame(width: 84, height: 84)
                         .padding(.bottom, 72)
 
-                    Text("Mendownload data")
+                    Text(AppTextAnalysisPDF.downloadingDataMessage)
                         .font(AppTypography.h2)
                         .padding(.bottom, 12)
 
@@ -68,10 +68,10 @@ struct PDFPageView: View {
             drawHeader(regularText)
             drawInfoSection(
                 title: presenter.data?.patientPDFData.name ?? "",
-                labels: ["NIK", "Umur", "Jenis Kelamin", "No. BPJS"],
+                labels: [AppTextAnalysisPDF.nikLabel, AppTextAnalysisPDF.ageLabel, AppTextAnalysisPDF.genderLabel, AppTextAnalysisPDF.bpjsLabel],
                 values: [
                     presenter.data?.patientPDFData.nik ?? "",
-                    "\(presenter.data?.patientPDFData.age ?? 0) Tahun",
+                    "\(presenter.data?.patientPDFData.age ?? 0)\(AppTextAnalysisPDF.ageSuffix)",
                     presenter.data?.patientPDFData.sex ?? "",
                     presenter.data?.patientPDFData.bpjs ?? ""
                 ],
@@ -82,8 +82,8 @@ struct PDFPageView: View {
                 boldLargeText
             )
             drawInfoSection(
-                title: "Informasi Sediaan",
-                labels: ["ID Pemeriksaan", "Diambil di", "Petugas"],
+                title: AppTextAnalysisPDF.specimenInfoTitle,
+                labels: [AppTextAnalysisPDF.examinationIdLabel, AppTextAnalysisPDF.takenAtLabel, AppTextAnalysisPDF.officerLabel],
                 values: [
                     presenter.data?.preparatPDFData.id ?? "",
                     presenter.data?.preparatPDFData.place ?? "",
@@ -99,15 +99,15 @@ struct PDFPageView: View {
             drawHasilPemeriksaan(regularText)
 
             drawInterpretasi(
-                title: "Interpretasi Mikroskopis",
+                title: AppTextAnalysisPDF.microscopicInterpretationTitle,
                 description: presenter.data?.hasilPDFData.descInterpretasi ?? "",
                 yContent: 388,
                 boldText,
                 regularText
             )
             drawInterpretasi(
-                title: "Catatan Petugas",
-                description: presenter.data?.hasilPDFData.descNotesPetugas ?? "Tidak ada catatan",
+                title: AppTextAnalysisPDF.staffNotesTitle,
+                description: presenter.data?.hasilPDFData.descNotesPetugas ?? AppTextAnalysisPDF.noNotesDefault,
                 yContent: 640,
                 boldText,
                 regularText
@@ -186,8 +186,8 @@ struct PDFPageView: View {
         let verticalPadding: CGFloat = 5
         
         // Draw headers
-        let leftHeader = NSAttributedString(string: "Pelaporan", attributes: boldAttributes)
-        let rightHeader = NSAttributedString(string: "Hasil Pengamatan", attributes: boldAttributes)
+        let leftHeader = NSAttributedString(string: AppTextAnalysisPDF.reportingHeaderTitle, attributes: boldAttributes)
+        let rightHeader = NSAttributedString(string: AppTextAnalysisPDF.observationResultsHeaderTitle, attributes: boldAttributes)
         
         // Position headers
         let leftHeaderX = startX + leftColumnPadding
