@@ -1,0 +1,78 @@
+/* 
+  Localizable.strings (Indonesian)
+  Oculab
+*/
+
+// MARK: - Common
+"common.ok" = "OK";
+"common.cancel" = "Batal";
+"common.close" = "Tutup";
+"common.save" = "Simpan";
+"common.delete" = "Hapus";
+"common.edit" = "Ubah";
+"common.next" = "Lanjutkan";
+"common.back" = "Kembali";
+"common.error" = "Error";
+
+// MARK: - Authentication
+"auth.login.title" = "Revolusi Deteksi Bakteri dengan Teknologi AI";
+"auth.login.email" = "Email";
+"auth.login.email.placeholder" = "Contoh: your.name@gmail.com";
+"auth.login.password" = "Kata Sandi";
+"auth.login.password.placeholder" = "Masukkan kata sandi anda";
+"auth.login.button" = "Login";
+"auth.login.not_registered" = "Faskes belum terdaftar?";
+"auth.login.register_facility" = "Daftarkan Faskes";
+
+// MARK: - Profile
+"profile.title" = "Profile";
+"profile.account_info" = "Informasi Akun";
+"profile.email" = "Email";
+"profile.role" = "Role";
+"profile.job_title" = "Jabatan Pekerjaan";
+"profile.job_title.value" = "Ahli Teknologi Laboratorium Medik";
+"profile.health_facility" = "Fasyankes";
+"profile.account_management" = "Manajemen Akun";
+"profile.edit_password" = "Atur Kata Sandi";
+"profile.edit_pin" = "Atur PIN";
+"profile.face_id" = "Face ID";
+"profile.privacy_policy" = "Kebijakan Privasi";
+"profile.logout" = "Keluar";
+
+// MARK: - Examination
+"exam.new" = "Pemeriksaan Baru";
+"exam.detail.title" = "Detail Pemeriksaan";
+"exam.patient_data" = "Data Pasien";
+"exam.patient.name" = "Nama";
+"exam.patient.nik" = "NIK";
+"exam.patient.dob" = "Tanggal Lahir";
+"exam.patient.sex" = "Jenis Kelamin";
+"exam.patient.bpjs" = "Nomor BPJS";
+"exam.result.title" = "Hasil Pemeriksaan";
+"exam.interpretation.staff" = "Interpretasi Petugas";
+"exam.interpretation.system" = "Interpretasi Sistem";
+"exam.not_available" = "Belum Tersedia";
+"exam.view_pdf" = "Lihat PDF";
+"exam.report_sitb" = "Laporkan ke SITB";
+
+// MARK: - Patient
+"patient.new" = "Data Pasien Baru";
+"patient.edit" = "Ubah Data Pasien";
+"patient.add_new" = "Tambahkan Pasien Baru";
+"patient.save" = "Simpan Data Pasien";
+"patient.search.placeholder" = "Cari nama pasien";
+"patient.no_results" = "Tidak ada hasil untuk";
+"patient.clear_search" = "Hapus Pencarian";
+"patient.history" = "Riwayat Pemeriksaan";
+"patient.new_examination" = "Pemeriksaan Baru";
+"patient.no_examinations" = "Belum ada pemeriksaan";
+
+// MARK: - Video Record
+"video.instruction.title" = "Instruksi Pemeriksaan";
+"video.preparation" = "Persiapan Pemeriksaan";
+"video.recording_instruction" = "Instruksi Pengambilan Gambar";
+"video.start_recording" = "Mulai Pengambilan Gambar";
+"video.save" = "Simpan Video";
+"video.retake" = "Ambil Ulang";
+"video.take_image" = "Ambil Gambar";
+"video.preview" = "Preview Video";

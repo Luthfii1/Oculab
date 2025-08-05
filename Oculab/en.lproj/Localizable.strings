@@ -1,0 +1,78 @@
+/* 
+  Localizable.strings (English)
+  Oculab
+*/
+
+// MARK: - Common
+"common.ok" = "OK";
+"common.cancel" = "Cancel";
+"common.close" = "Close";
+"common.save" = "Save";
+"common.delete" = "Delete";
+"common.edit" = "Edit";
+"common.next" = "Next";
+"common.back" = "Back";
+"common.error" = "Error";
+
+// MARK: - Authentication
+"auth.login.title" = "Revolutionizing Bacterial Detection with AI Technology";
+"auth.login.email" = "Email";
+"auth.login.email.placeholder" = "Example: your.name@gmail.com";
+"auth.login.password" = "Password";
+"auth.login.password.placeholder" = "Enter your password";
+"auth.login.button" = "Login";
+"auth.login.not_registered" = "Health facility not registered yet?";
+"auth.login.register_facility" = "Register Health Facility";
+
+// MARK: - Profile
+"profile.title" = "Profile";
+"profile.account_info" = "Account Information";
+"profile.email" = "Email";
+"profile.role" = "Role";
+"profile.job_title" = "Job Title";
+"profile.job_title.value" = "Medical Laboratory Technologist";
+"profile.health_facility" = "Health Facility";
+"profile.account_management" = "Account Management";
+"profile.edit_password" = "Change Password";
+"profile.edit_pin" = "Change PIN";
+"profile.face_id" = "Face ID";
+"profile.privacy_policy" = "Privacy Policy";
+"profile.logout" = "Logout";
+
+// MARK: - Examination
+"exam.new" = "New Examination";
+"exam.detail.title" = "Examination Details";
+"exam.patient_data" = "Patient Data";
+"exam.patient.name" = "Name";
+"exam.patient.nik" = "NIK";
+"exam.patient.dob" = "Date of Birth";
+"exam.patient.sex" = "Gender";
+"exam.patient.bpjs" = "BPJS Number";
+"exam.result.title" = "Examination Results";
+"exam.interpretation.staff" = "Staff Interpretation";
+"exam.interpretation.system" = "System Interpretation";
+"exam.not_available" = "Not Available";
+"exam.view_pdf" = "View PDF";
+"exam.report_sitb" = "Report to SITB";
+
+// MARK: - Patient
+"patient.new" = "New Patient Data";
+"patient.edit" = "Edit Patient Data";
+"patient.add_new" = "Add New Patient";
+"patient.save" = "Save Patient Data";
+"patient.search.placeholder" = "Search patient name";
+"patient.no_results" = "No results for";
+"patient.clear_search" = "Clear Search";
+"patient.history" = "Examination History";
+"patient.new_examination" = "New Examination";
+"patient.no_examinations" = "No examinations yet";
+
+// MARK: - Video Record
+"video.instruction.title" = "Examination Instructions";
+"video.preparation" = "Examination Preparation";
+"video.recording_instruction" = "Image Capture Instructions";
+"video.start_recording" = "Start Image Capture";
+"video.save" = "Save Video";
+"video.retake" = "Retake";
+"video.take_image" = "Take Image";
+"video.preview" = "Preview Video";

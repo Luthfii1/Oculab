@@ -92,12 +92,12 @@ enum AppText {
         static let docText = "doc.text"
         static let docTextFill = "doc.text.fill"
         static let paperplane = "paperplane"
-        static let chevronRightIcon = "chevron.right"
+        static let chevronRight = "chevron.right"
         static let photo = "photo"
         static let textBadgeCheckmark = "text.badge.checkmark"
         static let exclamationmarkTriangleFill = "exclamationmark.triangle.fill"
-        static let docOnDocFillIcon = "doc.on.doc.fill"
-        static let docBadgePlusIcon = "doc.badge.plus"
+        static let docOnDocFill = "doc.on.doc.fill"
+        static let docBadgePlus = "doc.badge.plus"
         static let plus = "plus"
         static let magnifyingglass = "magnifyingglass"
         static let deleteLeftFill = "delete.left.fill"
@@ -120,14 +120,18 @@ enum AppText {
         static let arrowCounterclockwise = "arrow.counterclockwise"
         static let camera = "camera"
         static let cameraFill = "camera.fill"
-        static let preparationSectionIcon = "list.number"
+        static let preparationSection = "list.number"
         static let destroy = "Destroy"
         static let checkmarkCircleFill = "checkmark.circle.fill"
-        static let shareIcon = "square.and.arrow.up"
+        static let share = "square.and.arrow.up"
         static let logo = "logo"
-        static let phoneIcon = "phoneIcon"
-        static let envelopeIcon = "envelopeIcon"
+        static let phone = "phoneIcon"
+        static let envelope = "envelopeIcon"
         static let line = "line"
+        static let contrast = "Contrast"
+        static let brightness = "Brightness"
+        static let comment = "Comment"
+        static let backWhite = "back_white"
     }
 
     enum Common {
@@ -139,8 +143,19 @@ enum AppText {
         static let editButton = "Ubah"
         static let nextButton = "Lanjutkan"
         static let backButton = "Kembali"
-        static let emptyString = ""
-        static let errorAlertTitle = "Error"
+        static let emptyValue = ""
+        static let error = "Error"
+        static let defaultStrikeValue = "-"
+        static let exitButton = "Keluar"
+        static var saveChangesButton = "Simpan Perubahan"
+        static let definitionBullet = "•"
+        static let doneButton = "Selesai"
+        static let unknownErrorMessage = "Terjadi Kesalahan"
+        static let unknownMessage = "Pesan tidak diketahui"
+        static let emptyString = "Kosong"
+        static let percentageSymbol = "%"
+        static let settingsButton = "Pengaturan"
+        static let requiredFieldIndicator = "*"
     }
     
     enum Authentication {
@@ -182,15 +197,12 @@ enum AppText {
             static let jobTitleKey = "Jabatan Pekerjaan"
             static let jobTitleValue = "Ahli Teknologi Laboratorium Medik"
             static let healthFacilityKey = "Fasyankes"
-            static let healthFacilityDefault = "-"
             static let accountManagementButton = "Manajemen Akun"
             static let editPasswordButton = "Atur Kata Sandi"
             static let editPinButton = "Atur PIN"
             static let faceIdToggle = "Face ID"
             static let privacyPolicyButton = "Kebijakan Privasi"
-            static let logoutButton = "Keluar"
             static let navigationTitle = "Profile"
-            static var saveChangesButton = "Simpan Perubahan"
         }
 
         enum PrivacyPolicyView {
@@ -204,7 +216,6 @@ enum AppText {
                 "Positif 2+: 1 – 10 BTA setiap 1 lapang pandang, minimal terdapat di 50 lapang pandang",
                 "Positif 3+: ≥ 10 BTA setiap 1 lapang pandang, minimal terdapat di 20 lapang pandang"
             ]
-            static let definitionBullet = "•"
 
             static let definitionTitle = "Definisi"
             static let definitionIntro = "Setiap kata atau istilah berikut yang digunakan di dalam Kebijakan Privasi ini memiliki arti seperti berikut di bawah, kecuali jika kata atau istilah yang bersangkutan di dalam pemakaiannya dengan tegas menentukan lain:"
@@ -278,7 +289,6 @@ enum AppText {
         
         enum GuidelinesOnboardingView {
             static let navigationTitle = "Persiapan Pemeriksaan"
-            static let continueButton = "Lanjutkan"
             
             struct GuidelineContent {
                 let imageName: String
@@ -319,11 +329,9 @@ enum AppText {
         enum ConfirmationPopupsComponent {
             static let unfinishedExaminationTitle = "Pemeriksaan Belum Selesai"
             static let unfinishedExaminationDescription = "Pemeriksaan disimpan sebagai draft dan dapat diakses di halaman riwayat"
-            static let exitButton = "Keluar"
             static let reviewAgainButton = "Periksa Kembali"
             static let saveResultTitle = "Simpan Hasil Pemeriksaan"
             static let saveResultDescription = "Hasil pemeriksaan yang sudah disimpan tidak dapat diubah kembali"
-            static let saveButton = "Simpan"
         }
         
         enum GradingCardComponent {
@@ -343,7 +351,6 @@ enum AppText {
             static let btaCountPlaceholder = "Contoh: 8"
             static let staffNotesTitle = "Catatan Petugas"
             static let staffNotesPlaceholder = "Contoh: Hanya terdapat 20 bakteri dari 60 lapangan pandang yang terkumpul"
-            static let doneButton = "Selesai"
         }
         
         enum LaborantInfoComponent {
@@ -360,14 +367,13 @@ enum AppText {
         }
         
         enum ExtendableCardComponent {
-            static let unknownTitle = "Unknown"
+            // This component doesn't have hardcoded strings, but keeping for consistency
         }
     }
     
     enum HomeHistory {
         static let navigationTitleHistory = "Riwayat"
         static let loadingMessage = "Memuat data pemeriksaan anda"
-        static let emptyStateImageName = "Empty"
         static let noExaminationMessage = "Tidak ada pemeriksaan diselesaikan pada"
 
         static let navigationTitleHome = "Tugas Pemeriksaan"
@@ -394,7 +400,7 @@ enum AppText {
         
         enum WeeklyCalendarComponent {
             static let title = "Pemeriksaan Selesai"
-            static let selectDatePickerTitle = "Select a Date"
+            static let selectDatePickerTitle = "Pilih Tanggal"
         }
         
         enum HomeActivityComponent {
@@ -406,7 +412,7 @@ enum AppText {
         }
         
         enum HalfCircleProgressComponent {
-            static let percentageSuffix = "%"
+            // This component doesn't have hardcoded strings, but keeping for consistency
         }
     }
     
@@ -416,7 +422,6 @@ enum AppText {
             static let editPatientNavigationTitle = "Ubah Data Pasien"
             static let addNewPatientButton = "Tambahkan Pasien Baru"
             static let savePatientButton = "Simpan Data Pasien"
-            static let errorAlertTitle = "Error"
         }
         
         enum ListView {
@@ -425,7 +430,6 @@ enum AppText {
             static let addNewPatientButton = "Tambah Pasien Baru"
             static let noResultsPrefix = "Tidak ada hasil untuk"
             static let clearSearchButton = "Hapus Pencarian"
-            static let magnifyingglassIcon = "magnifyingglass"
         }
         
         enum DetailView {
@@ -460,7 +464,6 @@ enum AppText {
             static let maleChoice = "Laki-laki"
             static let bpjsTitle = "Nomor BPJS (opsional)"
             static let bpjsPlaceholder = "Contoh: 1240630077675"
-            static let doneButton = "Selesai"
         }
     }
     
@@ -474,11 +477,9 @@ enum AppText {
             static let deleteAccountTitle = "Hapus akun"
             static let deleteAccountDescription = "Akun yang sudah dihapus tidak dapat dikembalikan lagi."
             static let deleteAccountButton = "Hapus Akun"
-            static let backButton = "Kembali"
             static let deleteSuccessTitle = "Berhasil Menghapus Akun"
             static let deleteSuccessDescription = "Akun berhasil dihapus"
-            static let deletionFailedTitle = "Deletion Failed"
-            static let unknownErrorMessage = "Unknown error"
+            static let deletionFailedTitle = "Gagal Menghapus"
         }
         
         enum NewUserFormView {
@@ -496,8 +497,7 @@ enum AppText {
             static let emailTitle = "Email"
             static let emailPlaceholder = "john@gmail.com"
             static let registerAccountButton = "Daftarkan Akun"
-            static let registrationFailedTitle = "Registration Failed"
-            static let unknownErrorMessage = "Unknown error"
+            static let registrationFailedTitle = "Pendaftaran Gagal"
         }
         
         enum EditUserFormView {
@@ -512,10 +512,7 @@ enum AppText {
             static let emailTitle = "Email"
             static let emailPlaceholder = "Email"
             static let emailDisabledDescription = "Email tidak dapat diubah"
-            static let saveChangesButton = "Simpan Perubahan"
-            static let cancelButton = "Batal"
-            static let editFailedTitle = "Edit Failed"
-            static let unknownErrorMessage = "Unknown error"
+            static let editFailedTitle = "Gagal Mengubah"
         }
         
         enum UserListView {
@@ -530,10 +527,9 @@ enum AppText {
     
     enum VideoRecord {
         enum VideoRecordView {
-            static let cameraAccessDeniedTitle = "Camera Access Denied"
-            static let cameraAccessDeniedMessage = "Please enable camera access for Oculab in Settings to record video"
-            static let goToSettingsButton = "Go to Settings"
-            static let cancelButton = "Cancel"
+            static let cameraAccessDeniedTitle = "Akses Kamera Ditolak"
+            static let cameraAccessDeniedMessage = "Silakan aktifkan akses kamera untuk Oculab di Pengaturan untuk merekam video"
+            static let goToSettingsButton = "Buka Pengaturan"
         }
         
         enum InstructionRecordView {
@@ -553,10 +549,8 @@ enum AppText {
         }
         
         enum CameraViewComponent {
-            static let cameraAccessAlertTitle = "Camera Access"
-            static let cameraAccessAlertMessage = "Please enable camera and microphone access in settings"
-            static let settingsButton = "Settings"
-            static let cancelButton = "Cancel"
+            static let cameraAccessAlertTitle = "Akses Kamera"
+            static let cameraAccessAlertMessage = "Silakan aktifkan akses kamera dan mikrofon di pengaturan"
         }
         
         enum VideoPreviewComponent {
@@ -565,12 +559,10 @@ enum AppText {
         }
         
         enum VideoInputComponent {
-            static let requiredFieldIndicator = "*"
             static let takeVideoButton = "Ambil Gambar"
             static let previewVideoButton = "Preview Video"
             static let videoErrorAlertTitle = "Gagal Memutar Video"
             static let videoErrorAlertMessage = "Video tidak dapat diputar. Silakan rekam ulang sampel."
-            static let videoErrorDismissButton = "Kembali"
         }
     }
     
@@ -593,7 +585,6 @@ enum AppText {
             static let navigationTitle = "Pemeriksaan"
             static let stepTitles = ["Data Pasien", "Data Sediaan", "Hasil"]
             static let currentStepIndex = 1
-            static let confirmIcon = "Confirm"
             static let confirmPopupTitle = "Buat Tugas Pemeriksaan?"
             static let createTaskButton = "Buat Tugas"
             static let reviewAgainButton = "Periksa Kembali"
@@ -608,13 +599,11 @@ enum AppText {
             static let slideType2Title = "Jenis Sediaan 2"
             static let morningChoice = "Pagi"
             static let anytimeChoice = "Sewaktu"
-            static let backButton = "Kembali"
             static let createTaskFinalButton = "Buat Tugas"
         }
         
         enum DateFieldComponent {
-            static let requiredFieldIndicator = "*"
-            static let datePickerLabel = "Date of Birth"
+            static let datePickerLabel = "Tanggal Lahir"
         }
         
         enum PatientDisplayFieldComponent {
@@ -627,7 +616,6 @@ enum AppText {
             static let maleChoice = "Laki-laki"
             static let bpjsTitle = "Nomor BPJS (opsional)"
             static let bpjsPlaceholder = "Contoh: 1240630077675"
-            static let doneButton = "Selesai"
         }
     }
     
@@ -642,9 +630,8 @@ enum AppText {
             static let navigationTitle = "Informasi Interpretasi Sistem"
             static let assessmentStandardTitle = "Standar Penilaian"
             static let assessmentStandardDescription = "Sistem ini menghitung bakteri sesuai rekomendasi WHO dan standar IUALTD"
-            static let confidenceLevelTitle = "Confidence Level"
-            static let bulletPoint = "•"
-            
+            static let confidenceLevelTitle = "Tingkat Keyakinan"
+
             // Assessment Standard Points
             static let negativeDescription = "Negatif: Tidak ditemukan BTA minimal dalam 100 lapang pandang"
             static let scantyDescription = "Scanty: 1-9 BTA dalam 100 lapang pandang"
@@ -667,10 +654,6 @@ enum AppText {
             static let bacteriaCountSuffix = " BTA"
             static let imageCountFormat = "Gambar %d dari %d"
             static let slideIdPrefix = "ID "
-            static let contrastIcon = "Contrast"
-            static let brightnessIcon = "Brightness"
-            static let commentIcon = "Comment"
-            static let backWhiteIcon = "back_white"
         }
         
         enum PDFView {
