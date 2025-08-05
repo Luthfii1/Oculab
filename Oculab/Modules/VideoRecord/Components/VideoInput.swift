@@ -30,7 +30,7 @@ struct VideoInput: View {
                     .foregroundColor(AppColors.slate900)
 
                 if isRequired {
-                    Text("*")
+                    Text(AppTextVideoRecordCompInput.requiredFieldIndicator)
                         .font(AppTypography.h4)
                         .foregroundColor(.red)
                 }
@@ -38,7 +38,7 @@ struct VideoInput: View {
 
             VStack(alignment: .center) {
                 if selectedURL == nil {
-                    AppButton(title: "Ambil Gambar", leftIcon: "camera", colorType: .secondary, size: .small) {
+                    AppButton(title: AppTextVideoRecordCompInput.takeVideoButton, leftIcon: AppText.Icon.camera, colorType: .secondary, size: .small) {
                         if !UserDefaults.standard.bool(forKey: UserDefaultType.hasSeenOnboarding.rawValue) {
                             showOnboardingGuidelines = true
                             UserDefaults.standard.set(true, forKey: UserDefaultType.hasSeenOnboarding.rawValue)
@@ -59,7 +59,7 @@ struct VideoInput: View {
                         .clipped()
                         .cornerRadius(Decimal.d8)
 
-                    AppButton(title: "Preview Video", leftIcon: "eye", colorType: .secondary, size: .small) {
+                    AppButton(title: AppTextVideoRecordCompInput.previewVideoButton, leftIcon: AppText.Icon.eye, colorType: .secondary, size: .small) {
                         // Cek apakah file masih bisa diputar
                         if let url = selectedURL, FileManager.default.fileExists(atPath: url.path) {
                             showFullScreenPlayer = true
@@ -72,9 +72,9 @@ struct VideoInput: View {
             // Alert untuk error handling
             .alert(isPresented: $showVideoErrorAlert) {
                 Alert(
-                    title: Text("Gagal Memutar Video"),
-                    message: Text("Video tidak dapat diputar. Silakan rekam ulang sampel."),
-                    dismissButton: .default(Text("Kembali"))
+                    title: Text(AppTextVideoRecordCompInput.videoErrorAlertTitle),
+                    message: Text(AppTextVideoRecordCompInput.videoErrorAlertMessage),
+                    dismissButton: .default(Text(AppTextVideoRecordCompInput.videoErrorDismissButton))
                 )
             }
 

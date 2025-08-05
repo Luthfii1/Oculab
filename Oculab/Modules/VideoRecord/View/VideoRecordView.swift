@@ -98,17 +98,17 @@ struct VideoRecordView: View {
         }
         .alert(isPresented: $videoRecordPresenter.alert) {
             Alert(
-                title: Text("Camera Access Denied"),
-                message: Text("Please enable camera access for Oculab in Settings to record video."),
-                primaryButton: .default(Text("Go to Settings")) {
-                    if let url = URL(string: UIApplication.openSettingsURLString) {
-                        UIApplication.shared.open(url)
+                    title: Text(AppTextVideoRecordView.cameraAccessDeniedTitle),
+                    message: Text(AppTextVideoRecordView.cameraAccessDeniedMessage),
+                    primaryButton: .default(Text(AppTextVideoRecordView.goToSettingsButton)) {
+                        if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
+                            UIApplication.shared.open(settingsUrl)
+                        }
+                    },
+                    secondaryButton: .cancel(Text(AppTextVideoRecordView.cancelButton)) {
+                        dismiss() 
                     }
-                },
-                secondaryButton: .cancel(Text("Cancel")) {
-                    dismiss()
-                }
-            )
+                )
         }
     }
 }

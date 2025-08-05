@@ -59,7 +59,7 @@ struct DateField: View {
                     .foregroundColor(textColor)
                 Spacer().frame(width: 2)
                 if isRequired {
-                    Text("*")
+                    Text(AppTextTaskAssignCompDateField.requiredFieldIndicator)
                         .foregroundColor(AppColors.red500)
                 }
             }
@@ -122,7 +122,7 @@ struct DateField: View {
             Spacer().frame(height: 8)
 
             if isDatePickerVisible {
-                DatePicker("Date of Birth", selection: $date, in: ...Date(), displayedComponents: .date)
+                DatePicker(AppTextTaskAssignCompDateField.datePickerLabel, selection: $date, in: ...Date(), displayedComponents: .date)
                     .datePickerStyle(.graphical)
                     .padding()
                     .overlay(

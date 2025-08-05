@@ -40,12 +40,12 @@ struct CameraView: View {
         }
         .alert(isPresented: $videoRecordPresenter.alert) {
             Alert(
-                title: Text("Camera Access"),
-                message: Text("Please enable camera and microphone access in settings"),
-                primaryButton: .default(Text("Settings")) {
+                title: Text(AppTextVideoRecordCompCamera.cameraAccessAlertTitle),
+                message: Text(AppTextVideoRecordCompCamera.cameraAccessAlertMessage),
+                primaryButton: .default(Text(AppTextVideoRecordCompCamera.settingsButton)) {
                     UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
                 },
-                secondaryButton: .cancel()
+                secondaryButton: .cancel(Text(AppTextVideoRecordCompCamera.cancelButton))
             )
         }
     }

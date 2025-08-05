@@ -22,14 +22,14 @@ struct InputPatientData: View {
             ScrollView(showsIndicators: false) {
                 VStack {
                     Spacer().frame(height: Decimal.d24)
-                    AppStepper(stepTitles: ["Data Pasien", "Data Sediaan", "Hasil"], currentStep: 0)
+                    AppStepper(stepTitles: AppTextTaskAssignInputPatient.stepTitles, currentStep: AppTextTaskAssignInputPatient.currentStepIndex)
                     Spacer().frame(height: Decimal.d24)
                     
                     VStack(alignment: .leading, spacing: Decimal.d24) {
                         // PIC Dropdown
                         AppDropdown(
-                                title: "Petugas Pemeriksaan",
-                                placeholder: "Pilih Petugas",
+                                title: AppTextTaskAssignInputPatient.picTitle,
+                                placeholder: AppTextTaskAssignInputPatient.picPlaceholder,
                                 leftIcon: "person.fill",
                                 choices: presenter.picName,
                                 selectedChoice: $presenter.selectedPIC
@@ -37,12 +37,12 @@ struct InputPatientData: View {
                         
                         // Patient Search Dropdown
                         AppDropdown(
-                            title: "Nama",
-                            placeholder: patientId != nil ? "Pasien dipilih otomatis" : "Cari nama pasien",
+                            title: AppTextTaskAssignInputPatient.patientNameTitle,
+                            placeholder: patientId != nil ? AppTextTaskAssignInputPatient.patientNamePlaceholderAutoSelected : AppTextTaskAssignInputPatient.patientNamePlaceholder,
                             leftIcon: "person.fill",
                             rightIcon: "",
                             choices: presenter.patientNameDoB,
-                            description: patientId != nil ? "Pasien telah dipilih dari riwayat" : "Pilih atau masukkan data pasien baru",
+                            description: patientId != nil ? AppTextTaskAssignInputPatient.patientNameDescriptionAutoSelected : AppTextTaskAssignInputPatient.patientNameDescription,
                             selectedChoice: $presenter.selectedPatient,
                             isEnablingAdding: patientId == nil
                         )
@@ -54,7 +54,7 @@ struct InputPatientData: View {
                                 .environmentObject(presenter)
                             
                             AppButton(
-                                title: "Isi Detail Sediaan",
+                                title: AppTextTaskAssignInputPatient.fillSpecimenDetailsButton,
                                 rightIcon: "arrow.forward",
                                 isEnabled: {
                                     let hasPatientData = !(presenter.patient.NIK == "" || presenter.patient.DoB == nil)
@@ -70,7 +70,7 @@ struct InputPatientData: View {
                     }
                     .padding(.horizontal, Decimal.d20)
                 }
-                .navigationTitle("Pemeriksaan")
+                .navigationTitle(AppTextTaskAssignInputPatient.navigationTitle)
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationBarBackButtonHidden(true)
                 .toolbar {
@@ -79,7 +79,7 @@ struct InputPatientData: View {
                             Router.shared.navigateBack()
                         }) {
                             HStack {
-                                Image("Destroy")
+                                Image(AppText.Icon.destroy)
                             }
                         }
                     }

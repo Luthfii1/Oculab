@@ -22,7 +22,7 @@ struct PDFPageView: View {
                             Button(action: {
                                 sharePDF()
                             }) {
-                                Image(systemName: "square.and.arrow.up")
+                                Image(systemName: AppText.Icon.shareIcon)
                                     .foregroundColor(.black)
                             }
                         }
@@ -32,11 +32,11 @@ struct PDFPageView: View {
                     Spacer()
                         .frame(height: UIScreen.main.bounds.height * 0.2)
 
-                    LottieHelper(animationName: "loadingPaperplane")
+                    LottieHelper(animationName: AppTextAnalysisPDF.loadingAnimationName)
                         .frame(width: 84, height: 84)
                         .padding(.bottom, 72)
 
-                    Text("Mendownload data")
+                    Text(AppTextAnalysisPDF.downloadingDataMessage)
                         .font(AppTypography.h2)
                         .padding(.bottom, 12)
 
@@ -67,13 +67,13 @@ struct PDFPageView: View {
             // Draw PDF content
             drawHeader(regularText)
             drawInfoSection(
-                title: presenter.data?.patientPDFData.name ?? "",
-                labels: ["NIK", "Umur", "Jenis Kelamin", "No. BPJS"],
+                title: presenter.data?.patientPDFData.name ?? AppText.Common.emptyString,
+                labels: [AppTextAnalysisPDF.nikLabel, AppTextAnalysisPDF.ageLabel, AppTextAnalysisPDF.genderLabel, AppTextAnalysisPDF.bpjsLabel],
                 values: [
-                    presenter.data?.patientPDFData.nik ?? "",
-                    "\(presenter.data?.patientPDFData.age ?? 0) Tahun",
-                    presenter.data?.patientPDFData.sex ?? "",
-                    presenter.data?.patientPDFData.bpjs ?? ""
+                    presenter.data?.patientPDFData.nik ?? AppText.Common.emptyString,
+                    "\(presenter.data?.patientPDFData.age ?? 0)\(AppTextAnalysisPDF.ageSuffix)",
+                    presenter.data?.patientPDFData.sex ?? AppText.Common.emptyString,
+                    presenter.data?.patientPDFData.bpjs ?? AppText.Common.emptyString
                 ],
                 xTitle: 33,
                 yStart: 149,
@@ -82,12 +82,12 @@ struct PDFPageView: View {
                 boldLargeText
             )
             drawInfoSection(
-                title: "Informasi Sediaan",
-                labels: ["ID Pemeriksaan", "Diambil di", "Petugas"],
+                title: AppTextAnalysisPDF.specimenInfoTitle,
+                labels: [AppTextAnalysisPDF.examinationIdLabel, AppTextAnalysisPDF.takenAtLabel, AppTextAnalysisPDF.officerLabel],
                 values: [
-                    presenter.data?.preparatPDFData.id ?? "",
-                    presenter.data?.preparatPDFData.place ?? "",
-                    presenter.data?.preparatPDFData.laborant ?? ""
+                    presenter.data?.preparatPDFData.id ?? AppText.Common.emptyString,
+                    presenter.data?.preparatPDFData.place ?? AppText.Common.emptyString,
+                    presenter.data?.preparatPDFData.laborant ?? AppText.Common.emptyString
                 ],
                 xTitle: 246,
                 yStart: 149,
@@ -99,15 +99,15 @@ struct PDFPageView: View {
             drawHasilPemeriksaan(regularText)
 
             drawInterpretasi(
-                title: "Interpretasi Mikroskopis",
-                description: presenter.data?.hasilPDFData.descInterpretasi ?? "",
+                title: AppTextAnalysisPDF.microscopicInterpretationTitle,
+                description: presenter.data?.hasilPDFData.descInterpretasi ?? AppText.Common.emptyString,
                 yContent: 388,
                 boldText,
                 regularText
             )
             drawInterpretasi(
-                title: "Catatan Petugas",
-                description: presenter.data?.hasilPDFData.descNotesPetugas ?? "Tidak ada catatan",
+                title: AppTextAnalysisPDF.staffNotesTitle,
+                description: presenter.data?.hasilPDFData.descNotesPetugas ?? AppTextAnalysisPDF.noNotesDefault,
                 yContent: 640,
                 boldText,
                 regularText
@@ -121,12 +121,12 @@ struct PDFPageView: View {
 
     // Draw header section with logo, description, phone, email
     private func drawHeader(_ regularText: [NSAttributedString.Key: Any]) {
-        UIImage(named: "logo")?.draw(at: CGPoint(x: 32, y: 32))
-        NSAttributedString(string: presenter.data?.kopPDFData.desc ?? "", attributes: regularText).draw(at: CGPoint(x: 32, y: 72))
-        
+        UIImage(named: AppText.Icon.logo)?.draw(at: CGPoint(x: 32, y: 32))
+        NSAttributedString(string: presenter.data?.kopPDFData.desc ?? AppText.Common.emptyString, attributes: regularText).draw(at: CGPoint(x: 32, y: 72))
+
         // Phone number with icon
-        let phoneIcon = UIImage(named: "phoneIcon")?.resizeImage(targetSize: CGSize(width: 12, height: 12))
-        let phoneText = NSAttributedString(string: presenter.data?.kopPDFData.notelp ?? "", attributes: regularText)
+        let phoneIcon = UIImage(named: AppText.Icon.phoneIcon)?.resizeImage(targetSize: CGSize(width: 12, height: 12))
+        let phoneText = NSAttributedString(string: presenter.data?.kopPDFData.notelp ?? AppText.Common.emptyString, attributes: regularText)
         let phoneTextSize = phoneText.size()
         let phoneIconSize = phoneIcon?.size ?? .zero
         let phoneX = 563 - phoneTextSize.width - phoneIconSize.width - 4 // 4 is padding between text and icon
@@ -134,15 +134,15 @@ struct PDFPageView: View {
         phoneIcon?.draw(at: CGPoint(x: phoneX + phoneTextSize.width + 4, y: 54))
         
         // Email with icon
-        let emailIcon = UIImage(named: "envelopeIcon")?.resizeImage(targetSize: CGSize(width: 12, height: 12))
-        let emailText = NSAttributedString(string: presenter.data?.kopPDFData.email ?? "", attributes: regularText)
+        let emailIcon = UIImage(named: AppText.Icon.envelopeIcon)?.resizeImage(targetSize: CGSize(width: 12, height: 12))
+        let emailText = NSAttributedString(string: presenter.data?.kopPDFData.email ?? AppText.Common.emptyString, attributes: regularText)
         let emailTextSize = emailText.size()
         let emailIconSize = emailIcon?.size ?? .zero
         let emailX = 563 - emailTextSize.width - emailIconSize.width - 4
         emailText.draw(at: CGPoint(x: emailX, y: 70))
         emailIcon?.draw(at: CGPoint(x: emailX + emailTextSize.width + 4, y: 70))
         
-        UIImage(named: "line")?.draw(at: CGPoint(x: 0, y: 97))
+        UIImage(named: AppText.Icon.line)?.draw(at: CGPoint(x: 0, y: 97))
     }
 
     private func drawInterpretasi(
@@ -186,8 +186,8 @@ struct PDFPageView: View {
         let verticalPadding: CGFloat = 5
         
         // Draw headers
-        let leftHeader = NSAttributedString(string: "Pelaporan", attributes: boldAttributes)
-        let rightHeader = NSAttributedString(string: "Hasil Pengamatan", attributes: boldAttributes)
+        let leftHeader = NSAttributedString(string: AppTextAnalysisPDF.reportingHeaderTitle, attributes: boldAttributes)
+        let rightHeader = NSAttributedString(string: AppTextAnalysisPDF.observationResultsHeaderTitle, attributes: boldAttributes)
         
         // Position headers
         let leftHeaderX = startX + leftColumnPadding
@@ -199,11 +199,11 @@ struct PDFPageView: View {
         
         // Table data
         let rows: [TableRow] = [
-            TableRow(left: "Negatif", right: "Tidak ditemukan BTA dalam 100 lapang pandang"),
-            TableRow(left: "Scanty", right: "Ditemukan 1-9 BTA dalam 100 lapang pandang"),
-            TableRow(left: "Positif (1+)", right: "Ditemukan 10-99 BTA dalam 100 lapang pandang"),
-            TableRow(left: "Positif (2+)", right: "Ditemukan 1-9 BTA dalam setiap lapang pandang, minimal dalam 50 lapang pandang"),
-            TableRow(left: "Positif (3+)", right: "Ditemukan ≥10 BTA dalam setiap lapang pandang, minimal dalam 20 lapang pandang")
+            TableRow(left: AppTextAnalysisPDF.negativeReportLabel, right: AppTextAnalysisPDF.negativeResultDescription),
+            TableRow(left: AppTextAnalysisPDF.scantyReportLabel, right: AppTextAnalysisPDF.scantyResultDescription),
+            TableRow(left: AppTextAnalysisPDF.positive1ReportLabel, right: AppTextAnalysisPDF.positive1ResultDescription),
+            TableRow(left: AppTextAnalysisPDF.positive2ReportLabel, right: AppTextAnalysisPDF.positive2ResultDescription),
+            TableRow(left: AppTextAnalysisPDF.positive3ReportLabel, right: AppTextAnalysisPDF.positive3ResultDescription)
         ]
         
         // Draw content
@@ -295,12 +295,12 @@ struct PDFPageView: View {
             .font: UIFont.boldSystemFont(ofSize: 12),
             .foregroundColor: UIColor.red
         ]
-        let labels = ["Tujuan Pemeriksaan", "Jenis Uji", "ID Sediaan", "Hasil Pemeriksaan"]
+        let labels = [AppTextAnalysisPDF.examinationPurposeLabel, AppTextAnalysisPDF.testTypeLabel, AppTextAnalysisPDF.specimenIdLabel, AppTextAnalysisPDF.examinationResultLabel]
         let values = [
-            presenter.data?.hasilPDFData.tujuan ?? "",
-            presenter.data?.hasilPDFData.jenisUji ?? "",
-            presenter.data?.hasilPDFData.idSediaan ?? "",
-            presenter.data?.hasilPDFData.hasil ?? ""
+            presenter.data?.hasilPDFData.tujuan ?? AppText.Common.emptyString,
+            presenter.data?.hasilPDFData.jenisUji ?? AppText.Common.emptyString,
+            presenter.data?.hasilPDFData.idSediaan ?? AppText.Common.emptyString,
+            presenter.data?.hasilPDFData.hasil ?? AppText.Common.emptyString
         ]
 
         for (index, label) in labels.enumerated() {
@@ -311,7 +311,7 @@ struct PDFPageView: View {
             NSAttributedString(string: values[index], attributes: attributes).draw(at: CGPoint(x: xPosition, y: 353))
         }
 
-        NSAttributedString(string: "HASIL PEMERIKSAAN BAKTERIOLOGIS", attributes: boldAttributes)
+        NSAttributedString(string: AppTextAnalysisPDF.bacteriologicalExaminationResultTitle, attributes: boldAttributes)
             .draw(at: CGPoint(x: 166, y: 274))
     }
 
@@ -338,13 +338,10 @@ struct PDFPageView: View {
         
         // Left signature (Petugas Lab)
         let leftX: CGFloat = 33
-        let leftTitle = NSAttributedString(string: "Petugas Lab", attributes: boldText)
+        let leftTitle = NSAttributedString(string: AppTextAnalysisPDF.labOfficerSignatureTitle, attributes: boldText)
         leftTitle.draw(at: CGPoint(x: leftX, y: startY))
         
 //        // Draw signature image placeholder
-//        if let signatureImage = UIImage(named: "ttd") {
-//            signatureImage.draw(in: CGRect(x: leftX, y: startY + 20, width: signatureSize.width, height: signatureSize.height))
-//        }
         
         // Draw horizontal line
         if let context = UIGraphicsGetCurrentContext() {
@@ -356,18 +353,15 @@ struct PDFPageView: View {
         }
         
         // Draw name
-        let leftName = NSAttributedString(string: presenter.data?.preparatPDFData.laborant ?? "", attributes: regularText)
+        let leftName = NSAttributedString(string: presenter.data?.preparatPDFData.laborant ?? AppText.Common.emptyString, attributes: regularText)
         leftName.draw(at: CGPoint(x: leftX, y: startY + 90))
         
         // Right signature (Dokter PJ)
         let rightX: CGFloat = 400
-        let rightTitle = NSAttributedString(string: "Dokter PJ Pemeriksaan Lab", attributes: boldText)
+        let rightTitle = NSAttributedString(string: AppTextAnalysisPDF.supervisingDoctorSignatureTitle, attributes: boldText)
         rightTitle.draw(at: CGPoint(x: rightX, y: startY))
         
 //        // Draw signature image placeholder
-//        if let signatureImage = UIImage(named: "ttd") {
-//            signatureImage.draw(in: CGRect(x: rightX, y: startY + 20, width: signatureSize.width, height: signatureSize.height))
-//        }
         
         // Draw horizontal line
         if let context = UIGraphicsGetCurrentContext() {
@@ -379,7 +373,7 @@ struct PDFPageView: View {
         }
         
         // Draw name
-        let rightName = NSAttributedString(string:  presenter.data?.preparatPDFData.dpjp ?? "", attributes: regularText)
+        let rightName = NSAttributedString(string:  presenter.data?.preparatPDFData.dpjp ?? AppText.Common.emptyString, attributes: regularText)
         rightName.draw(at: CGPoint(x: rightX, y: startY + 90))
     }
 

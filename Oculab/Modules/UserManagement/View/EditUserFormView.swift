@@ -17,12 +17,12 @@ struct EditUserFormView: View {
                 // Success popup
                 if presenter.showSuccessPopup {
                     AppPopup(
-                        image: "Success",
-                        title: "Berhasil mengubah Akun",
-                        description: "Anda telah berhasil mengubah akun untuk \(presenter.editSuccess.name) dengan role \(presenter.editSuccess.role)",
+                        image: AppText.Icon.success,
+                        title: AppTextUserMgmtEditUserForm.successTitle,
+                        description: "\(AppTextUserMgmtEditUserForm.successDescriptionPrefix) \(presenter.editSuccess.name) \(AppTextUserMgmtEditUserForm.successDescriptionSuffix) \(presenter.editSuccess.role)",
                         buttons: [
                             AppButton(
-                                title: "Kembali ke Daftar Akun",
+                                title: AppTextUserMgmtEditUserForm.backToAccountListButton,
                                 colorType: .secondary,
                                 size: .large,
                                 isEnabled: true
@@ -43,31 +43,31 @@ struct EditUserFormView: View {
                 }
                 ScrollView {
                     VStack(spacing: 24) {
-                        Image("AddAccount")
+                        Image(AppText.Icon.addAccount)
                         VStack(spacing: 16) {
                             AppDropdown(
-                                title: "Role",
+                                title: AppTextUserMgmtEditUserForm.roleTitle,
                                 placeholder: presenter.role,
                                 isRequired: true,
-                                leftIcon: "person.fill",
-                                rightIcon: "chevron.down",
-                                choices: [("Laboran", RolesType.LAB.rawValue), ("Admin", RolesType.ADMIN.rawValue)],
+                                leftIcon: AppText.Icon.personFill,
+                                rightIcon: AppText.Icon.chevronDown,
+                                choices: [(AppTextUserMgmtNewUserForm.roleLabPlaceholder, RolesType.LAB.rawValue), (AppTextUserMgmtNewUserForm.roleAdminChoice, RolesType.ADMIN.rawValue)],
                                 isSearchEnabled: false,
                                 selectedChoice: $presenter.role
                             )
                             
                             AppTextField(
-                                title: "Nama",
+                                title: AppTextUserMgmtEditUserForm.nameTitle,
                                 isRequired: true,
-                                placeholder: "Masukkan nama",
+                                placeholder: AppTextUserMgmtEditUserForm.namePlaceholder,
                                 text: $presenter.name
                             )
                             
                             AppTextField(
-                                title: "Email",
+                                title: AppTextUserMgmtEditUserForm.emailTitle,
                                 isRequired: true,
-                                placeholder: "Email",
-                                description: "Email tidak dapat diubah",
+                                placeholder: AppTextUserMgmtEditUserForm.emailPlaceholder,
+                                description: AppTextUserMgmtEditUserForm.emailDisabledDescription,
                                 isDisabled: true,
                                 text: .constant(account.email)
                             )
@@ -75,8 +75,8 @@ struct EditUserFormView: View {
                             // Save button
                             ZStack {
                                 AppButton(
-                                    title: presenter.isEditing ? "" : "Simpan Perubahan",
-                                    rightIcon: presenter.isEditing ? nil : "arrow.right",
+                                    title: presenter.isEditing ? AppText.Common.emptyString : AppTextUserMgmtEditUserForm.saveChangesButton,
+                                    rightIcon: presenter.isEditing ? nil : AppText.Icon.arrowRight,
                                     isEnabled: !presenter.isEditing,
                                     action: {
                                         Task {
@@ -94,7 +94,7 @@ struct EditUserFormView: View {
                                 }
                             }
                             
-                            Button("Batal") {
+                            Button(AppTextUserMgmtEditUserForm.cancelButton) {
                                 presenter.navigateBack()
                             }
                             .font(AppTypography.p2)
@@ -110,14 +110,14 @@ struct EditUserFormView: View {
                         UIApplication.shared.endEditing()
                     }
                 )
-                .navigationTitle("Edit Akun")
+                .navigationTitle(AppTextUserMgmtEditUserForm.navigationTitle)
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: {
                             presenter.navigateBack()
                         }) {
-                            Image(systemName: "chevron.left")
+                            Image(systemName: AppText.Icon.chevronLeft)
                                 .foregroundColor(.black)
                         }
                     }
@@ -128,18 +128,18 @@ struct EditUserFormView: View {
         .dismissKeyboardOnTap()
         // Error alert
         .alert(
-            "Edit Failed",
+            AppTextUserMgmtEditUserForm.editFailedTitle,
             isPresented: Binding(
                 get: { presenter.editError != nil },
                 set: { if !$0 { presenter.editError = nil } }
             ),
             actions: {
-                Button("OK") {
+                Button(AppText.Common.okButton) {
                     presenter.editError = nil
                 }
             },
             message: {
-                Text(presenter.editError ?? "Unknown error")
+                Text(presenter.editError ?? AppTextUserMgmtEditUserForm.unknownErrorMessage)
             }
         )
         .onAppear {

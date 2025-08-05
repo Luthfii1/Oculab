@@ -33,7 +33,7 @@ struct FOVDetail: View {
                     .edgesIgnoringSafeArea([.top, .bottom])
                 } else {
                     // view with information that the data is loading because the data is not yet fetched
-                    Text("Data is loading...")
+                    Text(AppTextAnalysisFOVDetail.loadingDataMessage)
                         .multilineTextAlignment(.center)
                         .font(AppTypography.h3)
                         .padding()
@@ -55,7 +55,7 @@ struct FOVDetail: View {
                     // Bottom controls
                     VStack {
                         VStack(spacing: Decimal.d4) {
-                            Text("Jumlah Bakteri: \(fovData.systemCount) BTA")
+                            Text("\(AppTextAnalysisFOVDetail.bacteriaCountPrefix)\(fovData.systemCount)\(AppTextAnalysisFOVDetail.bacteriaCountSuffix)")
                                 .font(AppTypography.h3)
                                 .foregroundColor(.white)
                         }
@@ -66,21 +66,21 @@ struct FOVDetail: View {
                             Button(action: {
                                 // Add contrast adjustment
                             }) {
-                                Image("Contrast")
+                                Image(AppTextAnalysisFOVDetail.contrastIcon)
                                     .foregroundColor(.white)
                             }
 
                             Button(action: {
                                 // Add brightness adjustment
                             }) {
-                                Image("Brightness")
+                                Image(AppTextAnalysisFOVDetail.brightnessIcon)
                                     .foregroundColor(.white)
                             }
 
                             Button(action: {
                                 // Add comment functionality
                             }) {
-                                Image("Comment")
+                                Image(AppTextAnalysisFOVDetail.commentIcon)
                                     .foregroundColor(.white)
                             }
                         }
@@ -94,10 +94,10 @@ struct FOVDetail: View {
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     VStack {
-                        Text("Gambar \(order + 1) dari \(total)")
+                        Text(" \(AppTextAnalysisFOVDetail.imageCountFormat) \(order + 1), \(total)")
                             .font(AppTypography.s4_1)
                             .foregroundColor(.white)
-                        Text("ID \(slideId)")
+                        Text("\(AppTextAnalysisFOVDetail.slideIdPrefix) \(slideId)")
                             .font(AppTypography.p3)
                             .foregroundColor(.white.opacity(0.8))
                     }
@@ -113,7 +113,7 @@ struct FOVDetail: View {
                         Router.shared.navigateBack()
                     }) {
                         HStack {
-                            Image("back_white")
+                            Image(AppTextAnalysisFOVDetail.backWhiteIcon)
                                 .foregroundColor(.white)
                         }
                     }

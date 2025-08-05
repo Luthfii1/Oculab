@@ -19,8 +19,8 @@ struct AnalysisResultView: View {
                     HeaderViewComponent(isLeavePopUpVisible: $presenter.isLeavePopUpVisible)
 
                     AppStepper(
-                        stepTitles: ["Data Pemeriksaan", "Hasil Pemeriksaan"],
-                        currentStep: 1
+                        stepTitles: AppTextAnalysisResult.stepTitles,
+                        currentStep: AppTextAnalysisResult.currentStepIndex
                     )
                     .padding(.vertical, Decimal.d16)
 
@@ -45,7 +45,7 @@ struct AnalysisResultView: View {
                         }
                     } else {
                         Spacer()
-                        Text("Loading examination data...")
+                        Text(AppTextAnalysisResult.loadingExaminationMessage)
                             .foregroundColor(.gray)
                             .padding()
                         Spacer()

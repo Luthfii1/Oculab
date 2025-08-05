@@ -54,7 +54,7 @@ struct FOVAlbum: View {
                                         .overlay(
                                             Group {
                                                 if fov.verified {
-                                                    Image(systemName: "checkmark.circle.fill")
+                                                    Image(systemName: AppText.Icon.checkmarkCircleFill)
                                                         .foregroundColor(.green)
                                                         .font(.system(size: 20))
                                                         .padding(4)
@@ -63,7 +63,7 @@ struct FOVAlbum: View {
                                             alignment: .topTrailing
                                         )
                                 case .failure:
-                                    Image(systemName: "exclamationmark.triangle.fill")
+                                    Image(systemName: AppText.Icon.exclamationmarkTriangleFill)
                                         .resizable()
                                         .scaledToFit()
                                         .frame(height: 114)
@@ -77,7 +77,7 @@ struct FOVAlbum: View {
                 }
             }
             .padding(.horizontal, Decimal.d20)
-            .navigationTitle("Album Gambar \(fovGroup.rawValue)")
+            .navigationTitle("\(AppTextAnalysisFOVAlbum.navigationTitleFormat) \(fovGroup.rawValue)")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -85,7 +85,7 @@ struct FOVAlbum: View {
                         Router.shared.navigateBack()
                     }) {
                         HStack {
-                            Image("back")
+                            Image(AppText.Icon.back)
                         }
                     }
                 }
