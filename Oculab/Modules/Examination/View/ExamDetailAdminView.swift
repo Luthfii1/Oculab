@@ -67,8 +67,8 @@ struct ExamDetailAdminView: View {
                                 }
                         }
                         ExtendedCard(data: [
-                            (AppTextExamDetail.slideIdKey, presenter.examinations.first?.slideId ?? AppText.Common.emptyString),
-                            (AppTextExamDetail.preparationTypeKey, presenter.examinations.first?.preparationType ?? AppText.Common.emptyString)
+                            (AppTextExamDetail.slideIdKey, presenter.examinations.first?.slideId ?? AppValue.empty),
+                            (AppTextExamDetail.preparationTypeKey, presenter.examinations.first?.preparationType ?? AppValue.empty)
                         ], titleSize: AppTypography.s5)
                     }
 
@@ -100,8 +100,8 @@ struct ExamDetailAdminView: View {
                             }
                         }
                         ExtendedCard(data: [
-                            (AppTextExamDetail.slideIdKey, presenter.examinations.count > 1 ? presenter.examinations[1].slideId : AppText.Common.emptyString),
-                            (AppTextExamDetail.preparationTypeKey, presenter.examinations.count > 1 ? presenter.examinations[1].preparationType : AppText.Common.emptyString)
+                            (AppTextExamDetail.slideIdKey, presenter.examinations.count > 1 ? presenter.examinations[1].slideId : AppValue.empty),
+                            (AppTextExamDetail.preparationTypeKey, presenter.examinations.count > 1 ? presenter.examinations[1].preparationType : AppValue.empty)
                         ], titleSize: AppTypography.s5)
                     }
                     VStack(spacing: Decimal.d16) {

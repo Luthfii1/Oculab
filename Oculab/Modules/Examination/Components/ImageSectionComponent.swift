@@ -14,7 +14,7 @@ struct ImageSectionComponent: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Decimal.d16) {
             HStack {
-                Image(systemName: AppText.Icon.photo)
+                Image(systemName: AppIcon.photo)
                     .foregroundColor(AppColors.purple500)
                 Text(AppTextExamCompImageSection.imageResultTitle)
                     .font(AppTypography.s4_1)

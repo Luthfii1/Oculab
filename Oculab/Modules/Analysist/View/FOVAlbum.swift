@@ -54,7 +54,7 @@ struct FOVAlbum: View {
                                         .overlay(
                                             Group {
                                                 if fov.verified {
-                                                    Image(systemName: AppText.Icon.checkmarkCircleFill)
+                                                    Image(systemName: AppIcon.checkmarkCircleFill)
                                                         .foregroundColor(.green)
                                                         .font(.system(size: 20))
                                                         .padding(4)
@@ -63,7 +63,7 @@ struct FOVAlbum: View {
                                             alignment: .topTrailing
                                         )
                                 case .failure:
-                                    Image(systemName: AppText.Icon.exclamationmarkTriangleFill)
+                                    Image(systemName: AppIcon.exclamationmarkTriangleFill)
                                         .resizable()
                                         .scaledToFit()
                                         .frame(height: 114)

@@ -43,9 +43,7 @@ class AuthenticationPresenter: ObservableObject {
         ["!", "0", "delete.left.fill"]
     ]
 
-    @Published var isLoading = false {
-        didSet { AppText.Authentication.LoginView.buttonText = isLoading ? "Loading..." : "Login" }
-    }
+    @Published var isLoading = false
 
     @Published var isError: Bool = false {
         didSet {
@@ -70,6 +68,10 @@ class AuthenticationPresenter: ObservableObject {
 
     var isFilled: Bool {
         !email.isEmpty && !password.isEmpty && !isLoading
+    }
+    
+    var loginButtonText: String {
+        return isLoading ? AppState.loading : AppTextAuthLogin.buttonText
     }
 
     private var interactor: AuthenticationInteractor

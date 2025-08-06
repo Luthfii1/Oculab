@@ -15,7 +15,7 @@ struct EditPasswordView: View {
             ZStack {
                 if profilePresenter.showSuccessPopup {
                     AppPopup(
-                        image: AppText.Icon.success,
+                        image: AppImage.success,
                         title: AppTextAuthEditPassword.successUpdatePasswordTitle,
                         description: AppTextAuthEditPassword.successUpdatePasswordMessage,
                         buttons: [

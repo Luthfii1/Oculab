@@ -21,7 +21,7 @@ extension AppText {
             static let title = "Revolusi Deteksi Bakteri dengan Teknologi AI"
             static let emailPlaceholder = "Contoh: nama.anda@gmail.com"
             static let passwordPlaceholder = "Masukkan kata sandi anda"
-            static var buttonText = "Login"
+            static let buttonText = "Login"
             static let faskesNotRegisteredYet = "Faskes belum terdaftar?"
             static let registerFaskesButtonText = "Daftarkan Faskes"
         }

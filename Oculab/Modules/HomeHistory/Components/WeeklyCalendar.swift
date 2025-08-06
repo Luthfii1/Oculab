@@ -17,7 +17,7 @@ struct WeeklyCalendarView: View {
             VStack(alignment: .center, spacing: Decimal.d16) {
                 HStack(alignment: .center) {
                     HStack {
-                        Image(systemName: AppText.Icon.textBadgeCheckmark)
+                        Image(systemName: AppIcon.textBadgeCheckmark)
                             .resizable()
                             .frame(width: Decimal.d16 + Decimal.d2, height: Decimal.d16 + Decimal.d2)
                             .foregroundColor(AppColors.purple500)
@@ -37,7 +37,7 @@ struct WeeklyCalendarView: View {
                             isDatePickerVisible.toggle()
                         }
                     }) {
-                        Image(systemName: AppText.Icon.calendar)
+                        Image(systemName: AppIcon.calendar)
                             .resizable()
                             .frame(width: Decimal.d16 + Decimal.d2, height: Decimal.d16 + Decimal.d2)
                             .font(.title)

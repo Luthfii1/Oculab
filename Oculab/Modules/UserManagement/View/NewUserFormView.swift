@@ -16,7 +16,7 @@ struct NewUserFormView: View {
                 // Success popup
                 if presenter.showSuccessPopup {
                     AppPopup(
-                        image: AppText.Icon.success,
+                        image: AppImage.success,
                         title: AppTextUserMgmtNewUserForm.successTitle,
                         description: "\(AppTextUserMgmtNewUserForm.successDescriptionPrefix) \(presenter.registrationSuccess.name) \(AppTextUserMgmtNewUserForm.successDescriptionSuffix) \(presenter.registrationSuccess.role)",
                         buttons: [
@@ -87,7 +87,7 @@ struct NewUserFormView: View {
                             // Register button
                             ZStack {
                                 AppButton(
-                                    title: presenter.isRegistering ? AppText.Common.emptyString : AppTextUserMgmtNewUserForm.registerAccountButton,
+                                    title: presenter.isRegistering ? AppValue.empty : AppTextUserMgmtNewUserForm.registerAccountButton,
                                     rightIcon: presenter.isRegistering ? nil : AppText.Icon.arrowRight,
                                     isEnabled: presenter.isFormValid(
                                         name: presenter.name,
@@ -122,7 +122,7 @@ struct NewUserFormView: View {
                             presenter.navigateBack()
                         }) {
                             HStack {
-                                Image(systemName: AppText.Icon.chevronLeft)
+                                Image(systemName: AppIcon.chevronLeft)
                             }
                         }
                     }

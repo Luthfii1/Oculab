@@ -85,7 +85,7 @@ struct ProfileView: View {
 
                     if authPresenter.isFaceIdAvailable {
                         HStack {
-                            Image(systemName: AppText.Icon.faceId)
+                            Image(systemName: AppIcon.faceId)
                                 .foregroundColor(AppColors.purple500)
                             Toggle(AppTextAuthProfile.faceIdToggle, isOn: Binding(
                                 get: { authPresenter.isFaceIdEnabledFromUserDefaults },

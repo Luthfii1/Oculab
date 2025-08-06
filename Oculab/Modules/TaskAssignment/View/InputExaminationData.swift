@@ -151,7 +151,7 @@ struct InputExaminationData: View {
                                         title: AppTextTaskAssignInputExam.createTaskFinalButton,
                                         rightIcon: AppText.Icon.arrowRight,
                                         size: .large,
-                                        isEnabled: (goalString != AppText.Common.emptyString && typeString != AppText.Common.emptyString && presenter.examination.slideId != AppText.Common.emptyString && typeString2 != AppText.Common.emptyString && presenter.examination2.slideId != AppText.Common.emptyString)
+                                        isEnabled: (goalString != AppValue.empty && typeString != AppValue.empty && presenter.examination.slideId != AppValue.empty && typeString2 != AppValue.empty && presenter.examination2.slideId != AppValue.empty)
                                     ) {
                                         presenter.isError = false
                                         presenter.errorMessage = ""

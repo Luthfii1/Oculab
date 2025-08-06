@@ -23,7 +23,7 @@ struct PatientDetailView: View {
                             (AppTextPatientDetail.patientNikKey, presenter.patient.NIK),
                             (AppTextPatientDetail.patientDobKey, presenter.formatDate(presenter.patient.DoB)),
                             (AppTextPatientDetail.patientSexKey, presenter.patient.sex.rawValue),
-                            (AppTextPatientDetail.patientBpjsKey, presenter.patient.BPJS ?? AppText.Common.emptyString),
+                            (AppTextPatientDetail.patientBpjsKey, presenter.patient.BPJS ?? AppValue.empty),
                         ], titleSize: AppTypography.s5)
                     } action: {
                         presenter.navigateTo(.patientForm(patientId: patientId))

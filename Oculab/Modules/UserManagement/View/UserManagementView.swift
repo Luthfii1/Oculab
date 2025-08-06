@@ -16,8 +16,8 @@ struct UserManagementView: View {
                 // Delete confirmation popup
                 if presenter.showDeleteConfirmationPopup {
                     AppPopup(
-                        image: AppText.Icon.confirm,
-                        title: "\(AppTextUserMgmtView.deleteAccountTitle) \(presenter.userToDelete?.name ?? AppText.Common.emptyString)?",
+                        image: AppImage.confirm,
+                        title: "\(AppTextUserMgmtView.deleteAccountTitle) \(presenter.userToDelete?.name ?? AppValue.empty)?",
                         description: AppTextUserMgmtView.deleteAccountDescription,
                         buttons: [
                             AppButton(
@@ -43,7 +43,7 @@ struct UserManagementView: View {
                 // Delete success popup
                 if presenter.showDeleteSuccessAlert {
                     AppPopup(
-                        image: AppText.Icon.success,
+                        image: AppImage.success,
                         title: AppTextUserMgmtView.deleteSuccessTitle,
                         description: presenter.deletionSuccess?.message ?? AppTextUserMgmtView.deleteSuccessDescription,
                         buttons: [
@@ -83,7 +83,7 @@ struct UserManagementView: View {
                         
                         if !presenter.searchText.isEmpty && presenter.displayedSortedGroupedAccounts.isEmpty {
                             VStack(spacing: 20) {
-                                Image(systemName: AppText.Icon.magnifyingglass)
+                                Image(systemName: AppIcon.magnifyingglass)
                                     .font(.system(size: 48))
                                     .foregroundColor(AppColors.slate300)
                                 

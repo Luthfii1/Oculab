@@ -50,7 +50,7 @@ struct HistoryView: View {
                                         result: exam.finalGradingResult.rawValue,
                                         patientName: exam.patientName,
                                         patientDOB: exam.patientDob.toFormattedDate(),
-                                        dpjpName: exam.dpjpName ?? AppText.Common.emptyString
+                                        dpjpName: exam.dpjpName ?? AppValue.empty
                                     )
                                 }
                             }

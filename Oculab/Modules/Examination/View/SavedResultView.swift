@@ -114,7 +114,7 @@ struct SavedResultView: View {
                                 .font(AppTypography.s5)
                                 .foregroundColor(AppColors.slate300)
                             HStack(alignment: .top) {
-                                Image(systemName: AppText.Icon.exclamationmarkTriangleFill)
+                                Image(systemName: AppIcon.exclamationmarkTriangleFill)
                                     .foregroundColor(AppColors.orange500)
 
                                 Text(AppTextExamSavedResult.systemInterpretationWarning)

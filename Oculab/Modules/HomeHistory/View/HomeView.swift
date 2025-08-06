@@ -22,7 +22,7 @@ struct HomeView: View {
 
                     VStack(alignment: .leading, spacing: 16) {
                         HStack(alignment: .center, spacing: 8) {
-                            Image(systemName: AppText.Icon.docOnDocFillIcon)
+                            Image(systemName: AppIcon.docOnDocFillIcon)
                                 .foregroundStyle(AppColors.purple500)
 
                             Text(AppText.HomeHistory.taskSectionTitle)

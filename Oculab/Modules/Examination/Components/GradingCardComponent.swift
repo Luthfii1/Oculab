@@ -32,7 +32,7 @@ struct GradingCardComponent: View {
                         Button(action: {
                             Router.shared.navigateTo(.informationInterpretation)
                         }) {
-                            Image(systemName: AppText.Icon.infoCircle)
+                            Image(systemName: AppIcon.infoCircle)
                                 .foregroundColor(AppColors.purple500)
                         }
                     }

@@ -20,7 +20,7 @@ struct BottomSheetMenu: View {
                     .padding(.top, 32)
             }
             
-            Text(presenter.selectedUser?.name ?? AppText.Common.emptyString)
+            Text(presenter.selectedUser?.name ?? AppValue.empty)
                 .font(AppTypography.s4)
                 .foregroundColor(AppColors.slate900)
                 .padding(.top, 32)
@@ -36,7 +36,7 @@ struct BottomSheetMenu: View {
                 }
             } label: {
                 HStack {
-                    Image(systemName: AppText.Icon.pencil)
+                    Image(systemName: AppIcon.edit)
                     Text(AppTextUserMgmtCompBottomSheet.editAccountDetailsButton)
                         .font(AppTypography.p3)
                 }
@@ -57,7 +57,7 @@ struct BottomSheetMenu: View {
                             ProgressView()
                                 .foregroundColor(AppColors.red500)
                         } else {
-                            Image(systemName: AppText.Icon.trash)
+                            Image(systemName: AppIcon.delete)
                             Text(AppTextUserMgmtCompBottomSheet.deleteAccountButton)
                                 .font(AppTypography.p3)
                         }

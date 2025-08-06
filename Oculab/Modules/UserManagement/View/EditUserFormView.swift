@@ -17,7 +17,7 @@ struct EditUserFormView: View {
                 // Success popup
                 if presenter.showSuccessPopup {
                     AppPopup(
-                        image: AppText.Icon.success,
+                        image: AppImage.success,
                         title: AppTextUserMgmtEditUserForm.successTitle,
                         description: "\(AppTextUserMgmtEditUserForm.successDescriptionPrefix) \(presenter.editSuccess.name) \(AppTextUserMgmtEditUserForm.successDescriptionSuffix) \(presenter.editSuccess.role)",
                         buttons: [
@@ -75,7 +75,7 @@ struct EditUserFormView: View {
                             // Save button
                             ZStack {
                                 AppButton(
-                                    title: presenter.isEditing ? AppText.Common.emptyString : AppTextUserMgmtEditUserForm.saveChangesButton,
+                                    title: presenter.isEditing ? AppValue.empty : AppTextUserMgmtEditUserForm.saveChangesButton,
                                     rightIcon: presenter.isEditing ? nil : AppText.Icon.arrowRight,
                                     isEnabled: !presenter.isEditing,
                                     action: {
@@ -117,7 +117,7 @@ struct EditUserFormView: View {
                         Button(action: {
                             presenter.navigateBack()
                         }) {
-                            Image(systemName: AppText.Icon.chevronLeft)
+                            Image(systemName: AppIcon.chevronLeft)
                                 .foregroundColor(.black)
                         }
                     }

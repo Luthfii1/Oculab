@@ -15,7 +15,7 @@ import SwiftUI
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 // Patient icon
-                Image(systemName: AppText.Icon.personFill)
+                Image(systemName: AppIcon.personFill)
                     .foregroundColor(AppColors.orange500)
                     .frame(width: 32, height: 32)
                     .background(Color.orange.opacity(0.2))

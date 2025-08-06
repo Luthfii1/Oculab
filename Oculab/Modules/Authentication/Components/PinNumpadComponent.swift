@@ -23,7 +23,7 @@ struct PinNumpadComponent: View {
                             switch item {
                             case "!":
                                 if authPresenter.isFaceIdEnabled(state: state) {
-                                    Image(systemName: AppText.Icon.faceId)
+                                    Image(systemName: AppIcon.faceId)
                                         .font(.title)
                                         .frame(width: 92, height: 92)
                                         .background(AppColors.slate50)
@@ -37,7 +37,7 @@ struct PinNumpadComponent: View {
                                 }
                             case "delete.left.fill":
                                 // Delete button
-                                Image(systemName: AppText.Icon.deleteLeftFill)
+                                Image(systemName: AppIcon.deleteLeftFill)
                                     .font(.title)
                                     .frame(width: 92, height: 92)
                                     .background(AppColors.slate50)

@@ -30,7 +30,7 @@ struct HomeActivityComponent: View {
                 StatusTagComponent(type: status)
             }
             HStack(spacing: Decimal.d8) {
-                Image(systemName: AppText.Icon.docTextFill)
+                Image(systemName: AppIcon.docTextFill)
                     .padding(Decimal.d8)
                     .background(AppColors.purple50)
                     .foregroundStyle(AppColors.purple500)

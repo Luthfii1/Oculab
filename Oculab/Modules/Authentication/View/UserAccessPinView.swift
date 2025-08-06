@@ -16,7 +16,7 @@ struct UserAccessPinView: View {
             ZStack {
                 if securityPresenter.showAccessPinSuccessPopup {
                     AppPopup(
-                        image: AppText.Icon.success,
+                        image: AppImage.success,
                         title: AppTextAuthUserAccessPin.successTitle,
                         description: AppTextAuthUserAccessPin.successDescription,
                         buttons: [

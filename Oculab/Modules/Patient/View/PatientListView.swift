@@ -42,7 +42,7 @@ struct PatientListView: View {
                         .padding(.top, 40)
                 } else if !presenter.searchText.isEmpty && presenter.filteredPatientNameDoB.isEmpty {
                     VStack(spacing: 20) {
-                        Image(systemName: AppText.Icon.magnifyingglass)
+                        Image(systemName: AppIcon.magnifyingglass)
                             .font(.system(size: 48))
                             .foregroundColor(AppColors.slate300)
                         
@@ -71,8 +71,8 @@ struct PatientListView: View {
                                     presenter.navigateTo(.patientDetail(patientId: patientId))
                                 } label: {
                                     PatientCard(
-                                        name: nameWithDoB.components(separatedBy: " (").first ?? AppText.Common.emptyString,
-                                        birthDate: nameWithDoB.components(separatedBy: " (").last?.replacingOccurrences(of: ")", with: "") ?? AppText.Common.emptyString
+                                        name: nameWithDoB.components(separatedBy: " (").first ?? AppValue.empty,
+                                        birthDate: nameWithDoB.components(separatedBy: " (").last?.replacingOccurrences(of: ")", with: "") ?? AppValue.empty
                                     )
                                 }
                             }

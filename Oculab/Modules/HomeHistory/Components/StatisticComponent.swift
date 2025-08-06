@@ -14,7 +14,7 @@ struct StatisticComponent: View {
     var body: some View {
         VStack(alignment: .center, spacing: 16) {
             HStack(alignment: .center, spacing: 8) {
-                Image(systemName: AppText.Icon.trayFullFill)
+                Image(systemName: AppIcon.trayFullFill)
                     .foregroundStyle(AppColors.purple500)
 
                 Text(AppTextHomeHistCompStatistic.title)

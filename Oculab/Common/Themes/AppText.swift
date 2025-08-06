@@ -101,7 +101,6 @@ enum AppText {
         static let settings = "Pengaturan"
         static let retry = "Coba Lagi"
         static let refresh = "Refresh"
-        static let continue = "Lanjutkan"
         static let confirm = "Konfirmasi"
         
         // Common button patterns

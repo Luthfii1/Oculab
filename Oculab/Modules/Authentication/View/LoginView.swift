@@ -52,7 +52,7 @@ struct LoginView: View {
                     .padding(.top, 12)
                     VStack(alignment: .center, spacing: 16) {
                         AppButton(
-                            title: AppTextAuthLogin.buttonText,
+                            title: presenter.loginButtonText, 
                             colorType: .primary,
                             size: .large,
                             isEnabled: presenter.isFilled

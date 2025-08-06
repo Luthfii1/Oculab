@@ -14,7 +14,7 @@ struct ConfirmationPopups: View {
     var body: some View {
         VStack {
             AppPopup(
-                image: AppText.Icon.confirmLeave,
+                image: AppImage.confirmLeave,
                 title: AppTextExamCompConfirmPopups.unfinishedExaminationTitle,
                 description: AppTextExamCompConfirmPopups.unfinishedExaminationDescription,
                 buttons: [
@@ -29,7 +29,7 @@ struct ConfirmationPopups: View {
             )
 
             AppPopup(
-                image: AppText.Icon.confirm,
+                image: AppImage.confirm,
                 title: AppTextExamCompConfirmPopups.saveResultTitle,
                 description: AppTextExamCompConfirmPopups.saveResultDescription,
                 buttons: [
