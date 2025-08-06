@@ -199,6 +199,18 @@ enum AppText {
         static func view(_ itemType: String) -> String {
             return "Lihat \(itemType)"
         }
+        
+        static func backTo(_ destination: String) -> String {
+            return "Kembali ke \(destination)"
+        }
+        
+        static func startAction(_ actionType: String) -> String {
+            return "Mulai \(actionType)"
+        }
+        
+        static func create(_ itemType: String) -> String {
+            return "Buat \(itemType)"
+        }
     }
     
     // MARK: - Universal States (Used across all modules)
@@ -225,6 +237,18 @@ enum AppText {
         static func failed(_ action: String) -> String {
             return "Gagal \(action)"
         }
+        
+        static func noData(_ itemType: String) -> String {
+            return "Belum ada \(itemType)"
+        }
+        
+        static func notDetermined(_ itemType: String) -> String {
+            return "\(itemType) belum ditentukan"
+        }
+        
+        static func successWith(_ action: String, _ itemType: String) -> String {
+            return "Berhasil \(action) \(itemType)"
+        }
     }
     
     // MARK: - Universal Labels (Common field names)
@@ -236,7 +260,7 @@ enum AppText {
         static let address = "Alamat"
         static let date = "Tanggal"
         static let time = "Waktu"
-        static let MARKs = "Catatan"
+        static let notes = "Catatan"
         static let description = "Deskripsi"
         static let title = "Judul"
         static let type = "Jenis"
@@ -392,13 +416,40 @@ enum AppText {
         static func imageCount(_ current: Int, _ total: Int) -> String {
             return "Gambar \(current) dari \(total)"
         }
+        
+        static func albumTitle(_ itemName: String) -> String {
+            return "Album Gambar \(itemName)"
+        }
+        
+        static func resultTitle(_ itemName: String, _ slideNumber: Int) -> String {
+            return "Hasil Pemeriksaan \(itemName) \(slideNumber)"
+        }
+        
+        static func slideTitle(_ slideNumber: Int) -> String {
+            return "Sediaan \(slideNumber)"
+        }
+        
+        static func slideIdTitle(_ slideNumber: Int) -> String {
+            return "ID Sediaan \(slideNumber)"
+        }
+
+        static func slideIdPlaceholder(_ slideNumber: String) -> String {
+            return "Contoh: \(slideNumber)"
+        }
+        
+        static func slideTypeTitle(_ slideNumber: Int) -> String {
+            return "Jenis Sediaan \(slideNumber)"
+        }
+        
+        static func withPrefix(_ prefix: String, _ content: String) -> String {
+            return "\(prefix) \(content)"
+        }
     }
     
     enum Authentication {
         enum LoginView {
             static let title = "Revolusi Deteksi Bakteri dengan Teknologi AI"
             static let emailPlaceholder = "Contoh: nama.anda@gmail.com"
-            static let passwordTitle = "Kata Sandi"
             static let passwordPlaceholder = "Masukkan kata sandi anda"
             static var buttonText = "Login"
             static let faskesNotRegisteredYet = "Faskes belum terdaftar?"
@@ -411,18 +462,18 @@ enum AppText {
             static let successUpdatePasswordButtonText = "Kembali ke profil"
             static let navigationTitle = "Atur Kata Sandi"
             static let currentPasswordTitle = "Kata Sandi Saat Ini"
-            static let currentPasswordPlaceholder = "Masukkan Kata Sandi"
+            static let currentPasswordPlaceholder = AppForm.placeholder("Kata Sandi")
             static let newPasswordTitle = "Kata Sandi Baru"
-            static let newPasswordPlaceholder = "Masukkan Kata Sandi Baru"
+            static let newPasswordPlaceholder = AppForm.placeholder("Kata Sandi Baru")
             static let newPasswordDescription = "Kata sandi harus terdiri dari minimal 8 karakter"
             static let confirmPasswordTitle = "Konfirmasi Kata Sandi Baru"
-            static let confirmPasswordPlaceholder = "Masukkan Konfirmasi Kata Sandi Baru"
+            static let confirmPasswordPlaceholder = AppForm.placeholder("Konfirmasi Kata Sandi Baru")
         }
 
         enum UserAccessPinView {
             static let successTitle = "PIN Berhasil Diubah"
             static let successDescription = "PIN akses Anda telah berhasil diperbarui"
-            static let successButton = "Kembali ke Profil"
+            static let successButton = AppAction.back + " ke " + AppNav.profile
         }
 
         enum ProfileView {
@@ -495,12 +546,11 @@ enum AppText {
         enum DetailViews {
             static let navigationTitle = "Detail Pemeriksaan"
             static let patientDataTitle = "Data Pasien"
-            static let examinationResult1Title = "Hasil Pemeriksaan Sediaan 1"
-            static let examinationResult2Title = "Hasil Pemeriksaan Sediaan 2"
+            static let examinationResult1Title = AppData.resultTitle("Sediaan", 1)
+            static let examinationResult2Title = AppData.resultTitle("Sediaan", 2)
             static let viewPdfButton = "Lihat PDF"
             static let reportToSitbButton = "Laporkan ke SITB"
             
-            // New examination view specific strings
             static let newExaminationTitle = "Pemeriksaan Baru"
             static let dataPemeriksaanStep = "Data Pemeriksaan"
             static let hasilPemeriksaanStep = "Hasil Pemeriksaan"
@@ -564,7 +614,7 @@ enum AppText {
         enum InterpretationSectionComponent {
             static let selectCategoryPlaceholder = "Pilih kategori"
             static let btaCountPlaceholder = "Contoh: 8"
-            static let staffMARKsPlaceholder = "Contoh: Hanya terdapat 20 bakteri dari 60 lapangan pandang yang terkumpul"
+            static let staffNotesPlaceholder = "Contoh: Hanya terdapat 20 bakteri dari 60 lapangan pandang yang terkumpul"
         }
         
         enum LaborantInfoComponent {
@@ -644,14 +694,10 @@ enum AppText {
             static let navigationTitle = "Riwayat Pemeriksaan"
             static let patientDataTitle = "Data Pasien"
             static let newExaminationButton = "Pemeriksaan Baru"
-            static let loadingPatientMessage = "Memuat data pasien..."
-            static let loadingExaminationsMessage = "Memuat pemeriksaan..."
-            static let noExaminationsMessage = "Belum ada pemeriksaan"
-            static let notDeterminedMessage = "Belum ditentukan"
-        }
-        
-        enum PatientCardComponent {
-            static let birthDatePrefix = "Tanggal Lahir: "
+            static let loadingPatientMessage = AppState.loading("data pasien")
+            static let loadingExaminationsMessage = AppState.loading("pemeriksaan")
+            static let noExaminationsMessage = AppState.noData("pemeriksaan")
+            static let notDeterminedMessage = AppState.notAvailable
         }
         
         enum PatientCardComponent {
@@ -665,39 +711,36 @@ enum AppText {
     
     enum UserManagement {
         enum UserManagementView {
-            static let addNewAccountButton = "Tambah Akun Baru"
+            static let addNewAccountButton = AppAction.add("Akun Baru")
             static let deleteAccountTitle = "Hapus akun"
             static let deleteAccountDescription = "Akun yang sudah dihapus tidak dapat dikembalikan lagi."
-            static let deleteAccountButton = "Hapus Akun"
-            static let deleteSuccessTitle = "Berhasil Menghapus Akun"
+            static let deleteAccountButton = AppAction.delete("Akun")
+            static let deleteSuccessTitle = AppState.success("Menghapus Akun")
             static let deleteSuccessDescription = "Akun berhasil dihapus"
-            static let deletionFailedTitle = "Gagal Menghapus"
+            static let deletionFailedTitle = AppState.failed("Menghapus")
         }
         
         enum NewUserFormView {
-            static let navigationTitle = "Buat Akun Baru"
-            static let successTitle = "Berhasil membuat Akun"
+            static let navigationTitle = AppAction.create("Akun Baru")
+            static let successTitle = AppState.success("membuat Akun")
             static let successDescriptionPrefix = "Anda telah berhasil menambahkan akun baru untuk"
             static let successDescriptionSuffix = "dengan role"
-            static let createAnotherAccountButton = "Buat Akun Lain"
-            static let backToAccountListButton = "Kembali ke Daftar Akun"
+            static let createAnotherAccountButton = AppAction.create("Akun Lain")
+            static let backToAccountListButton = AppAction.backTo("Daftar Akun")
             static let roleLabPlaceholder = "Laboran"
             static let roleAdminChoice = "Admin"
-            static let namePlaceholder = "John Doe"
-            static let emailPlaceholder = "john@gmail.com"
-            static let registerAccountButton = "Daftarkan Akun"
-            static let registrationFailedTitle = "Pendaftaran Gagal"
+            static let registerAccountButton = AppAction.save("Akun")
+            static let registrationFailedTitle = AppState.failed("Pendaftaran")
         }
         
         enum EditUserFormView {
             static let navigationTitle = "Edit Akun"
-            static let successTitle = "Berhasil mengubah Akun"
+            static let successTitle = AppState.success("mengubah Akun")
             static let successDescriptionPrefix = "Anda telah berhasil mengubah akun untuk"
             static let successDescriptionSuffix = "dengan role"
-            static let backToAccountListButton = "Kembali ke Daftar Akun"
-            static let namePlaceholder = "Masukkan nama"
+            static let backToAccountListButton = AppAction.backTo("Daftar Akun")
             static let emailDisabledDescription = "Email tidak dapat diubah"
-            static let editFailedTitle = "Gagal Mengubah"
+            static let editFailedTitle = AppState.failed("Mengubah")
         }
         
         enum UserListView {
@@ -772,12 +815,12 @@ enum AppText {
             static let reviewAgainButton = "Periksa Kembali"
             static let screeningChoice = "Skrinning"
             static let followUpChoice = "Follow Up"
-            static let slideId1Title = "ID Sediaan 1"
-            static let slideId1Placeholder = "Contoh: 24/11/1/0123A"
-            static let slideType1Title = "Jenis Sediaan 1"
-            static let slideId2Title = "ID Sediaan 2"
-            static let slideId2Placeholder = "Contoh: 24/11/1/0123A"
-            static let slideType2Title = "Jenis Sediaan 2"
+            static let slideId1Title = AppData.slideIdTitle(1)
+            static let slideId1Placeholder = AppData.slideIdPlaceholder("24/11/1/0123A")
+            static let slideType1Title = AppData.slideTypeTitle(1)
+            static let slideId2Title = AppData.slideIdTitle(2)
+            static let slideId2Placeholder = AppData.slideIdPlaceholder("24/11/1/0123B")
+            static let slideType2Title = AppData.slideTypeTitle(2)
             static let morningChoice = "Pagi"
             static let anytimeChoice = "Sewaktu"
             static let createTaskFinalButton = "Buat Tugas"
@@ -806,9 +849,13 @@ enum AppText {
         }
         
         enum FOVDetailView {
-            static let loadingDataMessage = "Memuat data pemeriksaan..."
-            static let bacteriaCountPrefix = "Jumlah Bakteri: "
-            static let slideIdPrefix = "ID "
+            static let loadingDataMessage = AppState.loading("data pemeriksaan")
+            static func bacteriaCountPrefix(_ count: String) -> String {
+                return AppData.withPrefix("Jumlah Bakteri:", count)
+            }
+            static func slideIdPrefix(_ id: String) -> String {
+                return AppData.withPrefix("ID", id)
+            }
         }
         
         enum PDFView {
@@ -817,7 +864,7 @@ enum AppText {
             static let examinationIdLabel = "ID Pemeriksaan"
             static let takenAtLabel = "Diambil di"
             static let officerLabel = "Petugas"
-            static let noMARKsDefault = "Tidak ada catatan"
+            static let noNotesDefault = "Tidak ada catatan"
             static let reportingHeaderTitle = "Pelaporan"
             static let observationResultsHeaderTitle = "Hasil Pengamatan"
             
@@ -831,7 +878,9 @@ enum AppText {
         }
         
         enum FOVAlbumView {
-            static let navigationTitleFormat = "Album Gambar %@"
+            static func navigationTitleFormat(_ itemName: String) -> String {
+                return AppData.albumTitle(itemName)
+            }
         }
         
         enum ZoomableImageComponent {
