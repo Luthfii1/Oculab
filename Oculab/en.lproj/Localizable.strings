@@ -1,78 +1,160 @@
 /* 
   Localizable.strings (English)
-  Oculab
+  Oculab - Improved Structure
 */
 
-// MARK: - Common
+// MARK: - Universal Actions
 "common.ok" = "OK";
 "common.cancel" = "Cancel";
-"common.close" = "Close";
 "common.save" = "Save";
 "common.delete" = "Delete";
 "common.edit" = "Edit";
+"common.close" = "Close";
 "common.next" = "Next";
 "common.back" = "Back";
-"common.error" = "Error";
+"common.done" = "Done";
+"common.retry" = "Retry";
+"common.refresh" = "Refresh";
+"common.continue" = "Continue";
+"common.skip" = "Skip";
+"common.confirm" = "Confirm";
+
+// MARK: - Universal States
+"state.loading" = "Loading...";
+"state.empty" = "No data available";
+"state.error" = "Error occurred";
+"state.success" = "Success";
+"state.pending" = "Pending";
+"state.not_available" = "Not Available";
+"state.unknown" = "Unknown";
+"state.completed" = "Completed";
+"state.in_progress" = "In Progress";
+
+// MARK: - Universal Labels
+"label.name" = "Name";
+"label.email" = "Email";
+"label.password" = "Password";
+"label.phone" = "Phone";
+"label.address" = "Address";
+"label.date" = "Date";
+"label.time" = "Time";
+"label.notes" = "Notes";
+"label.description" = "Description";
+"label.title" = "Title";
+"label.type" = "Type";
+"label.status" = "Status";
+"label.result" = "Result";
+"label.category" = "Category";
+
+// MARK: - Patient Data
+"patient.name" = "Name";
+"patient.nik" = "NIK";
+"patient.dob" = "Date of Birth";
+"patient.gender" = "Gender";
+"patient.bpjs" = "BPJS Number";
+"patient.age" = "Age";
+"patient.age_suffix" = " years old";
+"patient.gender.male" = "Male";
+"patient.gender.female" = "Female";
+"patient.placeholder.name" = "Enter patient name";
+"patient.placeholder.nik" = "e.g., 167012039484700";
+"patient.placeholder.bpjs" = "e.g., 1240630077675";
+"patient.placeholder.select_date" = "Select date";
+
+// MARK: - Medical Terms
+"medical.bta.negative" = "Negative";
+"medical.bta.scanty" = "Scanty";
+"medical.bta.positive1" = "Positive (1+)";
+"medical.bta.positive2" = "Positive (2+)";
+"medical.bta.positive3" = "Positive (3+)";
+"medical.bta.desc.negative" = "No BTA found in 100 fields of view";
+"medical.bta.desc.scanty" = "1-9 BTA found in 100 fields of view";
+"medical.bta.desc.positive1" = "10-99 BTA found in 100 fields of view";
+"medical.bta.desc.positive2" = "1-9 BTA per field of view, minimum 50 fields";
+"medical.bta.desc.positive3" = "≥10 BTA per field of view, minimum 20 fields";
+
+"medical.exam.purpose" = "Examination Purpose";
+"medical.exam.result" = "Examination Result";
+"medical.exam.interpretation" = "Interpretation";
+"medical.exam.staff_interpretation" = "Staff Interpretation";
+"medical.exam.system_interpretation" = "System Interpretation";
+"medical.exam.bacteria_count" = "Bacteria Count";
+"medical.exam.slide_id" = "Slide ID";
+"medical.exam.specimen_type" = "Specimen Type";
+
+"medical.confidence.perfect" = "Perfect (100%)";
+"medical.confidence.high" = "High (90-99%)";
+"medical.confidence.medium" = "Medium (70-89%)";
+"medical.confidence.low" = "Low (50-69%)";
+"medical.confidence.very_low" = "Very Low (10-49%)";
+"medical.confidence.unpredicted" = "Unpredicted (0-9%)";
+
+// MARK: - Search & Filter
+"search.placeholder" = "Search...";
+"search.no_results" = "No results found";
+"search.clear" = "Clear search";
+"search.searching" = "Searching...";
+"search.patient.placeholder" = "Search patient name";
+"search.account.placeholder" = "Search account";
+
+// MARK: - Forms
+"form.optional" = "(optional)";
+"form.select_option" = "Select an option";
+"form.enter_value" = "Enter value";
+"form.validation.required" = "This field is required";
+"form.validation.invalid" = "Invalid format";
+"form.validation.too_short" = "Too short";
+"form.validation.too_long" = "Too long";
+
+// MARK: - Navigation
+"nav.profile" = "Profile";
+"nav.history" = "History";
+"nav.examination" = "Examination";
+"nav.patients" = "Patients";
+"nav.settings" = "Settings";
+"nav.account_management" = "Account Management";
 
 // MARK: - Authentication
 "auth.login.title" = "Revolutionizing Bacterial Detection with AI Technology";
-"auth.login.email" = "Email";
-"auth.login.email.placeholder" = "Example: your.name@gmail.com";
-"auth.login.password" = "Password";
-"auth.login.password.placeholder" = "Enter your password";
-"auth.login.button" = "Login";
-"auth.login.not_registered" = "Health facility not registered yet?";
+"auth.login.subtitle" = "Advanced microscopy analysis for healthcare professionals";
+"auth.login.forgot_password" = "Forgot password?";
+"auth.login.not_registered" = "Health facility not registered?";
 "auth.login.register_facility" = "Register Health Facility";
 
-// MARK: - Profile
-"profile.title" = "Profile";
-"profile.account_info" = "Account Information";
-"profile.email" = "Email";
-"profile.role" = "Role";
-"profile.job_title" = "Job Title";
-"profile.job_title.value" = "Medical Laboratory Technologist";
-"profile.health_facility" = "Health Facility";
-"profile.account_management" = "Account Management";
-"profile.edit_password" = "Change Password";
-"profile.edit_pin" = "Change PIN";
-"profile.face_id" = "Face ID";
-"profile.privacy_policy" = "Privacy Policy";
-"profile.logout" = "Logout";
+"auth.profile.account_info" = "Account Information";
+"auth.profile.job_title" = "Job Title";
+"auth.profile.job_title_value" = "Medical Laboratory Technologist";
+"auth.profile.health_facility" = "Health Facility";
+"auth.profile.edit_password" = "Change Password";
+"auth.profile.edit_pin" = "Change PIN";
+"auth.profile.face_id" = "Face ID";
+"auth.profile.privacy_policy" = "Privacy Policy";
+"auth.profile.logout" = "Logout";
 
 // MARK: - Examination
-"exam.new" = "New Examination";
-"exam.detail.title" = "Examination Details";
-"exam.patient_data" = "Patient Data";
-"exam.patient.name" = "Name";
-"exam.patient.nik" = "NIK";
-"exam.patient.dob" = "Date of Birth";
-"exam.patient.sex" = "Gender";
-"exam.patient.bpjs" = "BPJS Number";
-"exam.result.title" = "Examination Results";
-"exam.interpretation.staff" = "Staff Interpretation";
-"exam.interpretation.system" = "System Interpretation";
-"exam.not_available" = "Not Available";
-"exam.view_pdf" = "View PDF";
-"exam.report_sitb" = "Report to SITB";
+"exam.progress.analyzing" = "Analyzing data";
+"exam.progress.processing" = "Processing examination";
+"exam.detail.patient_data" = "Patient Data";
+"exam.detail.slide_detail" = "Slide Details";
+"exam.detail.view_pdf" = "View PDF";
+"exam.detail.report_sitb" = "Report to SITB";
+"exam.steps.data_collection" = "Data Collection";
+"exam.steps.examination" = "Examination";
+"exam.steps.results" = "Results";
 
-// MARK: - Patient
-"patient.new" = "New Patient Data";
-"patient.edit" = "Edit Patient Data";
-"patient.add_new" = "Add New Patient";
-"patient.save" = "Save Patient Data";
-"patient.search.placeholder" = "Search patient name";
-"patient.no_results" = "No results for";
-"patient.clear_search" = "Clear Search";
-"patient.history" = "Examination History";
-"patient.new_examination" = "New Examination";
-"patient.no_examinations" = "No examinations yet";
+// MARK: - Error Messages
+"error.general" = "An error occurred";
+"error.network" = "Network connection error";
+"error.authentication" = "Authentication failed";
+"error.validation" = "Validation error";
+"error.not_found" = "Data not found";
+"error.permission_denied" = "Permission denied";
+"error.camera_access" = "Camera access denied. Please enable camera access in Settings.";
+"error.unknown" = "Unknown error occurred";
 
-// MARK: - Video Record
-"video.instruction.title" = "Examination Instructions";
-"video.preparation" = "Examination Preparation";
-"video.recording_instruction" = "Image Capture Instructions";
-"video.start_recording" = "Start Image Capture";
-"video.save" = "Save Video";
-"video.retake" = "Retake";
-"video.take_image" = "Take Image";
-"video.preview" = "Preview Video";
+// MARK: - Success Messages
+"success.saved" = "Successfully saved";
+"success.deleted" = "Successfully deleted";
+"success.updated" = "Successfully updated";
+"success.created" = "Successfully created";
+"success.completed" = "Successfully completed";
