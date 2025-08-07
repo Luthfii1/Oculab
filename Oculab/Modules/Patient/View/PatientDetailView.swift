@@ -17,25 +17,25 @@ struct PatientDetailView: View {
                 if !presenter.isLoadingPatient && !presenter.patient.name.isEmpty {
                     Spacer().frame(height: Decimal.d24)
                     
-                    AppCard(icon: AppText.Icon.personFill, title: AppTextPatientDetail.patientDataTitle, spacing: Decimal.d16, isEnablingEdit: true) {
+                    AppCard(icon: AppIcon.personFill, title: AppTextPatientDetail.patientDataTitle, spacing: Decimal.d16, isEnablingEdit: true) {
                         ExtendedCard(data: [
-                            (AppTextPatientDetail.patientNameKey, presenter.patient.name),
-                            (AppTextPatientDetail.patientNikKey, presenter.patient.NIK),
-                            (AppTextPatientDetail.patientDobKey, presenter.formatDate(presenter.patient.DoB)),
-                            (AppTextPatientDetail.patientSexKey, presenter.patient.sex.rawValue),
-                            (AppTextPatientDetail.patientBpjsKey, presenter.patient.BPJS ?? AppValue.empty),
+                            (AppPatient.name, presenter.patient.name),
+                            (AppPatient.nik, presenter.patient.NIK),
+                            (AppPatient.dateOfBirth, presenter.formatDate(presenter.patient.DoB)),
+                            (AppPatient.gender, presenter.patient.sex.rawValue),
+                            (AppPatient.bpjsNumber, presenter.patient.BPJS ?? AppValue.empty),
                         ], titleSize: AppTypography.s5)
                     } action: {
                         presenter.navigateTo(.patientForm(patientId: patientId))
                     }
                     
                     AppCard(
-                        icon: AppText.Icon.textBadgeCheckmark,
+                        icon: AppIcon.textBadgeCheckmark,
                         title: AppTextPatientDetail.examinationResultTitle,
                         spacing: Decimal.d16,
                         isBorderDisabled: true
                     ) {
-                        AppButton(title: AppTextPatientDetail.newExaminationButton, leftIcon: AppText.Icon.docBadgePlusIcon) {
+                        AppButton(title: AppAction.create("Pemeriksaan"), leftIcon: AppIcon.docBadgePlus) {
                             presenter.navigateTo(.inputPatientData(patientId: patientId))
                         }
                         
@@ -82,7 +82,7 @@ struct PatientDetailView: View {
                         presenter.navigateBack()
                     }) {
                         HStack {
-                            Image(AppText.Icon.back)
+                            Image(AppImage.back)
                         }
                     }
                 }

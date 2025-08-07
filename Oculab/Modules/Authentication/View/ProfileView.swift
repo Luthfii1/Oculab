@@ -17,14 +17,14 @@ struct ProfileView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .center, spacing: 20) {
                     ExtendableCard(
-                        icon: AppText.Icon.personFill,
+                        icon: AppIcon.personFill,
                         title: AppTextAuthProfile.accountInfoTitle,
                         isExtendable: false,
                         data: [
-                            (key: AppTextAuthProfile.emailKey, value: authPresenter.user.email ?? authPresenter.user.name),
-                            (key: AppTextAuthProfile.roleKey, value: authPresenter.user.role.rawValue.capitalized),
+                            (key: AppLabel.email, value: authPresenter.user.email ?? authPresenter.user.name),
+                            (key: AppLabel.role, value: authPresenter.user.role.rawValue.capitalized),
                             (key: AppTextAuthProfile.jobTitleKey, value: AppTextAuthProfile.jobTitleValue),
-                            (key: AppTextAuthProfile.healthFacilityKey, value: authPresenter.user.healthFacilityName ?? AppTextAuthProfile.healthFacilityDefault),
+                            (key: AppTextAuthProfile.healthFacilityKey, value: authPresenter.user.healthFacilityName ?? AppState.notAvailable),
                         ],
                         titleSize: AppTypography.s4_1,
                         titleCard: authPresenter.user.name
@@ -32,9 +32,9 @@ struct ProfileView: View {
 
                     if authPresenter.user.role == .ADMIN {
                         AppButton(
-                            title: AppTextAuthProfile.accountManagementButton,
-                            leftIcon: AppText.Icon.personFill,
-                            rightIcon: AppText.Icon.arrowRight,
+                            title: AppNav.accountManagement,
+                            leftIcon: AppIcon.personFill,
+                            rightIcon: AppIcon.arrowRight,
                             colorType: .tertiary,
                             titleColor: AppColors.slate900
                         ) {
@@ -51,8 +51,8 @@ struct ProfileView: View {
 
                     AppButton(
                         title: AppTextAuthProfile.editPasswordButton,
-                        leftIcon: AppText.Icon.lock,
-                        rightIcon: AppText.Icon.arrowRight,
+                        leftIcon: AppIcon.lock,
+                        rightIcon: AppIcon.arrowRight,
                         colorType: .tertiary,
                         titleColor: AppColors.slate900
                     ) {
@@ -68,8 +68,8 @@ struct ProfileView: View {
 
                     AppButton(
                         title: AppTextAuthProfile.editPinButton,
-                        leftIcon: AppText.Icon.lockCircleDotted,
-                        rightIcon: AppText.Icon.arrowRight,
+                        leftIcon: AppIcon.lockCircleDotted,
+                        rightIcon: AppIcon.arrowRight,
                         colorType: .tertiary,
                         titleColor: AppColors.slate900
                     ) {
@@ -114,8 +114,8 @@ struct ProfileView: View {
 
                     AppButton(
                         title: AppTextAuthProfile.privacyPolicyButton,
-                        leftIcon: AppText.Icon.lockShield,
-                        rightIcon: AppText.Icon.arrowRight,
+                        leftIcon: AppIcon.lockShield,
+                        rightIcon: AppIcon.arrowRight,
                         colorType: .tertiary,
                         titleColor: AppColors.slate900
                     ) {
@@ -129,7 +129,7 @@ struct ProfileView: View {
                             .stroke(AppColors.slate100)
                     )
 
-                    AppButton(title: AppTextAuthProfile.logoutButton, rightIcon: AppText.Icon.doorRightHandOpen, colorType: .destructive(.secondary)) {
+                    AppButton(title: AppAction.exit, rightIcon: AppIcon.doorRightHandOpen, colorType: .destructive(.secondary)) {
                         profilePresenter.logout()
                     }
 
@@ -137,7 +137,7 @@ struct ProfileView: View {
                 }
                 .padding(20)
             }
-            .navigationTitle(AppTextAuthProfile.navigationTitle)
+            .navigationTitle(AppNav.profile)
         }
     }
 }

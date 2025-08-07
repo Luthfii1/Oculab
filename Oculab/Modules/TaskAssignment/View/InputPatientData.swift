@@ -29,7 +29,7 @@ struct InputPatientData: View {
                         // PIC Dropdown
                         AppDropdown(
                                 title: AppTextTaskAssignInputPatient.picTitle,
-                                placeholder: AppTextTaskAssignInputPatient.picPlaceholder,
+                                placeholder: AppForm.select("Petugas"),
                                 leftIcon: "person.fill",
                                 choices: presenter.picName,
                                 selectedChoice: $presenter.selectedPIC
@@ -37,8 +37,8 @@ struct InputPatientData: View {
                         
                         // Patient Search Dropdown
                         AppDropdown(
-                            title: AppTextTaskAssignInputPatient.patientNameTitle,
-                            placeholder: patientId != nil ? AppTextTaskAssignInputPatient.patientNamePlaceholderAutoSelected : AppTextTaskAssignInputPatient.patientNamePlaceholder,
+                            title: AppPatient.name,
+                            placeholder: patientId != nil ? "Pasien dipilih otomatis" : AppSearch.Patient.placeholder,
                             leftIcon: "person.fill",
                             rightIcon: "",
                             choices: presenter.patientNameDoB,
@@ -70,7 +70,7 @@ struct InputPatientData: View {
                     }
                     .padding(.horizontal, Decimal.d20)
                 }
-                .navigationTitle(AppTextTaskAssignInputPatient.navigationTitle)
+                .navigationTitle("Data Pasien")
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationBarBackButtonHidden(true)
                 .toolbar {
@@ -79,7 +79,7 @@ struct InputPatientData: View {
                             Router.shared.navigateBack()
                         }) {
                             HStack {
-                                Image(AppText.Icon.destroy)
+                                Image(AppImage.destroy)
                             }
                         }
                     }
@@ -124,7 +124,7 @@ struct InputPatientData: View {
     }
 }
 
-#Preview("With Patient") {
-    InputPatientData(patientId: "d0c1a2b3-4f5e-6789-91ab-cdef12345678")
-}
+//#Preview("With Patient") {
+//    InputPatientData(patientId: "d0c1a2b3-4f5e-6789-91ab-cdef12345678")
+//}
 

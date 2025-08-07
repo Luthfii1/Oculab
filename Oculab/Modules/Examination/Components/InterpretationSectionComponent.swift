@@ -23,7 +23,7 @@ struct InterpretationSectionComponent: View {
             HStack {
                 Image(systemName: AppIcon.photo)
                     .foregroundColor(AppColors.purple500)
-                Text(AppTextExamCompInterpretationSection.interpretationResultTitle)
+                Text("Hasil Interpretasi")
                     .font(AppTypography.s4_1)
                     .padding(.leading, Decimal.d8)
                 Spacer()
@@ -37,10 +37,10 @@ struct InterpretationSectionComponent: View {
             )
 
             AppDropdown(
-                title: AppTextExamCompInterpretationSection.staffInterpretationTitle,
-                placeholder: AppTextExamCompInterpretationSection.selectCategoryPlaceholder,
+                title: AppMedical.Examination.staffInterpretation,
+                placeholder: AppForm.selectOption,
                 isRequired: false,
-                rightIcon: AppText.Icon.chevronDown,
+                rightIcon: AppIcon.down,
                 choices: GradingType.allCases.dropLast().map { ($0.rawValue, $0.rawValue) },
                 selectedChoice: $presenter.selectedTBGrade
             )
@@ -48,7 +48,7 @@ struct InterpretationSectionComponent: View {
 
             if presenter.selectedTBGrade == GradingType.SCANTY.rawValue {
                 AppTextField(
-                    title: AppTextExamCompInterpretationSection.btaCountTitle,
+                    title: AppMedical.Examination.bacteriaCount,
                     placeholder: AppTextExamCompInterpretationSection.btaCountPlaceholder,
                     isNumberOnly: true,
                     text: $presenter.numOfBTA
@@ -57,7 +57,7 @@ struct InterpretationSectionComponent: View {
             }
 
             AppTextBox(
-                title: AppTextExamCompInterpretationSection.staffNotesTitle,
+                title: AppLabel.notes,
                 placeholder: AppTextExamCompInterpretationSection.staffNotesPlaceholder,
                 text: $presenter.inspectorNotes
             )
@@ -65,7 +65,7 @@ struct InterpretationSectionComponent: View {
 
             AppButton(
                 title: presenter.buttonTitle,
-                rightIcon: AppText.Icon.checkmark,
+                rightIcon: AppIcon.checkmark,
                 isEnabled: presenter.isEnableToSubmit()
             ) {
                 presenter.isVerifPopUpVisible = true
@@ -74,7 +74,7 @@ struct InterpretationSectionComponent: View {
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
                 Spacer()
-                Button(AppTextExamCompInterpretationSection.doneButton) {
+                Button(AppAction.done) {
                     focusedField = nil
                 }
             }

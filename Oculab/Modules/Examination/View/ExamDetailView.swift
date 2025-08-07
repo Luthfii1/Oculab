@@ -38,30 +38,30 @@ struct ExamDetailView: View {
                             )
 
                             AppCard(
-                                icon: AppText.Icon.personFill,
-                                title: AppTextExamDetail.patientDataTitle,
+                                icon: AppIcon.personFill,
+                                title: "Data Pasien",
                                 spacing: Decimal.d8,
                                 isBorderDisabled: true
                             ) {
                                 ExtendedCard(data: [
-                                    (key: AppTextExamDetail.patientNameKey, value: presenter.patientDetailData.name),
-                                    (key: AppTextExamDetail.patientNikKey, value: presenter.patientDetailData.nik),
-                                    (key: AppTextExamDetail.patientDobKey, value: presenter.patientDetailData.dob),
-                                    (key: AppTextExamDetail.patientSexKey, value: presenter.patientDetailData.sex),
-                                    (key: AppTextExamDetail.patientBpjsKey, value: presenter.patientDetailData.bpjs)
+                                    (key: AppPatient.name, value: presenter.patientDetailData.name),
+                                    (key: AppPatient.nik, value: presenter.patientDetailData.nik),
+                                    (key: AppPatient.dateOfBirth, value: presenter.patientDetailData.dob),
+                                    (key: AppPatient.gender, value: presenter.patientDetailData.sex),
+                                    (key: AppPatient.bpjsNumber, value: presenter.patientDetailData.bpjs)
                                 ], titleSize: AppTypography.s5)
                             }
 
                             AppCard(
-                                icon: AppText.Icon.docTextMagnifyingglass,
+                                icon: AppIcon.docTextMagnifyingglass,
                                 title: AppTextExamDetail.slideDetailTitle,
                                 spacing: Decimal.d8,
                                 isBorderDisabled: true
                             ) {
                                 ExtendedCard(data: [
-                                    (key: AppTextExamDetail.slideIdKey, value: presenter.examDetailData.slideId),
-                                    (key: AppTextExamDetail.examinationGoalKey, value: presenter.examDetailData.examinationGoal),
-                                    (key: AppTextExamDetail.preparationTypeKey, value: presenter.examDetailData.type)
+                                    (key: AppMedical.Examination.slideId, value: presenter.examDetailData.slideId),
+                                    (key: AppMedical.Examination.purpose, value: presenter.examDetailData.examinationGoal),
+                                    (key: AppMedical.Examination.specimenType, value: presenter.examDetailData.type)
                                 ], titleSize: AppTypography.s5)
                             }
 
@@ -80,7 +80,7 @@ struct ExamDetailView: View {
 
                     AppButton(
                         title: presenter.buttonTitle,
-                        rightIcon: AppText.Icon.arrowRight,
+                        rightIcon: AppIcon.arrowRight,
                         size: .large,
                         isEnabled: presenter.buttonEnabled()
                     ) {
@@ -102,7 +102,7 @@ struct ExamDetailView: View {
                             Router.shared.navigateBack()
                         }) {
                             HStack {
-                                Image(AppText.Icon.back)
+                                Image(AppImage.back)
                             }
                         }
                     }

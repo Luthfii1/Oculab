@@ -32,7 +32,7 @@ struct FinishedExaminationCard: View {
             // Slide ID with icon and result tag
             HStack {
                 HStack(spacing: Decimal.d8) {
-                    Image(systemName: AppIcon.docTextFill)
+                    Image(systemName: AppIcon.documentFill)
                         .padding(Decimal.d8)
                         .background(AppColors.purple50)
                         .foregroundStyle(AppColors.purple500)
@@ -54,7 +54,7 @@ struct FinishedExaminationCard: View {
                     .cornerRadius(Decimal.d6)
             }
             
-            Text(AppTextHomeHistCompFinishedExamCard.patientLabel)
+            Text("Pasien")
                 .font(AppTypography.s6)
                 .foregroundStyle(AppColors.slate300)
             Text("\(patientName) (\(patientDOB))")

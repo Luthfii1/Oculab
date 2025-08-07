@@ -20,9 +20,9 @@ struct PatientDisplayField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
             AppTextField(
-                title: AppTextTaskAssignCompPatientDisplay.nikTitle,
+                title: AppPatient.nik,
                 isRequired: true,
-                placeholder: AppTextTaskAssignCompPatientDisplay.nikPlaceholder,
+                placeholder: AppPatient.Placeholder.nik,
                 isDisabled: presenter.patientFound,
                 isNumberOnly: true,
                 length: 16,
@@ -31,9 +31,9 @@ struct PatientDisplayField: View {
             .focused($focusedField, equals: .nik)
 
             DateField(
-                title: AppTextTaskAssignCompPatientDisplay.birthDateTitle,
+                title: AppPatient.dateOfBirth,
                 isRequired: true,
-                placeholder: AppTextTaskAssignCompPatientDisplay.birthDatePlaceholder,
+                placeholder: AppPatient.Placeholder.selectDate,
                 rightIcon: "calendar",
                 isDisabled: presenter.patientFound,
                 date: $presenter.selectedDoB
@@ -43,17 +43,17 @@ struct PatientDisplayField: View {
             }
 
             AppRadioButton(
-                title: AppTextTaskAssignCompPatientDisplay.genderTitle,
+                title: AppPatient.gender,
                 isRequired: true,
-                choices: [AppTextTaskAssignCompPatientDisplay.femaleChoice, AppTextTaskAssignCompPatientDisplay.maleChoice],
+                choices: [AppPatient.Gender.female, AppPatient.Gender.male],
                 isDisabled: presenter.patientFound,
                 selectedChoice: $presenter.selectedSex
             )
             .onChange(of: presenter.selectedSex) {
                 switch presenter.selectedSex {
-                case "Perempuan":
+                case AppPatient.Gender.female:
                     presenter.patient.sex = .FEMALE
-                case "Laki-laki":
+                case AppPatient.Gender.male:
                     presenter.patient.sex = .MALE
                 default:
                     presenter.patient.sex = .UNKNOWN
@@ -61,8 +61,8 @@ struct PatientDisplayField: View {
             }
 
             AppTextField(
-                title: AppTextTaskAssignCompPatientDisplay.bpjsTitle,
-                placeholder: AppTextTaskAssignCompPatientDisplay.bpjsPlaceholder,
+                title: AppPatient.bpjsNumber,
+                placeholder: AppPatient.Placeholder.bpjs,
                 isDisabled: presenter.patientFound,
                 isNumberOnly: true,
                 length: 13,
@@ -76,7 +76,7 @@ struct PatientDisplayField: View {
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
                 Spacer()
-                Button(AppTextTaskAssignCompPatientDisplay.doneButton) {
+                Button(AppAction.done) {
                     focusedField = nil
                 }
             }

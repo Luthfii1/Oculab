@@ -18,10 +18,11 @@ typealias AppTextHomeHistCompHalfCircleProgress = AppText.HomeHistory.HalfCircle
 
 extension AppText {
     enum HomeHistory {
-        static let loadingMessage = "Memuat data pemeriksaan anda"
         static let noExaminationMessage = "Tidak ada pemeriksaan diselesaikan pada"
+        static let emptyStateImageName = "Empty"
 
         static let navigationTitleHome = "Tugas Pemeriksaan"
+        static let navigationTitleHistory = "Riwayat Pemeriksaan"
         static let taskSectionTitle = "Tugas Pemeriksaan"
         static let newExaminationButton = "Pemeriksaan Baru"
         static let noTaskMessage = "Anda belum ditugaskan untuk melakukan pemeriksaan"
@@ -39,12 +40,10 @@ extension AppText {
             static let tasksInTotalSuffix = "Tugas"
             static let positiveLabel = "Positif"
             static let negativeLabel = "Negatif"
-            static let pendingLabel = "Pending"
         }
         
         enum WeeklyCalendarComponent {
             static let title = "Pemeriksaan Selesai"
-            static let selectDatePickerTitle = "Pilih Tanggal"
         }
         
         enum HomeActivityComponent {
@@ -56,7 +55,7 @@ extension AppText {
         }
         
         enum HalfCircleProgressComponent {
-            // This component doesn't have hardcoded strings, but keeping for consistency
+            // Uses AppValue.percentage directly
         }
     }
 }

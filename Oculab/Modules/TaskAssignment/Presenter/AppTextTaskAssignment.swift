@@ -19,8 +19,6 @@ extension AppText {
             static let stepTitles = ["Data Pasien", "Data Sediaan", "Hasil"]
             static let currentStepIndex = 0
             static let picTitle = "Petugas Pemeriksaan"
-            static let picPlaceholder = "Pilih Petugas"
-            static let patientNamePlaceholder = "Cari nama pasien"
             static let patientNamePlaceholderAutoSelected = "Pasien dipilih otomatis"
             static let patientNameDescription = "Pilih atau masukkan data pasien baru"
             static let patientNameDescriptionAutoSelected = "Pasien telah dipilih dari riwayat"

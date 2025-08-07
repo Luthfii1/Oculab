@@ -13,13 +13,11 @@ typealias AppTextExamDetail = AppText.Examination.DetailViews
 typealias AppTextExamGuidelines = AppText.Examination.GuidelinesOnboardingView
 typealias AppTextExamSavedResult = AppText.Examination.SavedResultView
 typealias AppTextExamCompConfirmPopups = AppText.Examination.ConfirmationPopupsComponent
-typealias AppTextExamCompGradingCard = AppText.Examination.GradingCardComponent
 typealias AppTextExamCompImageSection = AppText.Examination.ImageSectionComponent
 typealias AppTextExamCompInterpretationSection = AppText.Examination.InterpretationSectionComponent
 typealias AppTextExamCompLabInfo = AppText.Examination.LaborantInfoComponent
 typealias AppTextExamCompHeaderView = AppText.Examination.HeaderViewComponent
 typealias AppTextExamCompFolderCard = AppText.Examination.FolderCardComponent
-typealias AppTextExamCompExtendableCard = AppText.Examination.ExtendableCardComponent
 
 extension AppText {
     enum Examination {
@@ -31,10 +29,8 @@ extension AppText {
         
         enum DetailViews {
             static let navigationTitle = "Detail Pemeriksaan"
-            static let patientDataTitle = "Data Pasien"
             static let examinationResult1Title = AppData.resultTitle("Sediaan", 1)
             static let examinationResult2Title = AppData.resultTitle("Sediaan", 2)
-            static let viewPdfButton = "Lihat PDF"
             static let reportToSitbButton = "Laporkan ke SITB"
             
             static let newExaminationTitle = "Pemeriksaan Baru"
@@ -73,32 +69,20 @@ extension AppText {
         }
         
         enum SavedResultView {
-            static let examinationDetailTitle = "Detail Pemeriksaan"
-            static let examinationReasonKey = "Alasan Pemeriksaan"
-            static let imageResultTitle = "Hasil Gambar"
-            static let imageResultInstruction = "Ketuk untuk lihat detail gambar"
             static let systemInterpretationWarning = "Interpretasi sistem bukan merupakan hasil akhir untuk pasien"
         }
         
         enum ConfirmationPopupsComponent {
             static let unfinishedExaminationTitle = "Pemeriksaan Belum Selesai"
             static let unfinishedExaminationDescription = "Pemeriksaan disimpan sebagai draft dan dapat diakses di halaman riwayat"
-            static let reviewAgainButton = "Periksa Kembali"
-            static let saveResultTitle = "Simpan Hasil Pemeriksaan"
             static let saveResultDescription = "Hasil pemeriksaan yang sudah disimpan tidak dapat diubah kembali"
         }
         
-        enum GradingCardComponent {
-            // This component doesn't have hardcoded strings, but keeping for consistency
-        }
-        
         enum ImageSectionComponent {
-            static let imageResultTitle = "Hasil Gambar"
             static let imageResultInstruction = "Ketuk untuk lihat detail gambar"
         }
         
         enum InterpretationSectionComponent {
-            static let selectCategoryPlaceholder = "Pilih kategori"
             static let btaCountPlaceholder = "Contoh: 8"
             static let staffNotesPlaceholder = "Contoh: Hanya terdapat 20 bakteri dari 60 lapangan pandang yang terkumpul"
         }
@@ -109,15 +93,11 @@ extension AppText {
         }
         
         enum FolderCardComponent {
-            // This component doesn't have hardcoded strings, but keeping for consistency
+            static let imageCountSuffix = "Gambar"
         }
         
         enum HeaderViewComponent {
             static let newExaminationTitle = "Pemeriksaan Baru"
-        }
-        
-        enum ExtendableCardComponent {
-            // This component doesn't have hardcoded strings, but keeping for consistency
         }
     }
 }

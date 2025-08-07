@@ -43,6 +43,8 @@ extension AppText {
         enum CameraViewComponent {
             static let cameraAccessAlertTitle = "Akses Kamera"
             static let cameraAccessAlertMessage = "Silakan aktifkan akses kamera dan mikrofon di pengaturan"
+            static let settingsButton = "Buka Pengaturan"
+            static let cancelButton = AppAction.cancel
         }
         
         enum VideoPreviewComponent {
@@ -51,9 +53,6 @@ extension AppText {
         }
         
         enum VideoInputComponent {
-            static let takeVideoButton = "Ambil Gambar"
-            static let previewVideoButton = "Pratinjau Video"
-            static let videoErrorAlertTitle = "Gagal Memutar Video"
             static let videoErrorAlertMessage = "Video tidak dapat diputar. Silakan rekam ulang sampel."
         }
     }

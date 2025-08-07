@@ -19,7 +19,9 @@ extension AppText {
     enum Authentication {
         enum LoginView {
             static let title = "Revolusi Deteksi Bakteri dengan Teknologi AI"
+            static let emailTitle = AppLabel.email
             static let emailPlaceholder = "Contoh: nama.anda@gmail.com"
+            static let passwordTitle = AppLabel.password
             static let passwordPlaceholder = "Masukkan kata sandi anda"
             static let buttonText = "Login"
             static let faskesNotRegisteredYet = "Faskes belum terdaftar?"
@@ -62,11 +64,11 @@ extension AppText {
             static let intro = "Mohon untuk membaca seluruh kebijakan privasi yang terlampir dengan cermat dan seksama sebelum menggunakan setiap fitur dan/atau layanan yang tersedia dalam Oculab"
             static let generalTitle = "Ketentuan Umum"
             static let generalPoints = [
-                "Negatif: Tidak ditemukan BTA minimal dalam 100 lapang pandang",
-                "Scanty: 1-9 BTA dalam 100 lapang pandang",
-                "Positif 1+: 10 - 99 BTA dlm 100 lapang pandang",
-                "Positif 2+: 1 - 10 BTA setiap 1 lapang pandang, minimal terdapat di 50 lapang pandang",
-                "Positif 3+: ≥ 10 BTA setiap 1 lapang pandang, minimal terdapat di 20 lapang pandang"
+                "Negatif: " + AppMedical.BTA.Description.negative,
+                "Scanty: " + AppMedical.BTA.Description.scanty,
+                "Positif 1+: " + AppMedical.BTA.Description.positive1,
+                "Positif 2+: " + AppMedical.BTA.Description.positive2,
+                "Positif 3+: " + AppMedical.BTA.Description.positive3
             ]
 
             static let definitionTitle = "Definisi"

@@ -19,7 +19,7 @@ struct HeaderViewComponent: View {
                     Circle()
                         .stroke(AppColors.slate100, lineWidth: 1)
                         .frame(width: 36, height: 36)
-                    Image(systemName: AppIcon.xmark)
+                    Image(systemName: AppIcon.close)
                         .font(.system(size: 18, weight: .medium))
                         .foregroundColor(AppColors.slate900)
                 }

@@ -21,15 +21,15 @@ struct ExamDetailAdminView: View {
 
                 VStack(alignment: .leading, spacing: Decimal.d24) {
                     ExtendableCard(
-                        icon: AppText.Icon.personFill,
-                        title: AppTextExamDetail.patientDataTitle,
+                        icon: AppIcon.personFill,
+                        title: "Data Pasien",
                         isExtendable: true,
                         data: [
-                            (key: AppTextExamDetail.patientNameKey, value: presenter.patientDetailData.name),
-                            (key: AppTextExamDetail.patientNikKey, value: presenter.patientDetailData.nik),
-                            (key: AppTextExamDetail.patientDobKey, value: presenter.patientDetailData.dob),
-                            (key: AppTextExamDetail.patientSexKey, value: presenter.patientDetailData.sex),
-                            (key: AppTextExamDetail.patientBpjsKey, value: presenter.patientDetailData.bpjs),
+                            (key: AppPatient.name, value: presenter.patientDetailData.name),
+                            (key: AppPatient.nik, value: presenter.patientDetailData.nik),
+                            (key: AppPatient.dateOfBirth, value: presenter.patientDetailData.dob),
+                            (key: AppPatient.gender, value: presenter.patientDetailData.sex),
+                            (key: AppPatient.bpjsNumber, value: presenter.patientDetailData.bpjs),
                         ],
                         titleSize: AppTypography.s5
                     )
@@ -40,25 +40,25 @@ struct ExamDetailAdminView: View {
                     )
 
                     AppCard(
-                        icon: AppText.Icon.docTextMagnifyingglass,
+                        icon: AppIcon.docTextMagnifyingglass,
                         title: AppTextExamDetail.examinationResult1Title,
                         spacing: Decimal.d16
                     ) {
                         VStack(alignment: .leading) {
-                            Text(AppTextExamDetail.staffInterpretationTitle)
+                            Text(AppMedical.Examination.staffInterpretation)
                                 .font(AppTypography.s5)
                                 .foregroundColor(AppColors.slate300)
                                 
-                                let interpretasiPetugas = presenter.examinations.first?.expertResult ?? AppTextExamDetail.notAvailable
+                                let interpretasiPetugas = presenter.examinations.first?.expertResult ?? AppState.notAvailable
                                 
-                                if interpretasiPetugas != AppTextExamDetail.notAvailable {
+                                if interpretasiPetugas != AppState.notAvailable {
                                     GradingCardComponent(
                                         type: GradingType(rawValue: interpretasiPetugas) ?? .unknown,
                                         confidenceLevel: .lowConfidence,
                                         isExpert: true
                                     )
                                 } else {
-                                    Text(AppTextExamDetail.notAvailable)
+                                    Text(AppState.notAvailable)
                                         .font(AppTypography.p4)
                                         .padding(.vertical, 8)
                                         .padding(.horizontal, 16)
@@ -67,31 +67,31 @@ struct ExamDetailAdminView: View {
                                 }
                         }
                         ExtendedCard(data: [
-                            (AppTextExamDetail.slideIdKey, presenter.examinations.first?.slideId ?? AppValue.empty),
-                            (AppTextExamDetail.preparationTypeKey, presenter.examinations.first?.preparationType ?? AppValue.empty)
+                            (AppMedical.Examination.slideId, presenter.examinations.first?.slideId ?? AppValue.empty),
+                            (AppMedical.Examination.specimenType, presenter.examinations.first?.preparationType ?? AppValue.empty)
                         ], titleSize: AppTypography.s5)
                     }
 
                     AppCard(
-                        icon: AppText.Icon.docTextMagnifyingglass,
+                        icon: AppIcon.docTextMagnifyingglass,
                         title: AppTextExamDetail.examinationResult2Title,
                         spacing: Decimal.d16
                     ) {
                         VStack(alignment: .leading) {
-                            Text(AppTextExamDetail.staffInterpretationTitle)
+                            Text(AppMedical.Examination.staffInterpretation)
                                 .font(AppTypography.s5)
                                 .foregroundColor(AppColors.slate300)
                             
-                            let interpretasiPetugas = presenter.examinations.count > 1 ? (presenter.examinations[1].expertResult ?? AppTextExamDetail.notAvailable) : AppTextExamDetail.notAvailable
+                            let interpretasiPetugas = presenter.examinations.count > 1 ? (presenter.examinations[1].expertResult ?? AppState.notAvailable) : AppState.notAvailable
                             
-                            if interpretasiPetugas != AppTextExamDetail.notAvailable {
+                            if interpretasiPetugas != AppState.notAvailable {
                                 GradingCardComponent(
                                     type: GradingType(rawValue: interpretasiPetugas) ?? .unknown,
                                     confidenceLevel: .lowConfidence,
                                     isExpert: true
                                 )
                             } else {
-                                Text(AppTextExamDetail.notAvailable)
+                                Text(AppState.notAvailable)
                                     .font(AppTypography.p4)
                                     .padding(.vertical, 8)
                                     .padding(.horizontal, 16)
@@ -100,14 +100,14 @@ struct ExamDetailAdminView: View {
                             }
                         }
                         ExtendedCard(data: [
-                            (AppTextExamDetail.slideIdKey, presenter.examinations.count > 1 ? presenter.examinations[1].slideId : AppValue.empty),
-                            (AppTextExamDetail.preparationTypeKey, presenter.examinations.count > 1 ? presenter.examinations[1].preparationType : AppValue.empty)
+                            (AppMedical.Examination.slideId, presenter.examinations.count > 1 ? presenter.examinations[1].slideId : AppValue.empty),
+                            (AppMedical.Examination.specimenType, presenter.examinations.count > 1 ? presenter.examinations[1].preparationType : AppValue.empty)
                         ], titleSize: AppTypography.s5)
                     }
                     VStack(spacing: Decimal.d16) {
                         AppButton(
-                            title: AppTextExamDetail.viewPdfButton,
-                            rightIcon: AppText.Icon.docText,
+                            title: AppAction.view("PDF"),
+                            rightIcon: AppIcon.document,
                             colorType: .secondary,
                             size: .small,
                             isEnabled: true
@@ -117,7 +117,7 @@ struct ExamDetailAdminView: View {
                         
                         AppButton(
                             title: AppTextExamDetail.reportToSitbButton,
-                            rightIcon: AppText.Icon.paperplane,
+                            rightIcon: AppIcon.paperplane,
                             size: .small,
                             isEnabled: true
                         ) {
@@ -135,7 +135,7 @@ struct ExamDetailAdminView: View {
                         Router.shared.navigateBack()
                     }) {
                         HStack {
-                            Image(AppText.Icon.back)
+                            Image(AppImage.back)
                         }
                     }
                 }

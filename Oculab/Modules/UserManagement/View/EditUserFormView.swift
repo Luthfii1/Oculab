@@ -18,18 +18,19 @@ struct EditUserFormView: View {
                 if presenter.showSuccessPopup {
                     AppPopup(
                         image: AppImage.success,
-                        title: AppTextUserMgmtEditUserForm.successTitle,
+                        title: AppState.success("mengubah Akun"),
                         description: "\(AppTextUserMgmtEditUserForm.successDescriptionPrefix) \(presenter.editSuccess.name) \(AppTextUserMgmtEditUserForm.successDescriptionSuffix) \(presenter.editSuccess.role)",
                         buttons: [
                             AppButton(
-                                title: AppTextUserMgmtEditUserForm.backToAccountListButton,
+                                title: AppAction.backTo("Daftar Akun"),
                                 colorType: .secondary,
                                 size: .large,
-                                isEnabled: true
-                            ) {
-                                presenter.resetForm()
-                                presenter.navigateBack()
-                            }
+                                isEnabled: true,
+                                action: {
+                                    presenter.resetForm()
+                                    presenter.navigateBack()
+                                }
+                            )
                         ],
                         isVisible: Binding(
                             get: { presenter.showSuccessPopup },
@@ -43,28 +44,28 @@ struct EditUserFormView: View {
                 }
                 ScrollView {
                     VStack(spacing: 24) {
-                        Image(AppText.Icon.addAccount)
+                        Image(AppImage.addAccount)
                         VStack(spacing: 16) {
                             AppDropdown(
-                                title: AppTextUserMgmtEditUserForm.roleTitle,
+                                title: AppLabel.role,
                                 placeholder: presenter.role,
                                 isRequired: true,
-                                leftIcon: AppText.Icon.personFill,
-                                rightIcon: AppText.Icon.chevronDown,
+                                leftIcon: AppIcon.personFill,
+                                rightIcon: AppIcon.down,
                                 choices: [(AppTextUserMgmtNewUserForm.roleLabPlaceholder, RolesType.LAB.rawValue), (AppTextUserMgmtNewUserForm.roleAdminChoice, RolesType.ADMIN.rawValue)],
                                 isSearchEnabled: false,
                                 selectedChoice: $presenter.role
                             )
                             
                             AppTextField(
-                                title: AppTextUserMgmtEditUserForm.nameTitle,
+                                title: AppLabel.name,
                                 isRequired: true,
                                 placeholder: AppTextUserMgmtEditUserForm.namePlaceholder,
                                 text: $presenter.name
                             )
                             
                             AppTextField(
-                                title: AppTextUserMgmtEditUserForm.emailTitle,
+                                title: AppLabel.email,
                                 isRequired: true,
                                 placeholder: AppTextUserMgmtEditUserForm.emailPlaceholder,
                                 description: AppTextUserMgmtEditUserForm.emailDisabledDescription,
@@ -75,8 +76,8 @@ struct EditUserFormView: View {
                             // Save button
                             ZStack {
                                 AppButton(
-                                    title: presenter.isEditing ? AppValue.empty : AppTextUserMgmtEditUserForm.saveChangesButton,
-                                    rightIcon: presenter.isEditing ? nil : AppText.Icon.arrowRight,
+                                    title: presenter.isEditing ? AppValue.empty : AppAction.saveChanges,
+                                    rightIcon: presenter.isEditing ? nil : AppIcon.forward,
                                     isEnabled: !presenter.isEditing,
                                     action: {
                                         Task {
@@ -94,7 +95,7 @@ struct EditUserFormView: View {
                                 }
                             }
                             
-                            Button(AppTextUserMgmtEditUserForm.cancelButton) {
+                            Button(AppAction.cancel) {
                                 presenter.navigateBack()
                             }
                             .font(AppTypography.p2)
@@ -117,7 +118,7 @@ struct EditUserFormView: View {
                         Button(action: {
                             presenter.navigateBack()
                         }) {
-                            Image(systemName: AppIcon.chevronLeft)
+                            Image(systemName: AppIcon.back)
                                 .foregroundColor(.black)
                         }
                     }
@@ -128,18 +129,18 @@ struct EditUserFormView: View {
         .dismissKeyboardOnTap()
         // Error alert
         .alert(
-            AppTextUserMgmtEditUserForm.editFailedTitle,
+            AppState.failed("Mengubah"),
             isPresented: Binding(
                 get: { presenter.editError != nil },
                 set: { if !$0 { presenter.editError = nil } }
             ),
             actions: {
-                Button(AppText.Common.okButton) {
+                Button(AppAction.ok) {
                     presenter.editError = nil
                 }
             },
             message: {
-                Text(presenter.editError ?? AppTextUserMgmtEditUserForm.unknownErrorMessage)
+                Text(presenter.editError ?? AppValue.unknownError)
             }
         )
         .onAppear {
@@ -148,8 +149,8 @@ struct EditUserFormView: View {
     }
 }
 
-#Preview {
-    EditUserFormView(account:
-                        Account(id: "xxxx", name: "ddd", role: RolesType.LAB, email: RolesType.LAB.rawValue, username: "ssSss.com", accessPin: "1111"))
-        .environmentObject(DependencyInjection.shared.createAccountPresenter())
-}
+//#Preview {
+//    EditUserFormView(account:
+//                        Account(id: "xxxx", name: "ddd", role: RolesType.LAB, email: RolesType.LAB.rawValue, username: "ssSss.com", accessPin: "1111"))
+//        .environmentObject(DependencyInjection.shared.createAccountPresenter())
+//}

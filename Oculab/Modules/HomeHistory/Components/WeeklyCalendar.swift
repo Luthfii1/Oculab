@@ -105,7 +105,7 @@ struct WeeklyCalendarView: View {
 
                 VStack {
                     DatePicker(
-                        AppTextHomeHistCompWeeklyCalendar.selectDatePickerTitle,
+                        AppPatient.Placeholder.selectDate,
                         selection: $selectedDate,
                         displayedComponents: [.date]
                     )
@@ -161,7 +161,7 @@ struct WeeklyCalendarView: View {
 
     private func getDayOfWeek(date: Date) -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "E"
+        dateFormatter.dateFormat = "E" // TODO: create enum for dateFormatter
         return dateFormatter.string(from: date)
     }
 
@@ -172,7 +172,7 @@ struct WeeklyCalendarView: View {
 
     private func getMonthAndYear(for date: Date) -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMMM yyyy"
+        dateFormatter.dateFormat = "MMMM yyyy" // TODO: create enum for dateFormatter
         return dateFormatter.string(from: date)
     }
 
@@ -182,7 +182,7 @@ struct WeeklyCalendarView: View {
     }
 }
 
-#Preview {
-    @Previewable @State var selectedDate = Date()
-    WeeklyCalendarView(selectedDate: $selectedDate)
-}
+//#Preview {
+//    @Previewable @State var selectedDate = Date()
+//    WeeklyCalendarView(selectedDate: $selectedDate)
+//}

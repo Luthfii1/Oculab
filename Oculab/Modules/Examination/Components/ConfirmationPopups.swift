@@ -18,10 +18,10 @@ struct ConfirmationPopups: View {
                 title: AppTextExamCompConfirmPopups.unfinishedExaminationTitle,
                 description: AppTextExamCompConfirmPopups.unfinishedExaminationDescription,
                 buttons: [
-                    AppButton(title: AppTextExamCompConfirmPopups.exitButton, colorType: .destructive(.primary)) {
+                    AppButton(title: AppAction.exit, colorType: .destructive(.primary)) {
                         presenter.popToRoot()
                     },
-                    AppButton(title: AppTextExamCompConfirmPopups.reviewAgainButton, colorType: .destructive(.secondary)) {
+                    AppButton(title: "Periksa Kembali", colorType: .destructive(.secondary)) {
                         presenter.isLeavePopUpVisible = false
                     }
                 ],
@@ -30,15 +30,15 @@ struct ConfirmationPopups: View {
 
             AppPopup(
                 image: AppImage.confirm,
-                title: AppTextExamCompConfirmPopups.saveResultTitle,
+                title: AppAction.save("Hasil Pemeriksaan"),
                 description: AppTextExamCompConfirmPopups.saveResultDescription,
                 buttons: [
-                    AppButton(title: AppTextExamCompConfirmPopups.saveButton, colorType: .primary) {
+                    AppButton(title: AppAction.save, colorType: .primary) {
                         Task {
                             await presenter.submitExpertResult(examinationId: examinationId)
                         }
                     },
-                    AppButton(title: AppTextExamCompConfirmPopups.reviewAgainButton, colorType: .tertiary) {
+                    AppButton(title: "Periksa Kembali", colorType: .tertiary) {
                         presenter.isVerifPopUpVisible = false
                     }
                 ],

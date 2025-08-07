@@ -21,7 +21,7 @@ struct UserManagementView: View {
                         description: AppTextUserMgmtView.deleteAccountDescription,
                         buttons: [
                             AppButton(
-                                title: AppTextUserMgmtView.deleteAccountButton,
+                                title: AppAction.delete("Akun"),
                                 colorType: .destructive(.primary),
                                 isEnabled: !presenter.isDeleting
                             ) {
@@ -30,7 +30,7 @@ struct UserManagementView: View {
                                 }
                             },
                             AppButton(
-                                title: AppTextUserMgmtView.backButton,
+                                title: AppAction.back,
                                 colorType: .destructive(.secondary)
                             ) {
                                 presenter.dismissDeleteConfirmation()
@@ -44,11 +44,11 @@ struct UserManagementView: View {
                 if presenter.showDeleteSuccessAlert {
                     AppPopup(
                         image: AppImage.success,
-                        title: AppTextUserMgmtView.deleteSuccessTitle,
+                        title: AppState.success("Menghapus Akun"),
                         description: presenter.deletionSuccess?.message ?? AppTextUserMgmtView.deleteSuccessDescription,
                         buttons: [
                             AppButton(
-                                title: AppText.Common.okButton,
+                                title: AppAction.ok,
                                 colorType: .primary,
                                 size: .large,
                                 isEnabled: true
@@ -66,15 +66,15 @@ struct UserManagementView: View {
                     VStack(spacing: 24) {
                         AppSearchBar(
                             searchText: $presenter.searchText,
-                            placeholder: AppTextUserMgmtView.searchPlaceholder,
+                            placeholder: AppSearch.Account.placeholder,
                             onSearch: {
                                 presenter.searchAccounts(query: presenter.searchText)
                             }
                         )
 
                         AppButton(
-                            title: AppTextUserMgmtView.addNewAccountButton,
-                            leftIcon: AppText.Icon.plus,
+                            title: AppAction.add("Akun Baru"),
+                            leftIcon: AppIcon.add,
                             colorType: .secondary,
                             action: {
                                 presenter.navigateTo(.newAccount)
@@ -83,11 +83,11 @@ struct UserManagementView: View {
                         
                         if !presenter.searchText.isEmpty && presenter.displayedSortedGroupedAccounts.isEmpty {
                             VStack(spacing: 20) {
-                                Image(systemName: AppIcon.magnifyingglass)
+                                Image(systemName: AppIcon.search)
                                     .font(.system(size: 48))
                                     .foregroundColor(AppColors.slate300)
                                 
-                                Text("\(AppTextUserMgmtView.noResultsPrefix) \"\(presenter.searchText)\"")
+                                Text(AppSearch.noResults(presenter.searchText))
                                     .font(AppTypography.s3)
                                     .foregroundColor(AppColors.slate600)
                                     .multilineTextAlignment(.center)
@@ -95,7 +95,7 @@ struct UserManagementView: View {
                                 Button(action: {
                                     presenter.clearSearch()
                                 }) {
-                                    Text(AppTextUserMgmtView.clearSearchButton)
+                                    Text(AppSearch.clearSearch)
                                         .font(AppTypography.p2)
                                         .foregroundColor(AppColors.purple600)
                                 }
@@ -123,7 +123,7 @@ struct UserManagementView: View {
                             Button(action: {
                                 presenter.navigateBack()
                             }) {
-                                Image(AppText.Icon.back)
+                                Image(AppImage.back)
                             }
                         }
                     }
@@ -133,18 +133,18 @@ struct UserManagementView: View {
                     BottomSheetMenu(presenter: presenter)
                 }
                 .alert(
-                    AppTextUserMgmtView.deletionFailedTitle,
+                    AppState.failed("Menghapus"),
                     isPresented: Binding(
                         get: { presenter.deletionError != nil },
                         set: { if !$0 { presenter.deletionError = nil } }
                     ),
                     actions: {
-                        Button(AppText.Common.okButton) {
+                        Button(AppAction.ok) {
                             presenter.deletionError = nil
                         }
                     },
                     message: {
-                        Text(presenter.deletionError ?? AppTextUserMgmtView.unknownErrorMessage)
+                        Text(presenter.deletionError ?? AppValue.unknownError)
                     }
                 )
                 .onAppear {

@@ -16,7 +16,7 @@ struct ImageSectionComponent: View {
             HStack {
                 Image(systemName: AppIcon.photo)
                     .foregroundColor(AppColors.purple500)
-                Text(AppTextExamCompImageSection.imageResultTitle)
+                Text("Hasil Gambar")
                     .font(AppTypography.s4_1)
                     .padding(.leading, Decimal.d8)
             }

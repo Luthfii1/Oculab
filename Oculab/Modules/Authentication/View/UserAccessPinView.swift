@@ -79,7 +79,7 @@ struct UserAccessPinView: View {
                                 Router.shared.navigateBack()
                             }) {
                                 HStack {
-                                    Image(AppText.Icon.back)
+                                    Image(AppImage.back)
                                 }
                             }
                         }

@@ -22,15 +22,15 @@ struct HistoryView: View {
                     if presenter.isAllExamsLoading {
                         Spacer().frame(height: Decimal.d24)
                         VStack(alignment: .center) {
-                            ProgressView(AppText.HomeHistory.loadingMessage)
+                            ProgressView(AppState.loading("data pemeriksaan anda"))
                                 .progressViewStyle(CircularProgressViewStyle())
                         }
                         .frame(maxWidth: .infinity)
 
                     } else if shouldShowEmptyState() {
                         VStack(alignment: .center) {
-                            Image(AppText.HomeHistory.emptyStateImageName)
-                            Text("\(AppText.HomeHistory.noExaminationMessage) \(formatDate(selectedDate))")
+                            Image(AppTextHomeHistory.emptyStateImageName)
+                            Text("\(AppTextHomeHistory.noExaminationMessage) \(formatDate(selectedDate))")
                                 .font(AppTypography.p3)
                                 .foregroundStyle(AppColors.slate300)
                                 .frame(maxWidth: 254)
@@ -59,7 +59,7 @@ struct HistoryView: View {
                 }
             }
             .padding(.horizontal, Decimal.d20)
-            .navigationTitle(AppText.HomeHistory.navigationTitleHistory)
+            .navigationTitle(AppTextHomeHistory.navigationTitleHistory)
         }
         .ignoresSafeArea()
         .onAppear {

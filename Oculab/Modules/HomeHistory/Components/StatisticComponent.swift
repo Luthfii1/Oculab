@@ -27,7 +27,7 @@ struct StatisticComponent: View {
                 HStack(spacing: Decimal.d32) {
                     HalfCircleProgress(progress: presenter.progress)
                         .offset(y: 35)
-
+                    // TODO: Create func to create sentence
                     VStack(alignment: .leading, spacing: Decimal.d4) {
                         Text("\(presenter.statisticExam.totalFinished ?? 0) \(AppTextHomeHistCompStatistic.tasksCompletedSuffix)").font(AppTypography.h4_1)
                         Text(
@@ -74,7 +74,7 @@ struct StatisticComponent: View {
                             .foregroundStyle(AppColors.blue500)
                             .font(AppTypography.h1)
 
-                        Text(AppTextHomeHistCompStatistic.pendingLabel)
+                        Text(AppState.pending)
                             .foregroundStyle(AppColors.slate900)
                             .font(AppTypography.s6)
                     }

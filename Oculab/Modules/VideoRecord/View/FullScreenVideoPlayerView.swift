@@ -25,7 +25,7 @@ struct FullScreenVideoPlayerView: View {
             
             // Tombol "Close"
             Button(action: onClose) {
-                Image(systemName: AppIcon.xmarkCircleFill)
+                Image(systemName: AppIcon.close)
                     .resizable()
                     .frame(width: 32, height: 32)
                     .padding()

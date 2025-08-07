@@ -23,7 +23,7 @@ struct VideoPreview: View {
                 // Button to save video
                 AppButton(
                     title: AppTextVideoRecordCompPreview.saveVideoButton,
-                    rightIcon: AppText.Icon.checkmark,
+                    rightIcon: AppIcon.checkmark,
                     colorType: .neutral(.primary),
                     size: .large,
                     cornerRadius: 8
@@ -34,7 +34,7 @@ struct VideoPreview: View {
                 // Button to retake video
                 AppButton(
                     title: AppTextVideoRecordCompPreview.retakeVideoButton,
-                    leftIcon: AppText.Icon.arrowCounterclockwise,
+                    leftIcon: AppIcon.refresh,
                     colorType: .neutral(.secondary),
                     size: .large
                 ) {

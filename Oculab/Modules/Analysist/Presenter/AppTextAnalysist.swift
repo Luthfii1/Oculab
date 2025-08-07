@@ -41,16 +41,28 @@ extension AppText {
             static let lowConfidenceDescription = AppMedical.Confidence.low
             static let veryLowConfidenceDescription = AppMedical.Confidence.veryLow
             static let unpredictedConfidenceDescription = AppMedical.Confidence.unpredicted
+            
+            // MARK: - Grouped Data for Clean UI Implementation
+            static let btaDescriptions: [String] = [
+                negativeDescription,
+                scantyDescription,
+                positive1Description,
+                positive2Description,
+                positive3Description
+            ]
+            
+            static let confidenceDescriptions: [String] = [
+                perfectConfidenceDescription,
+                highConfidenceDescription,
+                mediumConfidenceDescription,
+                lowConfidenceDescription,
+                veryLowConfidenceDescription,
+                unpredictedConfidenceDescription
+            ]
         }
         
         enum FOVDetailView {
             static let loadingDataMessage = AppState.loading("data pemeriksaan")
-            static func bacteriaCountPrefix(_ count: String) -> String {
-                return AppData.withPrefix("Jumlah Bakteri:", count)
-            }
-            static func slideIdPrefix(_ id: String) -> String {
-                return AppData.withPrefix("ID", id)
-            }
         }
         
         enum PDFView {
@@ -67,6 +79,22 @@ extension AppText {
             // Table Content
             static let bacteriologicalExaminationResultTitle = "HASIL PEMERIKSAAN BAKTERIOLOGIS"
             static let testTypeLabel = AppLabel.type 
+            static let examinationPurposeLabel = AppMedical.Examination.purpose
+            static let specimenIdLabel = AppMedical.Examination.slideId
+            static let examinationResultLabel = AppMedical.Examination.result
+            
+            // BTA Report Labels and Descriptions for IUALTD Standard Table
+            static let negativeReportLabel = AppMedical.BTA.negative
+            static let scantyReportLabel = AppMedical.BTA.scanty
+            static let positive1ReportLabel = AppMedical.BTA.positive1
+            static let positive2ReportLabel = AppMedical.BTA.positive2
+            static let positive3ReportLabel = AppMedical.BTA.positive3
+            
+            static let negativeResultDescription = AppMedical.BTA.Description.negative
+            static let scantyResultDescription = AppMedical.BTA.Description.scanty
+            static let positive1ResultDescription = AppMedical.BTA.Description.positive1
+            static let positive2ResultDescription = AppMedical.BTA.Description.positive2
+            static let positive3ResultDescription = AppMedical.BTA.Description.positive3
             
             // Signature Section
             static let labOfficerSignatureTitle = "Petugas Lab"

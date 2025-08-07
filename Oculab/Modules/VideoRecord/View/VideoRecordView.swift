@@ -105,7 +105,7 @@ struct VideoRecordView: View {
                             UIApplication.shared.open(settingsUrl)
                         }
                     },
-                    secondaryButton: .cancel(Text(AppTextVideoRecordView.cancelButton)) {
+                    secondaryButton: .cancel(Text(AppAction.cancel)) {
                         dismiss() 
                     }
                 )

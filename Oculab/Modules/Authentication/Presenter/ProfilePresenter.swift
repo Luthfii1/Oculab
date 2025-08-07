@@ -42,10 +42,10 @@ class ProfilePresenter: ObservableObject {
     @Published var descriptionPasswordConfirm: String =
         "Pastikan password konfirmasi cocok dengan password yang Anda masukkan sebelumnya"
     @Published var descriptionOldPassword: String = ""
-    @Published var isLoading = false {
-        didSet {
-            AppText.Authentication.ProfileView.saveChangesButton = isLoading ? "Loading..." : "Simpan Perubahan"
-        }
+    @Published var isLoading = false
+
+    var saveChangesButtonText: String {
+        return isLoading ? AppState.loading : AppAction.saveChanges
     }
 
     @Published var showSuccessPopup: Bool = false

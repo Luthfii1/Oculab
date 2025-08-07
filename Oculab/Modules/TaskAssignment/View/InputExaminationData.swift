@@ -25,7 +25,7 @@ struct InputExaminationData: View {
         NavigationView {
             ZStack {
                 AppPopup(
-                    image: AppTextTaskAssignInputExam.confirmIcon,
+                    image: AppImage.confirm,
                     title: AppTextTaskAssignInputExam.confirmPopupTitle,
                     description: "Sediaan Pasien \(presenter.patient.name) akan diperiksa oleh \(presenter.pic.name)",
                     isError: presenter.isError,
@@ -64,7 +64,7 @@ struct InputExaminationData: View {
 
                             VStack(alignment: .leading, spacing: Decimal.d24) {
                                 AppRadioButton(
-                                    title: AppTextTaskAssignInputExam.examinationGoalTitle,
+                                    title: AppMedical.Examination.purpose,
                                     isRequired: true,
                                     choices: [AppTextTaskAssignInputExam.screeningChoice, AppTextTaskAssignInputExam.followUpChoice],
                                     isDisabled: false,
@@ -136,7 +136,7 @@ struct InputExaminationData: View {
                                 
                                 HStack {
                                     AppButton(
-                                        title: AppTextTaskAssignInputExam.backButton,
+                                        title: AppAction.back,
                                         leftIcon: "arrow.left",
                                         colorType: .tertiary,
                                         isEnabled: true
@@ -149,7 +149,7 @@ struct InputExaminationData: View {
                                     Spacer()
                                     AppButton(
                                         title: AppTextTaskAssignInputExam.createTaskFinalButton,
-                                        rightIcon: AppText.Icon.arrowRight,
+                                        rightIcon: AppIcon.arrowRight,
                                         size: .large,
                                         isEnabled: (goalString != AppValue.empty && typeString != AppValue.empty && presenter.examination.slideId != AppValue.empty && typeString2 != AppValue.empty && presenter.examination2.slideId != AppValue.empty)
                                     ) {
@@ -164,7 +164,7 @@ struct InputExaminationData: View {
                             .padding(.horizontal, Decimal.d20)
                         }
 
-                        .navigationTitle(AppTextTaskAssignInputExam.navigationTitle)
+                        .navigationTitle("Data Sediaan")
                         .navigationBarTitleDisplayMode(.inline)
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
@@ -172,7 +172,7 @@ struct InputExaminationData: View {
                                     Router.shared.popToRoot()
                                 }) {
                                     HStack {
-                                        Image(AppText.Icon.destroy)
+                                        Image(AppImage.destroy)
                                     }
                                 }
                             }

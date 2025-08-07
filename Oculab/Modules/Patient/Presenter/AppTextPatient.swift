@@ -19,18 +19,16 @@ extension AppText {
         enum FormView {
             static let newPatientNavigationTitle = "Data Pasien Baru"
             static let editPatientNavigationTitle = "Ubah Data Pasien"
-            static let addNewPatientButton = "Tambahkan Pasien Baru"
-            static let savePatientButton = "Simpan Data Pasien"
         }
         
         enum ListView {
-            static let addNewPatientButton = "Tambah Pasien Baru"
+            static let navigationTitle = "Daftar Pasien"
         }
         
         enum DetailView {
             static let navigationTitle = "Riwayat Pemeriksaan"
             static let patientDataTitle = "Data Pasien"
-            static let newExaminationButton = "Pemeriksaan Baru"
+            static let examinationResultTitle = "Hasil Pemeriksaan"
             static let loadingPatientMessage = AppState.loading("data pasien")
             static let loadingExaminationsMessage = AppState.loading("pemeriksaan")
             static let noExaminationsMessage = AppState.noData("pemeriksaan")

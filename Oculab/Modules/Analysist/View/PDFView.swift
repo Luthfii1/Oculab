@@ -22,7 +22,7 @@ struct PDFPageView: View {
                             Button(action: {
                                 sharePDF()
                             }) {
-                                Image(systemName: AppIcon.shareIcon)
+                                Image(systemName: AppIcon.share)
                                     .foregroundColor(.black)
                             }
                         }
@@ -121,11 +121,11 @@ struct PDFPageView: View {
 
     // Draw header section with logo, description, phone, email
     private func drawHeader(_ regularText: [NSAttributedString.Key: Any]) {
-        UIImage(named: AppText.Icon.logo)?.draw(at: CGPoint(x: 32, y: 32))
+        UIImage(named: AppImage.logo)?.draw(at: CGPoint(x: 32, y: 32))
         NSAttributedString(string: presenter.data?.kopPDFData.desc ?? AppValue.empty, attributes: regularText).draw(at: CGPoint(x: 32, y: 72))
 
         // Phone number with icon
-        let phoneIcon = UIImage(named: AppText.Icon.phoneIcon)?.resizeImage(targetSize: CGSize(width: 12, height: 12))
+        let phoneIcon = UIImage(named: AppImage.phone)?.resizeImage(targetSize: CGSize(width: 12, height: 12))
         let phoneText = NSAttributedString(string: presenter.data?.kopPDFData.notelp ?? AppValue.empty, attributes: regularText)
         let phoneTextSize = phoneText.size()
         let phoneIconSize = phoneIcon?.size ?? .zero
@@ -134,7 +134,7 @@ struct PDFPageView: View {
         phoneIcon?.draw(at: CGPoint(x: phoneX + phoneTextSize.width + 4, y: 54))
         
         // Email with icon
-        let emailIcon = UIImage(named: AppText.Icon.envelopeIcon)?.resizeImage(targetSize: CGSize(width: 12, height: 12))
+        let emailIcon = UIImage(named: AppImage.envelope)?.resizeImage(targetSize: CGSize(width: 12, height: 12))
         let emailText = NSAttributedString(string: presenter.data?.kopPDFData.email ?? AppValue.empty, attributes: regularText)
         let emailTextSize = emailText.size()
         let emailIconSize = emailIcon?.size ?? .zero
@@ -142,7 +142,7 @@ struct PDFPageView: View {
         emailText.draw(at: CGPoint(x: emailX, y: 70))
         emailIcon?.draw(at: CGPoint(x: emailX + emailTextSize.width + 4, y: 70))
         
-        UIImage(named: AppText.Icon.line)?.draw(at: CGPoint(x: 0, y: 97))
+        UIImage(named: AppImage.line)?.draw(at: CGPoint(x: 0, y: 97))
     }
 
     private func drawInterpretasi(

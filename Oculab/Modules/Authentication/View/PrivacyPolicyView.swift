@@ -26,7 +26,7 @@ struct PrivacyPolicyView: View {
                         VStack(alignment: .leading, spacing: 0) {
                             ForEach(AppTextAuthPrivacyPolicy.generalPoints, id: \ .self) { point in
                                 HStack(alignment: .top) {
-                                    Text(AppTextAuthPrivacyPolicy.definitionBullet)
+                                    Text(AppValue.bullet)
                                     Text(point)
                                 }
                             }
@@ -86,7 +86,7 @@ struct PrivacyPolicyView: View {
                         Router.shared.navigateBack()
                     }) {
                         HStack {
-                            Image(AppText.Icon.back)
+                            Image(AppImage.back)
                         }
                     }
                 }

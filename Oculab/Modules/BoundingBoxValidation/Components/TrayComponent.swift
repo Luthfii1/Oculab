@@ -4,7 +4,7 @@
 //
 //  Created by Alifiyah Ariandri on 20/05/25.
 //
-
+// TODO: Revamp the hardcoded strings and use AppText for consistency
 import SwiftUI
 
 struct TrayView: View {

@@ -21,34 +21,34 @@ struct SavedResultView: View {
 
                 VStack(alignment: .leading, spacing: Decimal.d24) {
                     ExtendableCard(
-                        icon: AppText.Icon.personFill,
-                        title: AppTextExamDetail.patientDataTitle,
+                        icon: AppIcon.personFill,
+                        title: "Data Pasien",
                         isExtendable: true,
                         data: [
-                            (key: AppTextExamDetail.patientNameKey, value: presenter.patientDetailData.name),
-                            (key: AppTextExamDetail.patientNikKey, value: presenter.patientDetailData.nik),
-                            (key: AppTextExamDetail.patientDobKey, value: presenter.patientDetailData.dob),
-                            (key: AppTextExamDetail.patientSexKey, value: presenter.patientDetailData.sex),
-                            (key: AppTextExamDetail.patientBpjsKey, value: presenter.patientDetailData.bpjs),
+                            (key: AppPatient.name, value: presenter.patientDetailData.name),
+                            (key: AppPatient.nik, value: presenter.patientDetailData.nik),
+                            (key: AppPatient.dateOfBirth, value: presenter.patientDetailData.dob),
+                            (key: AppPatient.gender, value: presenter.patientDetailData.sex),
+                            (key: AppPatient.bpjsNumber, value: presenter.patientDetailData.bpjs),
                         ],
                         titleSize: AppTypography.s5
                     )
 
                     ExtendableCard(
-                        icon: AppText.Icon.docTextMagnifyingglass,
-                        title: AppTextExamSavedResult.examinationDetailTitle,
+                        icon: AppIcon.docTextMagnifyingglass,
+                        title: AppData.withPrefix("Detail", "Pemeriksaan"),
                         isExtendable: true,
                         data: [
-                            (key: AppTextExamDetail.slideIdKey, value: presenter.examDetailData.slideId),
-                            (key: AppTextExamSavedResult.examinationReasonKey, value: presenter.examDetailData.examinationGoal),
-                            (key: AppTextExamDetail.preparationTypeKey, value: presenter.examDetailData.type),
+                            (key: AppMedical.Examination.slideId, value: presenter.examDetailData.slideId),
+                            (key: AppMedical.Examination.purpose, value: presenter.examDetailData.examinationGoal),
+                            (key: AppMedical.Examination.specimenType, value: presenter.examDetailData.type),
                         ],
                         titleSize: AppTypography.s6
                     )
 
-                    AppCard(icon: AppText.Icon.photo, title: AppTextExamSavedResult.imageResultTitle, spacing: Decimal.d16) {
+                    AppCard(icon: AppIcon.photo, title: "Hasil Gambar", spacing: Decimal.d16) {
                         VStack(alignment: .leading, spacing: Decimal.d16) {
-                            Text(AppTextExamSavedResult.imageResultInstruction)
+                            Text(AppTextExamCompImageSection.imageResultInstruction)
                                 .font(AppTypography.p3)
                                 .foregroundStyle(AppColors.slate300)
 
@@ -92,13 +92,13 @@ struct SavedResultView: View {
                     }
 
                     AppCard(
-                        icon: AppText.Icon.textBadgeCheckmark,
-                        title: AppTextExamSavedResult.interpretationResultTitle,
+                        icon: AppIcon.textBadgeCheckmark,
+                        title: "Hasil Interpretasi",
                         spacing: Decimal.d24,
                         isGrading: .FINISHED
                     ) {
                         VStack(alignment: .leading, spacing: Decimal.d8) {
-                            Text(AppTextExamSavedResult.staffInterpretationTitle)
+                            Text(AppMedical.Examination.staffInterpretation)
                                 .font(AppTypography.s5)
                                 .foregroundColor(AppColors.slate300)
                             GradingCardComponent(
@@ -110,11 +110,11 @@ struct SavedResultView: View {
                         }
 
                         VStack(alignment: .leading, spacing: Decimal.d8) {
-                            Text(AppTextExamSavedResult.systemInterpretationTitle)
+                            Text(AppMedical.Examination.systemInterpretation)
                                 .font(AppTypography.s5)
                                 .foregroundColor(AppColors.slate300)
                             HStack(alignment: .top) {
-                                Image(systemName: AppIcon.exclamationmarkTriangleFill)
+                                Image(systemName: AppIcon.warning)
                                     .foregroundColor(AppColors.orange500)
 
                                 Text(AppTextExamSavedResult.systemInterpretationWarning)
@@ -165,8 +165,8 @@ struct SavedResultView: View {
 
                         VStack(alignment: .leading, spacing: Decimal.d16) {
                             AppButton(
-                                title: AppTextExamDetail.viewPdfButton,
-                                rightIcon: AppText.Icon.docText,
+                                title: AppAction.view("PDF"),
+                                rightIcon: AppIcon.document,
                                 colorType: .secondary,
                                 size: .small,
                                 isEnabled: true
@@ -176,7 +176,7 @@ struct SavedResultView: View {
 
                             AppButton(
                                 title: AppTextExamDetail.reportToSitbButton,
-                                rightIcon: AppText.Icon.paperplane,
+                                rightIcon: AppIcon.paperplane,
                                 size: .small,
                                 isEnabled: true
                             ) {
@@ -195,7 +195,7 @@ struct SavedResultView: View {
                         Router.shared.navigateBack()
                     }) {
                         HStack {
-                            Image(AppText.Icon.back)
+                            Image(AppImage.back)
                         }
                     }
                 }

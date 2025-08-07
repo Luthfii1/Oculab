@@ -56,8 +56,8 @@ struct GuidelinesOnboardingView: View {
                     .padding(.bottom, 24)
 
                 AppButton(
-                    title: AppTextExamGuidelines.continueButton,
-                    rightIcon: AppText.Icon.arrowRight,
+                    title: AppAction.next,
+                    rightIcon: AppIcon.arrowRight,
                     isEnabled: currentPage == pages.count - 1,
                     action: {
                         if currentPage < pages.count - 1 {
@@ -77,7 +77,7 @@ struct GuidelinesOnboardingView: View {
                     Button(action: {
                         Router.shared.navigateBack()
                     }) {
-                        Image(AppText.Icon.back)
+                        Image(AppImage.back)
                     }
                 }
             }

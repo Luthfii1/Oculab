@@ -84,6 +84,7 @@ enum AppText {
         static let backWhite = "back_white"
         static let back = "back"
         static let success = "Success"
+        static let robot = "robot"
     }
     
     // MARK: - Universal Actions (Used across all modules)
