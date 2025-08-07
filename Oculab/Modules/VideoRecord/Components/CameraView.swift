@@ -45,7 +45,7 @@ struct CameraView: View {
                 primaryButton: .default(Text(AppTextVideoRecordCompCamera.settingsButton)) {
                     UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
                 },
-                secondaryButton: .cancel(Text(AppTextVideoRecordCompCamera.cancelButton))
+                secondaryButton: .cancel(Text(AppAction.cancel))
             )
         }
     }

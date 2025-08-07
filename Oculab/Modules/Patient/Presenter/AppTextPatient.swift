@@ -32,7 +32,7 @@ extension AppText {
             static let loadingPatientMessage = AppState.loading("data pasien")
             static let loadingExaminationsMessage = AppState.loading("pemeriksaan")
             static let noExaminationsMessage = AppState.noData("pemeriksaan")
-            static let notDeterminedMessage = AppState.notAvailable
+            static let notDeterminedMessage = AppState.notDetermined("pemeriksaan")
         }
         
         enum PatientCardComponent {

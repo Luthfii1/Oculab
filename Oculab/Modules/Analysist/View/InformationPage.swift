@@ -22,7 +22,7 @@ struct InformationPage: View {
                             VStack(alignment: .leading, spacing: Decimal.d16) {
                                 ForEach(AppTextAnalysisInformation.btaDescriptions, id: \.self) { description in
                                     HStack(alignment: .top) {
-                                        Text(AppTextAnalysisInformation.bulletPoint)
+                                        Text(AppValue.bullet)
                                         Text(description)
                                     }
                                 }
@@ -32,11 +32,11 @@ struct InformationPage: View {
                         .font(AppTypography.p3)
                     }
 
-                    AppCard(icon: AppIcon.info, title: AppTextAnalysisInformation.confidenceLevelTitle, spacing: Decimal.d16) {
+                    AppCard(icon: AppIcon.info, title: AppMedical.Examination.confidenceLevel, spacing: Decimal.d16) {
                         VStack(alignment: .leading, spacing: Decimal.d16) {
                             ForEach(AppTextAnalysisInformation.confidenceDescriptions, id: \.self) { description in
                                 HStack(alignment: .top) {
-                                    Text(AppTextAnalysisInformation.bulletPoint)
+                                    Text(AppValue.bullet)
                                     Text(description)
                                 }
                             }

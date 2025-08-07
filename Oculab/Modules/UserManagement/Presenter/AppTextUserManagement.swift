@@ -20,7 +20,6 @@ extension AppText {
             static let deleteAccountTitle = "Hapus akun"
             static let deleteAccountDescription = "Akun yang sudah dihapus tidak dapat dikembalikan lagi."
             static let deleteSuccessDescription = "Akun berhasil dihapus"
-            static let navigationTitle = AppNav.accountManagement
         }
         
         enum NewUserFormView {

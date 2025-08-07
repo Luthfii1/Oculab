@@ -116,7 +116,7 @@ struct UserManagementView: View {
                         }
                     }
                     .padding(.horizontal, Decimal.d20)
-                    .navigationTitle(AppTextUserMgmtView.navigationTitle)
+                    .navigationTitle(AppNav.accountManagement)
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarLeading) {

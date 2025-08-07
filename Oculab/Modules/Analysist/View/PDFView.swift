@@ -68,10 +68,10 @@ struct PDFPageView: View {
             drawHeader(regularText)
             drawInfoSection(
                 title: presenter.data?.patientPDFData.name ?? AppValue.empty,
-                labels: [AppTextAnalysisPDF.nikLabel, AppTextAnalysisPDF.ageLabel, AppTextAnalysisPDF.genderLabel, AppTextAnalysisPDF.bpjsLabel],
+                labels: [AppPatient.nik, AppPatient.age, AppPatient.gender, AppPatient.bpjsNumber],
                 values: [
                     presenter.data?.patientPDFData.nik ?? AppValue.empty,
-                    "\(presenter.data?.patientPDFData.age ?? 0)\(AppTextAnalysisPDF.ageSuffix)",
+                    "\(presenter.data?.patientPDFData.age ?? 0)\(AppPatient.ageSuffix)",
                     presenter.data?.patientPDFData.sex ?? AppValue.empty,
                     presenter.data?.patientPDFData.bpjs ?? AppValue.empty
                 ],
@@ -82,8 +82,8 @@ struct PDFPageView: View {
                 boldLargeText
             )
             drawInfoSection(
-                title: AppTextAnalysisPDF.specimenInfoTitle,
-                labels: [AppTextAnalysisPDF.examinationIdLabel, AppTextAnalysisPDF.takenAtLabel, AppTextAnalysisPDF.officerLabel],
+                title: AppMedical.Examination.specimenInfo,
+                labels: [AppMedical.Examination.examinationId, AppTextAnalysisPDF.takenAtLabel, AppTextAnalysisPDF.officerLabel],
                 values: [
                     presenter.data?.preparatPDFData.id ?? AppValue.empty,
                     presenter.data?.preparatPDFData.place ?? AppValue.empty,
@@ -99,14 +99,14 @@ struct PDFPageView: View {
             drawHasilPemeriksaan(regularText)
 
             drawInterpretasi(
-                title: AppTextAnalysisPDF.microscopicInterpretationTitle,
+                title: AppMedical.Examination.microscopicInterpretation,
                 description: presenter.data?.hasilPDFData.descInterpretasi ?? AppValue.empty,
                 yContent: 388,
                 boldText,
                 regularText
             )
             drawInterpretasi(
-                title: AppTextAnalysisPDF.staffNotesTitle,
+                title: AppLabel.notes,
                 description: presenter.data?.hasilPDFData.descNotesPetugas ?? AppTextAnalysisPDF.noNotesDefault,
                 yContent: 640,
                 boldText,
@@ -199,11 +199,11 @@ struct PDFPageView: View {
         
         // Table data
         let rows: [TableRow] = [
-            TableRow(left: AppTextAnalysisPDF.negativeReportLabel, right: AppTextAnalysisPDF.negativeResultDescription),
-            TableRow(left: AppTextAnalysisPDF.scantyReportLabel, right: AppTextAnalysisPDF.scantyResultDescription),
-            TableRow(left: AppTextAnalysisPDF.positive1ReportLabel, right: AppTextAnalysisPDF.positive1ResultDescription),
-            TableRow(left: AppTextAnalysisPDF.positive2ReportLabel, right: AppTextAnalysisPDF.positive2ResultDescription),
-            TableRow(left: AppTextAnalysisPDF.positive3ReportLabel, right: AppTextAnalysisPDF.positive3ResultDescription)
+            TableRow(left: AppMedical.BTA.negative, right: AppMedical.BTA.Description.negative),
+            TableRow(left: AppMedical.BTA.scanty, right: AppMedical.BTA.Description.scanty),
+            TableRow(left: AppMedical.BTA.positive1, right: AppMedical.BTA.Description.positive1),
+            TableRow(left: AppMedical.BTA.positive2, right: AppMedical.BTA.Description.positive2),
+            TableRow(left: AppMedical.BTA.positive3, right: AppMedical.BTA.Description.positive3)
         ]
         
         // Draw content
@@ -295,7 +295,7 @@ struct PDFPageView: View {
             .font: UIFont.boldSystemFont(ofSize: 12),
             .foregroundColor: UIColor.red
         ]
-        let labels = [AppTextAnalysisPDF.examinationPurposeLabel, AppTextAnalysisPDF.testTypeLabel, AppTextAnalysisPDF.specimenIdLabel, AppTextAnalysisPDF.examinationResultLabel]
+        let labels = [AppMedical.Examination.purpose, AppLabel.type, AppMedical.Examination.slideId, AppMedical.Examination.result]
         let values = [
             presenter.data?.hasilPDFData.tujuan ?? AppValue.empty,
             presenter.data?.hasilPDFData.jenisUji ?? AppValue.empty,

@@ -19,9 +19,7 @@ extension AppText {
     enum Authentication {
         enum LoginView {
             static let title = "Revolusi Deteksi Bakteri dengan Teknologi AI"
-            static let emailTitle = AppLabel.email
             static let emailPlaceholder = "Contoh: nama.anda@gmail.com"
-            static let passwordTitle = AppLabel.password
             static let passwordPlaceholder = "Masukkan kata sandi anda"
             static let buttonText = "Login"
             static let faskesNotRegisteredYet = "Faskes belum terdaftar?"
