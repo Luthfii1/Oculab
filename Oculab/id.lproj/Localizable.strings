@@ -243,3 +243,22 @@
 "video.retake" = "Ambil Ulang";
 "video.take_image" = "Ambil Gambar";
 "video.preview" = "Preview Video";
+
+// MARK: - Analysist Module
+"analysist.step.data_examination" = "Data Pemeriksaan";
+"analysist.step.examination_results" = "Hasil Pemeriksaan";
+"analysist.examination_data" = "data pemeriksaan";
+"analysist.data" = "data";
+"analysist.notes" = "catatan";
+
+"analysist.info.navigation_title" = "Informasi Interpretasi Sistem";
+"analysist.info.assessment_standard_title" = "Standar Penilaian";
+"analysist.info.assessment_standard_description" = "Sistem ini menghitung bakteri sesuai rekomendasi WHO dan standar IUALTD";
+
+"analysist.pdf.taken_at" = "Diambil di";
+"analysist.pdf.officer" = "Petugas";
+"analysist.pdf.reporting_header" = "Pelaporan";
+"analysist.pdf.observation_results_header" = "Hasil Pengamatan";
+"analysist.pdf.bacteriological_examination_title" = "HASIL PEMERIKSAAN BAKTERIOLOGIS";
+"analysist.pdf.lab_officer_signature" = "Petugas Lab";
+"analysist.pdf.supervising_doctor_signature" = "Dokter PJ Pemeriksaan Lab";

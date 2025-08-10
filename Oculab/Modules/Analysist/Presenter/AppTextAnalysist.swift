@@ -18,15 +18,15 @@ typealias AppTextAnalysisCompZoomable = AppText.Analysist.ZoomableImageComponent
 extension AppText {
     enum Analysist {
         enum AnalysisResultView {
-            static let stepTitles = ["Data Pemeriksaan", "Hasil Pemeriksaan"]
+            static let stepTitles = ["analysist.step.data_examination".localized, "analysist.step.examination_results".localized]
             static let currentStepIndex = 1
-            static let loadingExaminationMessage = AppState.loading("data pemeriksaan")
+            static let loadingExaminationMessage = AppState.loading("analysist.examination_data".localized)
         }
         
         enum InformationPageView {
-            static let navigationTitle = "Informasi Interpretasi Sistem"
-            static let assessmentStandardTitle = "Standar Penilaian"
-            static let assessmentStandardDescription = "Sistem ini menghitung bakteri sesuai rekomendasi WHO dan standar IUALTD"
+            static let navigationTitle = "analysist.info.navigation_title".localized
+            static let assessmentStandardTitle = "analysist.info.assessment_standard_title".localized
+            static let assessmentStandardDescription = "analysist.info.assessment_standard_description".localized
             
             // MARK: - Grouped Data for Clean UI Implementation
             static let btaDescriptions: [String] = [
@@ -48,24 +48,24 @@ extension AppText {
         }
         
         enum FOVDetailView {
-            static let loadingDataMessage = AppState.loading("data pemeriksaan")
+            static let loadingDataMessage = AppState.loading("analysist.examination_data".localized)
         }
         
         enum PDFView {
             static let loadingAnimationName = "loadingPaperplane"
-            static let downloadingDataMessage = AppState.loading("data")
-            static let takenAtLabel = "Diambil di"
-            static let officerLabel = "Petugas"
-            static let noNotesDefault = AppState.noData("catatan") 
-            static let reportingHeaderTitle = "Pelaporan"
-            static let observationResultsHeaderTitle = "Hasil Pengamatan"
+            static let downloadingDataMessage = AppState.loading("analysist.data".localized)
+            static let takenAtLabel = "analysist.pdf.taken_at".localized
+            static let officerLabel = "analysist.pdf.officer".localized
+            static let noNotesDefault = AppState.noData("analysist.notes".localized) 
+            static let reportingHeaderTitle = "analysist.pdf.reporting_header".localized
+            static let observationResultsHeaderTitle = "analysist.pdf.observation_results_header".localized
             
             // Table Content
-            static let bacteriologicalExaminationResultTitle = "HASIL PEMERIKSAAN BAKTERIOLOGIS"
+            static let bacteriologicalExaminationResultTitle = "analysist.pdf.bacteriological_examination_title".localized
             
             // Signature Section
-            static let labOfficerSignatureTitle = "Petugas Lab"
-            static let supervisingDoctorSignatureTitle = "Dokter PJ Pemeriksaan Lab"
+            static let labOfficerSignatureTitle = "analysist.pdf.lab_officer_signature".localized
+            static let supervisingDoctorSignatureTitle = "analysist.pdf.supervising_doctor_signature".localized
             static let generatedPDFFileName = "GeneratedPDF.pdf"
         }
         

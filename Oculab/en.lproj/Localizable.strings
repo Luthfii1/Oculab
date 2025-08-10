@@ -225,3 +225,22 @@
 "success.updated" = "Successfully updated";
 "success.created" = "Successfully created";
 "success.completed" = "Successfully completed";
+
+// MARK: - Analysist Module
+"analysist.step.data_examination" = "Examination Data";
+"analysist.step.examination_results" = "Examination Results";
+"analysist.examination_data" = "examination data";
+"analysist.data" = "data";
+"analysist.notes" = "notes";
+
+"analysist.info.navigation_title" = "System Interpretation Information";
+"analysist.info.assessment_standard_title" = "Assessment Standard";
+"analysist.info.assessment_standard_description" = "This system counts bacteria according to WHO recommendations and IUALTD standards";
+
+"analysist.pdf.taken_at" = "Taken at";
+"analysist.pdf.officer" = "Officer";
+"analysist.pdf.reporting_header" = "Reporting";
+"analysist.pdf.observation_results_header" = "Observation Results";
+"analysist.pdf.bacteriological_examination_title" = "BACTERIOLOGICAL EXAMINATION RESULTS";
+"analysist.pdf.lab_officer_signature" = "Lab Officer";
+"analysist.pdf.supervising_doctor_signature" = "Supervising Doctor for Lab Examination";
