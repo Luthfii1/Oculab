@@ -7,722 +7,431 @@
 
 import Foundation
 
-// NOTE: Authentication Module Texts
-typealias AppTextAuthLogin = AppText.Authentication.LoginView
-typealias AppTextAuthEditPassword = AppText.Authentication.EditPasswordView
-typealias AppTextAuthUserAccessPin = AppText.Authentication.UserAccessPinView
-typealias AppTextAuthProfile = AppText.Authentication.ProfileView
-typealias AppTextAuthPrivacyPolicy = AppText.Authentication.PrivacyPolicyView
-typealias AppTextAuthCompPin = AppText.Authentication.PinComponent
-
-// NOTE: Examination Module Texts
-typealias AppTextExamProgress = AppText.Examination.ProgressView
-typealias AppTextExamDetail = AppText.Examination.DetailViews
-typealias AppTextExamGuidelines = AppText.Examination.GuidelinesOnboardingView
-typealias AppTextExamSavedResult = AppText.Examination.SavedResultView
-typealias AppTextExamCompConfirmPopups = AppText.Examination.ConfirmationPopupsComponent
-typealias AppTextExamCompGradingCard = AppText.Examination.GradingCardComponent
-typealias AppTextExamCompImageSection = AppText.Examination.ImageSectionComponent
-typealias AppTextExamCompInterpretationSection = AppText.Examination.InterpretationSectionComponent
-typealias AppTextExamCompLabInfo = AppText.Examination.LaborantInfoComponent
-typealias AppTextExamCompHeaderView = AppText.Examination.HeaderViewComponent
-typealias AppTextExamCompFolderCard = AppText.Examination.FolderCardComponent
-typealias AppTextExamCompExtendableCard = AppText.Examination.ExtendableCardComponent
-
-// Note: HomeHistory Module Texts
-typealias AppTextHomeHistory = AppText.HomeHistory
-typealias AppTextHomeHistCompFinishedExamCard = AppText.HomeHistory.FinishedExaminationCardComponent
-typealias AppTextHomeHistCompStatistic = AppText.HomeHistory.StatisticComponent
-typealias AppTextHomeHistCompWeeklyCalendar = AppText.HomeHistory.WeeklyCalendarComponent
-typealias AppTextHomeHistCompHomeActivity = AppText.HomeHistory.HomeActivityComponent
-typealias AppTextHomeHistCompButtonActivity = AppText.HomeHistory.ButtonActivityComponent
-typealias AppTextHomeHistCompHalfCircleProgress = AppText.HomeHistory.HalfCircleProgressComponent
-
-// NOTE: Patient Module Texts
-typealias AppTextPatientDetail = AppText.Patient.DetailView
-typealias AppTextPatientForm = AppText.Patient.FormView
-typealias AppTextPatientList = AppText.Patient.ListView
-typealias AppTextPatientCompCard = AppText.Patient.PatientCardComponent
-typealias AppTextPatientCompFormField = AppText.Patient.PatientFormFieldComponent
-
-// NOTE: UserManagement Module Texts
-typealias AppTextUserMgmtView = AppText.UserManagement.UserManagementView
-typealias AppTextUserMgmtNewUserForm = AppText.UserManagement.NewUserFormView
-typealias AppTextUserMgmtEditUserForm = AppText.UserManagement.EditUserFormView
-typealias AppTextUserMgmtUserListView = AppText.UserManagement.UserListView
-typealias AppTextUserMgmtCompBottomSheet = AppText.UserManagement.BottomSheetMenuComponent
-
-// NOTE: VideoRecord Module Texts
-typealias AppTextVideoRecordView = AppText.VideoRecord.VideoRecordView
-typealias AppTextVideoRecordInstruction = AppText.VideoRecord.InstructionRecordView
-typealias AppTextVideoRecordStitched = AppText.VideoRecord.StitchedImageView
-typealias AppTextVideoRecordFullScreen = AppText.VideoRecord.FullScreenVideoPlayerView
-typealias AppTextVideoRecordCompCamera = AppText.VideoRecord.CameraViewComponent
-typealias AppTextVideoRecordCompPreview = AppText.VideoRecord.VideoPreviewComponent
-typealias AppTextVideoRecordCompInput = AppText.VideoRecord.VideoInputComponent
-
-// NOTE: TaskAssignment Module Texts
-typealias AppTextTaskAssignInputPatient = AppText.TaskAssignment.InputPatientDataView
-typealias AppTextTaskAssignInputExam = AppText.TaskAssignment.InputExaminationDataView
-typealias AppTextTaskAssignCompDateField = AppText.TaskAssignment.DateFieldComponent
-typealias AppTextTaskAssignCompPatientDisplay = AppText.TaskAssignment.PatientDisplayFieldComponent
-
-// NOTE: Analysist Module Texts
-typealias AppTextAnalysisResult = AppText.Analysist.AnalysisResultView
-typealias AppTextAnalysisInformation = AppText.Analysist.InformationPageView
-typealias AppTextAnalysisFOVDetail = AppText.Analysist.FOVDetailView
-typealias AppTextAnalysisPDF = AppText.Analysist.PDFView
-typealias AppTextAnalysisFOVAlbum = AppText.Analysist.FOVAlbumView
-typealias AppTextAnalysisCompZoomable = AppText.Analysist.ZoomableImageComponent
+// MARK: - Convenient Type Aliases (Shorter access)
+typealias AppAction = AppText.Action
+typealias AppState = AppText.State
+typealias AppLabel = AppText.Label
+typealias AppValue = AppText.Value
+typealias AppPatient = AppText.PatientData
+typealias AppMedical = AppText.Medical
+typealias AppSearch = AppText.Search
+typealias AppForm = AppText.Form
+typealias AppNav = AppText.Navigation
+typealias AppData = AppText.Data
+typealias AppIcon = AppText.SystemIcon
+typealias AppImage = AppText.AppIcon
+typealias AppFeature = AppText.Feature
 
 enum AppText {
-    enum Icon {
-        static let back = "back"
+    // MARK: - Core System Icons (Reusable across all modules)
+    enum SystemIcon {
+        static let back = "chevron.left"
+        static let forward = "chevron.right"
+        static let up = "chevron.up"
+        static let down = "chevron.down"
+        static let backCircle = "chevron.backward.circle"
+        static let close = "xmark"
+        static let add = "plus"
+        static let edit = "pencil"
+        static let delete = "trash"
+        static let search = "magnifyingglass"
+        static let settings = "gearshape"
+        static let info = "info.circle"
+        static let warning = "exclamationmark.triangle.fill"
+        static let alert = "exclamationmark.circle.fill"
+        static let success = "checkmark.circle.fill"
+        static let error = "xmark.circle.fill"
+        static let circleFill = "circle.fill"
+        static let camera = "camera"
+        static let cameraFill = "camera.fill"
+        static let photo = "photo"
+        static let document = "doc.text"
+        static let documentFill = "doc.text.fill"
+        static let share = "square.and.arrow.up"
+        static let refresh = "arrow.counterclockwise"
+        static let calendar = "calendar"
+        static let ellipsis = "ellipsis"
         static let eye = "eye"
+        static let eyeSlash = "eye.slash"
         static let faceId = "faceid"
-        static let success = "Success"
         static let checkmark = "checkmark"
         static let personFill = "person.fill"
         static let arrowRight = "arrow.right"
+        static let arrowForward = "arrow.forward"
         static let lock = "lock"
         static let lockCircleDotted = "lock.circle.dotted"
         static let lockShield = "lock.shield"
         static let doorRightHandOpen = "door.right.hand.open"
         static let docTextMagnifyingglass = "doc.text.magnifyingglass"
-        static let docText = "doc.text"
-        static let docTextFill = "doc.text.fill"
         static let paperplane = "paperplane"
-        static let chevronRightIcon = "chevron.right"
-        static let photo = "photo"
         static let textBadgeCheckmark = "text.badge.checkmark"
-        static let exclamationmarkTriangleFill = "exclamationmark.triangle.fill"
-        static let docOnDocFillIcon = "doc.on.doc.fill"
-        static let docBadgePlusIcon = "doc.badge.plus"
-        static let plus = "plus"
-        static let magnifyingglass = "magnifyingglass"
+        static let docOnDocFill = "doc.on.doc.fill"
+        static let docBadgePlus = "doc.badge.plus"
         static let deleteLeftFill = "delete.left.fill"
         static let robot = "robot"
         static let rectangleStackFill = "rectangle.stack.fill"
-        static let infoCircle = "info.circle"
-        static let xmark = "xmark"
-        static let chevronDown = "chevron.down"
-        static let chevronUp = "chevron.up"
-        static let confirmLeave = "Confirm-Leave"
-        static let confirm = "Confirm"
         static let trayFullFill = "tray.full.fill"
-        static let calendar = "calendar"
-        static let ellipsis = "ellipsis"
-        static let pencil = "pencil"
-        static let trash = "trash"
-        static let chevronLeft = "chevron.left"
-        static let addAccount = "AddAccount"
-        static let xmarkCircleFill = "xmark.circle.fill"
-        static let arrowCounterclockwise = "arrow.counterclockwise"
-        static let camera = "camera"
-        static let cameraFill = "camera.fill"
-        static let preparationSectionIcon = "list.number"
-        static let destroy = "Destroy"
-        static let checkmarkCircleFill = "checkmark.circle.fill"
-        static let shareIcon = "square.and.arrow.up"
+        static let preparationSection = "list.number"
+        static let rectangleSplit2x2Fill = "rectangle.split.2x2.fill"
+        static let clockArrowCirclepath = "clock.arrow.circlepath"
+        static let clockFill = "clock.fill"
+        static let personCircle = "person.circle"
+        static let squareAndPencil = "square.and.pencil"
+        static let circle = "circle"
+        static let largecircleFillCircle = "largecircle.fill.circle"
+        static let buttonProgrammable = "button.programmable"
+    }
+    
+    // MARK: - App Specific Icons
+    enum AppIcon {
         static let logo = "logo"
-        static let phoneIcon = "phoneIcon"
-        static let envelopeIcon = "envelopeIcon"
+        static let destroy = "Destroy"
+        static let confirm = "Confirm"
+        static let confirmLeave = "Confirm-Leave"
+        static let contrast = "Contrast"
+        static let brightness = "Brightness"
+        static let comment = "Comment"
+        static let addAccount = "AddAccount"
+        static let phone = "phoneIcon"
+        static let envelope = "envelopeIcon"
         static let line = "line"
-    }
-
-    enum Common {
-        static let okButton = "OK"
-        static let cancelButton = "Batal"
-        static let closeButton = "Tutup"
-        static let saveButton = "Simpan"
-        static let deleteButton = "Hapus"
-        static let editButton = "Ubah"
-        static let nextButton = "Lanjutkan"
-        static let backButton = "Kembali"
-        static let emptyString = ""
-        static let errorAlertTitle = "Error"
+        static let backWhite = "back_white"
+        static let back = "back"
+        static let success = "Success"
+        static let robot = "robot"
+        static let instruction = "Instruction"
+        static let logoSplashScreen = "LogoSplashScreen"
+        static let login = "LoginImage"
     }
     
-    enum Authentication {
-        enum LoginView {
-            static let title = "Revolusi Deteksi Bakteri dengan Teknologi AI"
-            static let emailTitle = "Email"
-            static let emailPlaceholder = "Contoh: your.name@gmail.com"
-            static let passwordTitle = "Kata Sandi"
-            static let passwordPlaceholder = "Masukkan kata sandi anda"
-            static var buttonText = "Login"
-            static let faskesNotRegisteredYet = "Faskes belum terdaftar?"
-            static let registerFaskesButtonText = "Daftarkan Faskes"
+    // MARK: - Universal Actions (Used across all modules)
+    enum Action {
+        static let ok = "common.ok".localized
+        static let cancel = "common.cancel".localized
+        static let save = "common.save".localized
+        static let delete = "common.delete".localized
+        static let edit = "common.edit".localized
+        static let close = "common.close".localized
+        static let next = "common.next".localized
+        static let back = "common.back".localized
+        static let done = "common.done".localized
+        static let exit = "common.exit".localized
+        static let settings = "common.settings".localized
+        static let retry = "common.retry".localized
+        static let refresh = "common.refresh".localized
+        static let continueAct = "common.continue".localized
+        static let skip = "common.skip".localized
+        static let confirm = "common.confirm".localized
+        static let search = "common.search".localized
+        
+        // Common button patterns
+        static let saveChanges = "common.save_changes".localized
+        static let saveData = "common.save_data".localized
+        static let addNew = "common.add_new".localized
+        static let editData = "common.edit_data".localized
+        static let deleteData = "common.delete_data".localized
+        
+        // Dynamic functions for custom combinations
+        static func save(_ itemType: String) -> String {
+            return "common.save_item".localized(with: itemType)
         }
         
-        enum EditPasswordView {
-            static let successUpdatePasswordTitle = "Berhasil mengubah Password"
-            static let successUpdatePasswordMessage = "Anda telah berhasil mengubah password akun anda"
-            static let successUpdatePasswordButtonText = "Kembali ke profile"
-            static let navigationTitle = "Atur Password"
-            static let currentPasswordTitle = "Password Saat Ini"
-            static let currentPasswordPlaceholder = "Masukkan Password"
-            static let newPasswordTitle = "Password Baru"
-            static let newPasswordPlaceholder = "Masukkan Password Baru"
-            static let newPasswordDescription = "Password harus terdiri dari minimal 8 karakter"
-            static let confirmPasswordTitle = "Konfirmasi Password Baru"
-            static let confirmPasswordPlaceholder = "Masukkan Konfirmasi Password Baru"
+        static func add(_ itemType: String?) -> String {
+            let item = itemType ?? ""
+            return "common.add_item".localized(with: item)
         }
-
-        enum UserAccessPinView {
-            static let successTitle = "PIN Berhasil Diubah"
-            static let successDescription = "PIN akses Anda telah berhasil diperbarui"
-            static let successButton = "Kembali ke Profile"
+        
+        static func edit(_ itemType: String) -> String {
+            return "common.edit_item".localized(with: itemType)
         }
-
-        enum ProfileView {
-            static let accountInfoTitle = "Informasi Akun"
-            static let emailKey = "Email"
-            static let roleKey = "Role"
-            static let jobTitleKey = "Jabatan Pekerjaan"
-            static let jobTitleValue = "Ahli Teknologi Laboratorium Medik"
-            static let healthFacilityKey = "Fasyankes"
-            static let healthFacilityDefault = "-"
-            static let accountManagementButton = "Manajemen Akun"
-            static let editPasswordButton = "Atur Kata Sandi"
-            static let editPinButton = "Atur PIN"
-            static let faceIdToggle = "Face ID"
-            static let privacyPolicyButton = "Kebijakan Privasi"
-            static let logoutButton = "Keluar"
-            static let navigationTitle = "Profile"
-            static var saveChangesButton = "Simpan Perubahan"
+        
+        static func delete(_ itemType: String) -> String {
+            return "common.delete_item".localized(with: itemType)
         }
-
-        enum PrivacyPolicyView {
-            static let navigationTitle = "Kebijakan Privasi Oculab"
-            static let intro = "Mohon untuk membaca seluruh kebijakan privasi yang terlampir dengan cermat dan seksama sebelum menggunakan setiap fitur dan/atau layanan yang tersedia dalam Oculab"
-            static let generalTitle = "Ketentuan Umum"
-            static let generalPoints = [
-                "Negatif: Tidak ditemukan BTA minimal dalam 100 lapang pandang",
-                "Scanty: 1-9 BTA dalam 100 lapang pandang",
-                "Positif 1+: 10 – 99 BTA dlm 100 lapang pandang",
-                "Positif 2+: 1 – 10 BTA setiap 1 lapang pandang, minimal terdapat di 50 lapang pandang",
-                "Positif 3+: ≥ 10 BTA setiap 1 lapang pandang, minimal terdapat di 20 lapang pandang"
-            ]
-            static let definitionBullet = "•"
-
-            static let definitionTitle = "Definisi"
-            static let definitionIntro = "Setiap kata atau istilah berikut yang digunakan di dalam Kebijakan Privasi ini memiliki arti seperti berikut di bawah, kecuali jika kata atau istilah yang bersangkutan di dalam pemakaiannya dengan tegas menentukan lain:"
-
-            struct Definition: Hashable {
-                let label: String
-                let text: String
-                let subpoints: [Definition]?
-                init(label: String, text: String, subpoints: [Definition]? = nil) {
-                    self.label = label
-                    self.text = text
-                    self.subpoints = subpoints
-                }
+        
+        static func view(_ itemType: String) -> String {
+            return "common.view_item".localized(with: itemType)
+        }
+        
+        static func backTo(_ destination: String) -> String {
+            return "common.back_to".localized(with: destination)
+        }
+        
+        static func startAction(_ actionType: String) -> String {
+            return "common.start_action".localized(with: actionType)
+        }
+        
+        static func create(_ itemType: String) -> String {
+            return "common.create_item".localized(with: itemType)
+        }
+        
+        static func disable(_ itemType: String) -> String {
+            return "common.disable_item".localized(with: itemType)
+        }
+    }
+    
+    // MARK: - Universal States (Used across all modules)
+    enum State {
+        static let loading = "state.loading".localized
+        static let empty = "state.empty".localized
+        static let error = "state.error".localized
+        static let success = "state.success".localized
+        static let pending = "state.pending".localized
+        static let notAvailable = "state.not_available".localized
+        static let unknown = "state.unknown".localized
+        static let completed = "state.completed".localized
+        static let inProgress = "state.in_progress".localized
+        
+        // Dynamic status patterns
+        static func loading(_ action: String) -> String {
+            return "state.loading_action".localized(with: action)
+        }
+        
+        static func success(_ action: String) -> String {
+            return "state.success_action".localized(with: action)
+        }
+        
+        static func failed(_ action: String) -> String {
+            return "state.failed_action".localized(with: action)
+        }
+        
+        static func noData(_ itemType: String) -> String {
+            return "state.no_data".localized(with: itemType)
+        }
+        
+        static func notDetermined(_ itemType: String) -> String {
+            return "state.not_determined".localized(with: itemType)
+        }
+        
+        static func successWith(_ action: String, _ itemType: String) -> String {
+            return "state.success_with".localized(with: action, itemType)
+        }
+    }
+    
+    // MARK: - Universal Labels (Common field names)
+    enum Label {
+        static let name = "label.name".localized
+        static let email = "label.email".localized
+        static let password = "label.password".localized
+        static let phone = "label.phone".localized
+        static let address = "label.address".localized
+        static let date = "label.date".localized
+        static let time = "label.time".localized
+        static let notes = "label.notes".localized
+        static let description = "label.description".localized
+        static let title = "label.title".localized
+        static let type = "label.type".localized
+        static let status = "label.status".localized
+        static let result = "label.result".localized
+        static let category = "label.category".localized
+        static let role = "label.role".localized
+    }
+    
+    // MARK: - Common Values
+    enum Value {
+        static let empty = ""
+        static let defaultStrike = "-"
+        static let bullet = "•"
+        static let percentage = "%"
+        static let required = "*"
+        static let unknownError = "common.unknown_error".localized
+        static let unknownMessage = "common.unknown_message".localized
+    }
+    
+    // MARK: - Patient Data (Reusable across modules)
+    enum PatientData {
+        static let name = "patient.name".localized
+        static let nik = "patient.nik".localized
+        static let dateOfBirth = "patient.dob".localized
+        static let gender = "patient.gender".localized
+        static let bpjsNumber = "patient.bpjs".localized
+        static let age = "patient.age".localized
+        static let ageSuffix = "patient.age_suffix".localized
+        
+        enum Gender {
+            static let male = "patient.gender.male".localized
+            static let female = "patient.gender.female".localized
+            static let other = "patient.gender.other".localized
+        }
+        
+        enum Placeholder {
+            static let name = "patient.placeholder.name".localized
+            static let nik = "patient.placeholder.nik".localized
+            static let bpjs = "patient.placeholder.bpjs".localized
+            static let selectDate = "patient.placeholder.select_date".localized
+        }
+    }
+    
+    // MARK: - Medical Terms (Reusable across examination modules)
+    enum Medical {
+        static let patient = "medical.patient".localized
+        
+        enum BTA {
+            static let negative = "medical.bta.negative".localized
+            static let scanty = "medical.bta.scanty".localized
+            static let positive1 = "medical.bta.positive1".localized
+            static let positive2 = "medical.bta.positive2".localized
+            static let positive3 = "medical.bta.positive3".localized
+            
+            enum Description {
+                static let negative = "medical.bta.desc.negative".localized
+                static let scanty = "medical.bta.desc.scanty".localized
+                static let positive1 = "medical.bta.desc.positive1".localized
+                static let positive2 = "medical.bta.desc.positive2".localized
+                static let positive3 = "medical.bta.desc.positive3".localized
             }
-
-            static let definitions: [Definition] = [
-                Definition(label: "a.", text: "“OCULAB” adalah platform yang dipergunakan di wilayah Republik Indonesia untuk tujuan:", subpoints: [
-                    Definition(label: "i.", text: "Mencakup Data Sumber Daya Manusia Kesehatan baik tenaga medis, tenaga keteknisian medis, dan tenaga Kesehatan lainnya yang diverifikasi oleh Dinas Kesehatan Kabupaten/ Kota dan divalidasi oleh Dinas Kesehatan Provinsi."),
-                    Definition(label: "ii.", text: "Penyelenggaraan informasi Sumber Daya Manusia Kesehatan;"),
-                    Definition(label: "iii.", text: "Sistem informasi Kesehatan bagi Sumber Daya Manusia Kesehatan; dan"),
-                    Definition(label: "iv.", text: "upaya kesehatan lainnya yang bersifat promotif, preventif, kuratif, dan rehabilitatif serta tujuan-tujuan lainnya selama diizinkan berdasarkan ketentuan peraturan perundang-undangan yang berlaku.")
-                ]),
-                Definition(label: "b.", text: "“Platform” adalah platform SATUSEHAT SDMK, sistem, dan/atau aplikasi layanan integrasi dan interoperabilitas data Sumber Daya Manusia Kesehatan yang dikelola dan diselenggarakan oleh Kementerian Kesehatan. Termasuk daftar Riwayat hidup, riwayat Pendidikan, riwayat pekerjaan dan kebutuhan data terkait lainnya."),
-                Definition(label: "c.", text: "“Platform” adalah platform SATUSEHAT SDMK, sistem, dan/atau aplikasi layanan integrasi dan interoperabilitas data Sumber Daya Manusia Kesehatan yang dikelola dan diselenggarakan oleh Kementerian Kesehatan. Termasuk daftar Riwayat hidup, riwayat Pendidikan, riwayat pekerjaan dan kebutuhan data terkait lainnya."),
-                Definition(label: "d.", text: "“Pengguna”, berarti setiap Sumber Daya Manusia Kesehatan yang menggunakan SATUSEHAT SDMK."),
-                Definition(label: "e.", text: "“Tenaga Kesehatan”, berarti setiap orang yang mengabdikan diri dalam bidang Kesehatan serta memiliki pengetahuan dan/ atau keterampilan melalui Pendidikan di bidang Kesehatan yang untuk jenis tertentu memerlukan kewenangan untuk melakukan Upaya Kesehatan."),
-                Definition(label: "f.", text: "“Fasilitas Pelayanan Kesehatan”, suatu alat dan/ atau tempat yang digunakan untuk menyelenggarakan Upaya pelayanan Kesehatan, baik promotif, preventif, kuratif maupun rehabilitatif yang dilakukan oleh pemerintah, pemerintah daerah, dan/ atau Masyarakat."),
-                Definition(label: "g.", text: "“Data Pribadi” atau “Data Kesehatan” berarti setiap dan seluruh data pribadi dan data kondisi kesehatan Pengguna, termasuk namun tidak terbatas pada nama, nomor identifikasi, lokasi Pengguna, kontak Pengguna, serta dokumen dan data lainnya sebagaimana diminta pada formulir pendaftaran akun atau informasi kesehatan termasuk setiap dan seluruh data kesehatan Pengguna seperti rekam medis, jenis kelamin, kondisi kesehatan, pengobatan, alergi, vaksinasi, imunisasi, tindakan, riwayat medis, resep, laporan, anjuran dan informasi medis atau catatan kondisi kesehatan lainnya."),
-                Definition(label: "h.", text: "“Pengendali Data” adalah setiap orang, badan publik, dan/atau organisasi internasional yang bertindak sendiri-sendiri atau bersama-sama dalam menentukan tujuan dan melakukan kendali pemrosesan Data Pribadi atau Data Kesehatan atau informasi lainnya. “Prosesor Data” adalah setiap orang, badan publik, dan/atau organisasi internasional yang bertindak sendiri-sendiri atau bersama-sama dalam melakukan pemrosesan Data Pribadi atau Data Kesehatan atau informasi lainnya yang ditunjuk Pengendali Data.")
-            ]
         }
-
-        enum PinComponent {
-            static let forgotPinText = "Lupa PIN?"
-            static let usePasswordButton = "Gunakan Password"
+        
+        enum Examination {
+            static let purpose = "medical.exam.purpose".localized
+            static let result = "medical.exam.result".localized
+            static let interpretation = "medical.exam.interpretation".localized
+            static let staffInterpretation = "medical.exam.staff_interpretation".localized
+            static let systemInterpretation = "medical.exam.system_interpretation".localized
+            static let bacteriaCount = "medical.exam.bacteria_count".localized
+            static let slideId = "medical.exam.slide_id".localized
+            static let examinationId = "medical.exam.examination_id".localized
+            static let specimenType = "medical.exam.specimen_type".localized
+            static let specimenInfo = "medical.exam.specimen_info".localized
+            static let microscopicInterpretation = "medical.exam.microscopic_interpretation".localized
+            static let bacteriaCountSuffix = "medical.exam.bacteria_suffix".localized
+            static let confidenceLevel = "medical.exam.confidence_level".localized
+            static let goalScreening = "medical.exam.goal_screening".localized
+            static let goalFollowUp = "medical.exam.goal_followup".localized
+            static let preparationTypeAnytime = "medical.exam.preparation_anytime".localized
+            static let preparationTypeMorning = "medical.exam.preparation_morning".localized
+        }
+        
+        enum Confidence {
+            static let perfect = "medical.confidence.perfect".localized
+            static let high = "medical.confidence.high".localized
+            static let medium = "medical.confidence.medium".localized
+            static let low = "medical.confidence.low".localized
+            static let veryLow = "medical.confidence.very_low".localized
+            static let unpredicted = "medical.confidence.unpredicted".localized
         }
     }
+    
+    // MARK: - Search & Filter (Reusable components)
+    enum Search {
+        static let search = "search.search".localized
+        static let placeholder = "search.placeholder".localized
+        static let noResults = "search.no_results".localized
+        static let clearSearch = "search.clear".localized
+        static let searching = "search.searching".localized
+        
+        enum Patient {
+            static let placeholder = "search.patient.placeholder".localized
+        }
+        
+        enum Account {
+            static let placeholder = "search.account.placeholder".localized
+        }
+        
+        static func noResults(_ searchTerm: String) -> String {
+            return "search.no_results_for".localized(with: searchTerm)
+        }
+        
+        static func resultFor(_ itemType: String) -> String {
+            return "search.result_for".localized(with: itemType)
+        }
+    }
+    
+    // MARK: - Forms (Reusable form elements)
+    enum Form {
+        static let optional = "form.optional".localized
+        static let selectOption = "form.select_option".localized
+        static let enterValue = "form.enter_value".localized
+        static let disable = "form.disable".localized
+        
+        enum Validation {
+            static let required = "form.validation.required".localized
+            static let invalid = "form.validation.invalid".localized
+            static let tooShort = "form.validation.too_short".localized
+            static let tooLong = "form.validation.too_long".localized
+        }
+        
+        static func placeholder(_ fieldName: String) -> String {
+            return "form.placeholder".localized(with: fieldName)
+        }
+        
+        static func select(_ itemType: String) -> String {
+            return "form.select".localized(with: itemType)
+        }
+        
+        static func search(_ itemType: String) -> String {
+            return "form.search".localized(with: itemType)
+        }
+    }
+    
+    // MARK: - Navigation (Reusable navigation items)
+    enum Navigation {
+        static let profile = "nav.profile".localized
+        static let history = "nav.history".localized
+        static let examination = "nav.examination".localized
+        static let patients = "nav.patients".localized
+        static let settings = "nav.settings".localized
+        static let accountManagement = "nav.account_management".localized
+    }
+    
+    // MARK: - Common Data Patterns
+    enum Data {
+        static func count(_ number: Int, _ itemType: String) -> String {
+            return "data.count".localized(with: number, itemType)
+        }
+        
+        static func fromTo(_ current: Int, _ total: Int, _ itemType: String) -> String {
+            return "data.from_to".localized(with: current, total, itemType)
+        }
+        
+        static func imageCount(_ current: Int, _ total: Int) -> String {
+            return "data.image_count".localized(with: current, total)
+        }
+        
+        static func albumTitle(_ itemName: String) -> String {
+            return "data.album_title".localized(with: itemName)
+        }
+        
+        static func resultTitle(_ itemName: String, _ slideNumber: Int) -> String {
+            return "data.result_title".localized(with: itemName, slideNumber)
+        }
+        
+        static func slideTitle(_ slideNumber: Int) -> String {
+            return "data.slide_title".localized(with: slideNumber)
+        }
+        
+        static func slideIdTitle(_ slideNumber: Int) -> String {
+            return "data.slide_id_title".localized(with: slideNumber)
+        }
 
-    enum Examination {
-        enum ProgressView {
-            static let loadingAnimationName = "loadingPaperplane"
-            static let analyzingTitle = "Menginterpretasikan data"
-            static let refreshInstruction = "Please scroll down to refresh to update the data"
+        static func slideIdPlaceholder(_ slideNumber: String) -> String {
+            return "data.slide_id_placeholder".localized(with: slideNumber)
         }
         
-        enum DetailViews {
-            static let navigationTitle = "Detail Pemeriksaan"
-            static let patientDataTitle = "Data Pasien"
-            static let patientNameKey = "Nama"
-            static let patientNikKey = "NIK"
-            static let patientDobKey = "Tanggal Lahir"
-            static let patientSexKey = "Jenis Kelamin"
-            static let patientBpjsKey = "Nomor BPJS"
-            static let examinationResult1Title = "Hasil Pemeriksaan Sediaan 1"
-            static let examinationResult2Title = "Hasil Pemeriksaan Sediaan 2"
-            static let staffInterpretationTitle = "Interpretasi Petugas"
-            static let notAvailable = "Belum Tersedia"
-            static let slideIdKey = "ID Sediaan"
-            static let preparationTypeKey = "Jenis Sediaan"
-            static let viewPdfButton = "Lihat PDF"
-            static let reportToSitbButton = "Laporkan ke SITB"
-            
-            // New examination view specific strings
-            static let newExaminationTitle = "Pemeriksaan Baru"
-            static let dataPemeriksaanStep = "Data Pemeriksaan"
-            static let hasilPemeriksaanStep = "Hasil Pemeriksaan"
-            static let slideDetailTitle = "Detail Sediaan"
-            static let examinationGoalKey = "Tujuan Pemeriksaan"
-            static let slideImageTitle = "Gambar Sediaan"
+        static func slideTypeTitle(_ slideNumber: Int) -> String {
+            return "data.slide_type_title".localized(with: slideNumber)
         }
         
-        enum GuidelinesOnboardingView {
-            static let navigationTitle = "Persiapan Pemeriksaan"
-            static let continueButton = "Lanjutkan"
-            
-            struct GuidelineContent {
-                let imageName: String
-                let title: String
-                let description: String
+        static func withPrefix(_ prefix: String, _ content: String) -> String {
+            return "data.with_prefix".localized(with: prefix, content)
+        }
+        
+        static func makeSentence<T>(_ words: [T]) -> String {
+            guard !words.isEmpty else {
+                return ""
             }
             
-            static let guidelines: [GuidelineContent] = [
-                GuidelineContent(
-                    imageName: "Guideline1",
-                    title: "Temukan Lapang Pandang pada Mikroskop",
-                    description: "Teteskan minyak imersi pada kaca sediaan dan atur lensa objektif ke perbesaran 100x"
-                ),
-                GuidelineContent(
-                    imageName: "Guideline2",
-                    title: "Pasang Handphone pada Adapter",
-                    description: "Bersihkan lensa kamera utama dan sejajarkan dengan lubang adapter"
-                ),
-                GuidelineContent(
-                    imageName: "Guideline3",
-                    title: "Pasang Adapter pada Mikroskop",
-                    description: "Pasang adapter ke lensa okuler dan atur fokus antara mikroskop dan kamera"
-                )
-            ]
-        }
-        
-        enum SavedResultView {
-            static let examinationDetailTitle = "Detail Pemeriksaan"
-            static let examinationReasonKey = "Alasan Pemeriksaan"
-            static let imageResultTitle = "Hasil Gambar"
-            static let imageResultInstruction = "Ketuk untuk lihat detail gambar"
-            static let interpretationResultTitle = "Hasil Interpretasi"
-            static let staffInterpretationTitle = "Interpretasi Petugas"
-            static let systemInterpretationTitle = "Interpretasi Sistem"
-            static let systemInterpretationWarning = "Interpretasi sistem bukan merupakan hasil akhir untuk pasien"
-        }
-        
-        enum ConfirmationPopupsComponent {
-            static let unfinishedExaminationTitle = "Pemeriksaan Belum Selesai"
-            static let unfinishedExaminationDescription = "Pemeriksaan disimpan sebagai draft dan dapat diakses di halaman riwayat"
-            static let exitButton = "Keluar"
-            static let reviewAgainButton = "Periksa Kembali"
-            static let saveResultTitle = "Simpan Hasil Pemeriksaan"
-            static let saveResultDescription = "Hasil pemeriksaan yang sudah disimpan tidak dapat diubah kembali"
-            static let saveButton = "Simpan"
-        }
-        
-        enum GradingCardComponent {
-            static let confidenceLevelText = "confidence level"
-        }
-        
-        enum ImageSectionComponent {
-            static let imageResultTitle = "Hasil Gambar"
-            static let imageResultInstruction = "Ketuk untuk lihat detail gambar"
-        }
-        
-        enum InterpretationSectionComponent {
-            static let interpretationResultTitle = "Hasil Interpretasi"
-            static let staffInterpretationTitle = "Interpretasi Petugas"
-            static let selectCategoryPlaceholder = "Pilih kategori"
-            static let btaCountTitle = "Jumlah BTA"
-            static let btaCountPlaceholder = "Contoh: 8"
-            static let staffNotesTitle = "Catatan Petugas"
-            static let staffNotesPlaceholder = "Contoh: Hanya terdapat 20 bakteri dari 60 lapangan pandang yang terkumpul"
-            static let doneButton = "Selesai"
-        }
-        
-        enum LaborantInfoComponent {
-            static let examinationOfficerTitle = "Petugas Pemeriksaan"
-            static let assignedByTitle = "Ditugaskan Oleh"
-        }
-        
-        enum FolderCardComponent {
-            static let imageCountSuffix = "Gambar"
-        }
-        
-        enum HeaderViewComponent {
-            static let newExaminationTitle = "Pemeriksaan Baru"
-        }
-        
-        enum ExtendableCardComponent {
-            static let unknownTitle = "Unknown"
+            var sentence = String(describing: words[0])
+            
+            for word in words.dropFirst() {
+                sentence += " \(String(describing: word))"
+            }
+            
+            return sentence
         }
     }
     
-    enum HomeHistory {
-        static let navigationTitleHistory = "Riwayat"
-        static let loadingMessage = "Memuat data pemeriksaan anda"
-        static let emptyStateImageName = "Empty"
-        static let noExaminationMessage = "Tidak ada pemeriksaan diselesaikan pada"
-
-        static let navigationTitleHome = "Tugas Pemeriksaan"
-        static let taskSectionTitle = "Tugas Pemeriksaan"
-        static let newExaminationButton = "Pemeriksaan Baru"
-        static let noTaskMessage = "Anda belum ditugaskan untuk melakukan pemeriksaan"
-        
-        enum FinishedExaminationCardComponent {
-            static let patientLabel = "Pasien"
-            static let dpjpLabel = "DPJP"
-            static let positiveKeyword = "positif"
-            static let positiveAltKeyword = "positive"
-        }
-        
-        enum StatisticComponent {
-            static let title = "Statistik Pemeriksaan"
-            static let tasksCompletedSuffix = "Tugas Selesai"
-            static let fromTasksPrefix = "dari"
-            static let tasksInTotalSuffix = "Tugas"
-            static let positiveLabel = "Positif"
-            static let negativeLabel = "Negatif"
-            static let pendingLabel = "Pending"
-        }
-        
-        enum WeeklyCalendarComponent {
-            static let title = "Pemeriksaan Selesai"
-            static let selectDatePickerTitle = "Select a Date"
-        }
-        
-        enum HomeActivityComponent {
-            static let examinationOfficerLabel = "Petugas Pemeriksaan"
-        }
-        
-        enum ButtonActivityComponent {
-            // This component doesn't have hardcoded strings, but keeping for consistency
-        }
-        
-        enum HalfCircleProgressComponent {
-            static let percentageSuffix = "%"
-        }
-    }
-    
-    enum Patient {
-        enum FormView {
-            static let newPatientNavigationTitle = "Data Pasien Baru"
-            static let editPatientNavigationTitle = "Ubah Data Pasien"
-            static let addNewPatientButton = "Tambahkan Pasien Baru"
-            static let savePatientButton = "Simpan Data Pasien"
-            static let errorAlertTitle = "Error"
-        }
-        
-        enum ListView {
-            static let navigationTitle = "Riwayat"
-            static let searchPlaceholder = "Cari nama pasien"
-            static let addNewPatientButton = "Tambah Pasien Baru"
-            static let noResultsPrefix = "Tidak ada hasil untuk"
-            static let clearSearchButton = "Hapus Pencarian"
-            static let magnifyingglassIcon = "magnifyingglass"
-        }
-        
-        enum DetailView {
-            static let navigationTitle = "Riwayat Pemeriksaan"
-            static let patientDataTitle = "Data Pasien"
-            static let examinationResultTitle = "Hasil Pemeriksaan"
-            static let newExaminationButton = "Pemeriksaan Baru"
-            static let loadingPatientMessage = "Loading patient data..."
-            static let loadingExaminationsMessage = "Loading examinations..."
-            static let noExaminationsMessage = "Belum ada pemeriksaan"
-            static let notDeterminedMessage = "Belum ditentukan"
-            static let patientNameKey = "Nama"
-            static let patientNikKey = "NIK"
-            static let patientDobKey = "Tanggal Lahir"
-            static let patientSexKey = "Jenis Kelamin"
-            static let patientBpjsKey = "Nomor BPJS"
-        }
-        
-        enum PatientCardComponent {
-            static let birthDatePrefix = "Tanggal Lahir: "
-        }
-        
-        enum PatientFormFieldComponent {
-            static let nameTitle = "Nama"
-            static let namePlaceholder = "John Doe"
-            static let nikTitle = "NIK"
-            static let nikPlaceholder = "Contoh: 167012039484700"
-            static let birthDateTitle = "Tanggal Lahir"
-            static let birthDatePlaceholder = "Pilih Tanggal"
-            static let genderTitle = "Jenis Kelamin"
-            static let femaleChoice = "Perempuan"
-            static let maleChoice = "Laki-laki"
-            static let bpjsTitle = "Nomor BPJS (opsional)"
-            static let bpjsPlaceholder = "Contoh: 1240630077675"
-            static let doneButton = "Selesai"
-        }
-    }
-    
-    enum UserManagement {
-        enum UserManagementView {
-            static let navigationTitle = "Manajemen Akun"
-            static let searchPlaceholder = "Cari akun"
-            static let addNewAccountButton = "Tambah Akun Baru"
-            static let noResultsPrefix = "Tidak ada hasil untuk"
-            static let clearSearchButton = "Hapus Pencarian"
-            static let deleteAccountTitle = "Hapus akun"
-            static let deleteAccountDescription = "Akun yang sudah dihapus tidak dapat dikembalikan lagi."
-            static let deleteAccountButton = "Hapus Akun"
-            static let backButton = "Kembali"
-            static let deleteSuccessTitle = "Berhasil Menghapus Akun"
-            static let deleteSuccessDescription = "Akun berhasil dihapus"
-            static let deletionFailedTitle = "Deletion Failed"
-            static let unknownErrorMessage = "Unknown error"
-        }
-        
-        enum NewUserFormView {
-            static let navigationTitle = "Buat Akun Baru"
-            static let successTitle = "Berhasil membuat Akun"
-            static let successDescriptionPrefix = "Anda telah berhasil menambahkan akun baru untuk"
-            static let successDescriptionSuffix = "dengan role"
-            static let createAnotherAccountButton = "Buat Akun Lain"
-            static let backToAccountListButton = "Kembali ke Daftar Akun"
-            static let roleTitle = "Role"
-            static let roleLabPlaceholder = "Laboran"
-            static let roleAdminChoice = "Admin"
-            static let nameTitle = "Nama"
-            static let namePlaceholder = "John Doe"
-            static let emailTitle = "Email"
-            static let emailPlaceholder = "john@gmail.com"
-            static let registerAccountButton = "Daftarkan Akun"
-            static let registrationFailedTitle = "Registration Failed"
-            static let unknownErrorMessage = "Unknown error"
-        }
-        
-        enum EditUserFormView {
-            static let navigationTitle = "Edit Akun"
-            static let successTitle = "Berhasil mengubah Akun"
-            static let successDescriptionPrefix = "Anda telah berhasil mengubah akun untuk"
-            static let successDescriptionSuffix = "dengan role"
-            static let backToAccountListButton = "Kembali ke Daftar Akun"
-            static let roleTitle = "Role"
-            static let nameTitle = "Nama"
-            static let namePlaceholder = "Masukkan nama"
-            static let emailTitle = "Email"
-            static let emailPlaceholder = "Email"
-            static let emailDisabledDescription = "Email tidak dapat diubah"
-            static let saveChangesButton = "Simpan Perubahan"
-            static let cancelButton = "Batal"
-            static let editFailedTitle = "Edit Failed"
-            static let unknownErrorMessage = "Unknown error"
-        }
-        
-        enum UserListView {
-            // This component doesn't have specific hardcoded strings, but keeping for consistency
-        }
-        
-        enum BottomSheetMenuComponent {
-            static let editAccountDetailsButton = "Ubah Detail Akun"
-            static let deleteAccountButton = "Hapus Akun"
-        }
-    }
-    
-    enum VideoRecord {
-        enum VideoRecordView {
-            static let cameraAccessDeniedTitle = "Camera Access Denied"
-            static let cameraAccessDeniedMessage = "Please enable camera access for Oculab in Settings to record video"
-            static let goToSettingsButton = "Go to Settings"
-            static let cancelButton = "Cancel"
-        }
-        
-        enum InstructionRecordView {
-            static let navigationTitle = "Instruksi Pemeriksaan"
-            static let preparationSectionTitle = "Persiapan Pemeriksaan"
-            static let recordingSectionTitle = "Instruksi Pengambilan Gambar"
-            static let startRecordingButton = "Mulai Pengambilan Gambar"
-        }
-        
-        enum StitchedImageView {
-            static let navigationTitle = "Stitched Image"
-            static let noImageAvailableMessage = "No stitched image available"
-        }
-        
-        enum FullScreenVideoPlayerView {
-            // Empty enum for consistency, no specific strings needed
-        }
-        
-        enum CameraViewComponent {
-            static let cameraAccessAlertTitle = "Camera Access"
-            static let cameraAccessAlertMessage = "Please enable camera and microphone access in settings"
-            static let settingsButton = "Settings"
-            static let cancelButton = "Cancel"
-        }
-        
-        enum VideoPreviewComponent {
-            static let saveVideoButton = "Simpan Video"
-            static let retakeVideoButton = "Ambil Ulang"
-        }
-        
-        enum VideoInputComponent {
-            static let requiredFieldIndicator = "*"
-            static let takeVideoButton = "Ambil Gambar"
-            static let previewVideoButton = "Preview Video"
-            static let videoErrorAlertTitle = "Gagal Memutar Video"
-            static let videoErrorAlertMessage = "Video tidak dapat diputar. Silakan rekam ulang sampel."
-            static let videoErrorDismissButton = "Kembali"
-        }
-    }
-    
-    enum TaskAssignment {
-        enum InputPatientDataView {
-            static let navigationTitle = "Pemeriksaan"
-            static let stepTitles = ["Data Pasien", "Data Sediaan", "Hasil"]
-            static let currentStepIndex = 0
-            static let picTitle = "Petugas Pemeriksaan"
-            static let picPlaceholder = "Pilih Petugas"
-            static let patientNameTitle = "Nama"
-            static let patientNamePlaceholder = "Cari nama pasien"
-            static let patientNamePlaceholderAutoSelected = "Pasien dipilih otomatis"
-            static let patientNameDescription = "Pilih atau masukkan data pasien baru"
-            static let patientNameDescriptionAutoSelected = "Pasien telah dipilih dari riwayat"
-            static let fillSpecimenDetailsButton = "Isi Detail Sediaan"
-        }
-        
-        enum InputExaminationDataView {
-            static let navigationTitle = "Pemeriksaan"
-            static let stepTitles = ["Data Pasien", "Data Sediaan", "Hasil"]
-            static let currentStepIndex = 1
-            static let confirmIcon = "Confirm"
-            static let confirmPopupTitle = "Buat Tugas Pemeriksaan?"
-            static let createTaskButton = "Buat Tugas"
-            static let reviewAgainButton = "Periksa Kembali"
-            static let examinationGoalTitle = "Tujuan Pemeriksaan"
-            static let screeningChoice = "Skrinning"
-            static let followUpChoice = "Follow Up"
-            static let slideId1Title = "ID Sediaan 1"
-            static let slideId1Placeholder = "Contoh: 24/11/1/0123A"
-            static let slideType1Title = "Jenis Sediaan 1"
-            static let slideId2Title = "ID Sediaan 2"
-            static let slideId2Placeholder = "Contoh: 24/11/1/0123A"
-            static let slideType2Title = "Jenis Sediaan 2"
-            static let morningChoice = "Pagi"
-            static let anytimeChoice = "Sewaktu"
-            static let backButton = "Kembali"
-            static let createTaskFinalButton = "Buat Tugas"
-        }
-        
-        enum DateFieldComponent {
-            static let requiredFieldIndicator = "*"
-            static let datePickerLabel = "Date of Birth"
-        }
-        
-        enum PatientDisplayFieldComponent {
-            static let nikTitle = "NIK"
-            static let nikPlaceholder = "Contoh: 167012039484700"
-            static let birthDateTitle = "Tanggal Lahir"
-            static let birthDatePlaceholder = "Pilih Tanggal"
-            static let genderTitle = "Jenis Kelamin"
-            static let femaleChoice = "Perempuan"
-            static let maleChoice = "Laki-laki"
-            static let bpjsTitle = "Nomor BPJS (opsional)"
-            static let bpjsPlaceholder = "Contoh: 1240630077675"
-            static let doneButton = "Selesai"
-        }
-    }
-    
-    enum Analysist {
-        enum AnalysisResultView {
-            static let stepTitles = ["Data Pemeriksaan", "Hasil Pemeriksaan"]
-            static let currentStepIndex = 1
-            static let loadingExaminationMessage = "Loading examination data..."
-        }
-        
-        enum InformationPageView {
-            static let navigationTitle = "Informasi Interpretasi Sistem"
-            static let assessmentStandardTitle = "Standar Penilaian"
-            static let assessmentStandardDescription = "Sistem ini menghitung bakteri sesuai rekomendasi WHO dan standar IUALTD"
-            static let confidenceLevelTitle = "Confidence Level"
-            static let bulletPoint = "•"
-            
-            // Assessment Standard Points
-            static let negativeDescription = "Negatif: Tidak ditemukan BTA minimal dalam 100 lapang pandang"
-            static let scantyDescription = "Scanty: 1-9 BTA dalam 100 lapang pandang"
-            static let positive1Description = "Positif 1+: 10 – 99 BTA dlm 100 lapang pandang"
-            static let positive2Description = "Positif 2+: 1 – 10 BTA setiap 1 lapang pandang, minimal terdapat di 50 lapang pandang"
-            static let positive3Description = "Positif 3+: ≥ 10 BTA setiap 1 lapang pandang, minimal terdapat di 20 lapang pandang"
-            
-            // Confidence Level Points
-            static let perfectConfidenceDescription = "100% Confidence: Tidak ada keraguan dari sistem"
-            static let highConfidenceDescription = "High Confidence: 90% - 99%"
-            static let mediumConfidenceDescription = "Medium Confidence: 70%-89%"
-            static let lowConfidenceDescription = "Low Confidence: 50%-69%"
-            static let veryLowConfidenceDescription = "Very Low: 10% - 50%"
-            static let unpredictedDescription = "Unpredicted: 0% - 9%"
-        }
-        
-        enum FOVDetailView {
-            static let loadingDataMessage = "Data is loading..."
-            static let bacteriaCountPrefix = "Jumlah Bakteri: "
-            static let bacteriaCountSuffix = " BTA"
-            static let imageCountFormat = "Gambar %d dari %d"
-            static let slideIdPrefix = "ID "
-            static let contrastIcon = "Contrast"
-            static let brightnessIcon = "Brightness"
-            static let commentIcon = "Comment"
-            static let backWhiteIcon = "back_white"
-        }
-        
-        enum PDFView {
-            static let loadingAnimationName = "loadingPaperplane"
-            static let downloadingDataMessage = "Mendownload data"
-            
-            // PDF Content Labels
-            static let nikLabel = "NIK"
-            static let ageLabel = "Umur"
-            static let ageSuffix = " Tahun"
-            static let genderLabel = "Jenis Kelamin"
-            static let bpjsLabel = "No. BPJS"
-            static let specimenInfoTitle = "Informasi Sediaan"
-            static let examinationIdLabel = "ID Pemeriksaan"
-            static let takenAtLabel = "Diambil di"
-            static let officerLabel = "Petugas"
-            static let microscopicInterpretationTitle = "Interpretasi Mikroskopis"
-            static let staffNotesTitle = "Catatan Petugas"
-            static let noNotesDefault = "Tidak ada catatan"
-            static let reportingHeaderTitle = "Pelaporan"
-            static let observationResultsHeaderTitle = "Hasil Pengamatan"
-            
-            // Table Content
-            static let bacteriologicalExaminationResultTitle = "HASIL PEMERIKSAAN BAKTERIOLOGIS"
-            static let examinationPurposeLabel = "Tujuan Pemeriksaan"
-            static let testTypeLabel = "Jenis Uji"
-            static let specimenIdLabel = "ID Sediaan"
-            static let examinationResultLabel = "Hasil Pemeriksaan"
-            
-            // IUALTD Standard Table Data
-            static let negativeReportLabel = "Negatif"
-            static let negativeResultDescription = "Tidak ditemukan BTA dalam 100 lapang pandang"
-            static let scantyReportLabel = "Scanty"
-            static let scantyResultDescription = "Ditemukan 1-9 BTA dalam 100 lapang pandang"
-            static let positive1ReportLabel = "Positif (1+)"
-            static let positive1ResultDescription = "Ditemukan 10-99 BTA dalam 100 lapang pandang"
-            static let positive2ReportLabel = "Positif (2+)"
-            static let positive2ResultDescription = "Ditemukan 1-9 BTA dalam setiap lapang pandang, minimal dalam 50 lapang pandang"
-            static let positive3ReportLabel = "Positif (3+)"
-            static let positive3ResultDescription = "Ditemukan ≥10 BTA dalam setiap lapang pandang, minimal dalam 20 lapang pandang"
-            
-            // Signature Section
-            static let labOfficerSignatureTitle = "Petugas Lab"
-            static let supervisingDoctorSignatureTitle = "Dokter PJ Pemeriksaan Lab"
-        }
-        
-        enum FOVAlbumView {
-            static let navigationTitleFormat = "Album Gambar %@"
-        }
-        
-        enum ZoomableImageComponent {
-            // This component is mostly UI interaction based, no specific text constants needed
-        }
+    enum Feature {
+        static let radioButton = "feature.radio_button".localized
     }
 }

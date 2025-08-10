@@ -12,31 +12,31 @@ class ExamDataPresenter: ObservableObject {
     @Published var isLoading: Bool = false {
         didSet {
             if isLoading {
-                buttonTitle = "Submitting..."
+                buttonTitle = AppTextExam.buttonSubmitting
             } else {
-                buttonTitle = "Mulai Analisis"
+                buttonTitle = AppTextExam.buttonStartAnalysis
             }
         }
     }
 
     @Published var recordVideo: URL?
-    @Published var buttonTitle: String = "Mulai Analisis"
+    @Published var buttonTitle: String = AppTextExam.buttonStartAnalysis
 
     @Published var examDetailData: ExaminationDetailData = .init(
-        examinationId: "",
-        pic: "",
-        slideId: "",
-        examinationGoal: "",
-        type: "",
-        dpjp: ""
+        examinationId: AppValue.empty,
+        pic: AppValue.empty,
+        slideId: AppValue.empty,
+        examinationGoal: AppValue.empty,
+        type: AppValue.empty,
+        dpjp: AppValue.empty
     )
     @Published var patientDetailData: PatientDetailData = .init(
-        patientId: "",
-        name: "",
-        nik: "",
-        dob: "",
-        sex: "",
-        bpjs: ""
+        patientId: AppValue.empty,
+        name: AppValue.empty,
+        nik: AppValue.empty,
+        dob: AppValue.empty,
+        sex: AppValue.empty,
+        bpjs: AppValue.empty
     )
     
     @Published var examinations: [AdminExaminationData] = []
@@ -124,9 +124,9 @@ class ExamDataPresenter: ObservableObject {
                 examDetailData = ExaminationDetailData(
                     examinationId: examinationResponse.observationId,
                     pic: examinationResponse.picName,
-                    slideId: examinationResponse.examinations.first?.slideId ?? "",
+                    slideId: examinationResponse.examinations.first?.slideId ?? AppValue.empty,
                     examinationGoal: examinationResponse.goal,
-                    type: examinationResponse.examinations.first?.preparationType ?? "",
+                    type: examinationResponse.examinations.first?.preparationType ?? AppValue.empty,
                     dpjp: examinationResponse.dpjpName
                 )
             } else {

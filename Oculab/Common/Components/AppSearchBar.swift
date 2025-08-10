@@ -10,16 +10,16 @@ import UIKit
 
 struct AppSearchBar: View {
     @Binding var searchText: String
-    var placeholder: String = "Cari akun"
+    var placeholder: String = AppSearch.placeholder
     var onSearch: () -> Void
     
     // Add this to observe changes in search text
-    @State private var localSearchText: String = ""
+    @State private var localSearchText: String = AppValue.empty
     
     var body: some View {
         HStack(spacing: 12) {
             HStack(spacing: 10) {
-                Image(systemName: "magnifyingglass")
+                Image(systemName: AppIcon.search)
                     .foregroundColor(AppColors.slate400)
 
                 // Use a local state binding first to avoid excessive presenter updates
@@ -34,11 +34,11 @@ struct AppSearchBar: View {
                 // Add a clear button when text is not empty
                 if !localSearchText.isEmpty {
                     Button(action: {
-                        localSearchText = ""
-                        searchText = ""
+                        localSearchText = AppValue.empty
+                        searchText = AppValue.empty
                         UIApplication.shared.endEditing()
                     }) {
-                        Image(systemName: "xmark.circle.fill")
+                        Image(systemName: AppIcon.error)
                             .foregroundColor(AppColors.slate400)
                     }
                 }
@@ -63,7 +63,7 @@ struct AppSearchBar: View {
             }
 
             AppButton(
-                title: "Cari",
+                title: AppAction.search,
                 cornerRadius: 12,
                 action: {
                     UIApplication.shared.endEditing()

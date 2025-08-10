@@ -19,14 +19,14 @@ class AnalysisResultPresenter: ObservableObject {
 
     // MARK: State for view
 
-    @Published var selectedTBGrade: String = ""
-    @Published var numOfBTA: String = ""
-    @Published var inspectorNotes: String = ""
+    @Published var selectedTBGrade: String = AppValue.empty
+    @Published var numOfBTA: String = AppValue.empty
+    @Published var inspectorNotes: String = AppValue.empty
     @Published private var currentStep: Int = 3
     @Published var isVerifPopUpVisible = false
     @Published var isLeavePopUpVisible = false
     @Published var isWSIImageVisible: Bool = false
-    @Published var buttonTitle: String = "Simpan Hasil Pemeriksaan"
+    @Published var buttonTitle: String = AppTextExamProgress.buttonSaveResult
     @Published var isAllFOVsVerified: Bool = false
 
     @Published var startTime: Date?
@@ -159,12 +159,12 @@ class AnalysisResultPresenter: ObservableObject {
     }
 
     func navigateToAlbum(fovGroup: FOVType) {
-        Router.shared.navigateTo(.photoAlbum(fovGroup: fovGroup, examId: examinationResult?.examinationId ?? ""))
+        Router.shared.navigateTo(.photoAlbum(fovGroup: fovGroup, examId: examinationResult?.examinationId ?? AppValue.empty))
     }
 
     func navigateToDetailed(fovData: FOVData, order: Int, total: Int, examId: String?) {
         Router.shared.navigateTo(.detailedPhoto(
-            slideId: examinationResult?.slideId ?? "",
+            slideId: examinationResult?.slideId ?? AppValue.empty,
             fovData: fovData,
             order: order,
             total: total,
@@ -182,7 +182,7 @@ class AnalysisResultPresenter: ObservableObject {
         if selectedTBGrade == GradingType.SCANTY.rawValue {
             return !numOfBTA.isEmpty && Int(numOfBTA) != nil
         } else {
-            return selectedTBGrade != ""
+            return selectedTBGrade != AppValue.empty
         }
     }
 
@@ -194,7 +194,7 @@ class AnalysisResultPresenter: ObservableObject {
     func checkIsAllFOVsVerified() {
         guard let groupedFOVs = groupedFOVs else {
             isAllFOVsVerified = false
-            buttonTitle = "Verikasi Semua Lapang Pandang"
+            buttonTitle = AppTextExamProgress.buttonVerifyAllFOVs
             return
         }
 
@@ -209,9 +209,9 @@ class AnalysisResultPresenter: ObservableObject {
 
         // Update button title based on verification status
         if isAllVerified {
-            buttonTitle = "Simpan Hasil Pemeriksaan"
+            buttonTitle = AppTextExamProgress.buttonSaveResult
         } else {
-            buttonTitle = "Verikasi Semua Lapang Pandang"
+            buttonTitle = AppTextExamProgress.buttonVerifyAllFOVs
         }
     }
 }

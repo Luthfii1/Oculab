@@ -14,7 +14,7 @@ struct FolderCardComponent: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Image(systemName: AppText.Icon.rectangleStackFill)
+                Image(systemName: AppIcon.rectangleStackFill)
                     .foregroundColor(AppColors.purple500)
                 Text(title.rawValue)
                     .font(AppTypography.s4_1)
@@ -22,9 +22,10 @@ struct FolderCardComponent: View {
                     .font(AppTypography.s4_1).foregroundStyle(AppColors.slate900)
 
                 Spacer()
-                Text("\(numOfImage) \(AppTextExamCompFolderCard.imageCountSuffix)").foregroundStyle(AppColors.slate900)
+                Text(AppData.makeSentence([numOfImage, AppTextExamCompFolderCard.imageCountSuffix]))
+                    .foregroundStyle(AppColors.slate900)
 
-                Image(systemName: AppText.Icon.chevronRightIcon).foregroundStyle(AppColors.slate900)
+                Image(systemName: AppIcon.forward).foregroundStyle(AppColors.slate900)
             }
         }
         .font(AppTypography.p3)

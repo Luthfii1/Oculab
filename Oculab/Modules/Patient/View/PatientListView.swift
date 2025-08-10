@@ -21,15 +21,15 @@ struct PatientListView: View {
                 
                 AppSearchBar(
                     searchText: $presenter.searchText,
-                    placeholder: AppTextPatientList.searchPlaceholder,
+                    placeholder: AppSearch.Patient.placeholder,
                     onSearch: {
                         presenter.searchPatients()
                     }
                 )
 
                 AppButton(
-                    title: AppTextPatientList.addNewPatientButton,
-                    leftIcon: AppText.Icon.plus,
+                    title: AppTextPatientList.buttonCreatePatient,
+                    leftIcon: AppIcon.add,
                     colorType: .secondary,
                     action: {
                         presenter.navigateTo(.patientForm())
@@ -42,11 +42,11 @@ struct PatientListView: View {
                         .padding(.top, 40)
                 } else if !presenter.searchText.isEmpty && presenter.filteredPatientNameDoB.isEmpty {
                     VStack(spacing: 20) {
-                        Image(systemName: AppText.Icon.magnifyingglass)
+                        Image(systemName: AppIcon.search)
                             .font(.system(size: 48))
                             .foregroundColor(AppColors.slate300)
                         
-                        Text("\(AppTextPatientList.noResultsPrefix) \"\(presenter.searchText)\"")
+                        Text(AppSearch.noResults(presenter.searchText))
                             .font(AppTypography.s3)
                             .foregroundColor(AppColors.slate700)
                             .multilineTextAlignment(.center)
@@ -54,7 +54,7 @@ struct PatientListView: View {
                         Button(action: {
                             presenter.clearSearch()
                         }) {
-                            Text(AppTextPatientList.clearSearchButton)
+                            Text(AppSearch.clearSearch)
                                 .font(AppTypography.p2)
                                 .foregroundColor(AppColors.purple600)
                         }
@@ -71,8 +71,8 @@ struct PatientListView: View {
                                     presenter.navigateTo(.patientDetail(patientId: patientId))
                                 } label: {
                                     PatientCard(
-                                        name: nameWithDoB.components(separatedBy: " (").first ?? AppText.Common.emptyString,
-                                        birthDate: nameWithDoB.components(separatedBy: " (").last?.replacingOccurrences(of: ")", with: "") ?? AppText.Common.emptyString
+                                        name: nameWithDoB.components(separatedBy: " (").first ?? AppValue.empty,
+                                        birthDate: nameWithDoB.components(separatedBy: " (").last?.replacingOccurrences(of: ")", with: AppValue.empty) ?? AppValue.empty
                                     )
                                 }
                             }

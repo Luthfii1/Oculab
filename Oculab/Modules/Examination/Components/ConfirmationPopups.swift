@@ -14,11 +14,11 @@ struct ConfirmationPopups: View {
     var body: some View {
         VStack {
             AppPopup(
-                image: AppText.Icon.confirmLeave,
+                image: AppImage.confirmLeave,
                 title: AppTextExamCompConfirmPopups.unfinishedExaminationTitle,
                 description: AppTextExamCompConfirmPopups.unfinishedExaminationDescription,
                 buttons: [
-                    AppButton(title: AppTextExamCompConfirmPopups.exitButton, colorType: .destructive(.primary)) {
+                    AppButton(title: AppAction.exit, colorType: .destructive(.primary)) {
                         presenter.popToRoot()
                     },
                     AppButton(title: AppTextExamCompConfirmPopups.reviewAgainButton, colorType: .destructive(.secondary)) {
@@ -29,11 +29,11 @@ struct ConfirmationPopups: View {
             )
 
             AppPopup(
-                image: AppText.Icon.confirm,
-                title: AppTextExamCompConfirmPopups.saveResultTitle,
+                image: AppImage.confirm,
+                title: AppTextExamCompConfirmPopups.saveResultButton,
                 description: AppTextExamCompConfirmPopups.saveResultDescription,
                 buttons: [
-                    AppButton(title: AppTextExamCompConfirmPopups.saveButton, colorType: .primary) {
+                    AppButton(title: AppAction.save, colorType: .primary) {
                         Task {
                             await presenter.submitExpertResult(examinationId: examinationId)
                         }

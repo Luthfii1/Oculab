@@ -17,7 +17,7 @@ struct WeeklyCalendarView: View {
             VStack(alignment: .center, spacing: Decimal.d16) {
                 HStack(alignment: .center) {
                     HStack {
-                        Image(systemName: AppText.Icon.textBadgeCheckmark)
+                        Image(systemName: AppIcon.textBadgeCheckmark)
                             .resizable()
                             .frame(width: Decimal.d16 + Decimal.d2, height: Decimal.d16 + Decimal.d2)
                             .foregroundColor(AppColors.purple500)
@@ -37,7 +37,7 @@ struct WeeklyCalendarView: View {
                             isDatePickerVisible.toggle()
                         }
                     }) {
-                        Image(systemName: AppText.Icon.calendar)
+                        Image(systemName: AppIcon.calendar)
                             .resizable()
                             .frame(width: Decimal.d16 + Decimal.d2, height: Decimal.d16 + Decimal.d2)
                             .font(.title)
@@ -57,7 +57,7 @@ struct WeeklyCalendarView: View {
                                 .font(AppTypography.s6)
                                 .foregroundColor(AppColors.slate100)
 
-                            Text("\(getDayOfMonth(date: date))")
+                            Text(String(getDayOfMonth(date: date)))
                                 .font(AppTypography.p2)
                                 .foregroundColor(
                                     isSameDay(date1: date, date2: selectedDate) ? AppColors
@@ -105,7 +105,7 @@ struct WeeklyCalendarView: View {
 
                 VStack {
                     DatePicker(
-                        AppTextHomeHistCompWeeklyCalendar.selectDatePickerTitle,
+                        AppPatient.Placeholder.selectDate,
                         selection: $selectedDate,
                         displayedComponents: [.date]
                     )
@@ -161,7 +161,7 @@ struct WeeklyCalendarView: View {
 
     private func getDayOfWeek(date: Date) -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "E"
+        dateFormatter.dateFormat = "E" // TODO: create enum for dateFormatter
         return dateFormatter.string(from: date)
     }
 
@@ -172,7 +172,7 @@ struct WeeklyCalendarView: View {
 
     private func getMonthAndYear(for date: Date) -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMMM yyyy"
+        dateFormatter.dateFormat = "MMMM yyyy" // TODO: create enum for dateFormatter
         return dateFormatter.string(from: date)
     }
 
@@ -182,7 +182,7 @@ struct WeeklyCalendarView: View {
     }
 }
 
-#Preview {
-    @Previewable @State var selectedDate = Date()
-    WeeklyCalendarView(selectedDate: $selectedDate)
-}
+//#Preview {
+//    @Previewable @State var selectedDate = Date()
+//    WeeklyCalendarView(selectedDate: $selectedDate)
+//}

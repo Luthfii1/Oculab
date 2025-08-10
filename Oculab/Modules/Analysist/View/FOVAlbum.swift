@@ -54,7 +54,7 @@ struct FOVAlbum: View {
                                         .overlay(
                                             Group {
                                                 if fov.verified {
-                                                    Image(systemName: AppText.Icon.checkmarkCircleFill)
+                                                    Image(systemName: AppIcon.success)
                                                         .foregroundColor(.green)
                                                         .font(.system(size: 20))
                                                         .padding(4)
@@ -63,7 +63,7 @@ struct FOVAlbum: View {
                                             alignment: .topTrailing
                                         )
                                 case .failure:
-                                    Image(systemName: AppText.Icon.exclamationmarkTriangleFill)
+                                    Image(systemName: AppIcon.warning)
                                         .resizable()
                                         .scaledToFit()
                                         .frame(height: 114)
@@ -77,7 +77,7 @@ struct FOVAlbum: View {
                 }
             }
             .padding(.horizontal, Decimal.d20)
-            .navigationTitle("\(AppTextAnalysisFOVAlbum.navigationTitleFormat) \(fovGroup.rawValue)")
+            .navigationTitle(AppTextAnalysisFOVAlbum.navigationTitleFormat(fovGroup.rawValue))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -85,7 +85,7 @@ struct FOVAlbum: View {
                         Router.shared.navigateBack()
                     }) {
                         HStack {
-                            Image(AppText.Icon.back)
+                            Image(AppImage.back)
                         }
                     }
                 }
@@ -100,6 +100,6 @@ struct FOVAlbum: View {
     }
 }
 
-#Preview {
-    FOVAlbum(fovGroup: .BTA1TO9, examId: "f58d4d5c-b591-45c3-9e4e-080b1b11dd4a")
-}
+//#Preview {
+//    FOVAlbum(fovGroup: .BTA1TO9, examId: "f58d4d5c-b591-45c3-9e4e-080b1b11dd4a")
+//}

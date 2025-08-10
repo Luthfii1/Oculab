@@ -22,10 +22,10 @@ struct HomeView: View {
 
                     VStack(alignment: .leading, spacing: 16) {
                         HStack(alignment: .center, spacing: 8) {
-                            Image(systemName: AppText.Icon.docOnDocFillIcon)
+                            Image(systemName: AppIcon.docOnDocFill)
                                 .foregroundStyle(AppColors.purple500)
 
-                            Text(AppText.HomeHistory.taskSectionTitle)
+                            Text(AppTextHomeHistory.taskSectionTitle)
                                 .foregroundStyle(AppColors.slate900)
                                 .font(AppTypography.s4_1)
                         }
@@ -50,11 +50,11 @@ struct HomeView: View {
                         }
 
                         if authentication.user.role == .ADMIN {
-                            AppButton(title: AppText.HomeHistory.newExaminationButton, leftIcon: AppText.Icon.docBadgePlusIcon) {
+                            AppButton(title: AppTextHomeHistory.newExaminationButton, leftIcon: AppIcon.docBadgePlus) {
                                 Router.shared.navigateTo(.inputPatientData())
                             }
                         }  else if authentication.user.role == .LAB && authentication.user.businessModel == .B2C {
-                            AppButton(title: AppText.HomeHistory.newExaminationButton, leftIcon: AppText.Icon.docBadgePlusIcon) {
+                            AppButton(title: AppTextHomeHistory.newExaminationButton, leftIcon: AppIcon.docBadgePlus) {
                                 Router.shared.navigateTo(.inputPatientData())
                             }
                         }
@@ -62,15 +62,15 @@ struct HomeView: View {
                         if presenter.isAllExamsLoading {
                             Spacer().frame(height: Decimal.d24)
                             VStack(alignment: .center) {
-                                ProgressView(AppText.HomeHistory.loadingMessage)
+                                ProgressView(AppTextHomeHistory.loadingState)
                                     .progressViewStyle(CircularProgressViewStyle())
                             }
                             .frame(maxWidth: .infinity)
 
                         } else if presenter.filteredExamination.isEmpty {
                             VStack(alignment: .center) {
-                                Image(AppText.HomeHistory.emptyStateImageName)
-                                Text(AppText.HomeHistory.noTaskMessage).font(AppTypography.p3)
+                                Image(AppTextHomeHistory.emptyStateImageName)
+                                Text(AppTextHomeHistory.noTaskMessage).font(AppTypography.p3)
                                     .foregroundStyle(AppColors.slate300)
                                     .frame(maxWidth: 254)
                                     .multilineTextAlignment(.center)
@@ -122,7 +122,7 @@ struct HomeView: View {
                     await presenter.fetchData(userRole: authentication.user.role)
                 }
             }
-            .navigationTitle(AppText.HomeHistory.navigationTitleHome)
+            .navigationTitle(AppTextHomeHistory.navigationTitleHome)
         }
         .ignoresSafeArea()
         .onAppear {

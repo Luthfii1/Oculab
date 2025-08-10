@@ -1,5 +1,5 @@
 //
-//  String+Extensioin.swift
+//  String+Extension.swift
 //  Oculab
 //
 //  Created by Luthfi Misbachul Munir on 17/11/24.

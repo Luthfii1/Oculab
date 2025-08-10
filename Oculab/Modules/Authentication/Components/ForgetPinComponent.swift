@@ -20,7 +20,7 @@ struct ForgetPinComponent: View {
                     title: AppTextAuthCompPin.usePasswordButton, 
                     colorType: .tertiary
                 ) {
-                    print("Use password tapped")
+                    print("Use password tapped") // TODO: Implement log instead of print
                 }
             }
         }

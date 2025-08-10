@@ -29,18 +29,18 @@ struct InputPatientData: View {
                         // PIC Dropdown
                         AppDropdown(
                                 title: AppTextTaskAssignInputPatient.picTitle,
-                                placeholder: AppTextTaskAssignInputPatient.picPlaceholder,
-                                leftIcon: "person.fill",
+                                placeholder: AppTextTaskAssignInputPatient.selectPIC,
+                                leftIcon: AppIcon.personFill,
                                 choices: presenter.picName,
                                 selectedChoice: $presenter.selectedPIC
                             )
                         
                         // Patient Search Dropdown
                         AppDropdown(
-                            title: AppTextTaskAssignInputPatient.patientNameTitle,
-                            placeholder: patientId != nil ? AppTextTaskAssignInputPatient.patientNamePlaceholderAutoSelected : AppTextTaskAssignInputPatient.patientNamePlaceholder,
-                            leftIcon: "person.fill",
-                            rightIcon: "",
+                            title: AppPatient.name,
+                            placeholder: patientId != nil ? AppTextTaskAssignInputPatient.patientNamePlaceholder : AppSearch.Patient.placeholder,
+                            leftIcon: AppIcon.personFill,
+                            rightIcon: AppValue.empty,
                             choices: presenter.patientNameDoB,
                             description: patientId != nil ? AppTextTaskAssignInputPatient.patientNameDescriptionAutoSelected : AppTextTaskAssignInputPatient.patientNameDescription,
                             selectedChoice: $presenter.selectedPatient,
@@ -49,16 +49,16 @@ struct InputPatientData: View {
                         .focused($focusedField, equals: .search)
                         .disabled(patientId != nil)
                         
-                        if presenter.selectedPatient != "" {
+                        if presenter.selectedPatient != AppValue.empty {
                             PatientDisplayField(focusedField: _focusedField)
                                 .environmentObject(presenter)
                             
                             AppButton(
                                 title: AppTextTaskAssignInputPatient.fillSpecimenDetailsButton,
-                                rightIcon: "arrow.forward",
+                                rightIcon: AppIcon.arrowForward,
                                 isEnabled: {
-                                    let hasPatientData = !(presenter.patient.NIK == "" || presenter.patient.DoB == nil)
-                                    let hasPIC = (authentication.user.role == .LAB && authentication.user.businessModel == .B2C) || presenter.selectedPIC != ""
+                                    let hasPatientData = !(presenter.patient.NIK == AppValue.empty || presenter.patient.DoB == nil)
+                                    let hasPIC = (authentication.user.role == .LAB && authentication.user.businessModel == .B2C) || presenter.selectedPIC != AppValue.empty
                                     return hasPatientData && hasPIC
                                 }()
                             ) {
@@ -79,7 +79,7 @@ struct InputPatientData: View {
                             Router.shared.navigateBack()
                         }) {
                             HStack {
-                                Image(AppText.Icon.destroy)
+                                Image(AppImage.destroy)
                             }
                         }
                     }
@@ -124,7 +124,7 @@ struct InputPatientData: View {
     }
 }
 
-#Preview("With Patient") {
-    InputPatientData(patientId: "d0c1a2b3-4f5e-6789-91ab-cdef12345678")
-}
+//#Preview("With Patient") {
+//    InputPatientData(patientId: "d0c1a2b3-4f5e-6789-91ab-cdef12345678")
+//}
 

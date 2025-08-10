@@ -22,9 +22,9 @@ struct GradingCardComponent: View {
 
                 if !isExpert {
                     HStack {
-                        Image(AppText.Icon.robot)
+                        Image(AppImage.robot)
                         Spacer().frame(width: 4)
-                        Text("\(confidenceLevel.rawValue) \(AppTextExamCompGradingCard.confidenceLevelText)")
+                        Text(AppData.makeSentence([confidenceLevel.rawValue, AppMedical.Examination.confidenceLevel]))
                             .font(AppTypography.p4)
                             .foregroundColor(AppColors.slate300)
 
@@ -32,7 +32,7 @@ struct GradingCardComponent: View {
                         Button(action: {
                             Router.shared.navigateTo(.informationInterpretation)
                         }) {
-                            Image(systemName: AppText.Icon.infoCircle)
+                            Image(systemName: AppIcon.info)
                                 .foregroundColor(AppColors.purple500)
                         }
                     }
@@ -40,7 +40,7 @@ struct GradingCardComponent: View {
             }
 
             if isExpert {
-                Text(expertNote ?? "")
+                Text(expertNote ?? AppValue.empty)
                     .font(AppTypography.p3)
             } else {
                 Text(type.description(withValues: n))

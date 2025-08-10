@@ -15,30 +15,16 @@ struct InformationPage: View {
                     Rectangle()
                         .frame(width: 0, height: 0)
 
-                    AppCard(icon: AppText.Icon.infoCircle, title: AppTextAnalysisInformation.assessmentStandardTitle, spacing: Decimal.d16) {
+                    AppCard(icon: AppIcon.info, title: AppTextAnalysisInformation.assessmentStandardTitle, spacing: Decimal.d16) {
                         VStack(alignment: .leading, spacing: Decimal.d16) {
                             Text(AppTextAnalysisInformation.assessmentStandardDescription)
 
                             VStack(alignment: .leading, spacing: Decimal.d16) {
-                                HStack(alignment: .top) {
-                                    Text(AppTextAnalysisInformation.bulletPoint)
-                                    Text(AppTextAnalysisInformation.negativeDescription)
-                                }
-                                HStack(alignment: .top) {
-                                    Text(AppTextAnalysisInformation.bulletPoint)
-                                    Text(AppTextAnalysisInformation.scantyDescription)
-                                }
-                                HStack(alignment: .top) {
-                                    Text(AppTextAnalysisInformation.bulletPoint)
-                                    Text(AppTextAnalysisInformation.positive1Description)
-                                }
-                                HStack(alignment: .top) {
-                                    Text(AppTextAnalysisInformation.bulletPoint)
-                                    Text(AppTextAnalysisInformation.positive2Description)
-                                }
-                                HStack(alignment: .top) {
-                                    Text(AppTextAnalysisInformation.bulletPoint)
-                                    Text(AppTextAnalysisInformation.positive3Description)
+                                ForEach(AppTextAnalysisInformation.btaDescriptions, id: \.self) { description in
+                                    HStack(alignment: .top) {
+                                        Text(AppValue.bullet)
+                                        Text(description)
+                                    }
                                 }
                             }
                             .padding(.leading, Decimal.d12)
@@ -46,31 +32,13 @@ struct InformationPage: View {
                         .font(AppTypography.p3)
                     }
 
-                    AppCard(icon: AppText.Icon.infoCircle, title: AppTextAnalysisInformation.confidenceLevelTitle, spacing: Decimal.d16) {
+                    AppCard(icon: AppIcon.info, title: AppMedical.Examination.confidenceLevel, spacing: Decimal.d16) {
                         VStack(alignment: .leading, spacing: Decimal.d16) {
-                            HStack(alignment: .top) {
-                                Text(AppTextAnalysisInformation.bulletPoint)
-                                Text(AppTextAnalysisInformation.perfectConfidenceDescription)
-                            }
-                            HStack(alignment: .top) {
-                                Text(AppTextAnalysisInformation.bulletPoint)
-                                Text(AppTextAnalysisInformation.highConfidenceDescription)
-                            }
-                            HStack(alignment: .top) {
-                                Text(AppTextAnalysisInformation.bulletPoint)
-                                Text(AppTextAnalysisInformation.mediumConfidenceDescription)
-                            }
-                            HStack(alignment: .top) {
-                                Text(AppTextAnalysisInformation.bulletPoint)
-                                Text(AppTextAnalysisInformation.lowConfidenceDescription)
-                            }
-                            HStack(alignment: .top) {
-                                Text(AppTextAnalysisInformation.bulletPoint)
-                                Text(AppTextAnalysisInformation.veryLowConfidenceDescription)
-                            }
-                            HStack(alignment: .top) {
-                                Text(AppTextAnalysisInformation.bulletPoint)
-                                Text(AppTextAnalysisInformation.unpredictedDescription)
+                            ForEach(AppTextAnalysisInformation.confidenceDescriptions, id: \.self) { description in
+                                HStack(alignment: .top) {
+                                    Text(AppValue.bullet)
+                                    Text(description)
+                                }
                             }
                         }
                         .padding(.leading, Decimal.d12)
@@ -87,7 +55,7 @@ struct InformationPage: View {
                         Router.shared.navigateBack()
                     }) {
                         HStack {
-                            Image(AppText.Icon.back)
+                            Image(AppImage.back)
                         }
                     }
                 }

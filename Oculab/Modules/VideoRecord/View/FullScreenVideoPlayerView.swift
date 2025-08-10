@@ -23,9 +23,8 @@ struct FullScreenVideoPlayerView: View {
             }
             .edgesIgnoringSafeArea(.all)
             
-            // Tombol "Close"
             Button(action: onClose) {
-                Image(systemName: AppText.Icon.xmarkCircleFill)
+                Image(systemName: AppIcon.close)
                     .resizable()
                     .frame(width: 32, height: 32)
                     .padding()

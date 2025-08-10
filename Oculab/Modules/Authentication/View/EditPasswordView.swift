@@ -15,7 +15,7 @@ struct EditPasswordView: View {
             ZStack {
                 if profilePresenter.showSuccessPopup {
                     AppPopup(
-                        image: AppText.Icon.success,
+                        image: AppImage.success,
                         title: AppTextAuthEditPassword.successUpdatePasswordTitle,
                         description: AppTextAuthEditPassword.successUpdatePasswordMessage,
                         buttons: [
@@ -45,7 +45,7 @@ struct EditPasswordView: View {
                                 title: AppTextAuthEditPassword.currentPasswordTitle,
                                 placeholder: AppTextAuthEditPassword.currentPasswordPlaceholder,
                                 description: profilePresenter.descriptionOldPassword,
-                                rightIcon: AppText.Icon.eye,
+                                rightIcon: AppIcon.eye,
                                 isError: profilePresenter.isOldPasswordError,
                                 text: $profilePresenter.oldPassword
                             )
@@ -54,7 +54,7 @@ struct EditPasswordView: View {
                                 title: AppTextAuthEditPassword.newPasswordTitle,
                                 placeholder: AppTextAuthEditPassword.newPasswordPlaceholder,
                                 description: AppTextAuthEditPassword.newPasswordDescription,
-                                rightIcon: AppText.Icon.eye,
+                                rightIcon: AppIcon.eye,
                                 text: $profilePresenter.inputPassword
                             )
 
@@ -62,15 +62,15 @@ struct EditPasswordView: View {
                                 title: AppTextAuthEditPassword.confirmPasswordTitle,
                                 placeholder: AppTextAuthEditPassword.confirmPasswordPlaceholder,
                                 description: profilePresenter.descriptionPasswordConfirm,
-                                rightIcon: AppText.Icon.eye,
+                                rightIcon: AppIcon.eye,
                                 isError: profilePresenter.isError,
                                 text: $profilePresenter.confirmPassword
                             )
                         }
 
                         AppButton(
-                            title: AppTextAuthProfile.saveChangesButton,
-                            rightIcon: AppText.Icon.checkmark,
+                            title: profilePresenter.saveChangesButtonText,
+                            rightIcon: AppIcon.checkmark,
                             isEnabled: profilePresenter.isPasswordEditButtonEnabled()
                         ) {
                             Task {
@@ -91,7 +91,7 @@ struct EditPasswordView: View {
                             Router.shared.navigateBack()
                         }) {
                             HStack {
-                                Image(AppText.Icon.back)
+                                Image(AppImage.back)
                             }
                         }
                     }

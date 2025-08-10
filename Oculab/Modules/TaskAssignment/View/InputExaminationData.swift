@@ -12,10 +12,10 @@ struct InputExaminationData: View {
 
     @State var selectedPIC: String
     @State var selectedPatient: String
-    @State var goalString: String = ""
-    @State var typeString: String = ""
+    @State var goalString: String = AppValue.empty
+    @State var typeString: String = AppValue.empty
 
-    @State var typeString2: String = ""
+    @State var typeString2: String = AppValue.empty
 
     @State var isAddingNewPatient: Bool = false
 
@@ -25,9 +25,9 @@ struct InputExaminationData: View {
         NavigationView {
             ZStack {
                 AppPopup(
-                    image: AppTextTaskAssignInputExam.confirmIcon,
+                    image: AppImage.confirm,
                     title: AppTextTaskAssignInputExam.confirmPopupTitle,
-                    description: "Sediaan Pasien \(presenter.patient.name) akan diperiksa oleh \(presenter.pic.name)",
+                    description: AppTextTaskAssignInputExam.examinationDescription(patientName: presenter.patient.name, picName: presenter.pic.name),
                     isError: presenter.isError,
                     errorMessage: presenter.errorMessage,
                     buttons: [
@@ -64,18 +64,18 @@ struct InputExaminationData: View {
 
                             VStack(alignment: .leading, spacing: Decimal.d24) {
                                 AppRadioButton(
-                                    title: AppTextTaskAssignInputExam.examinationGoalTitle,
+                                    title: AppMedical.Examination.purpose,
                                     isRequired: true,
                                     choices: [AppTextTaskAssignInputExam.screeningChoice, AppTextTaskAssignInputExam.followUpChoice],
                                     isDisabled: false,
                                     selectedChoice: $goalString
                                 ).onChange(of: goalString) {
                                     switch goalString {
-                                    case "Skrining":
+                                    case AppMedical.Examination.goalScreening:
                                         presenter.examination.goal = .SCREENING
                                         presenter.examination2.goal = .SCREENING
 
-                                    case "Follow Up":
+                                    case AppMedical.Examination.goalFollowUp:
                                         presenter.examination.goal = .TREATMENT
                                         presenter.examination2.goal = .TREATMENT
 
@@ -99,9 +99,9 @@ struct InputExaminationData: View {
                                     selectedChoice: $typeString
                                 ).onChange(of: typeString) {
                                     switch typeString {
-                                    case "Pagi":
+                                    case AppMedical.Examination.preparationTypeMorning:
                                         presenter.examination.preparationType = .SP
-                                    case "Sewaktu":
+                                    case AppMedical.Examination.preparationTypeAnytime:
                                         presenter.examination.preparationType = .SPS
                                     default:
                                         presenter.examination.preparationType = .SPS
@@ -122,9 +122,9 @@ struct InputExaminationData: View {
                                     selectedChoice: $typeString2
                                 ).onChange(of: typeString2) {
                                     switch typeString2 {
-                                    case "Pagi":
+                                    case AppMedical.Examination.preparationTypeMorning:
                                         presenter.examination2.preparationType = .SP
-                                    case "Sewaktu":
+                                    case AppMedical.Examination.preparationTypeAnytime:
                                         presenter.examination2.preparationType = .SPS
                                     default:
                                         presenter.examination2.preparationType = .SPS
@@ -136,8 +136,8 @@ struct InputExaminationData: View {
                                 
                                 HStack {
                                     AppButton(
-                                        title: AppTextTaskAssignInputExam.backButton,
-                                        leftIcon: "arrow.left",
+                                        title: AppAction.back,
+                                        leftIcon: AppIcon.back,
                                         colorType: .tertiary,
                                         isEnabled: true
                                     ) {
@@ -149,12 +149,12 @@ struct InputExaminationData: View {
                                     Spacer()
                                     AppButton(
                                         title: AppTextTaskAssignInputExam.createTaskFinalButton,
-                                        rightIcon: AppText.Icon.arrowRight,
+                                        rightIcon: AppIcon.arrowRight,
                                         size: .large,
-                                        isEnabled: (goalString != AppText.Common.emptyString && typeString != AppText.Common.emptyString && presenter.examination.slideId != AppText.Common.emptyString && typeString2 != AppText.Common.emptyString && presenter.examination2.slideId != AppText.Common.emptyString)
+                                        isEnabled: (goalString != AppValue.empty && typeString != AppValue.empty && presenter.examination.slideId != AppValue.empty && typeString2 != AppValue.empty && presenter.examination2.slideId != AppValue.empty)
                                     ) {
                                         presenter.isError = false
-                                        presenter.errorMessage = ""
+                                        presenter.errorMessage = AppValue.empty
                                         isSubmitPopUpVisible = true
                                     }
                                     .frame(maxWidth: .infinity)
@@ -172,7 +172,7 @@ struct InputExaminationData: View {
                                     Router.shared.popToRoot()
                                 }) {
                                     HStack {
-                                        Image(AppText.Icon.destroy)
+                                        Image(AppImage.destroy)
                                     }
                                 }
                             }
@@ -196,5 +196,5 @@ struct InputExaminationData: View {
 }
 
 #Preview {
-    InputExaminationData(selectedPIC: "", selectedPatient: "")
+    InputExaminationData(selectedPIC: AppValue.empty, selectedPatient: AppValue.empty)
 }

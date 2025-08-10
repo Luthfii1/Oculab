@@ -9,8 +9,8 @@ import SwiftUI
 
 class ContactPresenter: ObservableObject {
     @Published var contactData: ContactResponse = .init(
-        id: "",
-        whatsappLink: ""
+        id: AppValue.empty,
+        whatsappLink: AppValue.empty
     )
 
     private let interactor: ContactInteractor

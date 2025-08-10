@@ -25,12 +25,15 @@ struct HomeActivityComponent: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Decimal.d8) {
             HStack {
-                Text("\(date)").font(AppTypography.p5).foregroundStyle(AppColors.slate300)
+                Text(date)
+                    .font(AppTypography.p5)
+                    .foregroundStyle(AppColors.slate300)
+
                 Spacer()
                 StatusTagComponent(type: status)
             }
             HStack(spacing: Decimal.d8) {
-                Image(systemName: AppText.Icon.docTextFill)
+                Image(systemName: AppIcon.documentFill)
                     .padding(Decimal.d8)
                     .background(AppColors.purple50)
                     .foregroundStyle(AppColors.purple500)
@@ -42,10 +45,16 @@ struct HomeActivityComponent: View {
             
             switch viewType {
             case .lab:
-                Text(patientName + " (\(patientDOB))").font(AppTypography.p4).foregroundStyle(AppColors.slate900)
+                Text(AppData.makeSentence([patientName, patientDOB]))
+                    .font(AppTypography.p4)
+                    .foregroundStyle(AppColors.slate900)
             case .admin, .adminPatientDetail:
-                Text(AppTextHomeHistCompHomeActivity.examinationOfficerLabel).font(AppTypography.s6).foregroundStyle(AppColors.slate300)
-                Text(picName).font(AppTypography.p2).foregroundStyle(AppColors.slate900)
+                Text(AppTextHomeHistCompHomeActivity.examinationOfficerLabel)
+                    .font(AppTypography.s6)
+                    .foregroundStyle(AppColors.slate300)
+                Text(picName)
+                    .font(AppTypography.p2)
+                    .foregroundStyle(AppColors.slate900)
             }
         }
         .padding(Decimal.d12)
@@ -61,7 +70,7 @@ struct HomeActivityComponent: View {
         case .lab, .adminPatientDetail:
             return slideId
         case .admin:
-            return patientName + " (\(patientDOB))"
+            return AppData.makeSentence([patientName, patientDOB])
         }
     }
 }

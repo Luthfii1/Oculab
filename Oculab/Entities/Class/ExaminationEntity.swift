@@ -142,12 +142,12 @@ class Examination: Decodable, Identifiable {
         self.recordVideo = try container.decodeIfPresent(Data.self, forKey: .recordVideo)
         self.WSI = try container.decodeIfPresent(String.self, forKey: .WSI)
 
-        let dateString = try container.decodeIfPresent(String.self, forKey: .examinationDate) ?? ""
+        let dateString = try container.decodeIfPresent(String.self, forKey: .examinationDate) ?? AppValue.empty
 
         let dateFormatter = ISO8601DateFormatter()
         dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
 
-        if dateString != "" {
+        if dateString != AppValue.empty {
             guard let date = dateFormatter.date(from: dateString) else {
                 throw DecodingError.dataCorruptedError(
                     forKey: .examinationDate,
@@ -158,9 +158,9 @@ class Examination: Decodable, Identifiable {
             self.examinationDate = date
         }
 
-        let datePlanString = try container.decodeIfPresent(String.self, forKey: .examinationPlanDate) ?? ""
+        let datePlanString = try container.decodeIfPresent(String.self, forKey: .examinationPlanDate) ?? AppValue.empty
 
-        if datePlanString != "" {
+        if datePlanString != AppValue.empty {
             guard let datePlan = dateFormatter.date(from: datePlanString) else {
                 throw DecodingError.dataCorruptedError(
                     forKey: .examinationPlanDate,

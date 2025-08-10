@@ -19,7 +19,7 @@ struct OculabApp: App {
             DependencyInjection.shared.initializer(modelContext: container.mainContext)
             
         } catch {
-            fatalError("Failed to initialize SwiftData")
+            fatalError("[FATAL] Failed to initialize SwiftData [FATAL]")
         }
     }
 

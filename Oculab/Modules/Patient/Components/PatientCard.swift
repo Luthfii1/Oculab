@@ -15,7 +15,7 @@ import SwiftUI
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 // Patient icon
-                Image(systemName: AppText.Icon.personFill)
+                Image(systemName: AppIcon.personFill)
                     .foregroundColor(AppColors.orange500)
                     .frame(width: 32, height: 32)
                     .background(Color.orange.opacity(0.2))
@@ -30,8 +30,8 @@ import SwiftUI
                     .font(AppTypography.s4_1)
                     .foregroundColor(AppColors.slate900)
                     .lineLimit(2)
-                
-                Text("\(AppTextPatientCompCard.birthDatePrefix)\(birthDate)")
+
+                Text(AppData.makeSentence([AppTextPatientCompCard.birthDatePrefix, birthDate]))
                     .font(AppTypography.p4)
                     .foregroundColor(AppColors.slate900)
             }

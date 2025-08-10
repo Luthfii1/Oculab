@@ -1,0 +1,558 @@
+/* 
+  Localizable.strings (English)
+  Oculab - Improved Structure
+*/
+
+// MARK: - Universal Actions
+"common.ok" = "OK";
+"common.cancel" = "Cancel";
+"common.save" = "Save";
+"common.delete" = "Delete";
+"common.edit" = "Edit";
+"common.close" = "Close";
+"common.next" = "Next";
+"common.back" = "Back";
+"common.done" = "Done";
+"common.exit" = "Exit";
+"common.settings" = "Settings";
+"common.retry" = "Retry";
+"common.refresh" = "Refresh";
+"common.continue" = "Continue";
+"common.skip" = "Skip";
+"common.confirm" = "Confirm";
+"common.search" = "Search";
+
+// Common button patterns
+"common.save_changes" = "Save Changes";
+"common.save_data" = "Save Data";
+"common.add_new" = "Add New";
+"common.edit_data" = "Edit Data";
+"common.delete_data" = "Delete Data";
+
+// Dynamic action patterns
+"common.save_item" = "Save %@";
+"common.add_item" = "Add %@";
+"common.edit_item" = "Edit %@";
+"common.delete_item" = "Delete %@";
+"common.view_item" = "View %@";
+"common.back_to" = "Back to %@";
+"common.start_action" = "Start %@";
+"common.create_item" = "Create %@";
+"common.disable_item" = "Disable %@";
+
+// MARK: - Universal States
+"state.loading" = "Loading...";
+"state.empty" = "No data available";
+"state.error" = "Error occurred";
+"state.success" = "Success";
+"state.pending" = "Pending";
+"state.not_available" = "Not Available";
+"state.unknown" = "Unknown";
+"state.completed" = "Completed";
+"state.in_progress" = "In Progress";
+
+// Dynamic status patterns
+"state.loading_action" = "Loading %@...";
+"state.success_action" = "Successfully %@";
+"state.failed_action" = "Failed %@";
+"state.no_data" = "No %@ available";
+"state.not_determined" = "%@ not determined";
+"state.success_with" = "Successfully %@ %@";
+
+// MARK: - Universal Labels
+"label.name" = "Name";
+"label.email" = "Email";
+"label.password" = "Password";
+"label.phone" = "Phone";
+"label.address" = "Address";
+"label.date" = "Date";
+"label.time" = "Time";
+"label.notes" = "Notes";
+"label.description" = "Description";
+"label.title" = "Title";
+"label.type" = "Type";
+"label.status" = "Status";
+"label.result" = "Result";
+"label.category" = "Category";
+"label.role" = "Role";
+
+// MARK: - Common Values
+"common.unknown_error" = "An error occurred";
+"common.unknown_message" = "Unknown message";
+
+// MARK: - Patient Data
+"patient.name" = "Name";
+"patient.nik" = "NIK";
+"patient.dob" = "Date of Birth";
+"patient.gender" = "Gender";
+"patient.bpjs" = "BPJS Number";
+"patient.age" = "Age";
+"patient.age_suffix" = " years old";
+"patient.gender.male" = "Male";
+"patient.gender.female" = "Female";
+"patient.gender.other" = "Other";
+"patient.placeholder.name" = "Enter patient name";
+"patient.placeholder.nik" = "e.g., 167012039484700";
+"patient.placeholder.bpjs" = "e.g., 1240630077675";
+"patient.placeholder.select_date" = "Select date";
+
+// MARK: - Medical Terms
+"medical.patient" = "Patient";
+"medical.bta.negative" = "Negative";
+"medical.bta.scanty" = "Scanty";
+"medical.bta.positive1" = "Positive (1+)";
+"medical.bta.positive2" = "Positive (2+)";
+"medical.bta.positive3" = "Positive (3+)";
+"medical.bta.desc.negative" = "No BTA found in 100 fields of view";
+"medical.bta.desc.scanty" = "1-9 BTA found in 100 fields of view";
+"medical.bta.desc.positive1" = "10-99 BTA found in 100 fields of view";
+"medical.bta.desc.positive2" = "1-9 BTA per field of view, minimum 50 fields";
+"medical.bta.desc.positive3" = "≥10 BTA per field of view, minimum 20 fields";
+
+"medical.exam.purpose" = "Examination Purpose";
+"medical.exam.result" = "Examination Result";
+"medical.exam.interpretation" = "Interpretation";
+"medical.exam.staff_interpretation" = "Staff Interpretation";
+"medical.exam.system_interpretation" = "System Interpretation";
+"medical.exam.bacteria_count" = "Bacteria Count";
+"medical.exam.slide_id" = "Slide ID";
+"medical.exam.examination_id" = "Examination ID";
+"medical.exam.specimen_type" = "Specimen Type";
+"medical.exam.specimen_info" = "Specimen Information";
+"medical.exam.microscopic_interpretation" = "Microscopic Interpretation";
+"medical.exam.bacteria_suffix" = " BTA";
+"medical.exam.confidence_level" = "Confidence Level";
+"medical.exam.goal_screening" = "Screening";
+"medical.exam.goal_followup" = "Follow Up";
+"medical.exam.preparation_anytime" = "Anytime";
+"medical.exam.preparation_morning" = "Morning";
+
+"medical.confidence.perfect" = "Perfect (100%)";
+"medical.confidence.high" = "High (90-99%)";
+"medical.confidence.medium" = "Medium (70-89%)";
+"medical.confidence.low" = "Low (50-69%)";
+"medical.confidence.very_low" = "Very Low (10-49%)";
+"medical.confidence.unpredicted" = "Unpredicted (0-9%)";
+
+// MARK: - Search & Filter
+"search.search" = "Search";
+"search.placeholder" = "Search...";
+"search.no_results" = "No results found";
+"search.clear" = "Clear search";
+"search.searching" = "Searching...";
+"search.patient.placeholder" = "Search patient name";
+"search.account.placeholder" = "Search account";
+"search.no_results_for" = "No results for %@";
+"search.result_for" = "\"%@\"";
+
+// MARK: - Forms
+"form.optional" = "(optional)";
+"form.select_option" = "Select an option";
+"form.enter_value" = "Enter value";
+"form.disable" = "Disable";
+"form.validation.required" = "This field is required";
+"form.validation.invalid" = "Invalid format";
+"form.validation.too_short" = "Too short";
+"form.validation.too_long" = "Too long";
+"form.placeholder" = "Enter %@";
+"form.select" = "Select %@";
+"form.search" = "Search %@";
+
+// MARK: - Navigation
+"nav.profile" = "Profile";
+"nav.history" = "History";
+"nav.examination" = "Examination";
+"nav.patients" = "Patients";
+"nav.settings" = "Settings";
+"nav.account_management" = "Account Management";
+
+// MARK: - Data Patterns
+"data.count" = "%d %@";
+"data.from_to" = "%d of %d %@";
+"data.image_count" = "Image %d of %d";
+"data.album_title" = "Image Album %@";
+"data.result_title" = "Examination Result %@ %d";
+"data.slide_title" = "Slide %d";
+"data.slide_id_title" = "Slide ID %d";
+"data.slide_id_placeholder" = "e.g., %@";
+"data.slide_type_title" = "Slide Type %d";
+"data.with_prefix" = "%@ %@";
+
+// MARK: - Features
+"feature.radio_button" = "Radio Button";
+
+// MARK: - Authentication
+"auth.login.title" = "Revolutionizing Bacterial Detection with AI Technology";
+"auth.login.subtitle" = "Advanced microscopy analysis for healthcare professionals";
+"auth.login.forgot_password" = "Forgot password?";
+"auth.login.not_registered" = "Health facility not registered?";
+"auth.login.register_facility" = "Register Health Facility";
+
+"auth.profile.account_info" = "Account Information";
+"auth.profile.job_title" = "Job Title";
+"auth.profile.job_title_value" = "Medical Laboratory Technologist";
+"auth.profile.health_facility" = "Health Facility";
+"auth.profile.edit_password" = "Change Password";
+"auth.profile.edit_pin" = "Change PIN";
+"auth.profile.face_id" = "Face ID";
+"auth.profile.privacy_policy" = "Privacy Policy";
+"auth.profile.logout" = "Logout";
+
+// MARK: - Examination
+"exam.progress.analyzing" = "Analyzing data";
+"exam.progress.processing" = "Processing examination";
+"exam.detail.patient_data" = "Patient Data";
+"exam.detail.slide_detail" = "Slide Details";
+"exam.detail.view_pdf" = "View PDF";
+"exam.detail.report_sitb" = "Report to SITB";
+"exam.steps.data_collection" = "Data Collection";
+"exam.steps.examination" = "Examination";
+"exam.steps.results" = "Results";
+
+// MARK: - Error Messages
+"error.general" = "An error occurred";
+"error.network" = "Network connection error";
+"error.authentication" = "Authentication failed";
+"error.validation" = "Validation error";
+"error.not_found" = "Data not found";
+"error.permission_denied" = "Permission denied";
+"error.camera_access" = "Camera access denied. Please enable camera access in Settings.";
+"error.unknown" = "Unknown error occurred";
+
+// MARK: - Success Messages
+"success.saved" = "Successfully saved";
+"success.deleted" = "Successfully deleted";
+"success.updated" = "Successfully updated";
+"success.created" = "Successfully created";
+"success.completed" = "Successfully completed";
+
+// MARK: - Analysist Module
+"analysist.step.data_examination" = "Examination Data";
+"analysist.step.examination_results" = "Examination Results";
+"analysist.examination_data" = "examination data";
+"analysist.data" = "data";
+"analysist.notes" = "notes";
+
+"analysist.info.navigation_title" = "System Interpretation Information";
+"analysist.info.assessment_standard_title" = "Assessment Standard";
+"analysist.info.assessment_standard_description" = "This system counts bacteria according to WHO recommendations and IUALTD standards";
+
+"analysist.pdf.taken_at" = "Taken at";
+"analysist.pdf.officer" = "Officer";
+"analysist.pdf.reporting_header" = "Reporting";
+"analysist.pdf.observation_results_header" = "Observation Results";
+"analysist.pdf.bacteriological_examination_title" = "BACTERIOLOGICAL EXAMINATION RESULTS";
+"analysist.pdf.lab_officer_signature" = "Lab Officer";
+"analysist.pdf.supervising_doctor_signature" = "Supervising Doctor for Lab Examination";
+
+// MARK: - Authentication Module
+// Login View
+"auth.login.title" = "Revolutionizing Bacterial Detection with AI Technology";
+"auth.login.email.placeholder" = "Example: your.name@gmail.com";
+"auth.login.password.placeholder" = "Enter your password";
+"auth.login.button" = "Login";
+"auth.login.not_registered" = "Health facility not registered?";
+"auth.login.register_facility" = "Register Health Facility";
+
+// Edit Password View
+"auth.edit_password.success_title" = "Password Changed Successfully";
+"auth.edit_password.success_message" = "You have successfully changed your account password";
+"auth.edit_password.success_button" = "Back to Profile";
+"auth.edit_password.navigation_title" = "Change Password";
+"auth.edit_password.current_password_title" = "Current Password";
+"auth.edit_password.current_password" = "Password";
+"auth.edit_password.new_password_title" = "New Password";
+"auth.edit_password.new_password" = "New Password";
+"auth.edit_password.new_password_description" = "Password must consist of at least 8 characters";
+"auth.edit_password.confirm_password_title" = "Confirm New Password";
+"auth.edit_password.confirm_password" = "Confirm New Password";
+
+// PIN View
+"auth.pin.success_title" = "PIN Successfully Changed";
+"auth.pin.success_description" = "Your access PIN has been successfully updated";
+"auth.pin.success_button" = "Back to Profile";
+"auth.pin.forgot_pin" = "Forgot PIN?";
+"auth.pin.use_password" = "Use Password";
+"auth.pin.invalid_pin" = "Current PIN is incorrect";
+"auth.pin.create_change_title" = "Set Access PIN";
+"auth.pin.revalidate_change_title" = "Confirm Access PIN";
+"auth.pin.create_title" = "Set PIN for easy login in next sessions";
+"auth.pin.revalidate_title" = "Enter PIN again for confirmation";
+"auth.pin.authenticate_description" = "Enter PIN to access the application";
+"auth.pin.change_title" = "Enter your current PIN";
+"auth.pin.title_create_change" = "New PIN";
+"auth.pin.title_create" = "Set PIN";
+"auth.pin.title_authenticate" = "Enter PIN";
+"auth.pin.title_change" = "Current PIN";
+"auth.pin.invalid_match" = "PIN does not match, please try again";
+
+// Profile View
+"auth.profile.account_info" = "Account Information";
+"auth.profile.job_title" = "Job Title";
+"auth.profile.job_title_value" = "Medical Laboratory Technologist";
+"auth.profile.health_facility" = "Health Facility";
+"auth.profile.edit_password" = "Change Password";
+"auth.profile.edit_pin" = "Change PIN";
+"auth.profile.face_id" = "Face ID";
+"auth.profile.privacy_policy" = "Privacy Policy";
+"auth.profile.face_id_not_enabled" = "Face ID is not enabled. Please enable it in Profile Settings";
+"auth.profile.face_id_not_supported" = "Your device does not support Face ID";
+"auth.profile.face_id_failed" = "Face ID authentication failed: %@";
+"auth.profile.old_password_not_matched" = "Old password does not match";
+"auth.profile.confirm_password_desc" = "Make sure the confirmation password matches the password you entered previously";
+"auth.profile.confirm_password_error" = "Confirmation password does not match";
+"auth.profile.confirm_password_success" = "Confirmation password matches";
+"auth.profile.empty_password_error" = "Please enter both old and new passwords";
+
+// Privacy Policy View
+"auth.privacy.navigation_title" = "Oculab Privacy Policy";
+"auth.privacy.intro" = "Please read the entire attached privacy policy carefully and thoroughly before using any features and/or services available in Oculab";
+"auth.privacy.general_title" = "General Terms";
+"auth.privacy.general_point_negative" = "Negative: ";
+"auth.privacy.general_point_scanty" = "Scanty: ";
+"auth.privacy.general_point_positive1" = "Positive 1+: ";
+"auth.privacy.general_point_positive2" = "Positive 2+: ";
+"auth.privacy.general_point_positive3" = "Positive 3+: ";
+"auth.privacy.definition_title" = "Definitions";
+"auth.privacy.definition_intro" = "Each of the following words or terms used in this Privacy Policy has the meaning as follows below, unless the word or term in question in its use expressly determines otherwise:";
+
+// MARK: - Examination Module
+// Main Examination
+"examination.title_result_images" = "Image Results";
+"examination.title_result_interpretation" = "Interpretation Results";
+"examination.button_start_analysis" = "Start Analysis";
+"examination.button_submitting" = "Submitting...";
+
+// Progress View
+"examination.progress.analyzing_title" = "Interpreting data";
+"examination.progress.refresh_instruction" = "Pull down to reload";
+"examination.progress.button_save_result" = "Save Examination Results";
+"examination.progress.button_verify_fovs" = "Verify All Fields of View";
+
+// Detail Views
+"examination.detail.navigation_title" = "Examination Details";
+"examination.detail.specimen" = "Specimen";
+"examination.detail.report_to_sitb" = "Report to SITB";
+"examination.detail.new_examination_title" = "New Examination";
+"examination.detail.data_examination_step" = "Examination Data";
+"examination.detail.result_examination_step" = "Examination Results";
+"examination.detail.slide_detail_title" = "Specimen Details";
+"examination.detail.slide_image_title" = "Specimen Image";
+"examination.detail.patient_data_card" = "Patient Data";
+
+// Guidelines Onboarding
+"examination.guidelines.navigation_title" = "Examination Preparation";
+"examination.guidelines.step1_title" = "Find Field of View on Microscope";
+"examination.guidelines.step1_description" = "Drop immersion oil on the specimen slide and adjust the objective lens to 100x magnification";
+"examination.guidelines.step2_title" = "Attach Smartphone to Adapter";
+"examination.guidelines.step2_description" = "Clean the main camera lens and align it with the adapter hole";
+"examination.guidelines.step3_title" = "Attach Adapter to Microscope";
+"examination.guidelines.step3_description" = "Attach the adapter to the eyepiece lens and adjust focus between microscope and camera";
+
+// Saved Result View
+"examination.saved.system_interpretation_warning" = "System interpretation is not the final result for patients";
+"examination.saved.patient_data_card" = "Patient Data";
+"examination.saved.detail_prefix" = "Detail";
+"examination.saved.examination_suffix" = "Examination";
+
+// Confirmation Popups
+"examination.popup.unfinished_title" = "Examination Not Complete";
+"examination.popup.unfinished_description" = "Examination is saved as draft and can be accessed on the history page";
+"examination.popup.save_result_description" = "Saved examination results cannot be changed again";
+"examination.popup.review_again_button" = "Review Again";
+"examination.popup.examination_result" = "Examination Results";
+
+// Image Section Component
+"examination.image.result_instruction" = "Tap to view image details";
+
+// Interpretation Section Component
+"examination.interpretation.bta_count_placeholder" = "Example: 8";
+"examination.interpretation.staff_notes_placeholder" = "Example: Only 20 bacteria found from 60 collected fields of view";
+
+// Laborant Info Component
+"examination.laborant.officer_title" = "Examination Officer";
+"examination.laborant.assigned_by_title" = "Assigned By";
+
+// Folder Card Component
+"examination.folder.image_count_suffix" = "Images";
+
+// Header View Component
+"examination.header.new_examination_title" = "New Examination";
+
+// MARK: - HomeHistory Module
+// Main HomeHistory
+"home_history.no_examination_message" = "No examinations completed on";
+"home_history.navigation_title_home" = "Examination Tasks";
+"home_history.navigation_title_history" = "Examination History";
+"home_history.task_section_title" = "Examination Tasks";
+"home_history.new_examination_button" = "New Examination";
+"home_history.no_task_message" = "You have not been assigned to perform examinations";
+"home_history.examination_data" = "your examination data";
+
+// Finished Examination Card Component
+"home_history.finished_card.dpjp_label" = "DPJP";
+"home_history.finished_card.positive_keyword" = "positive";
+"home_history.finished_card.positive_alt_keyword" = "positive";
+
+// Statistic Component
+"home_history.statistic.title" = "Examination Statistics";
+"home_history.statistic.tasks_completed_suffix" = "Tasks Completed";
+"home_history.statistic.from_tasks_prefix" = "of";
+"home_history.statistic.tasks_total_suffix" = "Tasks";
+"home_history.statistic.positive_label" = "Positive";
+"home_history.statistic.negative_label" = "Negative";
+
+// Weekly Calendar Component
+"home_history.weekly_calendar.title" = "Examinations Completed";
+
+// Home Activity Component
+"home_history.home_activity.officer_label" = "Examination Officer";
+
+// MARK: - Patient Module
+// Form View
+"patient.form.new_patient_navigation_title" = "New Patient Data";
+"patient.form.edit_patient_navigation_title" = "Edit Patient Data";
+
+// List View
+"patient.list.navigation_title" = "Patient List";
+"patient.list.button_create_patient" = "New Patient";
+
+// Detail View
+"patient.detail.navigation_title" = "Examination History";
+"patient.detail.patient_data_title" = "Patient Data";
+"patient.detail.examination_result_title" = "Examination Results";
+"patient.detail.loading_patient_data" = "patient data";
+"patient.detail.loading_examinations_data" = "examinations";
+"patient.detail.no_examinations_data" = "examinations";
+"patient.detail.not_determined_data" = "examinations";
+"patient.detail.button_create_examination" = "Examination";
+
+// Patient Card Component
+"patient.card.birth_date_prefix" = "Date of Birth: ";
+"patient.card.button_create_patient" = "New Patient";
+"patient.card.button_save_patient" = "Patient Data";
+
+// Patient Form Field Component
+"patient.form_field.name_placeholder" = "John Doe";
+
+// MARK: - TaskAssignment Module
+// Input Patient Data View
+"task_assignment.input_patient.step_title_patient" = "Patient Data";
+"task_assignment.input_patient.step_title_specimen" = "Specimen Data";
+"task_assignment.input_patient.step_title_results" = "Results";
+"task_assignment.input_patient.pic_title" = "Examination Officer";
+"task_assignment.input_patient.patient_name_placeholder_auto_selected" = "Patient automatically selected";
+"task_assignment.input_patient.patient_name_description" = "Select or enter new patient data";
+"task_assignment.input_patient.patient_name_description_auto_selected" = "Patient has been selected from history";
+"task_assignment.input_patient.fill_specimen_details_button" = "Fill Specimen Details";
+"task_assignment.input_patient.select_pic_data" = "Officer";
+"task_assignment.input_patient.patient_name_placeholder" = "Patient automatically selected";
+"task_assignment.input_patient.navigation_title" = "Patient Data";
+
+// Input Examination Data View
+"task_assignment.input_exam.step_title_patient" = "Patient Data";
+"task_assignment.input_exam.step_title_specimen" = "Specimen Data";
+"task_assignment.input_exam.step_title_results" = "Results";
+"task_assignment.input_exam.confirm_popup_title" = "Create Examination Task?";
+"task_assignment.input_exam.create_task_button" = "Create Task";
+"task_assignment.input_exam.review_again_button" = "Review Again";
+"task_assignment.input_exam.screening_choice" = "Screening";
+"task_assignment.input_exam.follow_up_choice" = "Follow Up";
+"task_assignment.input_exam.morning_choice" = "Morning";
+"task_assignment.input_exam.anytime_choice" = "Anytime";
+"task_assignment.input_exam.create_task_final_button" = "Create Task";
+"task_assignment.input_exam.navigation_title" = "Specimen Data";
+"task_assignment.input_exam.warning_first_exam_should_be_filled" = "If creating 2 examinations, the first examination must be completely filled out.";
+"task_assignment.input_exam.warning_second_exam_should_be_filled" = "If creating 2 examinations, the second examination must be completely filled out.";
+"task_assignment.input_exam.warning_slide_ids_must_be_different" = "Slide IDs must be different for the two examinations.";
+"task_assignment.input_exam.warning_examination_must_be_filled" = "Examination must be completely filled out.";
+"task_assignment.input_exam.error_message_failed_to_get_response" = "Failed to get response from server.";
+"task_assignment.input_exam.error_message_not_all_exams_created" = "Not all examinations were created successfully.";
+"task_assignment.input_exam.error_message_exams_contain_invalid_data" = "Examinations were created but contain invalid data.";
+"task_assignment.input_exam.examination_description" = "Patient %@ specimen will be examined by %@";
+
+// MARK: - UserManagement Module
+// Main UserManagement
+"user_management.back_to_account_list_data" = "Account List";
+
+// UserManagement View
+"user_management.view.delete_account_title" = "Delete account";
+"user_management.view.delete_account_description" = "Deleted accounts cannot be restored.";
+"user_management.view.delete_success_description" = "Account successfully deleted";
+"user_management.view.success_delete_account_action" = "Deleting Account";
+"user_management.view.add_new_account_data" = "New Account";
+"user_management.view.failed_delete_account_action" = "Deleting";
+"user_management.view.invalid_email_format" = "Invalid email format";
+"user_management.view.failed_registration" = "Failed to register account: No response from server";
+"user_management.view.success_delete_account_name" = "%@ has been successfully deleted.";
+
+// New User Form View
+"user_management.new_user_form.success_description_prefix" = "You have successfully added a new account for";
+"user_management.new_user_form.success_description_suffix" = "with role";
+"user_management.new_user_form.role_lab_placeholder" = "Laboratory Technician";
+"user_management.new_user_form.role_admin_choice" = "Admin";
+"user_management.new_user_form.name_placeholder" = "Enter name";
+"user_management.new_user_form.email_placeholder" = "Enter email";
+"user_management.new_user_form.success_create_account_action" = "creating Account";
+"user_management.new_user_form.create_another_account_data" = "Another Account";
+"user_management.new_user_form.save_account_data" = "Account";
+"user_management.new_user_form.navigation_title_data" = "New Account";
+"user_management.new_user_form.failed_registration_action" = "Registration";
+
+// Edit User Form View
+"user_management.edit_user_form.success_update_account_action" = "updating Account";
+"user_management.edit_user_form.failed_update_account_action" = "Updating";
+"user_management.edit_user_form.navigation_title" = "Edit Account";
+"user_management.edit_user_form.success_description_prefix" = "You have successfully updated the account for";
+"user_management.edit_user_form.success_description_suffix" = "with role";
+"user_management.edit_user_form.email_disabled_description" = "Email cannot be changed";
+"user_management.edit_user_form.name_placeholder" = "Enter name";
+"user_management.edit_user_form.email_placeholder" = "Enter email";
+
+// Bottom Sheet Menu Component
+"user_management.bottom_sheet.edit_account_details_button" = "Edit Account Details";
+"user_management.bottom_sheet.delete_account_button" = "Delete Account";
+
+// MARK: - VideoRecord Module
+// Video Record View
+"video_record.video_record_view.camera_access_denied_title" = "Camera Access Denied";
+"video_record.video_record_view.camera_access_denied_message" = "Please enable camera access for Oculab in Settings to record videos";
+"video_record.video_record_view.go_to_settings_button" = "Open Settings";
+"video_record.video_record_view.specimen_title" = "Specimen: %@";
+"video_record.video_record_view.specimen_title_default" = "Specimen: -";
+
+// Instruction Record View
+"video_record.instruction_record_view.navigation_title" = "Examination Instructions";
+"video_record.instruction_record_view.preparation_section_title" = "Examination Preparation";
+"video_record.instruction_record_view.recording_section_title" = "Image Capture Instructions";
+"video_record.instruction_record_view.start_recording_button" = "Start Image Capture";
+
+// Pre-recording Instructions
+"video_record.instruction_record_view.pre_recording_instruction_1" = "Use 10x objective lens to determine focus, then drop immersion oil";
+"video_record.instruction_record_view.pre_recording_instruction_2" = "Ensure the objective lens is set to 100x magnification after focus is found";
+"video_record.instruction_record_view.pre_recording_instruction_3" = "Mount your device with the camera lens attached to the eyepiece lens";
+"video_record.instruction_record_view.pre_recording_instruction_4" = "Make sure you are in a location with stable network connection";
+
+// During Recording Instructions
+"video_record.instruction_record_view.during_recording_instruction_1" = "Ensure the specimen remains visible on screen and always in optimal focus";
+"video_record.instruction_record_view.during_recording_instruction_2" = "Read the specimen from left end to right end following the scanning scheme for smear examination";
+"video_record.instruction_record_view.during_recording_instruction_3" = "Overall image capture progress will be visible in the top right";
+
+// Stitched Image View
+"video_record.stitched_image_view.navigation_title" = "Stitched Images";
+"video_record.stitched_image_view.no_image_available_message" = "No images available";
+
+// Camera View Component
+"video_record.camera_view_component.camera_access_alert_title" = "Camera Access";
+"video_record.camera_view_component.camera_access_alert_message" = "Please enable camera and microphone access in settings";
+"video_record.camera_view_component.settings_button" = "Open Settings";
+
+// Video Preview Component
+"video_record.video_preview_component.save_video_button" = "Save Video";
+"video_record.video_preview_component.retake_video_button" = "Retake";
+
+// Video Input Component
+"video_record.video_input_component.video_error_alert_message" = "Video cannot be played. Please re-record the sample.";
+"video_record.video_input_component.create_video_button" = "Image";
+"video_record.video_input_component.view_video_button" = "Video";
+"video_record.video_input_component.video_playback_error_title" = "Playing Video";

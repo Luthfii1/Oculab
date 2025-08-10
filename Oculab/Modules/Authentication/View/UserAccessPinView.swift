@@ -16,7 +16,7 @@ struct UserAccessPinView: View {
             ZStack {
                 if securityPresenter.showAccessPinSuccessPopup {
                     AppPopup(
-                        image: AppText.Icon.success,
+                        image: AppImage.success,
                         title: AppTextAuthUserAccessPin.successTitle,
                         description: AppTextAuthUserAccessPin.successDescription,
                         buttons: [
@@ -79,7 +79,7 @@ struct UserAccessPinView: View {
                                 Router.shared.navigateBack()
                             }) {
                                 HStack {
-                                    Image(AppText.Icon.back)
+                                    Image(AppImage.back)
                                 }
                             }
                         }

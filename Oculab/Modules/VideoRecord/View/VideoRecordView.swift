@@ -57,7 +57,7 @@ struct VideoRecordView: View {
                         Button(action: {
                             videoRecordPresenter.navigateBack()
                         }) {
-                            Image(systemName: "chevron.backward.circle")
+                            Image(systemName: AppIcon.backCircle)
                                 .foregroundStyle(AppColors.slate0)
                         }
                     }
@@ -76,7 +76,7 @@ struct VideoRecordView: View {
                     Button(action: {
                         print("Detail information button")
                     }) {
-                        Image(systemName: "info.circle")
+                        Image(systemName: AppIcon.info)
                             .foregroundStyle(AppColors.slate0)
                     }
                 }
@@ -84,11 +84,9 @@ struct VideoRecordView: View {
         }
         .navigationBarBackButtonHidden(true)
         .onAppear {
-            print("VideoRecordView appeared. Checking camera permission and setting up.")
             videoRecordPresenter.checkPermission()
         }
         .onDisappear {
-            print("VideoRecordView disappeared. Stopping camera session.")
             videoRecordPresenter.stopCameraSession()
 
             videoRecordPresenter.isRecording = false
@@ -105,7 +103,7 @@ struct VideoRecordView: View {
                             UIApplication.shared.open(settingsUrl)
                         }
                     },
-                    secondaryButton: .cancel(Text(AppTextVideoRecordView.cancelButton)) {
+                    secondaryButton: .cancel(Text(AppAction.cancel)) {
                         dismiss() 
                     }
                 )

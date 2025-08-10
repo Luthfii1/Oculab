@@ -55,7 +55,7 @@ struct FOVDetail: View {
                     // Bottom controls
                     VStack {
                         VStack(spacing: Decimal.d4) {
-                            Text("\(AppTextAnalysisFOVDetail.bacteriaCountPrefix)\(fovData.systemCount)\(AppTextAnalysisFOVDetail.bacteriaCountSuffix)")
+                            Text(AppData.makeSentence([AppMedical.Examination.bacteriaCount, fovData.systemCount, AppMedical.Examination.bacteriaCountSuffix, AppMedical.Examination.bacteriaCountSuffix]))
                                 .font(AppTypography.h3)
                                 .foregroundColor(.white)
                         }
@@ -66,21 +66,21 @@ struct FOVDetail: View {
                             Button(action: {
                                 // Add contrast adjustment
                             }) {
-                                Image(AppTextAnalysisFOVDetail.contrastIcon)
+                                Image(AppImage.contrast)
                                     .foregroundColor(.white)
                             }
 
                             Button(action: {
                                 // Add brightness adjustment
                             }) {
-                                Image(AppTextAnalysisFOVDetail.brightnessIcon)
+                                Image(AppImage.brightness)
                                     .foregroundColor(.white)
                             }
 
                             Button(action: {
                                 // Add comment functionality
                             }) {
-                                Image(AppTextAnalysisFOVDetail.commentIcon)
+                                Image(AppImage.comment)
                                     .foregroundColor(.white)
                             }
                         }
@@ -94,10 +94,10 @@ struct FOVDetail: View {
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     VStack {
-                        Text(" \(AppTextAnalysisFOVDetail.imageCountFormat) \(order + 1), \(total)")
+                        Text(AppData.imageCount(order + 1, total))
                             .font(AppTypography.s4_1)
                             .foregroundColor(.white)
-                        Text("\(AppTextAnalysisFOVDetail.slideIdPrefix) \(slideId)")
+                        Text(AppData.makeSentence([AppMedical.Examination.slideId, slideId]))
                             .font(AppTypography.p3)
                             .foregroundColor(.white.opacity(0.8))
                     }
@@ -113,7 +113,7 @@ struct FOVDetail: View {
                         Router.shared.navigateBack()
                     }) {
                         HStack {
-                            Image(AppTextAnalysisFOVDetail.backWhiteIcon)
+                            Image(AppImage.backWhite)
                                 .foregroundColor(.white)
                         }
                     }

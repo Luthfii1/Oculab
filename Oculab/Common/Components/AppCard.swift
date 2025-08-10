@@ -57,8 +57,8 @@ struct AppCard<Content: View>: View {
                        action?()
                    } label: {
                        HStack(spacing: Decimal.d12) {
-                           Image(systemName: "square.and.pencil")
-                           Text("Edit").font(AppTypography.s6)
+                           Image(systemName: AppIcon.squareAndPencil)
+                           Text(AppAction.edit).font(AppTypography.s6)
                        }
                        .foregroundStyle(AppColors.purple500)
                    }

@@ -15,7 +15,7 @@ struct LoginView: View {
         NavigationView {
             VStack {
                 if !presenter.isKeyboardVisible {
-                    Image(.login)
+                    Image(AppImage.login)
                         .resizable()
                         .scaledToFit()
                         .transition(.opacity)
@@ -30,7 +30,7 @@ struct LoginView: View {
                         .multilineTextAlignment(.center)
                     VStack(spacing: 8) {
                         AppTextField(
-                            title: AppTextAuthLogin.emailTitle,
+                            title: AppLabel.email,
                             isRequired: true,
                             placeholder: AppTextAuthLogin.emailPlaceholder,
                             isError: presenter.isError,
@@ -38,11 +38,11 @@ struct LoginView: View {
                             text: $presenter.email
                         )
                         AppTextField(
-                            title: AppTextAuthLogin.passwordTitle,
+                            title: AppLabel.password,
                             isRequired: true,
                             placeholder: AppTextAuthLogin.passwordPlaceholder,
                             description: presenter.description,
-                            rightIcon: AppText.Icon.eye,
+                            rightIcon: AppIcon.eye,
                             isError: presenter.isError,
                             isDisabled: presenter.isLoading,
                             text: $presenter.password
@@ -52,7 +52,7 @@ struct LoginView: View {
                     .padding(.top, 12)
                     VStack(alignment: .center, spacing: 16) {
                         AppButton(
-                            title: AppTextAuthLogin.buttonText,
+                            title: presenter.loginButtonText, 
                             colorType: .primary,
                             size: .large,
                             isEnabled: presenter.isFilled

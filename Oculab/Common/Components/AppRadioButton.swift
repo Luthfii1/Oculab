@@ -22,7 +22,7 @@ struct AppRadioButton: View {
                     .foregroundColor(AppColors.slate900)
 
                 if isRequired {
-                    Text("*")
+                    Text(AppValue.required)
                         .font(AppTypography.h4)
                         .foregroundColor(.red)
                 }
@@ -30,7 +30,7 @@ struct AppRadioButton: View {
 
             ForEach(choices, id: \.self) { choice in
                 HStack(spacing: Decimal.d4) {
-                    Image(systemName: selectedChoice == choice ? "largecircle.fill.circle" : "circle")
+                    Image(systemName: selectedChoice == choice ? AppIcon.largecircleFillCircle : AppIcon.circle)
                         .resizable()
                         .frame(width: 16, height: 16)
                         .foregroundColor(selectedChoice == choice ? AppColors.purple600 : .gray)
@@ -57,21 +57,21 @@ struct AppRadioButton: View {
 }
 
 struct AppRadioButtonPreview: View {
-    @State private var sex = ""
+    @State private var sex = AppValue.empty
     @State private var isDisabled = false
 
     var body: some View {
         VStack(alignment: .leading) {
             AppRadioButton(
-                title: "Gender",
+                title: AppPatient.gender,
                 isRequired: true,
-                choices: ["Male", "Female", "Other"],
+                choices: [AppPatient.Gender.male, AppPatient.Gender.female, AppPatient.Gender.other],
                 isDisabled: isDisabled,
                 selectedChoice: $sex
             )
             .padding()
 
-            Toggle("Disable Radio Buttons", isOn: $isDisabled)
+            Toggle(AppAction.disable(AppFeature.radioButton), isOn: $isDisabled)
                 .padding()
         }
     }

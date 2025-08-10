@@ -16,12 +16,12 @@ struct UserManagementView: View {
                 // Delete confirmation popup
                 if presenter.showDeleteConfirmationPopup {
                     AppPopup(
-                        image: AppText.Icon.confirm,
-                        title: "\(AppTextUserMgmtView.deleteAccountTitle) \(presenter.userToDelete?.name ?? AppText.Common.emptyString)?",
+                        image: AppImage.confirm,
+                        title: AppData.makeSentence([AppTextUserMgmtView.deleteAccountTitle, presenter.userToDelete?.name ?? AppValue.empty]),
                         description: AppTextUserMgmtView.deleteAccountDescription,
                         buttons: [
                             AppButton(
-                                title: AppTextUserMgmtView.deleteAccountButton,
+                                title: AppTextUserMgmtView.deleteAccountTitle,
                                 colorType: .destructive(.primary),
                                 isEnabled: !presenter.isDeleting
                             ) {
@@ -30,7 +30,7 @@ struct UserManagementView: View {
                                 }
                             },
                             AppButton(
-                                title: AppTextUserMgmtView.backButton,
+                                title: AppAction.back,
                                 colorType: .destructive(.secondary)
                             ) {
                                 presenter.dismissDeleteConfirmation()
@@ -43,12 +43,12 @@ struct UserManagementView: View {
                 // Delete success popup
                 if presenter.showDeleteSuccessAlert {
                     AppPopup(
-                        image: AppText.Icon.success,
-                        title: AppTextUserMgmtView.deleteSuccessTitle,
+                        image: AppImage.success,
+                        title: AppTextUserMgmtView.successDeleteAccount,
                         description: presenter.deletionSuccess?.message ?? AppTextUserMgmtView.deleteSuccessDescription,
                         buttons: [
                             AppButton(
-                                title: AppText.Common.okButton,
+                                title: AppAction.ok,
                                 colorType: .primary,
                                 size: .large,
                                 isEnabled: true
@@ -66,15 +66,15 @@ struct UserManagementView: View {
                     VStack(spacing: 24) {
                         AppSearchBar(
                             searchText: $presenter.searchText,
-                            placeholder: AppTextUserMgmtView.searchPlaceholder,
+                            placeholder: AppSearch.Account.placeholder,
                             onSearch: {
                                 presenter.searchAccounts(query: presenter.searchText)
                             }
                         )
 
                         AppButton(
-                            title: AppTextUserMgmtView.addNewAccountButton,
-                            leftIcon: AppText.Icon.plus,
+                            title: AppTextUserMgmtView.addNewAccount,
+                            leftIcon: AppIcon.add,
                             colorType: .secondary,
                             action: {
                                 presenter.navigateTo(.newAccount)
@@ -83,11 +83,11 @@ struct UserManagementView: View {
                         
                         if !presenter.searchText.isEmpty && presenter.displayedSortedGroupedAccounts.isEmpty {
                             VStack(spacing: 20) {
-                                Image(systemName: AppText.Icon.magnifyingglass)
+                                Image(systemName: AppIcon.search)
                                     .font(.system(size: 48))
                                     .foregroundColor(AppColors.slate300)
                                 
-                                Text("\(AppTextUserMgmtView.noResultsPrefix) \"\(presenter.searchText)\"")
+                                Text(AppSearch.noResults(presenter.searchText))
                                     .font(AppTypography.s3)
                                     .foregroundColor(AppColors.slate600)
                                     .multilineTextAlignment(.center)
@@ -95,7 +95,7 @@ struct UserManagementView: View {
                                 Button(action: {
                                     presenter.clearSearch()
                                 }) {
-                                    Text(AppTextUserMgmtView.clearSearchButton)
+                                    Text(AppSearch.clearSearch)
                                         .font(AppTypography.p2)
                                         .foregroundColor(AppColors.purple600)
                                 }
@@ -116,14 +116,14 @@ struct UserManagementView: View {
                         }
                     }
                     .padding(.horizontal, Decimal.d20)
-                    .navigationTitle(AppTextUserMgmtView.navigationTitle)
+                    .navigationTitle(AppNav.accountManagement)
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarLeading) {
                             Button(action: {
                                 presenter.navigateBack()
                             }) {
-                                Image(AppText.Icon.back)
+                                Image(AppImage.back)
                             }
                         }
                     }
@@ -133,18 +133,18 @@ struct UserManagementView: View {
                     BottomSheetMenu(presenter: presenter)
                 }
                 .alert(
-                    AppTextUserMgmtView.deletionFailedTitle,
+                    AppTextUserMgmtView.failedDeleteAccount,
                     isPresented: Binding(
                         get: { presenter.deletionError != nil },
                         set: { if !$0 { presenter.deletionError = nil } }
                     ),
                     actions: {
-                        Button(AppText.Common.okButton) {
+                        Button(AppAction.ok) {
                             presenter.deletionError = nil
                         }
                     },
                     message: {
-                        Text(presenter.deletionError ?? AppTextUserMgmtView.unknownErrorMessage)
+                        Text(presenter.deletionError ?? AppValue.unknownError)
                     }
                 )
                 .onAppear {
@@ -158,7 +158,7 @@ struct UserManagementView: View {
     }
 }
 
-#Preview {
-    UserManagementView()
-        .environmentObject(DependencyInjection.shared.createAccountPresenter())
-}
+//#Preview {
+//    UserManagementView()
+//        .environmentObject(DependencyInjection.shared.createAccountPresenter())
+//}

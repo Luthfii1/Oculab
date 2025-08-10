@@ -16,27 +16,29 @@ struct NewUserFormView: View {
                 // Success popup
                 if presenter.showSuccessPopup {
                     AppPopup(
-                        image: AppText.Icon.success,
-                        title: AppTextUserMgmtNewUserForm.successTitle,
-                        description: "\(AppTextUserMgmtNewUserForm.successDescriptionPrefix) \(presenter.registrationSuccess.name) \(AppTextUserMgmtNewUserForm.successDescriptionSuffix) \(presenter.registrationSuccess.role)",
+                        image: AppImage.success,
+                        title: AppTextUserMgmtNewUserForm.successCreateAccount,
+                        description: AppData.makeSentence([AppTextUserMgmtNewUserForm.successDescriptionPrefix, presenter.registrationSuccess.name, AppTextUserMgmtNewUserForm.successDescriptionSuffix, presenter.registrationSuccess.role]),
                         buttons: [
                             AppButton(
-                                title: AppTextUserMgmtNewUserForm.createAnotherAccountButton,
+                                title: AppTextUserMgmtNewUserForm.createAnotherAccount,
                                 colorType: .secondary,
                                 size: .large,
-                                isEnabled: true
-                            ) {
-                                presenter.resetForm()
-                            },
+                                isEnabled: true,
+                                action: {
+                                    presenter.resetForm()
+                                }
+                            ),
                             
                             AppButton(
-                                title: AppTextUserMgmtNewUserForm.backToAccountListButton,
+                                title: AppTextUserMgmt.backToAccountList,
                                 colorType: .tertiary,
-                                isEnabled: true
-                            ) {
-                                presenter.resetForm()
-                                presenter.navigateBack()
-                            }
+                                isEnabled: true,
+                                action: {
+                                    presenter.resetForm()
+                                    presenter.navigateBack()
+                                }
+                            )
                         ],
                         isVisible: Binding(
                             get: { presenter.showSuccessPopup },
@@ -51,15 +53,15 @@ struct NewUserFormView: View {
                 
                 ScrollView {
                     VStack(spacing: 24) {
-                        Image(AppText.Icon.addAccount)
+                        Image(AppImage.addAccount)
                         VStack(spacing: 16) {
                             // Role dropdown
                             AppDropdown(
-                                title: AppTextUserMgmtNewUserForm.roleTitle,
+                                title: AppLabel.role,
                                 placeholder: AppTextUserMgmtNewUserForm.roleLabPlaceholder,
                                 isRequired: true,
-                                leftIcon: AppText.Icon.personFill,
-                                rightIcon: AppText.Icon.chevronDown,
+                                leftIcon: AppIcon.personFill,
+                                rightIcon: AppIcon.down,
                                 isDisabled: false,
                                 choices: [(AppTextUserMgmtNewUserForm.roleLabPlaceholder, RolesType.LAB.rawValue), (AppTextUserMgmtNewUserForm.roleAdminChoice, RolesType.ADMIN.rawValue)],
                                 isSearchEnabled: false,
@@ -68,7 +70,7 @@ struct NewUserFormView: View {
                             
                             // Name field
                             AppTextField(
-                                title: AppTextUserMgmtNewUserForm.nameTitle,
+                                title: AppLabel.name,
                                 isRequired: true,
                                 placeholder: AppTextUserMgmtNewUserForm.namePlaceholder,
                                 text: $presenter.name
@@ -76,7 +78,7 @@ struct NewUserFormView: View {
                             
                             // Email field
                             AppTextField(
-                                title: AppTextUserMgmtNewUserForm.emailTitle,
+                                title: AppLabel.email,
                                 isRequired: true,
                                 placeholder: AppTextUserMgmtNewUserForm.emailPlaceholder,
                                 description: presenter.editError,
@@ -87,8 +89,8 @@ struct NewUserFormView: View {
                             // Register button
                             ZStack {
                                 AppButton(
-                                    title: presenter.isRegistering ? AppText.Common.emptyString : AppTextUserMgmtNewUserForm.registerAccountButton,
-                                    rightIcon: presenter.isRegistering ? nil : AppText.Icon.arrowRight,
+                                    title: presenter.isRegistering ? AppValue.empty : AppTextUserMgmtNewUserForm.saveAccount,
+                                    rightIcon: presenter.isRegistering ? nil : AppIcon.forward,
                                     isEnabled: presenter.isFormValid(
                                         name: presenter.name,
                                         email: presenter.email,
@@ -122,7 +124,7 @@ struct NewUserFormView: View {
                             presenter.navigateBack()
                         }) {
                             HStack {
-                                Image(systemName: AppText.Icon.chevronLeft)
+                                Image(systemName: AppIcon.back)
                             }
                         }
                     }
@@ -133,18 +135,18 @@ struct NewUserFormView: View {
         .navigationBarHidden(true)
         // Error alert
         .alert(
-            AppTextUserMgmtNewUserForm.registrationFailedTitle,
+            AppTextUserMgmtNewUserForm.failedRegistration,
             isPresented: Binding(
                 get: { presenter.registrationError != nil },
                 set: { if !$0 { presenter.registrationError = nil } }
             ),
             actions: {
-                Button(AppText.Common.okButton) {
+                Button(AppAction.ok) {
                     presenter.registrationError = nil
                 }
             },
             message: {
-                Text(presenter.registrationError ?? AppTextUserMgmtNewUserForm.unknownErrorMessage)
+                Text(presenter.registrationError ?? AppValue.unknownError)
             }
         )
     }

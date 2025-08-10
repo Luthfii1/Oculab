@@ -13,27 +13,27 @@ struct PatientFormField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
             AppTextField(
-                title: AppTextPatientCompFormField.nameTitle,
+                title: AppPatient.name,
                 isRequired: true,
                 placeholder: AppTextPatientCompFormField.namePlaceholder,
-                leftIcon: AppText.Icon.personFill,
+                leftIcon: AppIcon.personFill,
                 text: $presenter.patient.name
             )
             
             AppTextField(
-                title: AppTextPatientCompFormField.nikTitle,
+                title: AppPatient.nik,
                 isRequired: true,
-                placeholder: AppTextPatientCompFormField.nikPlaceholder,
+                placeholder: AppPatient.Placeholder.nik,
                 isNumberOnly: true,
                 length: 16,
                 text: $presenter.patient.NIK
             )
 
             DateField(
-                title: AppTextPatientCompFormField.birthDateTitle,
+                title: AppPatient.dateOfBirth,
                 isRequired: true,
-                placeholder: AppTextPatientCompFormField.birthDatePlaceholder,
-                rightIcon: AppText.Icon.calendar,
+                placeholder: AppPatient.Placeholder.selectDate,
+                rightIcon: AppIcon.calendar,
                 date: $presenter.selectedDoB
             )
             .onChange(of: presenter.selectedDoB) {
@@ -41,17 +41,17 @@ struct PatientFormField: View {
             }
 
             AppRadioButton(
-                title: AppTextPatientCompFormField.genderTitle,
+                title: AppPatient.gender,
                 isRequired: true,
-                choices: [AppTextPatientCompFormField.femaleChoice, AppTextPatientCompFormField.maleChoice],
+                choices: [AppPatient.Gender.female, AppPatient.Gender.male],
                 isDisabled: false,
                 selectedChoice: $presenter.selectedSex
             )
             .onChange(of: presenter.selectedSex) {
                 switch presenter.selectedSex {
-                case AppTextPatientCompFormField.femaleChoice:
+                case AppPatient.Gender.female:
                     presenter.patient.sex = .FEMALE
-                case AppTextPatientCompFormField.maleChoice:
+                case AppPatient.Gender.male:
                     presenter.patient.sex = .MALE
                 default:
                     presenter.patient.sex = .UNKNOWN
@@ -59,8 +59,8 @@ struct PatientFormField: View {
             }
 
             AppTextField(
-                title: AppTextPatientCompFormField.bpjsTitle,
-                placeholder: AppTextPatientCompFormField.bpjsPlaceholder,
+                title: AppPatient.bpjsNumber,
+                placeholder: AppPatient.Placeholder.bpjs,
                 isNumberOnly: true,
                 length: 13,
                 text: $presenter.BPJSnumber
@@ -72,7 +72,7 @@ struct PatientFormField: View {
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
                 Spacer()
-                Button(AppTextPatientCompFormField.doneButton) {
+                Button(AppAction.done) {
                     UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 }
             }

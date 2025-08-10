@@ -40,7 +40,7 @@ struct UserListView: View {
                                     Button {
                                         presenter.selectUser(account)
                                     } label: {
-                                        Image(systemName: AppText.Icon.ellipsis)
+                                        Image(systemName: AppIcon.ellipsis)
                                             .font(.system(size: 20, weight: .medium))
                                             .foregroundColor(AppColors.slate400)
                                             .frame(width: 44)

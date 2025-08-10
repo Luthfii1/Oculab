@@ -224,120 +224,120 @@ struct AppButton: View, Identifiable {
 #Preview {
     VStack(spacing: 20) {
         AppButton(
-            title: "Primary Enabled",
-            leftIcon: "person.fill", // Optional left icon
-            rightIcon: "chevron.right", // Optional right icon
+            title: "PREVIEW Primary Enabled PREVIEW",
+            leftIcon: AppIcon.personFill, // Optional left icon
+            rightIcon: AppIcon.forward, // Optional right icon
             colorType: .primary, // Primary button type
             size: .large,
             isEnabled: true
         ) {
-            print("Primary Button Tapped")
+            print("LOG Primary Button Tapped LOG")
         }
 
         AppButton(
-            title: "Primary Disabled",
-            leftIcon: "person.fill",
-            rightIcon: "chevron.right",
+            title: "PREVIEW Primary Disabled PREVIEW",
+            leftIcon: AppIcon.personFill,
+            rightIcon: AppIcon.forward,
             colorType: .primary,
             size: .large,
             isEnabled: false // Disabled
         ) {
-            print("Should not be tapped")
+            print("LOG Should not be tapped LOG")
         }
 
         AppButton(
-            title: "Secondary Enabled",
+            title: "PREVIEW Secondary Enabled PREVIEW",
             colorType: .secondary,
             size: .small,
             isEnabled: true
         ) {
-            print("Secondary Button Tapped")
+            print("LOG Secondary Button Tapped LOG")
         }
 
         AppButton(
-            title: "Secondary Disabled",
+            title: "PREVIEW Secondary Disabled PREVIEW",
             colorType: .secondary,
             size: .small,
             isEnabled: false // Disabled, with clear background and slate200 border
         ) {
-            print("Should not be tapped")
+            print("LOG Should not be tapped LOG")
         }
 
         AppButton(
-            title: "Tertiary Enabled",
+            title: "PREVIEW Tertiary Enabled PREVIEW",
             colorType: .tertiary,
             size: .large,
             isEnabled: true
         ) {
-            print("Tertiary Button Tapped")
+            print("LOG Tertiary Button Tapped LOG")
         }
 
         AppButton(
-            title: "Tertiary Disabled",
+            title: "PREVIEW Tertiary Disabled PREVIEW",
             colorType: .tertiary,
             size: .large,
             isEnabled: false // Disabled
         ) {
-            print("Should not be tapped")
+            print("LOG Should not be tapped LOG")
         }
 
         AppButton(
-            title: "Destructive Primary Enabled",
+            title: "PREVIEW Destructive Primary Enabled PREVIEW",
             colorType: .destructive(.primary),
             size: .small,
             isEnabled: true
         ) {
-            print("Destructive Button Tapped")
+            print("LOG Destructive Button Tapped LOG")
         }
 
         AppButton(
-            title: "Destructive Secondary Enabled",
+            title: "PREVIEW Destructive Secondary Enabled PREVIEW",
             colorType: .destructive(.secondary),
             size: .small,
             isEnabled: true
         ) {
-            print("Destructive Button Tapped")
+            print("LOG Destructive Button Tapped LOG")
         }
 
         AppButton(
-            title: "Neutral Primary Enabled",
+            title: "PREVIEW Neutral Primary Enabled PREVIEW",
             colorType: .neutral(.primary),
             size: .small,
             isEnabled: true
         ) {
-            print("Neutral Button Tapped")
+            print("LOG Neutral Button Tapped LOG")
         }
 
         AppButton(
-            title: "Neutral Secondary Enabled",
+            title: "PREVIEW Neutral Secondary Enabled PREVIEW",
             colorType: .neutral(.secondary),
             size: .small,
             isEnabled: true
         ) {
-            print("Neutral Button Tapped")
+            print("LOG Neutral Button Tapped LOG")
         }
 
         HStack {
             AppButton(
-                title: "Primary Enabled",
-                leftIcon: "person.fill", // Optional left icon
-                rightIcon: "chevron.right", // Optional right icon
+                title: "PREVIEW Primary Enabled PREVIEW",
+                leftIcon: AppIcon.personFill, // Optional left icon
+                rightIcon: AppIcon.forward, // Optional right icon
                 colorType: .primary, // Primary button type
                 size: .large,
                 isEnabled: true
             ) {
-                print("Primary Button Tapped")
+                print("LOG Primary Button Tapped LOG")
             }
 
             AppButton(
-                title: "Primary Enabled",
-                leftIcon: "person.fill", // Optional left icon
-                rightIcon: "chevron.right", // Optional right icon
+                title: "PREVIEW Primary Enabled PREVIEW",
+                leftIcon: AppIcon.personFill, // Optional left icon
+                rightIcon: AppIcon.forward, // Optional right icon
                 colorType: .primary, // Primary button type
                 size: .large,
                 isEnabled: true
             ) {
-                print("Primary Button Tapped")
+                print("LOG Primary Button Tapped LOG")
             }
         }
     }

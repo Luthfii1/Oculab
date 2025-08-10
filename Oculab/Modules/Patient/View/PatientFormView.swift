@@ -36,8 +36,8 @@ struct PatientFormView: View {
                     Spacer()
 
                     AppButton(
-                        title: isAddingNewPatient ? AppTextPatientForm.addNewPatientButton : AppTextPatientForm.savePatientButton,
-                        leftIcon: isAddingNewPatient ? AppText.Icon.plus : AppText.Icon.checkmark
+                        title: isAddingNewPatient ? AppTextPatientCompCard.buttonCreatePatient : AppTextPatientCompCard.buttonSavePatient,
+                        leftIcon: isAddingNewPatient ? AppIcon.add : AppIcon.checkmark
                     ) {
                         Task {
                             if isAddingNewPatient {
@@ -59,7 +59,7 @@ struct PatientFormView: View {
                         Router.shared.navigateBack()
                     }) {
                         HStack {
-                            Image(AppText.Icon.back)
+                            Image(AppImage.back)
                         }
                     }
                 }
@@ -71,8 +71,8 @@ struct PatientFormView: View {
                     }
                 }
             }
-            .alert(AppText.Common.errorAlertTitle, isPresented: .constant(presenter.errorMessage != nil)) {
-                Button(AppText.Common.okButton) {
+            .alert(AppValue.unknownError, isPresented: .constant(presenter.errorMessage != nil)) {
+                Button(AppAction.ok) {
                     presenter.errorMessage = nil
                 }
             } message: {

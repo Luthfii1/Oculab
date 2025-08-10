@@ -13,19 +13,19 @@ class PatientPresenter: ObservableObject {
     
     @Published var isPatientLoading = false
     @Published var patientNameDoB: [(String, String)] = []
-    @Published var searchText: String = ""
+    @Published var searchText: String = AppValue.empty
     @Published var filteredPatientNameDoB: [(String, String)] = []
     
     @Published var patient: Patient = .init(
         _id: UUID().uuidString.lowercased(),
-        name: "",
-        NIK: "",
+        name: AppValue.empty,
+        NIK: AppValue.empty,
         DoB: Date(),
         sex: .UNKNOWN
     )
     
-    @Published var selectedSex: String = ""
-    @Published var BPJSnumber: String = ""
+    @Published var selectedSex: String = AppValue.empty
+    @Published var BPJSnumber: String = AppValue.empty
     @Published var selectedDoB: Date = Date()
     
     @Published var examinationList: [ExaminationResultCardData] = []
@@ -49,8 +49,8 @@ class PatientPresenter: ObservableObject {
 
                 patientNameDoB.removeAll()
                 for patient in response {
-                    let formattedDoB = patient.DoB.map { dateFormatter.string(from: $0) } ?? ""
-                    patientNameDoB.append((patient.name + " (\(formattedDoB))", patient._id))
+                    let formattedDoB = patient.DoB.map { dateFormatter.string(from: $0) } ?? AppValue.empty
+                    patientNameDoB.append((patient.name + String(formattedDoB), patient._id))
                 }
                 filterPatients()
             }
@@ -74,7 +74,7 @@ class PatientPresenter: ObservableObject {
     }
     
     func clearSearch() {
-        searchText = ""
+        searchText = AppValue.empty
         filterPatients()
     }
     
@@ -83,7 +83,7 @@ class PatientPresenter: ObservableObject {
             filteredPatientNameDoB = patientNameDoB
         } else {
             filteredPatientNameDoB = patientNameDoB.filter { nameWithDoB, _ in
-                let name = nameWithDoB.components(separatedBy: " (").first ?? ""
+                let name = nameWithDoB.components(separatedBy: " (").first ?? AppValue.empty
                 return name.localizedCaseInsensitiveContains(searchText)
             }
         }
@@ -101,16 +101,16 @@ class PatientPresenter: ObservableObject {
 
             if let fetchedPatient = response {
                 self.patient = fetchedPatient
-                self.BPJSnumber = fetchedPatient.BPJS ?? ""
+                self.BPJSnumber = fetchedPatient.BPJS ?? AppValue.empty
                 self.selectedDoB = fetchedPatient.DoB ?? Date()
                 
                 switch fetchedPatient.sex {
                 case .FEMALE:
-                    self.selectedSex = "Perempuan"
+                    self.selectedSex = AppPatient.Gender.female
                 case .MALE:
-                    self.selectedSex = "Laki-laki"
+                    self.selectedSex = AppPatient.Gender.male
                 default:
-                    self.selectedSex = ""
+                    self.selectedSex = AppValue.empty
                 }
             }
         } catch {
@@ -172,9 +172,9 @@ class PatientPresenter: ObservableObject {
         patient.BPJS = BPJSnumber.isEmpty ? nil : BPJSnumber
         
         switch selectedSex {
-        case "Perempuan":
+        case AppPatient.Gender.female:
             patient.sex = .FEMALE
-        case "Laki-laki":
+        case AppPatient.Gender.male:
             patient.sex = .MALE
         default:
             patient.sex = .UNKNOWN
@@ -243,7 +243,7 @@ class PatientPresenter: ObservableObject {
     }
     
     func formatDate(_ date: Date?) -> String {
-        guard let date = date else { return "" }
+        guard let date = date else { return AppValue.empty }
         let formatter = DateFormatter()
         formatter.dateFormat = "dd/MM/yyyy"
         return formatter.string(from: date)

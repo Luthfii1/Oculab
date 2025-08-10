@@ -13,7 +13,7 @@ struct SplashScreenView: View {
             VStack {
                 Spacer()
 
-                Image(.logoSplashScreen)
+                Image(AppImage.logoSplashScreen)
                     .resizable()
                     .scaledToFit()
                     .padding(.horizontal, 48)
