@@ -315,3 +315,66 @@
 "auth.privacy.general_point_positive3" = "Positive 3+: ";
 "auth.privacy.definition_title" = "Definitions";
 "auth.privacy.definition_intro" = "Each of the following words or terms used in this Privacy Policy has the meaning as follows below, unless the word or term in question in its use expressly determines otherwise:";
+
+// MARK: - Examination Module
+// Main Examination
+"examination.title_result_images" = "Image Results";
+"examination.title_result_interpretation" = "Interpretation Results";
+"examination.button_start_analysis" = "Start Analysis";
+"examination.button_submitting" = "Submitting...";
+
+// Progress View
+"examination.progress.analyzing_title" = "Interpreting data";
+"examination.progress.refresh_instruction" = "Pull down to reload";
+"examination.progress.button_save_result" = "Save Examination Results";
+"examination.progress.button_verify_fovs" = "Verify All Fields of View";
+
+// Detail Views
+"examination.detail.navigation_title" = "Examination Details";
+"examination.detail.specimen" = "Specimen";
+"examination.detail.report_to_sitb" = "Report to SITB";
+"examination.detail.new_examination_title" = "New Examination";
+"examination.detail.data_examination_step" = "Examination Data";
+"examination.detail.result_examination_step" = "Examination Results";
+"examination.detail.slide_detail_title" = "Specimen Details";
+"examination.detail.slide_image_title" = "Specimen Image";
+"examination.detail.patient_data_card" = "Patient Data";
+
+// Guidelines Onboarding
+"examination.guidelines.navigation_title" = "Examination Preparation";
+"examination.guidelines.step1_title" = "Find Field of View on Microscope";
+"examination.guidelines.step1_description" = "Drop immersion oil on the specimen slide and adjust the objective lens to 100x magnification";
+"examination.guidelines.step2_title" = "Attach Smartphone to Adapter";
+"examination.guidelines.step2_description" = "Clean the main camera lens and align it with the adapter hole";
+"examination.guidelines.step3_title" = "Attach Adapter to Microscope";
+"examination.guidelines.step3_description" = "Attach the adapter to the eyepiece lens and adjust focus between microscope and camera";
+
+// Saved Result View
+"examination.saved.system_interpretation_warning" = "System interpretation is not the final result for patients";
+"examination.saved.patient_data_card" = "Patient Data";
+"examination.saved.detail_prefix" = "Detail";
+"examination.saved.examination_suffix" = "Examination";
+
+// Confirmation Popups
+"examination.popup.unfinished_title" = "Examination Not Complete";
+"examination.popup.unfinished_description" = "Examination is saved as draft and can be accessed on the history page";
+"examination.popup.save_result_description" = "Saved examination results cannot be changed again";
+"examination.popup.review_again_button" = "Review Again";
+"examination.popup.examination_result" = "Examination Results";
+
+// Image Section Component
+"examination.image.result_instruction" = "Tap to view image details";
+
+// Interpretation Section Component
+"examination.interpretation.bta_count_placeholder" = "Example: 8";
+"examination.interpretation.staff_notes_placeholder" = "Example: Only 20 bacteria found from 60 collected fields of view";
+
+// Laborant Info Component
+"examination.laborant.officer_title" = "Examination Officer";
+"examination.laborant.assigned_by_title" = "Assigned By";
+
+// Folder Card Component
+"examination.folder.image_count_suffix" = "Images";
+
+// Header View Component
+"examination.header.new_examination_title" = "New Examination";

@@ -333,3 +333,66 @@
 "auth.privacy.general_point_positive3" = "Positif 3+: ";
 "auth.privacy.definition_title" = "Definisi";
 "auth.privacy.definition_intro" = "Setiap kata atau istilah berikut yang digunakan di dalam Kebijakan Privasi ini memiliki arti seperti berikut di bawah, kecuali jika kata atau istilah yang bersangkutan di dalam pemakaiannya dengan tegas menentukan lain:";
+
+// MARK: - Examination Module
+// Main Examination
+"examination.title_result_images" = "Hasil Gambar";
+"examination.title_result_interpretation" = "Hasil Interpretasi";
+"examination.button_start_analysis" = "Mulai Analisis";
+"examination.button_submitting" = "Mengirimkan...";
+
+// Progress View
+"examination.progress.analyzing_title" = "Menginterpretasikan data";
+"examination.progress.refresh_instruction" = "Tarik ke bawah untuk memuat ulang";
+"examination.progress.button_save_result" = "Simpan Hasil Pemeriksaan";
+"examination.progress.button_verify_fovs" = "Verikasi Semua Lapang Pandang";
+
+// Detail Views
+"examination.detail.navigation_title" = "Detail Pemeriksaan";
+"examination.detail.specimen" = "Sediaan";
+"examination.detail.report_to_sitb" = "Laporkan ke SITB";
+"examination.detail.new_examination_title" = "Pemeriksaan Baru";
+"examination.detail.data_examination_step" = "Data Pemeriksaan";
+"examination.detail.result_examination_step" = "Hasil Pemeriksaan";
+"examination.detail.slide_detail_title" = "Detail Sediaan";
+"examination.detail.slide_image_title" = "Gambar Sediaan";
+"examination.detail.patient_data_card" = "Data Pasien";
+
+// Guidelines Onboarding
+"examination.guidelines.navigation_title" = "Persiapan Pemeriksaan";
+"examination.guidelines.step1_title" = "Temukan Lapang Pandang pada Mikroskop";
+"examination.guidelines.step1_description" = "Teteskan minyak imersi pada kaca sediaan dan atur lensa objektif ke perbesaran 100x";
+"examination.guidelines.step2_title" = "Pasang Smartphone pada Adapter";
+"examination.guidelines.step2_description" = "Bersihkan lensa kamera utama dan sejajarkan dengan lubang adapter";
+"examination.guidelines.step3_title" = "Pasang Adapter pada Mikroskop";
+"examination.guidelines.step3_description" = "Pasang adapter ke lensa okuler dan atur fokus antara mikroskop dan kamera";
+
+// Saved Result View
+"examination.saved.system_interpretation_warning" = "Interpretasi sistem bukan merupakan hasil akhir untuk pasien";
+"examination.saved.patient_data_card" = "Data Pasien";
+"examination.saved.detail_prefix" = "Detail";
+"examination.saved.examination_suffix" = "Pemeriksaan";
+
+// Confirmation Popups
+"examination.popup.unfinished_title" = "Pemeriksaan Belum Selesai";
+"examination.popup.unfinished_description" = "Pemeriksaan disimpan sebagai draft dan dapat diakses di halaman riwayat";
+"examination.popup.save_result_description" = "Hasil pemeriksaan yang sudah disimpan tidak dapat diubah kembali";
+"examination.popup.review_again_button" = "Periksa Kembali";
+"examination.popup.examination_result" = "Hasil Pemeriksaan";
+
+// Image Section Component
+"examination.image.result_instruction" = "Ketuk untuk lihat detail gambar";
+
+// Interpretation Section Component
+"examination.interpretation.bta_count_placeholder" = "Contoh: 8";
+"examination.interpretation.staff_notes_placeholder" = "Contoh: Hanya terdapat 20 bakteri dari 60 lapangan pandang yang terkumpul";
+
+// Laborant Info Component
+"examination.laborant.officer_title" = "Petugas Pemeriksaan";
+"examination.laborant.assigned_by_title" = "Ditugaskan Oleh";
+
+// Folder Card Component
+"examination.folder.image_count_suffix" = "Gambar";
+
+// Header View Component
+"examination.header.new_examination_title" = "Pemeriksaan Baru";
