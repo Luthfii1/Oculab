@@ -18,71 +18,71 @@ typealias AppTextAuthCompPin = AppText.Authentication.PinComponent
 extension AppText {
     enum Authentication {
         enum LoginView {
-            static let title = "Revolusi Deteksi Bakteri dengan Teknologi AI"
-            static let emailPlaceholder = "Contoh: nama.anda@gmail.com"
-            static let passwordPlaceholder = "Masukkan kata sandi anda"
-            static let buttonText = "Login"
-            static let faskesNotRegisteredYet = "Faskes belum terdaftar?"
-            static let registerFaskesButtonText = "Daftarkan Faskes"
+            static let title = "auth.login.title".localized
+            static let emailPlaceholder = "auth.login.email.placeholder".localized
+            static let passwordPlaceholder = "auth.login.password.placeholder".localized
+            static let buttonText = "auth.login.button".localized
+            static let faskesNotRegisteredYet = "auth.login.not_registered".localized
+            static let registerFaskesButtonText = "auth.login.register_facility".localized
         }
         
         enum EditPasswordView {
-            static let successUpdatePasswordTitle = "Berhasil mengubah kata sandi"
-            static let successUpdatePasswordMessage = "Anda telah berhasil mengubah kata sandi akun anda"
-            static let successUpdatePasswordButtonText = "Kembali ke profil"
-            static let navigationTitle = "Atur Kata Sandi"
-            static let currentPasswordTitle = "Kata Sandi Saat Ini"
-            static let currentPasswordPlaceholder = AppForm.placeholder("Kata Sandi")
-            static let newPasswordTitle = "Kata Sandi Baru"
-            static let newPasswordPlaceholder = AppForm.placeholder("Kata Sandi Baru")
-            static let newPasswordDescription = "Kata sandi harus terdiri dari minimal 8 karakter"
-            static let confirmPasswordTitle = "Konfirmasi Kata Sandi Baru"
-            static let confirmPasswordPlaceholder = AppForm.placeholder("Konfirmasi Kata Sandi Baru")
+            static let successUpdatePasswordTitle = "auth.edit_password.success_title".localized
+            static let successUpdatePasswordMessage = "auth.edit_password.success_message".localized
+            static let successUpdatePasswordButtonText = "auth.edit_password.success_button".localized
+            static let navigationTitle = "auth.edit_password.navigation_title".localized
+            static let currentPasswordTitle = "auth.edit_password.current_password_title".localized
+            static let currentPasswordPlaceholder = AppForm.placeholder("auth.edit_password.current_password".localized)
+            static let newPasswordTitle = "auth.edit_password.new_password_title".localized
+            static let newPasswordPlaceholder = AppForm.placeholder("auth.edit_password.new_password".localized)
+            static let newPasswordDescription = "auth.edit_password.new_password_description".localized
+            static let confirmPasswordTitle = "auth.edit_password.confirm_password_title".localized
+            static let confirmPasswordPlaceholder = AppForm.placeholder("auth.edit_password.confirm_password".localized)
         }
 
         enum UserAccessPinView {
-            static let successTitle = "PIN Berhasil Diubah"
-            static let successDescription = "PIN akses Anda telah berhasil diperbarui"
-            static let successButton = AppAction.back + " ke " + AppNav.profile
+            static let successTitle = "auth.pin.success_title".localized
+            static let successDescription = "auth.pin.success_description".localized
+            static let successButton = "auth.pin.success_button".localized
         }
 
         enum ProfileView {
-            static let accountInfoTitle = "Informasi Akun"
-            static let jobTitleKey = "Jabatan Pekerjaan"
-            static let jobTitleValue = "Ahli Teknologi Laboratorium Medik"
-            static let healthFacilityKey = "Fasyankes"
-            static let editPasswordButton = "Atur Kata Sandi"
-            static let editPinButton = "Atur PIN"
-            static let faceIdToggle = "Face ID"
-            static let privacyPolicyButton = "Kebijakan Privasi"
+            static let accountInfoTitle = "auth.profile.account_info".localized
+            static let jobTitleKey = "auth.profile.job_title".localized
+            static let jobTitleValue = "auth.profile.job_title_value".localized
+            static let healthFacilityKey = "auth.profile.health_facility".localized
+            static let editPasswordButton = "auth.profile.edit_password".localized
+            static let editPinButton = "auth.profile.edit_pin".localized
+            static let faceIdToggle = "auth.profile.face_id".localized
+            static let privacyPolicyButton = "auth.profile.privacy_policy".localized
 
-            static let descFaceIdNotEnabled = "Face ID belum diaktifkan. Silakan aktifkan di Pengaturan Profil"
-            static let descFaceIdNotSupported = "Perangkat Anda tidak mendukung Face ID"
+            static let descFaceIdNotEnabled = "auth.profile.face_id_not_enabled".localized
+            static let descFaceIdNotSupported = "auth.profile.face_id_not_supported".localized
             static func descFailedFaceID(error: String) -> String {
-                return "Autentikasi Face ID gagal: \(error)"
+                return "auth.profile.face_id_failed".localized(with: error)
             }
 
-            static let oldPasswordNotMatched = "Password lama tidak cocok"
-            static let descConfirmPassword = "Pastikan password konfirmasi cocok dengan password yang Anda masukkan sebelumnya"
-            static let confirmPasswordError = "Password konfirmasi tidak cocok"
-            static let confirmPasswordSuccess = "Password konfirmasi cocok"
-            static let emptyPasswordError = "Harap masukkan baik password lama maupun baru"
+            static let oldPasswordNotMatched = "auth.profile.old_password_not_matched".localized
+            static let descConfirmPassword = "auth.profile.confirm_password_desc".localized
+            static let confirmPasswordError = "auth.profile.confirm_password_error".localized
+            static let confirmPasswordSuccess = "auth.profile.confirm_password_success".localized
+            static let emptyPasswordError = "auth.profile.empty_password_error".localized
         }
 
         enum PrivacyPolicyView {
-            static let navigationTitle = "Kebijakan Privasi Oculab"
-            static let intro = "Mohon untuk membaca seluruh kebijakan privasi yang terlampir dengan cermat dan seksama sebelum menggunakan setiap fitur dan/atau layanan yang tersedia dalam Oculab"
-            static let generalTitle = "Ketentuan Umum"
+            static let navigationTitle = "auth.privacy.navigation_title".localized
+            static let intro = "auth.privacy.intro".localized
+            static let generalTitle = "auth.privacy.general_title".localized
             static let generalPoints = [
-                "Negatif: " + AppMedical.BTA.Description.negative,
-                "Scanty: " + AppMedical.BTA.Description.scanty,
-                "Positif 1+: " + AppMedical.BTA.Description.positive1,
-                "Positif 2+: " + AppMedical.BTA.Description.positive2,
-                "Positif 3+: " + AppMedical.BTA.Description.positive3
+                "auth.privacy.general_point_negative".localized + AppMedical.BTA.Description.negative,
+                "auth.privacy.general_point_scanty".localized + AppMedical.BTA.Description.scanty,
+                "auth.privacy.general_point_positive1".localized + AppMedical.BTA.Description.positive1,
+                "auth.privacy.general_point_positive2".localized + AppMedical.BTA.Description.positive2,
+                "auth.privacy.general_point_positive3".localized + AppMedical.BTA.Description.positive3
             ]
 
-            static let definitionTitle = "Definisi"
-            static let definitionIntro = "Setiap kata atau istilah berikut yang digunakan di dalam Kebijakan Privasi ini memiliki arti seperti berikut di bawah, kecuali jika kata atau istilah yang bersangkutan di dalam pemakaiannya dengan tegas menentukan lain:"
+            static let definitionTitle = "auth.privacy.definition_title".localized
+            static let definitionIntro = "auth.privacy.definition_intro".localized
 
             struct Definition: Hashable {
                 let label: String
@@ -113,21 +113,21 @@ extension AppText {
         }
 
         enum PinComponent {
-            static let forgotPinText = "Lupa PIN?"
-            static let usePasswordButton = "Gunakan Password"
-            static let invalidPinText = "PIN saat ini salah"
-            static let createChangePinTitle = "Atur PIN Akses"
-            static let revalidateChangePinTitle = "Konfirmasi PIN Akses"
-            static let createPinTitle = "Atur PIN untuk kemudahan login di sesi berikutnya"
-            static let revalidatePinTitle = "Masukkan PIN kembali untuk konfirmasi"
-            static let authenticatePinDescription = "Masukkan PIN untuk mengakses aplikasi"
-            static let changePinTitle = "Masukkan PIN Anda saat ini"
-            static let titleCreateChangePin = "PIN Baru"
-            static let titleCreatePin = "Atur PIN"
-            static let titleAuthenticatePin = "Masukkan PIN"
-            static let titleChangePin = "PIN saat Ini"
+            static let forgotPinText = "auth.pin.forgot_pin".localized
+            static let usePasswordButton = "auth.pin.use_password".localized
+            static let invalidPinText = "auth.pin.invalid_pin".localized
+            static let createChangePinTitle = "auth.pin.create_change_title".localized
+            static let revalidateChangePinTitle = "auth.pin.revalidate_change_title".localized
+            static let createPinTitle = "auth.pin.create_title".localized
+            static let revalidatePinTitle = "auth.pin.revalidate_title".localized
+            static let authenticatePinDescription = "auth.pin.authenticate_description".localized
+            static let changePinTitle = "auth.pin.change_title".localized
+            static let titleCreateChangePin = "auth.pin.title_create_change".localized
+            static let titleCreatePin = "auth.pin.title_create".localized
+            static let titleAuthenticatePin = "auth.pin.title_authenticate".localized
+            static let titleChangePin = "auth.pin.title_change".localized
 
-            static let invalidPinMatchText = "PIN tidak cocok, silakan coba lagi"
+            static let invalidPinMatchText = "auth.pin.invalid_match".localized
         }
     }
 }

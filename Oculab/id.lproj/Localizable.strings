@@ -262,3 +262,74 @@
 "analysist.pdf.bacteriological_examination_title" = "HASIL PEMERIKSAAN BAKTERIOLOGIS";
 "analysist.pdf.lab_officer_signature" = "Petugas Lab";
 "analysist.pdf.supervising_doctor_signature" = "Dokter PJ Pemeriksaan Lab";
+
+// MARK: - Authentication Module
+// Login View
+"auth.login.title" = "Revolusi Deteksi Bakteri dengan Teknologi AI";
+"auth.login.email.placeholder" = "Contoh: nama.anda@gmail.com";
+"auth.login.password.placeholder" = "Masukkan kata sandi anda";
+"auth.login.button" = "Login";
+"auth.login.not_registered" = "Faskes belum terdaftar?";
+"auth.login.register_facility" = "Daftarkan Faskes";
+
+// Edit Password View
+"auth.edit_password.success_title" = "Berhasil mengubah kata sandi";
+"auth.edit_password.success_message" = "Anda telah berhasil mengubah kata sandi akun anda";
+"auth.edit_password.success_button" = "Kembali ke profil";
+"auth.edit_password.navigation_title" = "Atur Kata Sandi";
+"auth.edit_password.current_password_title" = "Kata Sandi Saat Ini";
+"auth.edit_password.current_password" = "Kata Sandi";
+"auth.edit_password.new_password_title" = "Kata Sandi Baru";
+"auth.edit_password.new_password" = "Kata Sandi Baru";
+"auth.edit_password.new_password_description" = "Kata sandi harus terdiri dari minimal 8 karakter";
+"auth.edit_password.confirm_password_title" = "Konfirmasi Kata Sandi Baru";
+"auth.edit_password.confirm_password" = "Konfirmasi Kata Sandi Baru";
+
+// PIN View
+"auth.pin.success_title" = "PIN Berhasil Diubah";
+"auth.pin.success_description" = "PIN akses Anda telah berhasil diperbarui";
+"auth.pin.success_button" = "Kembali ke Profil";
+"auth.pin.forgot_pin" = "Lupa PIN?";
+"auth.pin.use_password" = "Gunakan Password";
+"auth.pin.invalid_pin" = "PIN saat ini salah";
+"auth.pin.create_change_title" = "Atur PIN Akses";
+"auth.pin.revalidate_change_title" = "Konfirmasi PIN Akses";
+"auth.pin.create_title" = "Atur PIN untuk kemudahan login di sesi berikutnya";
+"auth.pin.revalidate_title" = "Masukkan PIN kembali untuk konfirmasi";
+"auth.pin.authenticate_description" = "Masukkan PIN untuk mengakses aplikasi";
+"auth.pin.change_title" = "Masukkan PIN Anda saat ini";
+"auth.pin.title_create_change" = "PIN Baru";
+"auth.pin.title_create" = "Atur PIN";
+"auth.pin.title_authenticate" = "Masukkan PIN";
+"auth.pin.title_change" = "PIN saat Ini";
+"auth.pin.invalid_match" = "PIN tidak cocok, silakan coba lagi";
+
+// Profile View
+"auth.profile.account_info" = "Informasi Akun";
+"auth.profile.job_title" = "Jabatan Pekerjaan";
+"auth.profile.job_title_value" = "Ahli Teknologi Laboratorium Medik";
+"auth.profile.health_facility" = "Fasyankes";
+"auth.profile.edit_password" = "Atur Kata Sandi";
+"auth.profile.edit_pin" = "Atur PIN";
+"auth.profile.face_id" = "Face ID";
+"auth.profile.privacy_policy" = "Kebijakan Privasi";
+"auth.profile.face_id_not_enabled" = "Face ID belum diaktifkan. Silakan aktifkan di Pengaturan Profil";
+"auth.profile.face_id_not_supported" = "Perangkat Anda tidak mendukung Face ID";
+"auth.profile.face_id_failed" = "Autentikasi Face ID gagal: %@";
+"auth.profile.old_password_not_matched" = "Password lama tidak cocok";
+"auth.profile.confirm_password_desc" = "Pastikan password konfirmasi cocok dengan password yang Anda masukkan sebelumnya";
+"auth.profile.confirm_password_error" = "Password konfirmasi tidak cocok";
+"auth.profile.confirm_password_success" = "Password konfirmasi cocok";
+"auth.profile.empty_password_error" = "Harap masukkan baik password lama maupun baru";
+
+// Privacy Policy View
+"auth.privacy.navigation_title" = "Kebijakan Privasi Oculab";
+"auth.privacy.intro" = "Mohon untuk membaca seluruh kebijakan privasi yang terlampir dengan cermat dan seksama sebelum menggunakan setiap fitur dan/atau layanan yang tersedia dalam Oculab";
+"auth.privacy.general_title" = "Ketentuan Umum";
+"auth.privacy.general_point_negative" = "Negatif: ";
+"auth.privacy.general_point_scanty" = "Scanty: ";
+"auth.privacy.general_point_positive1" = "Positif 1+: ";
+"auth.privacy.general_point_positive2" = "Positif 2+: ";
+"auth.privacy.general_point_positive3" = "Positif 3+: ";
+"auth.privacy.definition_title" = "Definisi";
+"auth.privacy.definition_intro" = "Setiap kata atau istilah berikut yang digunakan di dalam Kebijakan Privasi ini memiliki arti seperti berikut di bawah, kecuali jika kata atau istilah yang bersangkutan di dalam pemakaiannya dengan tegas menentukan lain:";

@@ -244,3 +244,74 @@
 "analysist.pdf.bacteriological_examination_title" = "BACTERIOLOGICAL EXAMINATION RESULTS";
 "analysist.pdf.lab_officer_signature" = "Lab Officer";
 "analysist.pdf.supervising_doctor_signature" = "Supervising Doctor for Lab Examination";
+
+// MARK: - Authentication Module
+// Login View
+"auth.login.title" = "Revolutionizing Bacterial Detection with AI Technology";
+"auth.login.email.placeholder" = "Example: your.name@gmail.com";
+"auth.login.password.placeholder" = "Enter your password";
+"auth.login.button" = "Login";
+"auth.login.not_registered" = "Health facility not registered?";
+"auth.login.register_facility" = "Register Health Facility";
+
+// Edit Password View
+"auth.edit_password.success_title" = "Password Changed Successfully";
+"auth.edit_password.success_message" = "You have successfully changed your account password";
+"auth.edit_password.success_button" = "Back to Profile";
+"auth.edit_password.navigation_title" = "Change Password";
+"auth.edit_password.current_password_title" = "Current Password";
+"auth.edit_password.current_password" = "Password";
+"auth.edit_password.new_password_title" = "New Password";
+"auth.edit_password.new_password" = "New Password";
+"auth.edit_password.new_password_description" = "Password must consist of at least 8 characters";
+"auth.edit_password.confirm_password_title" = "Confirm New Password";
+"auth.edit_password.confirm_password" = "Confirm New Password";
+
+// PIN View
+"auth.pin.success_title" = "PIN Successfully Changed";
+"auth.pin.success_description" = "Your access PIN has been successfully updated";
+"auth.pin.success_button" = "Back to Profile";
+"auth.pin.forgot_pin" = "Forgot PIN?";
+"auth.pin.use_password" = "Use Password";
+"auth.pin.invalid_pin" = "Current PIN is incorrect";
+"auth.pin.create_change_title" = "Set Access PIN";
+"auth.pin.revalidate_change_title" = "Confirm Access PIN";
+"auth.pin.create_title" = "Set PIN for easy login in next sessions";
+"auth.pin.revalidate_title" = "Enter PIN again for confirmation";
+"auth.pin.authenticate_description" = "Enter PIN to access the application";
+"auth.pin.change_title" = "Enter your current PIN";
+"auth.pin.title_create_change" = "New PIN";
+"auth.pin.title_create" = "Set PIN";
+"auth.pin.title_authenticate" = "Enter PIN";
+"auth.pin.title_change" = "Current PIN";
+"auth.pin.invalid_match" = "PIN does not match, please try again";
+
+// Profile View
+"auth.profile.account_info" = "Account Information";
+"auth.profile.job_title" = "Job Title";
+"auth.profile.job_title_value" = "Medical Laboratory Technologist";
+"auth.profile.health_facility" = "Health Facility";
+"auth.profile.edit_password" = "Change Password";
+"auth.profile.edit_pin" = "Change PIN";
+"auth.profile.face_id" = "Face ID";
+"auth.profile.privacy_policy" = "Privacy Policy";
+"auth.profile.face_id_not_enabled" = "Face ID is not enabled. Please enable it in Profile Settings";
+"auth.profile.face_id_not_supported" = "Your device does not support Face ID";
+"auth.profile.face_id_failed" = "Face ID authentication failed: %@";
+"auth.profile.old_password_not_matched" = "Old password does not match";
+"auth.profile.confirm_password_desc" = "Make sure the confirmation password matches the password you entered previously";
+"auth.profile.confirm_password_error" = "Confirmation password does not match";
+"auth.profile.confirm_password_success" = "Confirmation password matches";
+"auth.profile.empty_password_error" = "Please enter both old and new passwords";
+
+// Privacy Policy View
+"auth.privacy.navigation_title" = "Oculab Privacy Policy";
+"auth.privacy.intro" = "Please read the entire attached privacy policy carefully and thoroughly before using any features and/or services available in Oculab";
+"auth.privacy.general_title" = "General Terms";
+"auth.privacy.general_point_negative" = "Negative: ";
+"auth.privacy.general_point_scanty" = "Scanty: ";
+"auth.privacy.general_point_positive1" = "Positive 1+: ";
+"auth.privacy.general_point_positive2" = "Positive 2+: ";
+"auth.privacy.general_point_positive3" = "Positive 3+: ";
+"auth.privacy.definition_title" = "Definitions";
+"auth.privacy.definition_intro" = "Each of the following words or terms used in this Privacy Policy has the meaning as follows below, unless the word or term in question in its use expressly determines otherwise:";
