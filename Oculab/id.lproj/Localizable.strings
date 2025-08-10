@@ -488,3 +488,45 @@
 "task_assignment.input_exam.error_message_not_all_exams_created" = "Tidak semua pemeriksaan berhasil dibuat.";
 "task_assignment.input_exam.error_message_exams_contain_invalid_data" = "Pemeriksaan telah dibuat tetapi mengandung data yang tidak valid.";
 "task_assignment.input_exam.examination_description" = "Sediaan Pasien %@ akan diperiksa oleh %@";
+
+// MARK: - UserManagement Module
+// Main UserManagement
+"user_management.back_to_account_list_data" = "Daftar Akun";
+
+// UserManagement View
+"user_management.view.delete_account_title" = "Hapus akun";
+"user_management.view.delete_account_description" = "Akun yang sudah dihapus tidak dapat dikembalikan lagi.";
+"user_management.view.delete_success_description" = "Akun berhasil dihapus";
+"user_management.view.success_delete_account_action" = "Menghapus Akun";
+"user_management.view.add_new_account_data" = "Akun Baru";
+"user_management.view.failed_delete_account_action" = "Menghapus";
+"user_management.view.invalid_email_format" = "Format email tidak valid";
+"user_management.view.failed_registration" = "Gagal mendaftarkan akun: Tidak ada respon dari server";
+"user_management.view.success_delete_account_name" = "%@ telah berhasil dihapus.";
+
+// New User Form View
+"user_management.new_user_form.success_description_prefix" = "Anda telah berhasil menambahkan akun baru untuk";
+"user_management.new_user_form.success_description_suffix" = "dengan role";
+"user_management.new_user_form.role_lab_placeholder" = "Laboran";
+"user_management.new_user_form.role_admin_choice" = "Admin";
+"user_management.new_user_form.name_placeholder" = "Masukkan nama";
+"user_management.new_user_form.email_placeholder" = "Masukkan email";
+"user_management.new_user_form.success_create_account_action" = "membuat Akun";
+"user_management.new_user_form.create_another_account_data" = "Akun Lain";
+"user_management.new_user_form.save_account_data" = "Akun";
+"user_management.new_user_form.navigation_title_data" = "Akun Baru";
+"user_management.new_user_form.failed_registration_action" = "Pendaftaran";
+
+// Edit User Form View
+"user_management.edit_user_form.success_update_account_action" = "mengubah Akun";
+"user_management.edit_user_form.failed_update_account_action" = "Mengubah";
+"user_management.edit_user_form.navigation_title" = "Edit Akun";
+"user_management.edit_user_form.success_description_prefix" = "Anda telah berhasil mengubah akun untuk";
+"user_management.edit_user_form.success_description_suffix" = "dengan role";
+"user_management.edit_user_form.email_disabled_description" = "Email tidak dapat diubah";
+"user_management.edit_user_form.name_placeholder" = "Masukkan nama";
+"user_management.edit_user_form.email_placeholder" = "Masukkan email";
+
+// Bottom Sheet Menu Component
+"user_management.bottom_sheet.edit_account_details_button" = "Ubah Detail Akun";
+"user_management.bottom_sheet.delete_account_button" = "Hapus Akun";

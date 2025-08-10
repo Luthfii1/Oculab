@@ -470,3 +470,45 @@
 "task_assignment.input_exam.error_message_not_all_exams_created" = "Not all examinations were created successfully.";
 "task_assignment.input_exam.error_message_exams_contain_invalid_data" = "Examinations were created but contain invalid data.";
 "task_assignment.input_exam.examination_description" = "Patient %@ specimen will be examined by %@";
+
+// MARK: - UserManagement Module
+// Main UserManagement
+"user_management.back_to_account_list_data" = "Account List";
+
+// UserManagement View
+"user_management.view.delete_account_title" = "Delete account";
+"user_management.view.delete_account_description" = "Deleted accounts cannot be restored.";
+"user_management.view.delete_success_description" = "Account successfully deleted";
+"user_management.view.success_delete_account_action" = "Deleting Account";
+"user_management.view.add_new_account_data" = "New Account";
+"user_management.view.failed_delete_account_action" = "Deleting";
+"user_management.view.invalid_email_format" = "Invalid email format";
+"user_management.view.failed_registration" = "Failed to register account: No response from server";
+"user_management.view.success_delete_account_name" = "%@ has been successfully deleted.";
+
+// New User Form View
+"user_management.new_user_form.success_description_prefix" = "You have successfully added a new account for";
+"user_management.new_user_form.success_description_suffix" = "with role";
+"user_management.new_user_form.role_lab_placeholder" = "Laboratory Technician";
+"user_management.new_user_form.role_admin_choice" = "Admin";
+"user_management.new_user_form.name_placeholder" = "Enter name";
+"user_management.new_user_form.email_placeholder" = "Enter email";
+"user_management.new_user_form.success_create_account_action" = "creating Account";
+"user_management.new_user_form.create_another_account_data" = "Another Account";
+"user_management.new_user_form.save_account_data" = "Account";
+"user_management.new_user_form.navigation_title_data" = "New Account";
+"user_management.new_user_form.failed_registration_action" = "Registration";
+
+// Edit User Form View
+"user_management.edit_user_form.success_update_account_action" = "updating Account";
+"user_management.edit_user_form.failed_update_account_action" = "Updating";
+"user_management.edit_user_form.navigation_title" = "Edit Account";
+"user_management.edit_user_form.success_description_prefix" = "You have successfully updated the account for";
+"user_management.edit_user_form.success_description_suffix" = "with role";
+"user_management.edit_user_form.email_disabled_description" = "Email cannot be changed";
+"user_management.edit_user_form.name_placeholder" = "Enter name";
+"user_management.edit_user_form.email_placeholder" = "Enter email";
+
+// Bottom Sheet Menu Component
+"user_management.bottom_sheet.edit_account_details_button" = "Edit Account Details";
+"user_management.bottom_sheet.delete_account_button" = "Delete Account";
