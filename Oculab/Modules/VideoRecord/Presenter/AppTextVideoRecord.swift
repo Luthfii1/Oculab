@@ -19,9 +19,9 @@ typealias AppTextVideoRecordCompInput = AppText.VideoRecord.VideoInputComponent
 extension AppText {
     enum VideoRecord {
         enum VideoRecordView {
-            static let cameraAccessDeniedTitle = "Akses Kamera Ditolak"
-            static let cameraAccessDeniedMessage = "Silakan aktifkan akses kamera untuk Oculab di Pengaturan untuk merekam video"
-            static let goToSettingsButton = "Buka Pengaturan"
+            static let cameraAccessDeniedTitle = "video_record.video_record_view.camera_access_denied_title".localized
+            static let cameraAccessDeniedMessage = "video_record.video_record_view.camera_access_denied_message".localized
+            static let goToSettingsButton = "video_record.video_record_view.go_to_settings_button".localized
             
             static func videoFileDateAndExtension() -> String {
                 let formatter = DateFormatter()
@@ -30,36 +30,36 @@ extension AppText {
             }
 
             static func specimenTitle(_ specimenId: String) -> String {
-                return "Sediaan: \(specimenId)"
+                return "video_record.video_record_view.specimen_title".localized(with: [specimenId])
             }
             
-            static let specimenTitleDefault = "Sediaan: -"
+            static let specimenTitleDefault = "video_record.video_record_view.specimen_title_default".localized
         }
         
         enum InstructionRecordView {
-            static let navigationTitle = "Instruksi Pemeriksaan"
-            static let preparationSectionTitle = "Persiapan Pemeriksaan"
-            static let recordingSectionTitle = "Instruksi Pengambilan Gambar"
-            static let startRecordingButton = "Mulai Pengambilan Gambar"
+            static let navigationTitle = "video_record.instruction_record_view.navigation_title".localized
+            static let preparationSectionTitle = "video_record.instruction_record_view.preparation_section_title".localized
+            static let recordingSectionTitle = "video_record.instruction_record_view.recording_section_title".localized
+            static let startRecordingButton = "video_record.instruction_record_view.start_recording_button".localized
 
             // MARK: - Instruction Arrays
             static let preRecordingInstructions: [String] = [
-                "Gunakan lensa objektif 10x untuk menentukan fokus, kemudian teteskan minyak imersi",
-                "Pastikan lensa objektif telah diatur ke perbesaran 100x setelah fokus ditemukan",
-                "Pasang perangkat Anda dengan lensa kamera menempel pada lensa okuler",
-                "Pastikan Anda berada di lokasi dengan jaringan yang lancar"
+                "video_record.instruction_record_view.pre_recording_instruction_1".localized,
+                "video_record.instruction_record_view.pre_recording_instruction_2".localized,
+                "video_record.instruction_record_view.pre_recording_instruction_3".localized,
+                "video_record.instruction_record_view.pre_recording_instruction_4".localized
             ]
             
             static let duringRecordingInstructions: [String] = [
-                "Pastikan sediaan tetap terlihat di layar dan selalu dalam fokus optimal",
-                "Baca sediaan mulai dari ujung kiri ke ujung kanan mengikuti skema pemindaian untuk pemeriksaan apusan",
-                "Progress pengambilan gambar keseluruhan akan terlihat di kanan atas"
+                "video_record.instruction_record_view.during_recording_instruction_1".localized,
+                "video_record.instruction_record_view.during_recording_instruction_2".localized,
+                "video_record.instruction_record_view.during_recording_instruction_3".localized
             ]
         }
         
         enum StitchedImageView {
-            static let navigationTitle = "Gambar Stitched"
-            static let noImageAvailableMessage = "Tidak ada gambar yang tersedia"
+            static let navigationTitle = "video_record.stitched_image_view.navigation_title".localized
+            static let noImageAvailableMessage = "video_record.stitched_image_view.no_image_available_message".localized
         }
         
         enum FullScreenVideoPlayerView {
@@ -67,21 +67,21 @@ extension AppText {
         }
         
         enum CameraViewComponent {
-            static let cameraAccessAlertTitle = "Akses Kamera"
-            static let cameraAccessAlertMessage = "Silakan aktifkan akses kamera dan mikrofon di pengaturan"
-            static let settingsButton = "Buka Pengaturan"
+            static let cameraAccessAlertTitle = "video_record.camera_view_component.camera_access_alert_title".localized
+            static let cameraAccessAlertMessage = "video_record.camera_view_component.camera_access_alert_message".localized
+            static let settingsButton = "video_record.camera_view_component.settings_button".localized
         }
         
         enum VideoPreviewComponent {
-            static let saveVideoButton = "Simpan Video"
-            static let retakeVideoButton = "Ambil Ulang"
+            static let saveVideoButton = "video_record.video_preview_component.save_video_button".localized
+            static let retakeVideoButton = "video_record.video_preview_component.retake_video_button".localized
         }
         
         enum VideoInputComponent {
-            static let videoErrorAlertMessage = "Video tidak dapat diputar. Silakan rekam ulang sampel."
-            static let createVideoButton = "Gambar"
-            static let viewVideoButton = "Video"
-            static let videoPlaybackErrorTitle = "Memutar Video"
+            static let videoErrorAlertMessage = "video_record.video_input_component.video_error_alert_message".localized
+            static let createVideoButton = "video_record.video_input_component.create_video_button".localized
+            static let viewVideoButton = "video_record.video_input_component.view_video_button".localized
+            static let videoPlaybackErrorTitle = "video_record.video_input_component.video_playback_error_title".localized
         }
     }
 }

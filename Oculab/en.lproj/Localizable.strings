@@ -512,3 +512,47 @@
 // Bottom Sheet Menu Component
 "user_management.bottom_sheet.edit_account_details_button" = "Edit Account Details";
 "user_management.bottom_sheet.delete_account_button" = "Delete Account";
+
+// MARK: - VideoRecord Module
+// Video Record View
+"video_record.video_record_view.camera_access_denied_title" = "Camera Access Denied";
+"video_record.video_record_view.camera_access_denied_message" = "Please enable camera access for Oculab in Settings to record videos";
+"video_record.video_record_view.go_to_settings_button" = "Open Settings";
+"video_record.video_record_view.specimen_title" = "Specimen: %@";
+"video_record.video_record_view.specimen_title_default" = "Specimen: -";
+
+// Instruction Record View
+"video_record.instruction_record_view.navigation_title" = "Examination Instructions";
+"video_record.instruction_record_view.preparation_section_title" = "Examination Preparation";
+"video_record.instruction_record_view.recording_section_title" = "Image Capture Instructions";
+"video_record.instruction_record_view.start_recording_button" = "Start Image Capture";
+
+// Pre-recording Instructions
+"video_record.instruction_record_view.pre_recording_instruction_1" = "Use 10x objective lens to determine focus, then drop immersion oil";
+"video_record.instruction_record_view.pre_recording_instruction_2" = "Ensure the objective lens is set to 100x magnification after focus is found";
+"video_record.instruction_record_view.pre_recording_instruction_3" = "Mount your device with the camera lens attached to the eyepiece lens";
+"video_record.instruction_record_view.pre_recording_instruction_4" = "Make sure you are in a location with stable network connection";
+
+// During Recording Instructions
+"video_record.instruction_record_view.during_recording_instruction_1" = "Ensure the specimen remains visible on screen and always in optimal focus";
+"video_record.instruction_record_view.during_recording_instruction_2" = "Read the specimen from left end to right end following the scanning scheme for smear examination";
+"video_record.instruction_record_view.during_recording_instruction_3" = "Overall image capture progress will be visible in the top right";
+
+// Stitched Image View
+"video_record.stitched_image_view.navigation_title" = "Stitched Images";
+"video_record.stitched_image_view.no_image_available_message" = "No images available";
+
+// Camera View Component
+"video_record.camera_view_component.camera_access_alert_title" = "Camera Access";
+"video_record.camera_view_component.camera_access_alert_message" = "Please enable camera and microphone access in settings";
+"video_record.camera_view_component.settings_button" = "Open Settings";
+
+// Video Preview Component
+"video_record.video_preview_component.save_video_button" = "Save Video";
+"video_record.video_preview_component.retake_video_button" = "Retake";
+
+// Video Input Component
+"video_record.video_input_component.video_error_alert_message" = "Video cannot be played. Please re-record the sample.";
+"video_record.video_input_component.create_video_button" = "Image";
+"video_record.video_input_component.view_video_button" = "Video";
+"video_record.video_input_component.video_playback_error_title" = "Playing Video";
