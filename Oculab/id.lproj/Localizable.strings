@@ -425,3 +425,30 @@
 
 // Home Activity Component
 "home_history.home_activity.officer_label" = "Petugas Pemeriksaan";
+
+// MARK: - Patient Module
+// Form View
+"patient.form.new_patient_navigation_title" = "Data Pasien Baru";
+"patient.form.edit_patient_navigation_title" = "Ubah Data Pasien";
+
+// List View
+"patient.list.navigation_title" = "Daftar Pasien";
+"patient.list.button_create_patient" = "Pasien Baru";
+
+// Detail View
+"patient.detail.navigation_title" = "Riwayat Pemeriksaan";
+"patient.detail.patient_data_title" = "Data Pasien";
+"patient.detail.examination_result_title" = "Hasil Pemeriksaan";
+"patient.detail.loading_patient_data" = "data pasien";
+"patient.detail.loading_examinations_data" = "pemeriksaan";
+"patient.detail.no_examinations_data" = "pemeriksaan";
+"patient.detail.not_determined_data" = "pemeriksaan";
+"patient.detail.button_create_examination" = "Pemeriksaan";
+
+// Patient Card Component
+"patient.card.birth_date_prefix" = "Tanggal Lahir: ";
+"patient.card.button_create_patient" = "Pasien Baru";
+"patient.card.button_save_patient" = "Data Pasien";
+
+// Patient Form Field Component
+"patient.form_field.name_placeholder" = "John Doe";

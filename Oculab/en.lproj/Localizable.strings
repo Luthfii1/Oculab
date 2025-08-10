@@ -407,3 +407,30 @@
 
 // Home Activity Component
 "home_history.home_activity.officer_label" = "Examination Officer";
+
+// MARK: - Patient Module
+// Form View
+"patient.form.new_patient_navigation_title" = "New Patient Data";
+"patient.form.edit_patient_navigation_title" = "Edit Patient Data";
+
+// List View
+"patient.list.navigation_title" = "Patient List";
+"patient.list.button_create_patient" = "New Patient";
+
+// Detail View
+"patient.detail.navigation_title" = "Examination History";
+"patient.detail.patient_data_title" = "Patient Data";
+"patient.detail.examination_result_title" = "Examination Results";
+"patient.detail.loading_patient_data" = "patient data";
+"patient.detail.loading_examinations_data" = "examinations";
+"patient.detail.no_examinations_data" = "examinations";
+"patient.detail.not_determined_data" = "examinations";
+"patient.detail.button_create_examination" = "Examination";
+
+// Patient Card Component
+"patient.card.birth_date_prefix" = "Date of Birth: ";
+"patient.card.button_create_patient" = "New Patient";
+"patient.card.button_save_patient" = "Patient Data";
+
+// Patient Form Field Component
+"patient.form_field.name_placeholder" = "John Doe";
