@@ -3,16 +3,183 @@
   Oculab
 */
 
-// MARK: - Common
+// MARK: - Universal Actions
 "common.ok" = "OK";
 "common.cancel" = "Batal";
-"common.close" = "Tutup";
 "common.save" = "Simpan";
 "common.delete" = "Hapus";
 "common.edit" = "Ubah";
+"common.close" = "Tutup";
 "common.next" = "Lanjutkan";
 "common.back" = "Kembali";
-"common.error" = "Error";
+"common.done" = "Selesai";
+"common.exit" = "Keluar";
+"common.settings" = "Pengaturan";
+"common.retry" = "Coba Lagi";
+"common.refresh" = "Refresh";
+"common.continue" = "Lanjutkan";
+"common.skip" = "Lewati";
+"common.confirm" = "Konfirmasi";
+"common.search" = "Cari";
+
+// Common button patterns
+"common.save_changes" = "Simpan Perubahan";
+"common.save_data" = "Simpan Data";
+"common.add_new" = "Tambah Baru";
+"common.edit_data" = "Ubah Data";
+"common.delete_data" = "Hapus Data";
+
+// Dynamic action patterns
+"common.save_item" = "Simpan %@";
+"common.add_item" = "Tambah %@";
+"common.edit_item" = "Ubah %@";
+"common.delete_item" = "Hapus %@";
+"common.view_item" = "Lihat %@";
+"common.back_to" = "Kembali ke %@";
+"common.start_action" = "Mulai %@";
+"common.create_item" = "Buat %@";
+"common.disable_item" = "Nonaktifkan %@";
+
+// MARK: - Universal States
+"state.loading" = "Memuat...";
+"state.empty" = "Kosong";
+"state.error" = "Error";
+"state.success" = "Berhasil";
+"state.pending" = "Pending";
+"state.not_available" = "Belum Tersedia";
+"state.unknown" = "Tidak Diketahui";
+"state.completed" = "Selesai";
+"state.in_progress" = "Sedang Berlangsung";
+
+// Dynamic status patterns
+"state.loading_action" = "Memuat %@...";
+"state.success_action" = "Berhasil %@";
+"state.failed_action" = "Gagal %@";
+"state.no_data" = "Belum ada %@";
+"state.not_determined" = "%@ belum ditentukan";
+"state.success_with" = "Berhasil %@ %@";
+
+// MARK: - Universal Labels
+"label.name" = "Nama";
+"label.email" = "Email";
+"label.password" = "Kata Sandi";
+"label.phone" = "Telepon";
+"label.address" = "Alamat";
+"label.date" = "Tanggal";
+"label.time" = "Waktu";
+"label.notes" = "Catatan";
+"label.description" = "Deskripsi";
+"label.title" = "Judul";
+"label.type" = "Jenis";
+"label.status" = "Status";
+"label.result" = "Hasil";
+"label.category" = "Kategori";
+"label.role" = "Role";
+
+// MARK: - Common Values
+"common.unknown_error" = "Terjadi Kesalahan";
+"common.unknown_message" = "Pesan tidak diketahui";
+
+// MARK: - Patient Data
+"patient.name" = "Nama";
+"patient.nik" = "NIK";
+"patient.dob" = "Tanggal Lahir";
+"patient.gender" = "Jenis Kelamin";
+"patient.bpjs" = "Nomor BPJS";
+"patient.age" = "Umur";
+"patient.age_suffix" = " Tahun";
+"patient.gender.male" = "Laki-laki";
+"patient.gender.female" = "Perempuan";
+"patient.gender.other" = "Lainnya";
+"patient.placeholder.name" = "Masukkan nama pasien";
+"patient.placeholder.nik" = "Contoh: 167012039484700";
+"patient.placeholder.bpjs" = "Contoh: 1240630077675";
+"patient.placeholder.select_date" = "Pilih Tanggal";
+
+// MARK: - Medical Terms
+"medical.patient" = "Pasien";
+"medical.bta.negative" = "Negatif";
+"medical.bta.scanty" = "Scanty";
+"medical.bta.positive1" = "Positif (1+)";
+"medical.bta.positive2" = "Positif (2+)";
+"medical.bta.positive3" = "Positif (3+)";
+"medical.bta.desc.negative" = "Tidak ditemukan BTA dalam 100 lapang pandang";
+"medical.bta.desc.scanty" = "Ditemukan 1-9 BTA dalam 100 lapang pandang";
+"medical.bta.desc.positive1" = "Ditemukan 10-99 BTA dalam 100 lapang pandang";
+"medical.bta.desc.positive2" = "Ditemukan 1-9 BTA dalam setiap lapang pandang, minimal dalam 50 lapang pandang";
+"medical.bta.desc.positive3" = "Ditemukan ≥10 BTA dalam setiap lapang pandang, minimal dalam 20 lapang pandang";
+
+"medical.exam.purpose" = "Tujuan Pemeriksaan";
+"medical.exam.result" = "Hasil Pemeriksaan";
+"medical.exam.interpretation" = "Interpretasi";
+"medical.exam.staff_interpretation" = "Interpretasi Petugas";
+"medical.exam.system_interpretation" = "Interpretasi Sistem";
+"medical.exam.bacteria_count" = "Jumlah Bakteri";
+"medical.exam.slide_id" = "ID Sediaan";
+"medical.exam.examination_id" = "ID Pemeriksaan";
+"medical.exam.specimen_type" = "Jenis Sediaan";
+"medical.exam.specimen_info" = "Informasi Sediaan";
+"medical.exam.microscopic_interpretation" = "Interpretasi Mikroskopis";
+"medical.exam.bacteria_suffix" = " BTA";
+"medical.exam.confidence_level" = "Tingkat Keyakinan";
+"medical.exam.goal_screening" = "Skrining";
+"medical.exam.goal_followup" = "Follow Up";
+"medical.exam.preparation_anytime" = "Sewaktu";
+"medical.exam.preparation_morning" = "Pagi";
+
+"medical.confidence.perfect" = "100% Confidence: Tidak ada keraguan dari sistem";
+"medical.confidence.high" = "High Confidence: 90% - 99%";
+"medical.confidence.medium" = "Medium Confidence: 70%-89%";
+"medical.confidence.low" = "Low Confidence: 50%-69%";
+"medical.confidence.very_low" = "Very Low: 10% - 50%";
+"medical.confidence.unpredicted" = "Unpredicted: 0% - 9%";
+
+// MARK: - Search & Filter
+"search.search" = "Cari";
+"search.placeholder" = "Cari...";
+"search.no_results" = "Tidak ada data yang sesuai";
+"search.clear" = "Hapus Pencarian";
+"search.searching" = "Mencari...";
+"search.patient.placeholder" = "Cari nama pasien";
+"search.account.placeholder" = "Cari akun";
+"search.no_results_for" = "Tidak ada hasil untuk %@";
+"search.result_for" = "\"%@\"";
+
+// MARK: - Forms
+"form.optional" = "(opsional)";
+"form.select_option" = "Pilih opsi";
+"form.enter_value" = "Masukkan nilai";
+"form.disable" = "Nonaktifkan";
+"form.validation.required" = "Field ini wajib diisi";
+"form.validation.invalid" = "Format tidak valid";
+"form.validation.too_short" = "Terlalu pendek";
+"form.validation.too_long" = "Terlalu panjang";
+"form.placeholder" = "Masukkan %@";
+"form.select" = "Pilih %@";
+"form.search" = "Cari %@";
+
+// MARK: - Navigation
+"nav.profile" = "Profil";
+"nav.history" = "Riwayat";
+"nav.examination" = "Pemeriksaan";
+"nav.patients" = "Pasien";
+"nav.settings" = "Pengaturan";
+"nav.account_management" = "Manajemen Akun";
+
+// MARK: - Data Patterns
+"data.count" = "%d %@";
+"data.from_to" = "%d dari %d %@";
+"data.image_count" = "Gambar %d dari %d";
+"data.album_title" = "Album Gambar %@";
+"data.result_title" = "Hasil Pemeriksaan %@ %d";
+"data.slide_title" = "Sediaan %d";
+"data.slide_id_title" = "ID Sediaan %d";
+"data.slide_id_placeholder" = "Contoh: %@";
+"data.slide_type_title" = "Jenis Sediaan %d";
+"data.with_prefix" = "%@ %@";
+
+// MARK: - Features
+"feature.radio_button" = "Tombol Pilihan Radio";
 
 // MARK: - Authentication
 "auth.login.title" = "Revolusi Deteksi Bakteri dengan Teknologi AI";

@@ -104,122 +104,125 @@ enum AppText {
     
     // MARK: - Universal Actions (Used across all modules)
     enum Action {
-        static let ok = "OK"
-        static let cancel = "Batal"
-        static let save = "Simpan"
-        static let delete = "Hapus"
-        static let edit = "Ubah"
-        static let close = "Tutup"
-        static let next = "Lanjutkan"
-        static let back = "Kembali"
-        static let done = "Selesai"
-        static let exit = "Keluar"
-        static let settings = "Pengaturan"
-        static let retry = "Coba Lagi"
-        static let refresh = "Refresh"
-        static let confirm = "Konfirmasi"
-        static let search = "Cari"
+        static let ok = "common.ok".localized
+        static let cancel = "common.cancel".localized
+        static let save = "common.save".localized
+        static let delete = "common.delete".localized
+        static let edit = "common.edit".localized
+        static let close = "common.close".localized
+        static let next = "common.next".localized
+        static let back = "common.back".localized
+        static let done = "common.done".localized
+        static let exit = "common.exit".localized
+        static let settings = "common.settings".localized
+        static let retry = "common.retry".localized
+        static let refresh = "common.refresh".localized
+        static let continueAct = "common.continue".localized
+        static let skip = "common.skip".localized
+        static let confirm = "common.confirm".localized
+        static let search = "common.search".localized
         
         // Common button patterns
-        static let saveChanges = "Simpan Perubahan"
-        static let saveData = "Simpan Data"
-        static let addNew = "Tambah Baru"
-        static let editData = "Ubah Data"
-        static let deleteData = "Hapus Data"
+        static let saveChanges = "common.save_changes".localized
+        static let saveData = "common.save_data".localized
+        static let addNew = "common.add_new".localized
+        static let editData = "common.edit_data".localized
+        static let deleteData = "common.delete_data".localized
         
         // Dynamic functions for custom combinations
         static func save(_ itemType: String) -> String {
-            return "Simpan \(itemType)"
+            return "common.save_item".localized(with: itemType)
         }
         
         static func add(_ itemType: String?) -> String {
-            return "Tambah \(String(describing: itemType))"
+            let item = itemType ?? ""
+            return "common.add_item".localized(with: item)
         }
         
         static func edit(_ itemType: String) -> String {
-            return "Ubah \(itemType)"
+            return "common.edit_item".localized(with: itemType)
         }
         
         static func delete(_ itemType: String) -> String {
-            return "Hapus \(itemType)"
+            return "common.delete_item".localized(with: itemType)
         }
         
         static func view(_ itemType: String) -> String {
-            return "Lihat \(itemType)"
+            return "common.view_item".localized(with: itemType)
         }
         
         static func backTo(_ destination: String) -> String {
-            return "Kembali ke \(destination)"
+            return "common.back_to".localized(with: destination)
         }
         
         static func startAction(_ actionType: String) -> String {
-            return "Mulai \(actionType)"
+            return "common.start_action".localized(with: actionType)
         }
         
         static func create(_ itemType: String) -> String {
-            return "Buat \(itemType)"
+            return "common.create_item".localized(with: itemType)
         }
         
         static func disable(_ itemType: String) -> String {
-            return "Nonaktifkan \(itemType)"
+            return "common.disable_item".localized(with: itemType)
         }
     }
     
     // MARK: - Universal States (Used across all modules)
     enum State {
-        static let loading = "Memuat..."
-        static let empty = "Kosong"
-        static let error = "Error"
-        static let success = "Berhasil"
-        static let pending = "Pending"
-        static let notAvailable = "Belum Tersedia"
-        static let unknown = "Tidak Diketahui"
-        static let completed = "Selesai"
-        static let inProgress = "Sedang Berlangsung"
+        static let loading = "state.loading".localized
+        static let empty = "state.empty".localized
+        static let error = "state.error".localized
+        static let success = "state.success".localized
+        static let pending = "state.pending".localized
+        static let notAvailable = "state.not_available".localized
+        static let unknown = "state.unknown".localized
+        static let completed = "state.completed".localized
+        static let inProgress = "state.in_progress".localized
         
         // Dynamic status patterns
         static func loading(_ action: String) -> String {
-            return "Memuat \(action)..."
+            return "state.loading_action".localized(with: action)
         }
         
         static func success(_ action: String) -> String {
-            return "Berhasil \(action)"
+            return "state.success_action".localized(with: action)
         }
         
         static func failed(_ action: String) -> String {
-            return "Gagal \(action)"
+            return "state.failed_action".localized(with: action)
         }
         
         static func noData(_ itemType: String) -> String {
-            return "Belum ada \(itemType)"
+            return "state.no_data".localized(with: itemType)
         }
         
         static func notDetermined(_ itemType: String) -> String {
-            return "\(itemType) belum ditentukan"
+            return "state.not_determined".localized(with: itemType)
         }
         
         static func successWith(_ action: String, _ itemType: String) -> String {
-            return "Berhasil \(action) \(itemType)"
+            return "state.success_with".localized(with: action, itemType)
         }
     }
     
     // MARK: - Universal Labels (Common field names)
     enum Label {
-        static let name = "Nama"
-        static let email = "Email"
-        static let password = "Kata Sandi"
-        static let phone = "Telepon"
-        static let address = "Alamat"
-        static let date = "Tanggal"
-        static let time = "Waktu"
-        static let notes = "Catatan"
-        static let description = "Deskripsi"
-        static let title = "Judul"
-        static let type = "Jenis"
-        static let status = "Status"
-        static let result = "Hasil"
-        static let category = "Kategori"
-        static let role = "Role"
+        static let name = "label.name".localized
+        static let email = "label.email".localized
+        static let password = "label.password".localized
+        static let phone = "label.phone".localized
+        static let address = "label.address".localized
+        static let date = "label.date".localized
+        static let time = "label.time".localized
+        static let notes = "label.notes".localized
+        static let description = "label.description".localized
+        static let title = "label.title".localized
+        static let type = "label.type".localized
+        static let status = "label.status".localized
+        static let result = "label.result".localized
+        static let category = "label.category".localized
+        static let role = "label.role".localized
     }
     
     // MARK: - Common Values
@@ -229,186 +232,186 @@ enum AppText {
         static let bullet = "•"
         static let percentage = "%"
         static let required = "*"
-        static let unknownError = "Terjadi Kesalahan"
-        static let unknownMessage = "Pesan tidak diketahui"
+        static let unknownError = "common.unknown_error".localized
+        static let unknownMessage = "common.unknown_message".localized
     }
     
     // MARK: - Patient Data (Reusable across modules)
     enum PatientData {
-        static let name = "Nama"
-        static let nik = "NIK"
-        static let dateOfBirth = "Tanggal Lahir"
-        static let gender = "Jenis Kelamin"
-        static let bpjsNumber = "Nomor BPJS"
-        static let age = "Umur"
-        static let ageSuffix = " Tahun"
+        static let name = "patient.name".localized
+        static let nik = "patient.nik".localized
+        static let dateOfBirth = "patient.dob".localized
+        static let gender = "patient.gender".localized
+        static let bpjsNumber = "patient.bpjs".localized
+        static let age = "patient.age".localized
+        static let ageSuffix = "patient.age_suffix".localized
         
         enum Gender {
-            static let male = "Laki-laki"
-            static let female = "Perempuan"
-            static let other = "Lainnya"
+            static let male = "patient.gender.male".localized
+            static let female = "patient.gender.female".localized
+            static let other = "patient.gender.other".localized
         }
         
         enum Placeholder {
-            static let name = "Masukkan nama pasien"
-            static let nik = "Contoh: 167012039484700"
-            static let bpjs = "Contoh: 1240630077675"
-            static let selectDate = "Pilih Tanggal"
+            static let name = "patient.placeholder.name".localized
+            static let nik = "patient.placeholder.nik".localized
+            static let bpjs = "patient.placeholder.bpjs".localized
+            static let selectDate = "patient.placeholder.select_date".localized
         }
     }
     
     // MARK: - Medical Terms (Reusable across examination modules)
     enum Medical {
-        static let patient = "Pasien"
+        static let patient = "medical.patient".localized
         
         enum BTA {
-            static let negative = "Negatif"
-            static let scanty = "Scanty"
-            static let positive1 = "Positif (1+)"
-            static let positive2 = "Positif (2+)"
-            static let positive3 = "Positif (3+)"
+            static let negative = "medical.bta.negative".localized
+            static let scanty = "medical.bta.scanty".localized
+            static let positive1 = "medical.bta.positive1".localized
+            static let positive2 = "medical.bta.positive2".localized
+            static let positive3 = "medical.bta.positive3".localized
             
             enum Description {
-                static let negative = "Tidak ditemukan BTA dalam 100 lapang pandang"
-                static let scanty = "Ditemukan 1-9 BTA dalam 100 lapang pandang"
-                static let positive1 = "Ditemukan 10-99 BTA dalam 100 lapang pandang"
-                static let positive2 = "Ditemukan 1-9 BTA dalam setiap lapang pandang, minimal dalam 50 lapang pandang"
-                static let positive3 = "Ditemukan ≥10 BTA dalam setiap lapang pandang, minimal dalam 20 lapang pandang"
+                static let negative = "medical.bta.desc.negative".localized
+                static let scanty = "medical.bta.desc.scanty".localized
+                static let positive1 = "medical.bta.desc.positive1".localized
+                static let positive2 = "medical.bta.desc.positive2".localized
+                static let positive3 = "medical.bta.desc.positive3".localized
             }
         }
         
         enum Examination {
-            static let purpose = "Tujuan Pemeriksaan"
-            static let result = "Hasil Pemeriksaan"
-            static let interpretation = "Interpretasi"
-            static let staffInterpretation = "Interpretasi Petugas"
-            static let systemInterpretation = "Interpretasi Sistem"
-            static let bacteriaCount = "Jumlah Bakteri"
-            static let slideId = "ID Sediaan"
-            static let examinationId = "ID Pemeriksaan" 
-            static let specimenType = "Jenis Sediaan"
-            static let specimenInfo = "Informasi Sediaan"
-            static let microscopicInterpretation = "Interpretasi Mikroskopis"
-            static let bacteriaCountSuffix = " BTA"
-            static let confidenceLevel = "Tingkat Keyakinan"
-            static let goalScreening = "Skrining"
-            static let goalFollowUp = "Follow Up"
-            static let preparationTypeAnytime = "Sewaktu"
-            static let preparationTypeMorning = "Pagi"
+            static let purpose = "medical.exam.purpose".localized
+            static let result = "medical.exam.result".localized
+            static let interpretation = "medical.exam.interpretation".localized
+            static let staffInterpretation = "medical.exam.staff_interpretation".localized
+            static let systemInterpretation = "medical.exam.system_interpretation".localized
+            static let bacteriaCount = "medical.exam.bacteria_count".localized
+            static let slideId = "medical.exam.slide_id".localized
+            static let examinationId = "medical.exam.examination_id".localized
+            static let specimenType = "medical.exam.specimen_type".localized
+            static let specimenInfo = "medical.exam.specimen_info".localized
+            static let microscopicInterpretation = "medical.exam.microscopic_interpretation".localized
+            static let bacteriaCountSuffix = "medical.exam.bacteria_suffix".localized
+            static let confidenceLevel = "medical.exam.confidence_level".localized
+            static let goalScreening = "medical.exam.goal_screening".localized
+            static let goalFollowUp = "medical.exam.goal_followup".localized
+            static let preparationTypeAnytime = "medical.exam.preparation_anytime".localized
+            static let preparationTypeMorning = "medical.exam.preparation_morning".localized
         }
         
         enum Confidence {
-            static let perfect = "100% Confidence: Tidak ada keraguan dari sistem"
-            static let high = "High Confidence: 90% - 99%"
-            static let medium = "Medium Confidence: 70%-89%"
-            static let low = "Low Confidence: 50%-69%"
-            static let veryLow = "Very Low: 10% - 50%"
-            static let unpredicted = "Unpredicted: 0% - 9%"
+            static let perfect = "medical.confidence.perfect".localized
+            static let high = "medical.confidence.high".localized
+            static let medium = "medical.confidence.medium".localized
+            static let low = "medical.confidence.low".localized
+            static let veryLow = "medical.confidence.very_low".localized
+            static let unpredicted = "medical.confidence.unpredicted".localized
         }
     }
     
     // MARK: - Search & Filter (Reusable components)
     enum Search {
-        static let search = "Cari"
-        static let placeholder = "Cari..."
-        static let noResults = "Tidak ada data yang sesuai"
-        static let clearSearch = "Hapus Pencarian"
-        static let searching = "Mencari..."
+        static let search = "search.search".localized
+        static let placeholder = "search.placeholder".localized
+        static let noResults = "search.no_results".localized
+        static let clearSearch = "search.clear".localized
+        static let searching = "search.searching".localized
         
         enum Patient {
-            static let placeholder = "Cari nama pasien"
+            static let placeholder = "search.patient.placeholder".localized
         }
         
         enum Account {
-            static let placeholder = "Cari akun"
+            static let placeholder = "search.account.placeholder".localized
         }
         
         static func noResults(_ searchTerm: String) -> String {
-            return "Tidak ada hasil untuk \(searchTerm)"
+            return "search.no_results_for".localized(with: searchTerm)
         }
         
         static func resultFor(_ itemType: String) -> String {
-            return "\"\(itemType)\""
+            return "search.result_for".localized(with: itemType)
         }
     }
     
     // MARK: - Forms (Reusable form elements)
     enum Form {
-        static let optional = "(opsional)"
-        static let selectOption = "Pilih opsi"
-        static let enterValue = "Masukkan nilai"
-        static let disable = "Nonaktifkan"
+        static let optional = "form.optional".localized
+        static let selectOption = "form.select_option".localized
+        static let enterValue = "form.enter_value".localized
+        static let disable = "form.disable".localized
         
         enum Validation {
-            static let required = "Field ini wajib diisi"
-            static let invalid = "Format tidak valid"
-            static let tooShort = "Terlalu pendek"
-            static let tooLong = "Terlalu panjang"
+            static let required = "form.validation.required".localized
+            static let invalid = "form.validation.invalid".localized
+            static let tooShort = "form.validation.too_short".localized
+            static let tooLong = "form.validation.too_long".localized
         }
         
         static func placeholder(_ fieldName: String) -> String {
-            return "Masukkan \(fieldName)"
+            return "form.placeholder".localized(with: fieldName)
         }
         
         static func select(_ itemType: String) -> String {
-            return "Pilih \(itemType)"
+            return "form.select".localized(with: itemType)
         }
         
         static func search(_ itemType: String) -> String {
-            return "Cari \(itemType)"
+            return "form.search".localized(with: itemType)
         }
     }
     
     // MARK: - Navigation (Reusable navigation items)
     enum Navigation {
-        static let profile = "Profil"
-        static let history = "Riwayat"
-        static let examination = "Pemeriksaan"
-        static let patients = "Pasien"
-        static let settings = "Pengaturan"
-        static let accountManagement = "Manajemen Akun"
+        static let profile = "nav.profile".localized
+        static let history = "nav.history".localized
+        static let examination = "nav.examination".localized
+        static let patients = "nav.patients".localized
+        static let settings = "nav.settings".localized
+        static let accountManagement = "nav.account_management".localized
     }
     
     // MARK: - Common Data Patterns
     enum Data {
         static func count(_ number: Int, _ itemType: String) -> String {
-            return "\(number) \(itemType)"
+            return "data.count".localized(with: number, itemType)
         }
         
         static func fromTo(_ current: Int, _ total: Int, _ itemType: String) -> String {
-            return "\(current) dari \(total) \(itemType)"
+            return "data.from_to".localized(with: current, total, itemType)
         }
         
         static func imageCount(_ current: Int, _ total: Int) -> String {
-            return "Gambar \(current) dari \(total)"
+            return "data.image_count".localized(with: current, total)
         }
         
         static func albumTitle(_ itemName: String) -> String {
-            return "Album Gambar \(itemName)"
+            return "data.album_title".localized(with: itemName)
         }
         
         static func resultTitle(_ itemName: String, _ slideNumber: Int) -> String {
-            return "Hasil Pemeriksaan \(itemName) \(slideNumber)"
+            return "data.result_title".localized(with: itemName, slideNumber)
         }
         
         static func slideTitle(_ slideNumber: Int) -> String {
-            return "Sediaan \(slideNumber)"
+            return "data.slide_title".localized(with: slideNumber)
         }
         
         static func slideIdTitle(_ slideNumber: Int) -> String {
-            return "ID Sediaan \(slideNumber)"
+            return "data.slide_id_title".localized(with: slideNumber)
         }
 
         static func slideIdPlaceholder(_ slideNumber: String) -> String {
-            return "Contoh: \(slideNumber)"
+            return "data.slide_id_placeholder".localized(with: slideNumber)
         }
         
         static func slideTypeTitle(_ slideNumber: Int) -> String {
-            return "Jenis Sediaan \(slideNumber)"
+            return "data.slide_type_title".localized(with: slideNumber)
         }
         
         static func withPrefix(_ prefix: String, _ content: String) -> String {
-            return "\(prefix) \(content)"
+            return "data.with_prefix".localized(with: prefix, content)
         }
         
         static func makeSentence<T>(_ words: [T]) -> String {
@@ -427,6 +430,6 @@ enum AppText {
     }
     
     enum Feature {
-        static let radioButton = "Tombol Pilihan Radio"
+        static let radioButton = "feature.radio_button".localized
     }
 }

@@ -13,11 +13,32 @@
 "common.next" = "Next";
 "common.back" = "Back";
 "common.done" = "Done";
+"common.exit" = "Exit";
+"common.settings" = "Settings";
 "common.retry" = "Retry";
 "common.refresh" = "Refresh";
 "common.continue" = "Continue";
 "common.skip" = "Skip";
 "common.confirm" = "Confirm";
+"common.search" = "Search";
+
+// Common button patterns
+"common.save_changes" = "Save Changes";
+"common.save_data" = "Save Data";
+"common.add_new" = "Add New";
+"common.edit_data" = "Edit Data";
+"common.delete_data" = "Delete Data";
+
+// Dynamic action patterns
+"common.save_item" = "Save %@";
+"common.add_item" = "Add %@";
+"common.edit_item" = "Edit %@";
+"common.delete_item" = "Delete %@";
+"common.view_item" = "View %@";
+"common.back_to" = "Back to %@";
+"common.start_action" = "Start %@";
+"common.create_item" = "Create %@";
+"common.disable_item" = "Disable %@";
 
 // MARK: - Universal States
 "state.loading" = "Loading...";
@@ -29,6 +50,14 @@
 "state.unknown" = "Unknown";
 "state.completed" = "Completed";
 "state.in_progress" = "In Progress";
+
+// Dynamic status patterns
+"state.loading_action" = "Loading %@...";
+"state.success_action" = "Successfully %@";
+"state.failed_action" = "Failed %@";
+"state.no_data" = "No %@ available";
+"state.not_determined" = "%@ not determined";
+"state.success_with" = "Successfully %@ %@";
 
 // MARK: - Universal Labels
 "label.name" = "Name";
@@ -45,6 +74,11 @@
 "label.status" = "Status";
 "label.result" = "Result";
 "label.category" = "Category";
+"label.role" = "Role";
+
+// MARK: - Common Values
+"common.unknown_error" = "An error occurred";
+"common.unknown_message" = "Unknown message";
 
 // MARK: - Patient Data
 "patient.name" = "Name";
@@ -56,12 +90,14 @@
 "patient.age_suffix" = " years old";
 "patient.gender.male" = "Male";
 "patient.gender.female" = "Female";
+"patient.gender.other" = "Other";
 "patient.placeholder.name" = "Enter patient name";
 "patient.placeholder.nik" = "e.g., 167012039484700";
 "patient.placeholder.bpjs" = "e.g., 1240630077675";
 "patient.placeholder.select_date" = "Select date";
 
 // MARK: - Medical Terms
+"medical.patient" = "Patient";
 "medical.bta.negative" = "Negative";
 "medical.bta.scanty" = "Scanty";
 "medical.bta.positive1" = "Positive (1+)";
@@ -80,7 +116,16 @@
 "medical.exam.system_interpretation" = "System Interpretation";
 "medical.exam.bacteria_count" = "Bacteria Count";
 "medical.exam.slide_id" = "Slide ID";
+"medical.exam.examination_id" = "Examination ID";
 "medical.exam.specimen_type" = "Specimen Type";
+"medical.exam.specimen_info" = "Specimen Information";
+"medical.exam.microscopic_interpretation" = "Microscopic Interpretation";
+"medical.exam.bacteria_suffix" = " BTA";
+"medical.exam.confidence_level" = "Confidence Level";
+"medical.exam.goal_screening" = "Screening";
+"medical.exam.goal_followup" = "Follow Up";
+"medical.exam.preparation_anytime" = "Anytime";
+"medical.exam.preparation_morning" = "Morning";
 
 "medical.confidence.perfect" = "Perfect (100%)";
 "medical.confidence.high" = "High (90-99%)";
@@ -90,21 +135,28 @@
 "medical.confidence.unpredicted" = "Unpredicted (0-9%)";
 
 // MARK: - Search & Filter
+"search.search" = "Search";
 "search.placeholder" = "Search...";
 "search.no_results" = "No results found";
 "search.clear" = "Clear search";
 "search.searching" = "Searching...";
 "search.patient.placeholder" = "Search patient name";
 "search.account.placeholder" = "Search account";
+"search.no_results_for" = "No results for %@";
+"search.result_for" = "\"%@\"";
 
 // MARK: - Forms
 "form.optional" = "(optional)";
 "form.select_option" = "Select an option";
 "form.enter_value" = "Enter value";
+"form.disable" = "Disable";
 "form.validation.required" = "This field is required";
 "form.validation.invalid" = "Invalid format";
 "form.validation.too_short" = "Too short";
 "form.validation.too_long" = "Too long";
+"form.placeholder" = "Enter %@";
+"form.select" = "Select %@";
+"form.search" = "Search %@";
 
 // MARK: - Navigation
 "nav.profile" = "Profile";
@@ -113,6 +165,21 @@
 "nav.patients" = "Patients";
 "nav.settings" = "Settings";
 "nav.account_management" = "Account Management";
+
+// MARK: - Data Patterns
+"data.count" = "%d %@";
+"data.from_to" = "%d of %d %@";
+"data.image_count" = "Image %d of %d";
+"data.album_title" = "Image Album %@";
+"data.result_title" = "Examination Result %@ %d";
+"data.slide_title" = "Slide %d";
+"data.slide_id_title" = "Slide ID %d";
+"data.slide_id_placeholder" = "e.g., %@";
+"data.slide_type_title" = "Slide Type %d";
+"data.with_prefix" = "%@ %@";
+
+// MARK: - Features
+"feature.radio_button" = "Radio Button";
 
 // MARK: - Authentication
 "auth.login.title" = "Revolutionizing Bacterial Detection with AI Technology";
