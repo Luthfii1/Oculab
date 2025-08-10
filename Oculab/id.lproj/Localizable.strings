@@ -452,3 +452,39 @@
 
 // Patient Form Field Component
 "patient.form_field.name_placeholder" = "John Doe";
+
+// MARK: - TaskAssignment Module
+// Input Patient Data View
+"task_assignment.input_patient.step_title_patient" = "Data Pasien";
+"task_assignment.input_patient.step_title_specimen" = "Data Sediaan";
+"task_assignment.input_patient.step_title_results" = "Hasil";
+"task_assignment.input_patient.pic_title" = "Petugas Pemeriksaan";
+"task_assignment.input_patient.patient_name_placeholder_auto_selected" = "Pasien dipilih otomatis";
+"task_assignment.input_patient.patient_name_description" = "Pilih atau masukkan data pasien baru";
+"task_assignment.input_patient.patient_name_description_auto_selected" = "Pasien telah dipilih dari riwayat";
+"task_assignment.input_patient.fill_specimen_details_button" = "Isi Detail Sediaan";
+"task_assignment.input_patient.select_pic_data" = "Petugas";
+"task_assignment.input_patient.patient_name_placeholder" = "Pasien dipilih otomatis";
+"task_assignment.input_patient.navigation_title" = "Data Pasien";
+
+// Input Examination Data View
+"task_assignment.input_exam.step_title_patient" = "Data Pasien";
+"task_assignment.input_exam.step_title_specimen" = "Data Sediaan";
+"task_assignment.input_exam.step_title_results" = "Hasil";
+"task_assignment.input_exam.confirm_popup_title" = "Buat Tugas Pemeriksaan?";
+"task_assignment.input_exam.create_task_button" = "Buat Tugas";
+"task_assignment.input_exam.review_again_button" = "Periksa Kembali";
+"task_assignment.input_exam.screening_choice" = "Skrining";
+"task_assignment.input_exam.follow_up_choice" = "Follow Up";
+"task_assignment.input_exam.morning_choice" = "Pagi";
+"task_assignment.input_exam.anytime_choice" = "Sewaktu";
+"task_assignment.input_exam.create_task_final_button" = "Buat Tugas";
+"task_assignment.input_exam.navigation_title" = "Data Sediaan";
+"task_assignment.input_exam.warning_first_exam_should_be_filled" = "Jika membuat 2 pemeriksaan, pemeriksaan pertama harus diisi dengan lengkap.";
+"task_assignment.input_exam.warning_second_exam_should_be_filled" = "Jika membuat 2 pemeriksaan, pemeriksaan kedua harus diisi dengan lengkap.";
+"task_assignment.input_exam.warning_slide_ids_must_be_different" = "ID Sediaan harus berbeda untuk kedua pemeriksaan.";
+"task_assignment.input_exam.warning_examination_must_be_filled" = "Pemeriksaan harus diisi dengan lengkap.";
+"task_assignment.input_exam.error_message_failed_to_get_response" = "Gagal mendapatkan respon dari server.";
+"task_assignment.input_exam.error_message_not_all_exams_created" = "Tidak semua pemeriksaan berhasil dibuat.";
+"task_assignment.input_exam.error_message_exams_contain_invalid_data" = "Pemeriksaan telah dibuat tetapi mengandung data yang tidak valid.";
+"task_assignment.input_exam.examination_description" = "Sediaan Pasien %@ akan diperiksa oleh %@";

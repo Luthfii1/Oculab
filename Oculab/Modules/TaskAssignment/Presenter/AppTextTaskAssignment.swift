@@ -16,46 +16,50 @@ typealias AppTextTaskAssignCompPatientDisplay = AppText.TaskAssignment.PatientDi
 extension AppText {
     enum TaskAssignment {
         enum InputPatientDataView {
-            static let stepTitles = ["Data Pasien", "Data Sediaan", "Hasil"]
+            static let stepTitles = ["task_assignment.input_patient.step_title_patient".localized, 
+                                   "task_assignment.input_patient.step_title_specimen".localized, 
+                                   "task_assignment.input_patient.step_title_results".localized]
             static let currentStepIndex = 0
-            static let picTitle = "Petugas Pemeriksaan"
-            static let patientNamePlaceholderAutoSelected = "Pasien dipilih otomatis"
-            static let patientNameDescription = "Pilih atau masukkan data pasien baru"
-            static let patientNameDescriptionAutoSelected = "Pasien telah dipilih dari riwayat"
-            static let fillSpecimenDetailsButton = "Isi Detail Sediaan"
-            static let selectPIC = AppForm.select("Petugas")
-            static let patientNamePlaceholder = "Pasien dipilih otomatis"
-            static let navigationTitle = "Data Pasien"
+            static let picTitle = "task_assignment.input_patient.pic_title".localized
+            static let patientNamePlaceholderAutoSelected = "task_assignment.input_patient.patient_name_placeholder_auto_selected".localized
+            static let patientNameDescription = "task_assignment.input_patient.patient_name_description".localized
+            static let patientNameDescriptionAutoSelected = "task_assignment.input_patient.patient_name_description_auto_selected".localized
+            static let fillSpecimenDetailsButton = "task_assignment.input_patient.fill_specimen_details_button".localized
+            static let selectPIC = AppForm.select("task_assignment.input_patient.select_pic_data".localized)
+            static let patientNamePlaceholder = "task_assignment.input_patient.patient_name_placeholder".localized
+            static let navigationTitle = "task_assignment.input_patient.navigation_title".localized
         }
         
         enum InputExaminationDataView {
-            static let stepTitles = ["Data Pasien", "Data Sediaan", "Hasil"]
+            static let stepTitles = ["task_assignment.input_exam.step_title_patient".localized, 
+                                   "task_assignment.input_exam.step_title_specimen".localized, 
+                                   "task_assignment.input_exam.step_title_results".localized]
             static let currentStepIndex = 1
-            static let confirmPopupTitle = "Buat Tugas Pemeriksaan?"
-            static let createTaskButton = "Buat Tugas"
-            static let reviewAgainButton = "Periksa Kembali"
-            static let screeningChoice = "Skrinning"
-            static let followUpChoice = "Follow Up"
+            static let confirmPopupTitle = "task_assignment.input_exam.confirm_popup_title".localized
+            static let createTaskButton = "task_assignment.input_exam.create_task_button".localized
+            static let reviewAgainButton = "task_assignment.input_exam.review_again_button".localized
+            static let screeningChoice = "task_assignment.input_exam.screening_choice".localized
+            static let followUpChoice = "task_assignment.input_exam.follow_up_choice".localized
             static let slideId1Title = AppData.slideIdTitle(1)
             static let slideId1Placeholder = AppData.slideIdPlaceholder("24/11/1/0123A")
             static let slideType1Title = AppData.slideTypeTitle(1)
             static let slideId2Title = AppData.slideIdTitle(2)
             static let slideId2Placeholder = AppData.slideIdPlaceholder("24/11/1/0123B")
             static let slideType2Title = AppData.slideTypeTitle(2)
-            static let morningChoice = "Pagi"
-            static let anytimeChoice = "Sewaktu"
-            static let createTaskFinalButton = "Buat Tugas"
-            static let navigationTitle = "Data Sediaan"
-            static let warningFirstExamShouldBeFilled = "If creating 2 examinations, the first examination must be completely filled out."
-            static let warningSecondExamShouldBeFilled = "If creating 2 examinations, the second examination must be completely filled out."
-            static let warningSlideIDsMustBeDifferent = "Slide IDs must be different for the two examinations."
-            static let warningExaminationMustBeFilled = "Examination must be completely filled out."
-            static let errorMessageFailedToGetResponse = "Failed to get response from server."
-            static let errorMessageNotAllExamsCreated = "Not all examinations were created successfully."
-            static let errorMessageExamsContainInvalidData = "Examinations were created but contain invalid data."
+            static let morningChoice = "task_assignment.input_exam.morning_choice".localized
+            static let anytimeChoice = "task_assignment.input_exam.anytime_choice".localized
+            static let createTaskFinalButton = "task_assignment.input_exam.create_task_final_button".localized
+            static let navigationTitle = "task_assignment.input_exam.navigation_title".localized
+            static let warningFirstExamShouldBeFilled = "task_assignment.input_exam.warning_first_exam_should_be_filled".localized
+            static let warningSecondExamShouldBeFilled = "task_assignment.input_exam.warning_second_exam_should_be_filled".localized
+            static let warningSlideIDsMustBeDifferent = "task_assignment.input_exam.warning_slide_ids_must_be_different".localized
+            static let warningExaminationMustBeFilled = "task_assignment.input_exam.warning_examination_must_be_filled".localized
+            static let errorMessageFailedToGetResponse = "task_assignment.input_exam.error_message_failed_to_get_response".localized
+            static let errorMessageNotAllExamsCreated = "task_assignment.input_exam.error_message_not_all_exams_created".localized
+            static let errorMessageExamsContainInvalidData = "task_assignment.input_exam.error_message_exams_contain_invalid_data".localized
 
             static func examinationDescription(patientName: String, picName: String) -> String {
-                return "Sediaan Pasien \(patientName) akan diperiksa oleh \(picName)"
+                return "task_assignment.input_exam.examination_description".localized(with: [patientName, picName])
             }
         }
         

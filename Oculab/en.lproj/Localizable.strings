@@ -434,3 +434,39 @@
 
 // Patient Form Field Component
 "patient.form_field.name_placeholder" = "John Doe";
+
+// MARK: - TaskAssignment Module
+// Input Patient Data View
+"task_assignment.input_patient.step_title_patient" = "Patient Data";
+"task_assignment.input_patient.step_title_specimen" = "Specimen Data";
+"task_assignment.input_patient.step_title_results" = "Results";
+"task_assignment.input_patient.pic_title" = "Examination Officer";
+"task_assignment.input_patient.patient_name_placeholder_auto_selected" = "Patient automatically selected";
+"task_assignment.input_patient.patient_name_description" = "Select or enter new patient data";
+"task_assignment.input_patient.patient_name_description_auto_selected" = "Patient has been selected from history";
+"task_assignment.input_patient.fill_specimen_details_button" = "Fill Specimen Details";
+"task_assignment.input_patient.select_pic_data" = "Officer";
+"task_assignment.input_patient.patient_name_placeholder" = "Patient automatically selected";
+"task_assignment.input_patient.navigation_title" = "Patient Data";
+
+// Input Examination Data View
+"task_assignment.input_exam.step_title_patient" = "Patient Data";
+"task_assignment.input_exam.step_title_specimen" = "Specimen Data";
+"task_assignment.input_exam.step_title_results" = "Results";
+"task_assignment.input_exam.confirm_popup_title" = "Create Examination Task?";
+"task_assignment.input_exam.create_task_button" = "Create Task";
+"task_assignment.input_exam.review_again_button" = "Review Again";
+"task_assignment.input_exam.screening_choice" = "Screening";
+"task_assignment.input_exam.follow_up_choice" = "Follow Up";
+"task_assignment.input_exam.morning_choice" = "Morning";
+"task_assignment.input_exam.anytime_choice" = "Anytime";
+"task_assignment.input_exam.create_task_final_button" = "Create Task";
+"task_assignment.input_exam.navigation_title" = "Specimen Data";
+"task_assignment.input_exam.warning_first_exam_should_be_filled" = "If creating 2 examinations, the first examination must be completely filled out.";
+"task_assignment.input_exam.warning_second_exam_should_be_filled" = "If creating 2 examinations, the second examination must be completely filled out.";
+"task_assignment.input_exam.warning_slide_ids_must_be_different" = "Slide IDs must be different for the two examinations.";
+"task_assignment.input_exam.warning_examination_must_be_filled" = "Examination must be completely filled out.";
+"task_assignment.input_exam.error_message_failed_to_get_response" = "Failed to get response from server.";
+"task_assignment.input_exam.error_message_not_all_exams_created" = "Not all examinations were created successfully.";
+"task_assignment.input_exam.error_message_exams_contain_invalid_data" = "Examinations were created but contain invalid data.";
+"task_assignment.input_exam.examination_description" = "Patient %@ specimen will be examined by %@";
