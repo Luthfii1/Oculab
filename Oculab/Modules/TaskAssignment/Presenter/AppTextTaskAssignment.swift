@@ -23,6 +23,9 @@ extension AppText {
             static let patientNameDescription = "Pilih atau masukkan data pasien baru"
             static let patientNameDescriptionAutoSelected = "Pasien telah dipilih dari riwayat"
             static let fillSpecimenDetailsButton = "Isi Detail Sediaan"
+            static let selectPIC = AppForm.select("Petugas")
+            static let patientNamePlaceholder = "Pasien dipilih otomatis"
+            static let navigationTitle = "Data Pasien"
         }
         
         enum InputExaminationDataView {
@@ -42,6 +45,18 @@ extension AppText {
             static let morningChoice = "Pagi"
             static let anytimeChoice = "Sewaktu"
             static let createTaskFinalButton = "Buat Tugas"
+            static let navigationTitle = "Data Sediaan"
+            static let warningFirstExamShouldBeFilled = "If creating 2 examinations, the first examination must be completely filled out."
+            static let warningSecondExamShouldBeFilled = "If creating 2 examinations, the second examination must be completely filled out."
+            static let warningSlideIDsMustBeDifferent = "Slide IDs must be different for the two examinations."
+            static let warningExaminationMustBeFilled = "Examination must be completely filled out."
+            static let errorMessageFailedToGetResponse = "Failed to get response from server."
+            static let errorMessageNotAllExamsCreated = "Not all examinations were created successfully."
+            static let errorMessageExamsContainInvalidData = "Examinations were created but contain invalid data."
+
+            static func examinationDescription(patientName: String, picName: String) -> String {
+                return "Sediaan Pasien \(patientName) akan diperiksa oleh \(picName)"
+            }
         }
         
         enum DateFieldComponent {

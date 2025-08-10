@@ -16,7 +16,7 @@ struct ImageSectionComponent: View {
             HStack {
                 Image(systemName: AppIcon.photo)
                     .foregroundColor(AppColors.purple500)
-                Text("Hasil Gambar")
+                Text(AppTextExam.titleResultImages)
                     .font(AppTypography.s4_1)
                     .padding(.leading, Decimal.d8)
             }
@@ -40,7 +40,7 @@ struct ImageSectionComponent: View {
                             .frame(height: 114)
                             .clipped()
                     case .failure:
-                        Image(systemName: "exclamationmark.triangle.fill")
+                        Image(systemName: AppIcon.warning)
                             .resizable()
                             .scaledToFit()
                             .frame(height: 114)

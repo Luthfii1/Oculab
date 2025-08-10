@@ -12,7 +12,7 @@ struct AppDropdown: View {
     var placeholder: String
     var isRequired: Bool = false
     var leftIcon: String? = nil // SF Symbol or custom icon name
-    var rightIcon: String? = "chevron.down" // Default right icon
+    var rightIcon: String? = AppIcon.down // Default right icon
     var isDisabled: Bool = false
     var choices: [(display: String, value: String)] // List of dropdown choices with display and value
     var description: String? = nil // Description or additional info
@@ -20,7 +20,7 @@ struct AppDropdown: View {
     @Binding var selectedChoice: String
 
     @State private var isDropdownOpen: Bool = false
-    @State private var searchText: String = "" // New state for search text
+    @State private var searchText: String = AppValue.empty // New state for search text
     @State var isEnablingAdding: Bool = false
 
     // Computed property to filter choices based on search text
@@ -52,7 +52,7 @@ struct AppDropdown: View {
                     .font(AppTypography.s4_1)
                     .foregroundColor(textColor)
                 if isRequired {
-                    Text("*")
+                    Text(AppValue.required)
                         .foregroundColor(AppColors.red500)
                 }
             }
@@ -65,7 +65,7 @@ struct AppDropdown: View {
                     withAnimation {
                         isDropdownOpen.toggle()
                         if isSearchEnabled {
-                            searchText = "" // Reset search when dropdown is opened
+                            searchText = AppValue.empty // Reset search when dropdown is opened
                         }
                     }
                 }
@@ -127,9 +127,9 @@ struct AppDropdown: View {
                             selectedChoice = searchText
                         } label: {
                             HStack {
-                                Text("Tambahkan").font(AppTypography.p2).foregroundStyle(AppColors.purple500)
+                                Text(AppAction.addNew).font(AppTypography.p2).foregroundStyle(AppColors.purple500)
                                     .bold()
-                                Text("\"\(searchText)\"").foregroundStyle(AppColors.slate900)
+                                Text(AppSearch.resultFor(searchText)).foregroundStyle(AppColors.slate900)
 
                             }.padding(.top, 8)
                         }
@@ -137,7 +137,7 @@ struct AppDropdown: View {
 
                     ScrollView {
                         if filteredChoices.isEmpty {
-                            Text("Tidak ada data yang sesuai")
+                            Text(AppSearch.noResults)
                                 .foregroundColor(AppColors.slate100)
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 .padding(.top, 8)

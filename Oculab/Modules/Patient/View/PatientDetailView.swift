@@ -35,7 +35,10 @@ struct PatientDetailView: View {
                         spacing: Decimal.d16,
                         isBorderDisabled: true
                     ) {
-                        AppButton(title: AppAction.create("Pemeriksaan"), leftIcon: AppIcon.docBadgePlus) {
+                        AppButton(
+                            title: AppTextPatientDetail.buttonCreateExamination,
+                            leftIcon: AppIcon.docBadgePlus
+                        ) {
                             presenter.navigateTo(.inputPatientData(patientId: patientId))
                         }
                         

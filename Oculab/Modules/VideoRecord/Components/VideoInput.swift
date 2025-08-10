@@ -38,7 +38,7 @@ struct VideoInput: View {
 
             VStack(alignment: .center) {
                 if selectedURL == nil {
-                    AppButton(title: AppAction.create("Gambar"), leftIcon: AppIcon.camera, colorType: .secondary, size: .small) {
+                    AppButton(title: AppAction.create(AppTextVideoRecordCompInput.createVideoButton), leftIcon: AppIcon.camera, colorType: .secondary, size: .small) {
                         if !UserDefaults.standard.bool(forKey: UserDefaultType.hasSeenOnboarding.rawValue) {
                             showOnboardingGuidelines = true
                             UserDefaults.standard.set(true, forKey: UserDefaultType.hasSeenOnboarding.rawValue)
@@ -46,8 +46,8 @@ struct VideoInput: View {
                             videoPresenter.previewURL = nil
                             examPresenter.recordVideo = nil
 
-                            print("VideoInput: Initiating new video record. videoPresenter.previewURL is now \(videoPresenter.previewURL?.lastPathComponent ?? "nil")")
-                            print("VideoInput: examPresenter.recordVideo is now \(examPresenter.recordVideo?.lastPathComponent ?? "nil")")
+                            print("VideoInput: Initiating new video record. videoPresenter.previewURL is now \(videoPresenter.previewURL?.lastPathComponent ?? AppValue.empty)")
+                            print("VideoInput: examPresenter.recordVideo is now \(examPresenter.recordVideo?.lastPathComponent ?? AppValue.empty)")
 
                             examPresenter.newVideoRecord()
                         }
@@ -59,7 +59,7 @@ struct VideoInput: View {
                         .clipped()
                         .cornerRadius(Decimal.d8)
 
-                    AppButton(title: AppAction.view("Video"), leftIcon: AppIcon.eye, colorType: .secondary, size: .small) {
+                    AppButton(title: AppAction.view(AppTextVideoRecordCompInput.viewVideoButton), leftIcon: AppIcon.eye, colorType: .secondary, size: .small) {
                         // Cek apakah file masih bisa diputar
                         if let url = selectedURL, FileManager.default.fileExists(atPath: url.path) {
                             showFullScreenPlayer = true
@@ -72,7 +72,7 @@ struct VideoInput: View {
             // Alert untuk error handling
             .alert(isPresented: $showVideoErrorAlert) {
                 Alert(
-                    title: Text(AppState.failed("Memutar Video")),
+                    title: Text(AppState.failed(AppTextVideoRecordCompInput.videoPlaybackErrorTitle)),
                     message: Text(AppTextVideoRecordCompInput.videoErrorAlertMessage),
                     dismissButton: .default(Text(AppAction.ok))
                 )

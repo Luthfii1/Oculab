@@ -22,7 +22,7 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     }
 
     @Published var session = AVCaptureSession()
-    @Published var videoRecordingTitle: String = "Sediaan: -"
+    @Published var videoRecordingTitle: String = AppTextVideoRecordView.specimenTitleDefault
     @Published var alert = false
     @Published var output = AVCaptureMovieFileOutput()
     @Published var preview: AVCaptureVideoPreviewLayer!
@@ -35,7 +35,7 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     @Published var showRecordingTitle: Bool = false
     @Published var stitchedImage: UIImage? // For stitched images
     @Published var progressImage: UIImage?
-    @Published var progressImageChecker: String = ""
+    @Published var progressImageChecker: String = AppValue.empty
     @Published var zoomFactor: CGFloat = 1.0
 
     private let videoDataOutput = AVCaptureVideoDataOutput()
@@ -44,17 +44,8 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     private let minZoomFactor: CGFloat = 1.0
     private let maxZoomFactor: CGFloat = 4.9
 
-    let preRecordingInstructions: [String] = [
-        "Gunakan lensa objektif 10x untuk menentukan fokus, kemudian teteskan minyak imersi",
-        "Pastikan lensa objektif telah diatur ke perbesaran 100x setelah fokus ditemukan",
-        "Pasang perangkat Anda dengan lensa kamera menempel pada lensa okuler",
-        "Pastikan Anda berada di lokasi dengan jaringan yang lancar"
-    ]
-    let duringRecordingInstructions: [String] = [
-        "Pastikan sediaan tetap terlihat di layar dan selalu dalam fokus optimal",
-        "Baca sediaan mulai dari ujung kiri ke ujung kanan mengikuti skema pemindaian untuk pemeriksaan apusan",
-        "Progress pengambilan gambar keseluruhan akan terlihat di kanan atas"
-    ]
+    let preRecordingInstructions: [String] = AppTextVideoRecordInstruction.preRecordingInstructions
+    let duringRecordingInstructions: [String] = AppTextVideoRecordInstruction.duringRecordingInstructions
 
     func checkPermission() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
@@ -131,7 +122,7 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     }
 
     func startRecording() {
-        let tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(Date()).mov")
+        let tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(AppTextVideoRecordView.videoFileDateAndExtension())
         output.startRecording(to: tempURL, recordingDelegate: self)
         isRecording = true
     }
@@ -161,54 +152,10 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
             self.stopCameraSession()
         }
     }
-
-//    func fileOutput(
-//        _ output: AVCaptureFileOutput,
-//        didFinishRecordingTo outputFileURL: URL,
-//        from connections: [AVCaptureConnection],
-//        error: Error?
-//    ) {
-//        if let error = error {
-//            print("Recording error: \(error.localizedDescription)")
-//            return
-//        }
-//
-//        previewURL = outputFileURL
-//    }
-//
+    
     func handleButtonRecording() {
         isRecording ? stopRecording() : startRecording()
     }
-
-//    func captureOutput(
-//        _ output: AVCaptureOutput,
-//        didOutput sampleBuffer: CMSampleBuffer,
-//        from connection: AVCaptureConnection
-//    ) {
-//        if isRecording {
-//            guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
-//                return
-//            }
-//
-//            let ciImage = CIImage(cvPixelBuffer: imageBuffer)
-//            guard let cgImage = CIContext().createCGImage(ciImage, from: ciImage.extent) else {
-//                return
-//            }
-//            let uiImage = UIImage(cgImage: cgImage)
-//
-//            // Update the progress image to reflect the latest frame
-//            DispatchQueue.main.async {
-//                self.progressImage = uiImage
-//            }
-//
-//            // Check if 0.5 seconds have passed since the last stitch
-//            let now = Date()
-//            if lastStitchTime == nil || now.timeIntervalSince(lastStitchTime!) >= stitchInterval {
-//                lastStitchTime = now
-//                stitchNewFrame(uiImage)
-//            }
-//        }
-//    }
 
     func stitchNewFrame(_ newImage: UIImage) {
         guard let lastStitchedImage = stitchedImage else {
@@ -231,7 +178,7 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     }
 
     func getIconButtonRecording() -> String {
-        return isRecording ? "circle.fill" : "button.programmable"
+        return isRecording ? AppIcon.circleFill : AppIcon.buttonProgrammable
     }
 
     func getColorButtonRecording() -> Color {
@@ -288,5 +235,13 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
         } catch {
             print("Error setting zoom: \(error.localizedDescription)")
         }
+    }
+    
+    func setSpecimenTitle(specimenId: String) {
+        videoRecordingTitle = AppTextVideoRecordView.specimenTitle(specimenId)
+    }
+    
+    func resetSpecimenTitle() {
+        videoRecordingTitle = AppTextVideoRecordView.specimenTitleDefault
     }
 }

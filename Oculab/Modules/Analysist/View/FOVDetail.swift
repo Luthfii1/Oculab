@@ -55,7 +55,7 @@ struct FOVDetail: View {
                     // Bottom controls
                     VStack {
                         VStack(spacing: Decimal.d4) {
-                            Text("\(AppMedical.Examination.bacteriaCount): \(fovData.systemCount)\(AppMedical.Examination.bacteriaCountSuffix)")
+                            Text(AppData.makeSentence([AppMedical.Examination.bacteriaCount, fovData.systemCount, AppMedical.Examination.bacteriaCountSuffix, AppMedical.Examination.bacteriaCountSuffix]))
                                 .font(AppTypography.h3)
                                 .foregroundColor(.white)
                         }
@@ -97,7 +97,7 @@ struct FOVDetail: View {
                         Text(AppData.imageCount(order + 1, total))
                             .font(AppTypography.s4_1)
                             .foregroundColor(.white)
-                        Text("\(AppMedical.Examination.slideId): \(slideId)")
+                        Text(AppData.makeSentence([AppMedical.Examination.slideId, slideId]))
                             .font(AppTypography.p3)
                             .foregroundColor(.white.opacity(0.8))
                     }

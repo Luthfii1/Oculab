@@ -62,7 +62,7 @@ struct HomeView: View {
                         if presenter.isAllExamsLoading {
                             Spacer().frame(height: Decimal.d24)
                             VStack(alignment: .center) {
-                                ProgressView(AppState.loading("data pemeriksaan anda"))
+                                ProgressView(AppTextHomeHistory.loadingState)
                                     .progressViewStyle(CircularProgressViewStyle())
                             }
                             .frame(maxWidth: .infinity)

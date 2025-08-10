@@ -57,7 +57,7 @@ struct WeeklyCalendarView: View {
                                 .font(AppTypography.s6)
                                 .foregroundColor(AppColors.slate100)
 
-                            Text("\(getDayOfMonth(date: date))")
+                            Text(String(getDayOfMonth(date: date)))
                                 .font(AppTypography.p2)
                                 .foregroundColor(
                                     isSameDay(date1: date, date2: selectedDate) ? AppColors

@@ -34,7 +34,7 @@ struct PatientDisplayField: View {
                 title: AppPatient.dateOfBirth,
                 isRequired: true,
                 placeholder: AppPatient.Placeholder.selectDate,
-                rightIcon: "calendar",
+                rightIcon: AppIcon.calendar,
                 isDisabled: presenter.patientFound,
                 date: $presenter.selectedDoB
             )

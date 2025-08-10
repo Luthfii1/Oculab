@@ -45,7 +45,7 @@ struct HomeActivityComponent: View {
             
             switch viewType {
             case .lab:
-                Text(patientName + " (\(patientDOB))") // TODO: Create func to create sentence
+                Text(AppData.makeSentence([patientName, patientDOB]))
                     .font(AppTypography.p4)
                     .foregroundStyle(AppColors.slate900)
             case .admin, .adminPatientDetail:
@@ -70,7 +70,7 @@ struct HomeActivityComponent: View {
         case .lab, .adminPatientDetail:
             return slideId
         case .admin:
-            return patientName + " (\(patientDOB))" // TODO: Create func to create sentence
+            return AppData.makeSentence([patientName, patientDOB])
         }
     }
 }

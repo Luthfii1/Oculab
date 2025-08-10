@@ -16,20 +16,20 @@ struct ContentView: View {
             HomeView()
                 .environmentObject(DependencyInjection.shared.createAuthPresenter())
                 .tabItem {
-                    Image(systemName: "rectangle.split.2x2.fill")
-                    Text("Pemeriksaan")
+                    Image(systemName: AppIcon.rectangleSplit2x2Fill)
+                    Text(AppNav.examination)
                 }
             if authPresenter.user.role == .LAB {
                 HistoryView(selectedDate: Date())
                     .tabItem {
-                        Image(systemName: "clock.arrow.circlepath")
-                        Text("Riwayat")
+                        Image(systemName: AppIcon.clockArrowCirclepath)
+                        Text(AppNav.history)
                     }
             } else {
                 PatientListView()
                     .tabItem {
-                        Image(systemName: "clock.arrow.circlepath")
-                        Text("Riwayat")
+                        Image(systemName: AppIcon.clockArrowCirclepath)
+                        Text(AppNav.history)
                     }
             }
             
@@ -37,8 +37,8 @@ struct ContentView: View {
                 .environmentObject(DependencyInjection.shared.createAuthPresenter())
                 .environmentObject(DependencyInjection.shared.createProfilePresenter())
                 .tabItem {
-                    Image(systemName: "person.circle")
-                    Text("Profil")
+                    Image(systemName: AppIcon.personCircle)
+                    Text(AppNav.profile)
                 }
         }
         .tint(AppColors.purple500)

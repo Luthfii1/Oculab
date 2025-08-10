@@ -24,7 +24,7 @@ struct GradingCardComponent: View {
                     HStack {
                         Image(AppImage.robot)
                         Spacer().frame(width: 4)
-                        Text("\(confidenceLevel.rawValue) \(AppMedical.Examination.confidenceLevel)")
+                        Text(AppData.makeSentence([confidenceLevel.rawValue, AppMedical.Examination.confidenceLevel]))
                             .font(AppTypography.p4)
                             .foregroundColor(AppColors.slate300)
 
@@ -40,7 +40,7 @@ struct GradingCardComponent: View {
             }
 
             if isExpert {
-                Text(expertNote ?? "")
+                Text(expertNote ?? AppValue.empty)
                     .font(AppTypography.p3)
             } else {
                 Text(type.description(withValues: n))

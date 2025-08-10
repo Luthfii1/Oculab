@@ -26,7 +26,8 @@ extension AppText {
         static let taskSectionTitle = "Tugas Pemeriksaan"
         static let newExaminationButton = "Pemeriksaan Baru"
         static let noTaskMessage = "Anda belum ditugaskan untuk melakukan pemeriksaan"
-        
+        static let loadingState = AppState.loading("data pemeriksaan anda")
+
         enum FinishedExaminationCardComponent {
             static let dpjpLabel = "DPJP"
             static let positiveKeyword = "positif"

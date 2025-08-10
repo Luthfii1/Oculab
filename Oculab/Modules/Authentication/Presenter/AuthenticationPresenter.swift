@@ -15,21 +15,21 @@ enum PinMode {
 
 class AuthenticationPresenter: ObservableObject {
     @Published var isSplashScreenVisible = true
-    @Published var description: String = ""
+    @Published var description: String = AppValue.empty
     @Published var textColor: Color = AppColors.slate900
     @Published var pinColor: Color = AppColors.purple500
-    @Published var email = ""
-    @Published var password = ""
+    @Published var email = AppValue.empty
+    @Published var password = AppValue.empty
     @Published var isKeyboardVisible = false
-    @Published var firstPin = ""
-    @Published var secondPin = ""
+    @Published var firstPin = AppValue.empty
+    @Published var secondPin = AppValue.empty
     @Published var isOpeningApp = false
     @Published var user: User = .init()
     @Published var isPinAuthorized: Bool = false
-    @Published var descriptionPIN: String = ""
+    @Published var descriptionPIN: String = AppValue.empty
     @Published var isFaceIdAvailable: Bool = false
     @Published var isFaceIdEnabledFromUserDefaults: Bool = UserDefaults.standard.bool(forKey: UserDefaultType.isFaceIdEnabled.rawValue)
-    @Published var inputPin = "" {
+    @Published var inputPin = AppValue.empty {
         didSet {
             if !inputPin.isEmpty {
                 isError = false
@@ -48,7 +48,7 @@ class AuthenticationPresenter: ObservableObject {
     @Published var isError: Bool = false {
         didSet {
             if !isError {
-                description = ""
+                description = AppValue.empty
             }
             textColor = isError ? AppColors.red500 : AppColors.slate900
             pinColor = isError ? AppColors.red500 : AppColors.purple500
@@ -60,9 +60,9 @@ class AuthenticationPresenter: ObservableObject {
             setDescriptionPIN()
         }
     }
-    
-    @Published var oldAccessPin = ""
-    @Published var newAccessPin = ""
+
+    @Published var oldAccessPin = AppValue.empty
+    @Published var newAccessPin = AppValue.empty
     @Published var isAccessPinChangeInProgress = false
     @Published var showAccessPinSuccessPopup = false
 
@@ -89,14 +89,14 @@ class AuthenticationPresenter: ObservableObject {
         if isAccessPinChangeInProgress {
             if oldAccessPin != inputPin {
                 isError = true
-                description = "PIN saat ini salah"
+                description = AppTextAuthCompPin.invalidPinText
                 return false
             }
         } else {
             // Normal authentication - check against stored PIN
             if await interactor.getUserLocalData()?.accessPin != inputPin {
                 isError = true
-                description = "PIN salah, silakan coba lagi"
+                description = AppTextAuthCompPin.invalidPinText
                 return false
             }
         }
@@ -112,7 +112,7 @@ class AuthenticationPresenter: ObservableObject {
         switch state {
         case .create:
             firstPin = pin
-            inputPin = ""
+            inputPin = AppValue.empty
             state = .revalidate
             Router.shared.navigateTo(.userAccessPin(state: .revalidate))
 
@@ -134,7 +134,7 @@ class AuthenticationPresenter: ObservableObject {
                 }
             } else {
                 isError = true
-                inputPin = ""
+                inputPin = AppValue.empty
                 // Error description is already set in revalidatePinMatched()
             }
 
@@ -144,7 +144,7 @@ class AuthenticationPresenter: ObservableObject {
                     isPinAuthorized = true
                     Router.shared.popToRoot()
                 } else {
-                    inputPin = ""
+                    inputPin = AppValue.empty
                     // Error description is already set in isValidPin()
                 }
             }
@@ -154,14 +154,14 @@ class AuthenticationPresenter: ObservableObject {
                 if await self.isValidPin() {
                     oldAccessPin = inputPin // Store the old PIN
                     isAccessPinChangeInProgress = true
-                    inputPin = ""
-                    firstPin = ""
-                    secondPin = ""
+                    inputPin = AppValue.empty
+                    firstPin = AppValue.empty
+                    secondPin = AppValue.empty
                     state = .create
                     
                     Router.shared.navigateTo(.userAccessPin(state: .create))
                 } else {
-                    inputPin = ""
+                    inputPin = AppValue.empty
                     // Error description is already set in isValidPin()
                 }
             }
@@ -246,14 +246,14 @@ class AuthenticationPresenter: ObservableObject {
     }
     
     func resetPinChangeFlow() {
-        oldAccessPin = ""
-        newAccessPin = ""
-        firstPin = ""
-        secondPin = ""
-        inputPin = ""
+        oldAccessPin = AppValue.empty
+        newAccessPin = AppValue.empty
+        firstPin = AppValue.empty
+        secondPin = AppValue.empty
+        inputPin = AppValue.empty
         isAccessPinChangeInProgress = false
         isError = false
-        description = ""
+        description = AppValue.empty
     }
     
     func setDescriptionPIN() {
@@ -261,20 +261,20 @@ class AuthenticationPresenter: ObservableObject {
             switch state {
             case .create:
                 if isAccessPinChangeInProgress {
-                    descriptionPIN = "Masukkan PIN baru Anda"
+                    descriptionPIN = AppTextAuthCompPin.createChangePinTitle
                 } else {
-                    descriptionPIN = "Atur PIN untuk kemudahan login di sesi berikutnya"
+                    descriptionPIN = AppTextAuthCompPin.createPinTitle
                 }
             case .revalidate:
                 if isAccessPinChangeInProgress {
-                    descriptionPIN = "Konfirmasi PIN baru Anda"
+                    descriptionPIN = AppTextAuthCompPin.revalidateChangePinTitle
                 } else {
-                    descriptionPIN = "Masukkan PIN kembali untuk konfirmasi"
+                    descriptionPIN = AppTextAuthCompPin.revalidatePinTitle
                 }
             case .authenticate:
-                descriptionPIN = "Masukkan PIN untuk mengakses aplikasi"
+                descriptionPIN = AppTextAuthCompPin.titleAuthenticatePin
             case .changePIN:
-                descriptionPIN = "Masukkan PIN Anda saat ini"
+                descriptionPIN = AppTextAuthCompPin.changePinTitle
             }
         }
     }
@@ -282,19 +282,19 @@ class AuthenticationPresenter: ObservableObject {
     var title: String {
         switch state {
         case .create:
-            return isAccessPinChangeInProgress ? "PIN Baru" : "Atur PIN"
+            return isAccessPinChangeInProgress ? AppTextAuthCompPin.titleCreateChangePin : AppTextAuthCompPin.titleCreatePin
         case .revalidate:
-            return isAccessPinChangeInProgress ? "Konfirmasi PIN Baru" : "Konfirmasi PIN"
+            return isAccessPinChangeInProgress ? AppTextAuthCompPin.revalidateChangePinTitle : AppTextAuthCompPin.revalidatePinTitle
         case .authenticate:
-            return "Masukkan PIN"
+            return AppTextAuthCompPin.titleAuthenticatePin
         case .changePIN:
-            return "PIN Saat Ini"
+            return AppTextAuthCompPin.titleChangePin
         }
     }
 
     func clearInput() {
-        email = ""
-        password = ""
+        email = AppValue.empty
+        password = AppValue.empty
         isError = false
     }
 
@@ -313,7 +313,7 @@ class AuthenticationPresenter: ObservableObject {
         let matched = firstPin == secondPin
         if !matched {
             // Set error description when PINs don't match
-            description = "PIN tidak cocok, silakan coba lagi"
+            description = AppTextAuthCompPin.invalidPinMatchText
         }
         return matched
     }
@@ -327,9 +327,9 @@ class AuthenticationPresenter: ObservableObject {
             user = getAccountResponse
 
             // Reset the pin input state before navigation
-            inputPin = ""
-            firstPin = ""
-            secondPin = ""
+            inputPin = AppValue.empty
+            firstPin = AppValue.empty
+            secondPin = AppValue.empty
 
             if getAccountResponse.accessPin == nil {
                 state = .create
@@ -430,14 +430,14 @@ class AuthenticationPresenter: ObservableObject {
         guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
             // Device does not support Face ID
             isError = true
-            description = "Perangkat Anda tidak mendukung Face ID"
+            description = AppTextAuthProfile.descFaceIdNotSupported
             return
         }
 
         // Check if Face ID is enabled in app settings
         guard isFaceIdEnabledFromUserDefaults else {
             isError = true
-            description = "Face ID belum diaktifkan. Silakan aktifkan di Pengaturan Profil"
+            description = AppTextAuthProfile.descFaceIdNotEnabled
             return
         }
 
@@ -464,7 +464,7 @@ class AuthenticationPresenter: ObservableObject {
         } catch {
             DispatchQueue.main.async {
                 self.isError = true
-                self.description = "Autentikasi Face ID gagal: \(error.localizedDescription)"
+                self.description = AppTextAuthProfile.descFailedFaceID(error: error.localizedDescription)
             }
         }
     }
@@ -481,7 +481,7 @@ class AuthenticationPresenter: ObservableObject {
 
         guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
             isError = true
-            description = "Perangkat Anda tidak mendukung Face ID"
+            description = AppTextAuthProfile.descFaceIdNotSupported
             return
         }
 
@@ -502,7 +502,7 @@ class AuthenticationPresenter: ObservableObject {
             updateFaceIdPreference(true)
         } catch {
             isError = true
-            description = "Gagal mengaktifkan Face ID: \(error.localizedDescription)"
+            description = AppTextAuthProfile.descFailedFaceID(error: error.localizedDescription)
             // Reset toggle ke `false` secara manual
             isFaceIdEnabledFromUserDefaults = false
         }

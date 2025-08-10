@@ -39,7 +39,7 @@ struct ExamDetailView: View {
 
                             AppCard(
                                 icon: AppIcon.personFill,
-                                title: "Data Pasien",
+                                title: AppTextExamDetail.titlePatientDataCard,
                                 spacing: Decimal.d8,
                                 isBorderDisabled: true
                             ) {

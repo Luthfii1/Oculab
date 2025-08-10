@@ -11,8 +11,8 @@ import SwiftUI
 class InputPatientPresenter: ObservableObject {
     var interactor: InputPatientInteractor? = InputPatientInteractor()
 
-    @Published var selectedPIC: String = ""
-    @Published var selectedPatient: String = "" {
+    @Published var selectedPIC: String = AppValue.empty
+    @Published var selectedPatient: String = AppValue.empty {
         didSet {
             print("patient: \(selectedPatient)")
         }
@@ -20,12 +20,12 @@ class InputPatientPresenter: ObservableObject {
 
     @Published var isAddingNewPatient: Bool = false
     @Published var isError: Bool = false
-    @Published var errorMessage: String = ""
+    @Published var errorMessage: String = AppValue.empty
 
     @Published var isAddingName: Bool = false
-    @Published var selectedSex: String = ""
+    @Published var selectedSex: String = AppValue.empty
     @Published var selectedDoB: Date = .init()
-    @Published var BPJSnumber: String = ""
+    @Published var BPJSnumber: String = AppValue.empty
 
     @Published var isUserLoading = false
     @Published var isPatientLoading = false
@@ -35,12 +35,12 @@ class InputPatientPresenter: ObservableObject {
 
     @Published var patient: Patient = .init(
         _id: UUID().uuidString.lowercased(),
-        name: "",
-        NIK: "",
+        name: AppValue.empty,
+        NIK: AppValue.empty,
         DoB: Date(),
         sex: .UNKNOWN
     )
-    @Published var pic: User = .init(_id: "", name: "", role: .ADMIN)
+    @Published var pic: User = .init(_id: AppValue.empty, name: AppValue.empty, role: .ADMIN)
 
     @Published var patientFound: Bool = false {
         didSet {
@@ -50,12 +50,12 @@ class InputPatientPresenter: ObservableObject {
                 print("bpjs: \(String(describing: patient.BPJS))")
                 selectedDoB = patient.DoB ?? Date()
                 if patient.sex == .MALE {
-                    selectedSex = "Laki-laki"
+                    selectedSex = AppPatient.Gender.male
                 } else if patient.sex == .FEMALE {
-                    selectedSex = "Perempuan"
+                    selectedSex = AppPatient.Gender.female
                 }
                 
-                BPJSnumber = patient.BPJS ?? ""
+                BPJSnumber = patient.BPJS ?? AppValue.empty
             }
         }
     }
@@ -64,7 +64,7 @@ class InputPatientPresenter: ObservableObject {
         _id: UUID().uuidString.lowercased(),
         goal: nil,
         preparationType: nil,
-        slideId: "",
+        slideId: AppValue.empty,
         recordVideo: nil,
         examinationDate: Date(),
         examinationPlanDate: Date(),
@@ -75,7 +75,7 @@ class InputPatientPresenter: ObservableObject {
         _id: UUID().uuidString.lowercased(),
         goal: nil,
         preparationType: nil,
-        slideId: "",
+        slideId: AppValue.empty,
         recordVideo: nil,
         examinationDate: Date(),
         examinationPlanDate: Date(),
@@ -125,8 +125,8 @@ class InputPatientPresenter: ObservableObject {
                 dateFormatter.dateFormat = "dd/MM/yyyy"
 
                 for patient in response {
-                    let formattedDoB = patient.DoB.map { dateFormatter.string(from: $0) } ?? ""
-                    patientNameDoB.append((patient.name + " (\(formattedDoB))", patient._id))
+                    let formattedDoB = patient.DoB.map { dateFormatter.string(from: $0) } ?? AppValue.empty
+                    patientNameDoB.append((patient.name +  String(formattedDoB), patient._id))
                 }
             }
         } catch {
@@ -149,14 +149,14 @@ class InputPatientPresenter: ObservableObject {
         patientFound = false
         patient = Patient(
             _id: UUID().uuidString.lowercased(),
-            name: "",
-            NIK: "",
+            name: AppValue.empty,
+            NIK: AppValue.empty,
             DoB: Date(),
             sex: .UNKNOWN
         )
         selectedDoB = Date()
-        selectedSex = ""
-        BPJSnumber = ""
+        selectedSex = AppValue.empty
+        BPJSnumber = AppValue.empty
     }
 
     @MainActor
@@ -240,9 +240,9 @@ class InputPatientPresenter: ObservableObject {
     func addNewPatient() async -> Bool {
         print(patient._id)
         print(patient.name)
-        print(patient.BPJS ?? "no data BPJS")
+        print(patient.BPJS ?? AppValue.empty)
         print(patient.NIK)
-        print(patient.DoB ?? "no data DoB")
+        print(patient.DoB ?? AppValue.empty)
 
         do {
             patient.name = selectedPatient
@@ -284,20 +284,20 @@ class InputPatientPresenter: ObservableObject {
             guard let prepType1 = examination.preparationType,
                   !examination.slideId.isEmpty else {
                 isError = true
-                errorMessage = "If creating 2 examinations, the first examination must be completely filled out."
+                errorMessage = AppTextTaskAssignInputExam.warningFirstExamShouldBeFilled
                 return
             }
             
             guard let prepType2 = examination2.preparationType,
                   !examination2.slideId.isEmpty else {
                 isError = true
-                errorMessage = "If creating 2 examinations, the second examination must be completely filled out."
+                errorMessage = AppTextTaskAssignInputExam.warningSecondExamShouldBeFilled
                 return
             }
             
             guard examination.slideId != examination2.slideId else {
                 isError = true
-                errorMessage = "Slide IDs must be different for the two examinations."
+                errorMessage = AppTextTaskAssignInputExam.warningSlideIDsMustBeDifferent
                 return
             }
             
@@ -329,7 +329,7 @@ class InputPatientPresenter: ObservableObject {
                   let prepType1 = examination.preparationType,
                   !examination.slideId.isEmpty else {
                 isError = true
-                errorMessage = "Examination must be completely filled out."
+                errorMessage = AppTextTaskAssignInputExam.warningExaminationMustBeFilled
                 return
             }
             
@@ -352,7 +352,7 @@ class InputPatientPresenter: ObservableObject {
                 examinations: examinationsToSend
             ) else {
                 isError = true
-                errorMessage = "Failed to get response from server."
+                errorMessage = AppTextTaskAssignInputExam.errorMessageFailedToGetResponse
                 return
             }
 
@@ -361,13 +361,13 @@ class InputPatientPresenter: ObservableObject {
 
             guard createdExaminations.count == expectedCount else {
                 isError = true
-                errorMessage = "Not all examinations were created successfully."
+                errorMessage = AppTextTaskAssignInputExam.errorMessageNotAllExamsCreated
                 return
             }
 
             guard createdExaminations.allSatisfy({ !$0._id.isEmpty && !$0.slideId.isEmpty }) else {
                 isError = true
-                errorMessage = "Examinations were created but contain invalid data."
+                errorMessage = AppTextTaskAssignInputExam.errorMessageExamsContainInvalidData
                 return
             }
 

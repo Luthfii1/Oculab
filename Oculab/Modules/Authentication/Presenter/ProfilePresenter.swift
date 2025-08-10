@@ -12,20 +12,20 @@ class ProfilePresenter: ObservableObject {
     private var authInteractor: AuthenticationInteractor
 
     @Published var user: User = .init()
-    @Published var oldPassword: String = "" {
+    @Published var oldPassword: String = AppValue.empty {
         didSet {
             validatePasswords()
             isOldPasswordError = false
         }
     }
 
-    @Published var inputPassword: String = "" {
+    @Published var inputPassword: String = AppValue.empty {
         didSet {
             validatePasswords()
         }
     }
 
-    @Published var confirmPassword: String = "" {
+    @Published var confirmPassword: String = AppValue.empty {
         didSet {
             validatePasswords()
         }
@@ -34,14 +34,13 @@ class ProfilePresenter: ObservableObject {
     @Published var isError: Bool = false
     @Published var isOldPasswordError: Bool = false {
         didSet {
-            isOldPasswordError == true ? (descriptionOldPassword = "Password lama tidak cocok") :
-                (descriptionOldPassword = "")
+            isOldPasswordError == true ? (descriptionOldPassword = AppTextAuthProfile.oldPasswordNotMatched) :
+                (descriptionOldPassword = AppValue.empty)
         }
     }
 
-    @Published var descriptionPasswordConfirm: String =
-        "Pastikan password konfirmasi cocok dengan password yang Anda masukkan sebelumnya"
-    @Published var descriptionOldPassword: String = ""
+    @Published var descriptionPasswordConfirm: String = AppTextAuthProfile.descConfirmPassword
+    @Published var descriptionOldPassword: String = AppValue.empty
     @Published var isLoading = false
 
     var saveChangesButtonText: String {
@@ -63,17 +62,17 @@ class ProfilePresenter: ObservableObject {
         guard !confirmPassword.isEmpty else {
             isError = false
             descriptionPasswordConfirm =
-                "Pastikan password konfirmasi cocok dengan password yang Anda masukkan sebelumnya"
+                AppTextAuthProfile.descConfirmPassword
             return
         }
 
         // Check if passwords match
         if !confirmPassword.isEmpty && inputPassword != confirmPassword {
             isError = true
-            descriptionPasswordConfirm = "Password konfirmasi tidak cocok"
+            descriptionPasswordConfirm = AppTextAuthProfile.confirmPasswordError
         } else if !confirmPassword.isEmpty && inputPassword == confirmPassword {
             isError = false
-            descriptionPasswordConfirm = "Password konfirmasi cocok"
+            descriptionPasswordConfirm = AppTextAuthProfile.confirmPasswordSuccess
         }
     }
 
@@ -97,12 +96,11 @@ class ProfilePresenter: ObservableObject {
     }
 
     func resetEditPassword() {
-        oldPassword = ""
-        inputPassword = ""
-        confirmPassword = ""
+        oldPassword = AppValue.empty
+        inputPassword = AppValue.empty
+        confirmPassword = AppValue.empty
         isError = false
-        descriptionPasswordConfirm =
-            "Pastikan password konfirmasi cocok dengan password yang Anda masukkan sebelumnya"
+        descriptionPasswordConfirm = AppTextAuthProfile.descConfirmPassword
     }
 
     func navigateTo(_ destination: Router.Route) {
@@ -112,8 +110,7 @@ class ProfilePresenter: ObservableObject {
     @MainActor
     func postEditPassword(authPresenter: AuthenticationPresenter) async {
         guard !confirmPassword.isEmpty, !oldPassword.isEmpty else {
-            print("Password fields are empty")
-            descriptionOldPassword = "Please enter both old and new passwords"
+            descriptionOldPassword = AppTextAuthProfile.emptyPasswordError
             isOldPasswordError = true
             return
         }

@@ -22,7 +22,7 @@ struct SavedResultView: View {
                 VStack(alignment: .leading, spacing: Decimal.d24) {
                     ExtendableCard(
                         icon: AppIcon.personFill,
-                        title: "Data Pasien",
+                        title: AppTextExamSavedResult.titlePatientDataCard,
                         isExtendable: true,
                         data: [
                             (key: AppPatient.name, value: presenter.patientDetailData.name),
@@ -36,7 +36,7 @@ struct SavedResultView: View {
 
                     ExtendableCard(
                         icon: AppIcon.docTextMagnifyingglass,
-                        title: AppData.withPrefix("Detail", "Pemeriksaan"),
+                        title: AppTextExamSavedResult.titleDetailsExamCard,
                         isExtendable: true,
                         data: [
                             (key: AppMedical.Examination.slideId, value: presenter.examDetailData.slideId),
@@ -46,7 +46,7 @@ struct SavedResultView: View {
                         titleSize: AppTypography.s6
                     )
 
-                    AppCard(icon: AppIcon.photo, title: "Hasil Gambar", spacing: Decimal.d16) {
+                    AppCard(icon: AppIcon.photo, title: AppTextExam.titleResultImages, spacing: Decimal.d16) {
                         VStack(alignment: .leading, spacing: Decimal.d16) {
                             Text(AppTextExamCompImageSection.imageResultInstruction)
                                 .font(AppTypography.p3)
@@ -93,7 +93,7 @@ struct SavedResultView: View {
 
                     AppCard(
                         icon: AppIcon.textBadgeCheckmark,
-                        title: "Hasil Interpretasi",
+                        title: AppTextExam.titleResultInterpretation,
                         spacing: Decimal.d24,
                         isGrading: .FINISHED
                     ) {
@@ -165,7 +165,7 @@ struct SavedResultView: View {
 
                         VStack(alignment: .leading, spacing: Decimal.d16) {
                             AppButton(
-                                title: AppAction.view("PDF"),
+                                title: AppTextExamSavedResult.actionViewPdf,
                                 rightIcon: AppIcon.document,
                                 colorType: .secondary,
                                 size: .small,

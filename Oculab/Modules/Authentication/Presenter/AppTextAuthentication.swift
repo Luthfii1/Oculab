@@ -55,6 +55,18 @@ extension AppText {
             static let editPinButton = "Atur PIN"
             static let faceIdToggle = "Face ID"
             static let privacyPolicyButton = "Kebijakan Privasi"
+
+            static let descFaceIdNotEnabled = "Face ID belum diaktifkan. Silakan aktifkan di Pengaturan Profil"
+            static let descFaceIdNotSupported = "Perangkat Anda tidak mendukung Face ID"
+            static func descFailedFaceID(error: String) -> String {
+                return "Autentikasi Face ID gagal: \(error)"
+            }
+
+            static let oldPasswordNotMatched = "Password lama tidak cocok"
+            static let descConfirmPassword = "Pastikan password konfirmasi cocok dengan password yang Anda masukkan sebelumnya"
+            static let confirmPasswordError = "Password konfirmasi tidak cocok"
+            static let confirmPasswordSuccess = "Password konfirmasi cocok"
+            static let emptyPasswordError = "Harap masukkan baik password lama maupun baru"
         }
 
         enum PrivacyPolicyView {
@@ -103,6 +115,19 @@ extension AppText {
         enum PinComponent {
             static let forgotPinText = "Lupa PIN?"
             static let usePasswordButton = "Gunakan Password"
+            static let invalidPinText = "PIN saat ini salah"
+            static let createChangePinTitle = "Atur PIN Akses"
+            static let revalidateChangePinTitle = "Konfirmasi PIN Akses"
+            static let createPinTitle = "Atur PIN untuk kemudahan login di sesi berikutnya"
+            static let revalidatePinTitle = "Masukkan PIN kembali untuk konfirmasi"
+            static let authenticatePinDescription = "Masukkan PIN untuk mengakses aplikasi"
+            static let changePinTitle = "Masukkan PIN Anda saat ini"
+            static let titleCreateChangePin = "PIN Baru"
+            static let titleCreatePin = "Atur PIN"
+            static let titleAuthenticatePin = "Masukkan PIN"
+            static let titleChangePin = "PIN saat Ini"
+
+            static let invalidPinMatchText = "PIN tidak cocok, silakan coba lagi"
         }
     }
 }

@@ -36,7 +36,7 @@ struct PatientFormView: View {
                     Spacer()
 
                     AppButton(
-                        title: isAddingNewPatient ? AppAction.add("Pasien Baru") : AppAction.save("Data Pasien"),
+                        title: isAddingNewPatient ? AppTextPatientCompCard.buttonCreatePatient : AppTextPatientCompCard.buttonSavePatient,
                         leftIcon: isAddingNewPatient ? AppIcon.add : AppIcon.checkmark
                     ) {
                         Task {

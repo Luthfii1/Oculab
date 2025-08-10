@@ -17,11 +17,11 @@ struct NewUserFormView: View {
                 if presenter.showSuccessPopup {
                     AppPopup(
                         image: AppImage.success,
-                        title: AppState.success("membuat Akun"),
-                        description: "\(AppTextUserMgmtNewUserForm.successDescriptionPrefix) \(presenter.registrationSuccess.name) \(AppTextUserMgmtNewUserForm.successDescriptionSuffix) \(presenter.registrationSuccess.role)",
+                        title: AppTextUserMgmtNewUserForm.successCreateAccount,
+                        description: AppData.makeSentence([AppTextUserMgmtNewUserForm.successDescriptionPrefix, presenter.registrationSuccess.name, AppTextUserMgmtNewUserForm.successDescriptionSuffix, presenter.registrationSuccess.role]),
                         buttons: [
                             AppButton(
-                                title: AppAction.create("Akun Lain"),
+                                title: AppTextUserMgmtNewUserForm.createAnotherAccount,
                                 colorType: .secondary,
                                 size: .large,
                                 isEnabled: true,
@@ -31,7 +31,7 @@ struct NewUserFormView: View {
                             ),
                             
                             AppButton(
-                                title: AppAction.backTo("Daftar Akun"),
+                                title: AppTextUserMgmt.backToAccountList,
                                 colorType: .tertiary,
                                 isEnabled: true,
                                 action: {
@@ -89,7 +89,7 @@ struct NewUserFormView: View {
                             // Register button
                             ZStack {
                                 AppButton(
-                                    title: presenter.isRegistering ? AppValue.empty : AppAction.save("Akun"),
+                                    title: presenter.isRegistering ? AppValue.empty : AppTextUserMgmtNewUserForm.saveAccount,
                                     rightIcon: presenter.isRegistering ? nil : AppIcon.forward,
                                     isEnabled: presenter.isFormValid(
                                         name: presenter.name,
@@ -116,7 +116,7 @@ struct NewUserFormView: View {
                     }
                     .padding(.horizontal, Decimal.d20)
                 }
-                .navigationTitle(AppAction.create("Akun Baru"))
+                .navigationTitle(AppTextUserMgmtNewUserForm.navigationTitle)
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
@@ -135,7 +135,7 @@ struct NewUserFormView: View {
         .navigationBarHidden(true)
         // Error alert
         .alert(
-            AppState.failed("Pendaftaran"),
+            AppTextUserMgmtNewUserForm.failedRegistration,
             isPresented: Binding(
                 get: { presenter.registrationError != nil },
                 set: { if !$0 { presenter.registrationError = nil } }

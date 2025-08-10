@@ -22,6 +22,18 @@ extension AppText {
             static let cameraAccessDeniedTitle = "Akses Kamera Ditolak"
             static let cameraAccessDeniedMessage = "Silakan aktifkan akses kamera untuk Oculab di Pengaturan untuk merekam video"
             static let goToSettingsButton = "Buka Pengaturan"
+            
+            static func videoFileDateAndExtension() -> String {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
+                return "\(formatter.string(from: Date())).mov"
+            }
+
+            static func specimenTitle(_ specimenId: String) -> String {
+                return "Sediaan: \(specimenId)"
+            }
+            
+            static let specimenTitleDefault = "Sediaan: -"
         }
         
         enum InstructionRecordView {
@@ -29,6 +41,20 @@ extension AppText {
             static let preparationSectionTitle = "Persiapan Pemeriksaan"
             static let recordingSectionTitle = "Instruksi Pengambilan Gambar"
             static let startRecordingButton = "Mulai Pengambilan Gambar"
+
+            // MARK: - Instruction Arrays
+            static let preRecordingInstructions: [String] = [
+                "Gunakan lensa objektif 10x untuk menentukan fokus, kemudian teteskan minyak imersi",
+                "Pastikan lensa objektif telah diatur ke perbesaran 100x setelah fokus ditemukan",
+                "Pasang perangkat Anda dengan lensa kamera menempel pada lensa okuler",
+                "Pastikan Anda berada di lokasi dengan jaringan yang lancar"
+            ]
+            
+            static let duringRecordingInstructions: [String] = [
+                "Pastikan sediaan tetap terlihat di layar dan selalu dalam fokus optimal",
+                "Baca sediaan mulai dari ujung kiri ke ujung kanan mengikuti skema pemindaian untuk pemeriksaan apusan",
+                "Progress pengambilan gambar keseluruhan akan terlihat di kanan atas"
+            ]
         }
         
         enum StitchedImageView {
@@ -53,6 +79,9 @@ extension AppText {
         
         enum VideoInputComponent {
             static let videoErrorAlertMessage = "Video tidak dapat diputar. Silakan rekam ulang sampel."
+            static let createVideoButton = "Gambar"
+            static let viewVideoButton = "Video"
+            static let videoPlaybackErrorTitle = "Memutar Video"
         }
     }
 }

@@ -10,7 +10,7 @@ import SwiftUI
 struct AppTextField: View {
     var title: String
     var isRequired: Bool = false
-    var placeholder: String = ""
+    var placeholder: String = AppValue.empty
     var description: String? = nil
     var leftIcon: String? = nil
     var rightIcon: String? = nil
@@ -23,7 +23,7 @@ struct AppTextField: View {
     @FocusState private var isFocused: Bool
 
     private var isPasswordInput: Bool {
-        rightIcon == "eye"
+        rightIcon == AppIcon.eye
     }
 
     // Colors based on the state (error, disabled, normal)
@@ -64,7 +64,7 @@ struct AppTextField: View {
                     .foregroundColor(textColor)
                 Spacer().frame(width: 2)
                 if isRequired {
-                    Text("*")
+                    Text(AppValue.required)
                         .foregroundColor(AppColors.red500)
                 }
             }
@@ -114,11 +114,11 @@ struct AppTextField: View {
                         }
                 }
 
-                if rightIcon == "eye" {
+                if rightIcon == AppIcon.eye {
                     Button(action: {
                         isPasswordVisible.toggle()
                     }) {
-                        Image(systemName: isPasswordVisible ? "eye.slash" : "eye")
+                        Image(systemName: isPasswordVisible ? AppIcon.eyeSlash : AppIcon.eye)
                             .foregroundColor(iconColor)
                             .padding(.trailing, 12)
                     }
@@ -138,7 +138,7 @@ struct AppTextField: View {
             Spacer().frame(height: 8)
 
             // Description or error message
-            if let description = description, description != "" {
+            if let description = description, description != AppValue.empty {
                 Text(description)
                     .font(AppTypography.p3)
                     .foregroundColor(isError ? AppColors.red500 : AppColors.slate600)

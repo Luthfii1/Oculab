@@ -17,11 +17,11 @@ struct UserManagementView: View {
                 if presenter.showDeleteConfirmationPopup {
                     AppPopup(
                         image: AppImage.confirm,
-                        title: "\(AppTextUserMgmtView.deleteAccountTitle) \(presenter.userToDelete?.name ?? AppValue.empty)?",
+                        title: AppData.makeSentence([AppTextUserMgmtView.deleteAccountTitle, presenter.userToDelete?.name ?? AppValue.empty]),
                         description: AppTextUserMgmtView.deleteAccountDescription,
                         buttons: [
                             AppButton(
-                                title: AppAction.delete("Akun"),
+                                title: AppTextUserMgmtView.deleteAccountTitle,
                                 colorType: .destructive(.primary),
                                 isEnabled: !presenter.isDeleting
                             ) {
@@ -44,7 +44,7 @@ struct UserManagementView: View {
                 if presenter.showDeleteSuccessAlert {
                     AppPopup(
                         image: AppImage.success,
-                        title: AppState.success("Menghapus Akun"),
+                        title: AppTextUserMgmtView.successDeleteAccount,
                         description: presenter.deletionSuccess?.message ?? AppTextUserMgmtView.deleteSuccessDescription,
                         buttons: [
                             AppButton(
@@ -73,7 +73,7 @@ struct UserManagementView: View {
                         )
 
                         AppButton(
-                            title: AppAction.add("Akun Baru"),
+                            title: AppTextUserMgmtView.addNewAccount,
                             leftIcon: AppIcon.add,
                             colorType: .secondary,
                             action: {
@@ -133,7 +133,7 @@ struct UserManagementView: View {
                     BottomSheetMenu(presenter: presenter)
                 }
                 .alert(
-                    AppState.failed("Menghapus"),
+                    AppTextUserMgmtView.failedDeleteAccount,
                     isPresented: Binding(
                         get: { presenter.deletionError != nil },
                         set: { if !$0 { presenter.deletionError = nil } }
@@ -158,7 +158,7 @@ struct UserManagementView: View {
     }
 }
 
-#Preview {
-    UserManagementView()
-        .environmentObject(DependencyInjection.shared.createAccountPresenter())
-}
+//#Preview {
+//    UserManagementView()
+//        .environmentObject(DependencyInjection.shared.createAccountPresenter())
+//}

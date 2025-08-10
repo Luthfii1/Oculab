@@ -23,7 +23,6 @@ struct FullScreenVideoPlayerView: View {
             }
             .edgesIgnoringSafeArea(.all)
             
-            // Tombol "Close"
             Button(action: onClose) {
                 Image(systemName: AppIcon.close)
                     .resizable()

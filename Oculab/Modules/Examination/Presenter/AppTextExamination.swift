@@ -8,6 +8,7 @@
 import Foundation
 
 // MARK: Examination Module Texts
+typealias AppTextExam = AppText.Examination
 typealias AppTextExamProgress = AppText.Examination.ProgressView
 typealias AppTextExamDetail = AppText.Examination.DetailViews
 typealias AppTextExamGuidelines = AppText.Examination.GuidelinesOnboardingView
@@ -21,10 +22,17 @@ typealias AppTextExamCompFolderCard = AppText.Examination.FolderCardComponent
 
 extension AppText {
     enum Examination {
+        static let titleResultImages = "Hasil Gambar"
+        static let titleResultInterpretation = "Hasil Interpretasi"
+        static let buttonStartAnalysis = "Mulai Analisis"
+        static let buttonSubmitting = "Mengirimkan..."
+
         enum ProgressView {
             static let loadingAnimationName = "loadingPaperplane"
             static let analyzingTitle = "Menginterpretasikan data"
             static let refreshInstruction = "Tarik ke bawah untuk memuat ulang"
+            static let buttonSaveResult = "Simpan Hasil Pemeriksaan"
+            static let buttonVerifyAllFOVs = "Verikasi Semua Lapang Pandang"
         }
         
         enum DetailViews {
@@ -38,6 +46,9 @@ extension AppText {
             static let hasilPemeriksaanStep = "Hasil Pemeriksaan"
             static let slideDetailTitle = "Detail Sediaan"
             static let slideImageTitle = "Gambar Sediaan"
+
+            static let titlePatientDataCard = "Data Pasien"
+            static let buttonViewPDF = AppAction.view("PDF")
         }
         
         enum GuidelinesOnboardingView {
@@ -70,12 +81,17 @@ extension AppText {
         
         enum SavedResultView {
             static let systemInterpretationWarning = "Interpretasi sistem bukan merupakan hasil akhir untuk pasien"
+            static let titlePatientDataCard = "Data Pasien"
+            static let titleDetailsExamCard = AppData.withPrefix("Detail", "Pemeriksaan")
+            static let actionViewPdf = AppAction.view("PDF")
         }
         
         enum ConfirmationPopupsComponent {
             static let unfinishedExaminationTitle = "Pemeriksaan Belum Selesai"
             static let unfinishedExaminationDescription = "Pemeriksaan disimpan sebagai draft dan dapat diakses di halaman riwayat"
             static let saveResultDescription = "Hasil pemeriksaan yang sudah disimpan tidak dapat diubah kembali"
+            static let reviewAgainButton = "Periksa Kembali"
+            static let saveResultButton = AppAction.save("Hasil Pemeriksaan")
         }
         
         enum ImageSectionComponent {

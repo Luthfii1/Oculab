@@ -66,6 +66,7 @@ extension AppText {
             // Signature Section
             static let labOfficerSignatureTitle = "Petugas Lab"
             static let supervisingDoctorSignatureTitle = "Dokter PJ Pemeriksaan Lab"
+            static let generatedPDFFileName = "GeneratedPDF.pdf"
         }
         
         enum FOVAlbumView {

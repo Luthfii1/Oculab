@@ -23,6 +23,7 @@ extension AppText {
         
         enum ListView {
             static let navigationTitle = "Daftar Pasien"
+            static let buttonCreatePatient = AppAction.add("Pasien Baru")
         }
         
         enum DetailView {
@@ -33,10 +34,13 @@ extension AppText {
             static let loadingExaminationsMessage = AppState.loading("pemeriksaan")
             static let noExaminationsMessage = AppState.noData("pemeriksaan")
             static let notDeterminedMessage = AppState.notDetermined("pemeriksaan")
+            static let buttonCreateExamination = AppAction.create("Pemeriksaan")
         }
         
         enum PatientCardComponent {
             static let birthDatePrefix = "Tanggal Lahir: "
+            static let buttonCreatePatient = AppAction.add("Pasien Baru")
+            static let buttonSavePatient = AppAction.save("Data Pasien")
         }
         
         enum PatientFormFieldComponent {

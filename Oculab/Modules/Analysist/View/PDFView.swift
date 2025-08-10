@@ -71,7 +71,7 @@ struct PDFPageView: View {
                 labels: [AppPatient.nik, AppPatient.age, AppPatient.gender, AppPatient.bpjsNumber],
                 values: [
                     presenter.data?.patientPDFData.nik ?? AppValue.empty,
-                    "\(presenter.data?.patientPDFData.age ?? 0)\(AppPatient.ageSuffix)",
+                    AppData.makeSentence([(presenter.data?.patientPDFData.age ?? Int(0)), AppPatient.ageSuffix]),
                     presenter.data?.patientPDFData.sex ?? AppValue.empty,
                     presenter.data?.patientPDFData.bpjs ?? AppValue.empty
                 ],
@@ -382,7 +382,7 @@ struct PDFPageView: View {
     func savePDF() {
         let pdfData = generatePDF()
         if let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
-            let documentURL = documentDirectory.appendingPathComponent("GeneratedPDF.pdf")
+            let documentURL = documentDirectory.appendingPathComponent(AppTextAnalysisPDF.generatedPDFFileName)
             do {
                 try pdfData.write(to: documentURL)
                 print("PDF saved at: \(documentURL)")

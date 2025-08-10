@@ -10,7 +10,7 @@ import SwiftUI
 struct DateField: View {
     var title: String
     var isRequired: Bool = false
-    var placeholder: String = ""
+    var placeholder: String = AppValue.empty
     var description: String? = nil
     var leftIcon: String? = nil
     var rightIcon: String? = nil

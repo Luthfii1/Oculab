@@ -28,7 +28,7 @@ struct PatientListView: View {
                 )
 
                 AppButton(
-                    title: AppAction.add("Pasien Baru"),
+                    title: AppTextPatientList.buttonCreatePatient,
                     leftIcon: AppIcon.add,
                     colorType: .secondary,
                     action: {
@@ -72,7 +72,7 @@ struct PatientListView: View {
                                 } label: {
                                     PatientCard(
                                         name: nameWithDoB.components(separatedBy: " (").first ?? AppValue.empty,
-                                        birthDate: nameWithDoB.components(separatedBy: " (").last?.replacingOccurrences(of: ")", with: "") ?? AppValue.empty
+                                        birthDate: nameWithDoB.components(separatedBy: " (").last?.replacingOccurrences(of: ")", with: AppValue.empty) ?? AppValue.empty
                                     )
                                 }
                             }

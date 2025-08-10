@@ -54,9 +54,9 @@ class Patient: Encodable, Decodable, Identifiable {
 
         let dateFormatter = ISO8601DateFormatter()
         dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        let dateString = try container.decodeIfPresent(String.self, forKey: .DoB) ?? ""
+        let dateString = try container.decodeIfPresent(String.self, forKey: .DoB) ?? AppValue.empty
 
-        if dateString != "" {
+        if dateString != AppValue.empty {
             guard let date = dateFormatter.date(from: dateString) else {
                 throw DecodingError.dataCorruptedError(
                     forKey: .DoB,

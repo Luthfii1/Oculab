@@ -20,6 +20,7 @@ typealias AppNav = AppText.Navigation
 typealias AppData = AppText.Data
 typealias AppIcon = AppText.SystemIcon
 typealias AppImage = AppText.AppIcon
+typealias AppFeature = AppText.Feature
 
 enum AppText {
     // MARK: - Core System Icons (Reusable across all modules)
@@ -28,6 +29,7 @@ enum AppText {
         static let forward = "chevron.right"
         static let up = "chevron.up"
         static let down = "chevron.down"
+        static let backCircle = "chevron.backward.circle"
         static let close = "xmark"
         static let add = "plus"
         static let edit = "pencil"
@@ -36,8 +38,10 @@ enum AppText {
         static let settings = "gearshape"
         static let info = "info.circle"
         static let warning = "exclamationmark.triangle.fill"
+        static let alert = "exclamationmark.circle.fill"
         static let success = "checkmark.circle.fill"
         static let error = "xmark.circle.fill"
+        static let circleFill = "circle.fill"
         static let camera = "camera"
         static let cameraFill = "camera.fill"
         static let photo = "photo"
@@ -48,10 +52,12 @@ enum AppText {
         static let calendar = "calendar"
         static let ellipsis = "ellipsis"
         static let eye = "eye"
+        static let eyeSlash = "eye.slash"
         static let faceId = "faceid"
         static let checkmark = "checkmark"
         static let personFill = "person.fill"
         static let arrowRight = "arrow.right"
+        static let arrowForward = "arrow.forward"
         static let lock = "lock"
         static let lockCircleDotted = "lock.circle.dotted"
         static let lockShield = "lock.shield"
@@ -66,6 +72,14 @@ enum AppText {
         static let rectangleStackFill = "rectangle.stack.fill"
         static let trayFullFill = "tray.full.fill"
         static let preparationSection = "list.number"
+        static let rectangleSplit2x2Fill = "rectangle.split.2x2.fill"
+        static let clockArrowCirclepath = "clock.arrow.circlepath"
+        static let clockFill = "clock.fill"
+        static let personCircle = "person.circle"
+        static let squareAndPencil = "square.and.pencil"
+        static let circle = "circle"
+        static let largecircleFillCircle = "largecircle.fill.circle"
+        static let buttonProgrammable = "button.programmable"
     }
     
     // MARK: - App Specific Icons
@@ -85,6 +99,7 @@ enum AppText {
         static let back = "back"
         static let success = "Success"
         static let robot = "robot"
+        static let instruction = "Instruction"
     }
     
     // MARK: - Universal Actions (Used across all modules)
@@ -103,6 +118,7 @@ enum AppText {
         static let retry = "Coba Lagi"
         static let refresh = "Refresh"
         static let confirm = "Konfirmasi"
+        static let search = "Cari"
         
         // Common button patterns
         static let saveChanges = "Simpan Perubahan"
@@ -116,8 +132,8 @@ enum AppText {
             return "Simpan \(itemType)"
         }
         
-        static func add(_ itemType: String) -> String {
-            return "Tambah \(itemType)"
+        static func add(_ itemType: String?) -> String {
+            return "Tambah \(String(describing: itemType))"
         }
         
         static func edit(_ itemType: String) -> String {
@@ -142,6 +158,10 @@ enum AppText {
         
         static func create(_ itemType: String) -> String {
             return "Buat \(itemType)"
+        }
+        
+        static func disable(_ itemType: String) -> String {
+            return "Nonaktifkan \(itemType)"
         }
     }
     
@@ -226,6 +246,7 @@ enum AppText {
         enum Gender {
             static let male = "Laki-laki"
             static let female = "Perempuan"
+            static let other = "Lainnya"
         }
         
         enum Placeholder {
@@ -238,6 +259,8 @@ enum AppText {
     
     // MARK: - Medical Terms (Reusable across examination modules)
     enum Medical {
+        static let patient = "Pasien"
+        
         enum BTA {
             static let negative = "Negatif"
             static let scanty = "Scanty"
@@ -268,6 +291,10 @@ enum AppText {
             static let microscopicInterpretation = "Interpretasi Mikroskopis"
             static let bacteriaCountSuffix = " BTA"
             static let confidenceLevel = "Tingkat Keyakinan"
+            static let goalScreening = "Skrining"
+            static let goalFollowUp = "Follow Up"
+            static let preparationTypeAnytime = "Sewaktu"
+            static let preparationTypeMorning = "Pagi"
         }
         
         enum Confidence {
@@ -282,8 +309,9 @@ enum AppText {
     
     // MARK: - Search & Filter (Reusable components)
     enum Search {
+        static let search = "Cari"
         static let placeholder = "Cari..."
-        static let noResults = "Tidak ada hasil untuk"
+        static let noResults = "Tidak ada data yang sesuai"
         static let clearSearch = "Hapus Pencarian"
         static let searching = "Mencari..."
         
@@ -298,6 +326,10 @@ enum AppText {
         static func noResults(_ searchTerm: String) -> String {
             return "Tidak ada hasil untuk \(searchTerm)"
         }
+        
+        static func resultFor(_ itemType: String) -> String {
+            return "\"\(itemType)\""
+        }
     }
     
     // MARK: - Forms (Reusable form elements)
@@ -305,6 +337,7 @@ enum AppText {
         static let optional = "(opsional)"
         static let selectOption = "Pilih opsi"
         static let enterValue = "Masukkan nilai"
+        static let disable = "Nonaktifkan"
         
         enum Validation {
             static let required = "Field ini wajib diisi"
@@ -377,5 +410,23 @@ enum AppText {
         static func withPrefix(_ prefix: String, _ content: String) -> String {
             return "\(prefix) \(content)"
         }
+        
+        static func makeSentence<T>(_ words: [T]) -> String {
+            guard !words.isEmpty else {
+                return ""
+            }
+            
+            var sentence = String(describing: words[0])
+            
+            for word in words.dropFirst() {
+                sentence += ", \(String(describing: word))"
+            }
+            
+            return sentence
+        }
+    }
+    
+    enum Feature {
+        static let radioButton = "Tombol Pilihan Radio"
     }
 }

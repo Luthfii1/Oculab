@@ -29,10 +29,9 @@ struct StatisticComponent: View {
                         .offset(y: 35)
                     // TODO: Create func to create sentence
                     VStack(alignment: .leading, spacing: Decimal.d4) {
-                        Text("\(presenter.statisticExam.totalFinished ?? 0) \(AppTextHomeHistCompStatistic.tasksCompletedSuffix)").font(AppTypography.h4_1)
+                        Text(AppData.makeSentence([presenter.statisticExam.totalFinished ?? 0, AppTextHomeHistCompStatistic.tasksCompletedSuffix])).font(AppTypography.h4_1)
                         Text(
-                            "\(AppTextHomeHistCompStatistic.fromTasksPrefix) \((presenter.statisticExam.totalFinished ?? 0) + (presenter.statisticExam.totalNotFinished ?? 0)) \(AppTextHomeHistCompStatistic.tasksInTotalSuffix)"
-
+                            AppData.makeSentence([AppTextHomeHistCompStatistic.fromTasksPrefix, (presenter.statisticExam.totalFinished ?? 0) + (presenter.statisticExam.totalNotFinished ?? 0), AppTextHomeHistCompStatistic.tasksInTotalSuffix])
                         )
                         .font(AppTypography.p3).foregroundStyle(AppColors.slate300)
                     }

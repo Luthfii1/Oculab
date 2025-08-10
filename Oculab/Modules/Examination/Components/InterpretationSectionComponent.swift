@@ -23,7 +23,7 @@ struct InterpretationSectionComponent: View {
             HStack {
                 Image(systemName: AppIcon.photo)
                     .foregroundColor(AppColors.purple500)
-                Text("Hasil Interpretasi")
+                Text(AppTextExam.titleResultInterpretation)
                     .font(AppTypography.s4_1)
                     .padding(.leading, Decimal.d8)
                 Spacer()

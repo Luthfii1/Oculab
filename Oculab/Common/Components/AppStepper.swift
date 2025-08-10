@@ -23,7 +23,7 @@ struct AppStepper: View {
                                     .fill(AppColors.purple500)
                                     .frame(width: 20, height: 20)
 
-                                Image(systemName: "checkmark")
+                                Image(systemName: AppIcon.checkmark)
                                     .resizable()
                                     .frame(width: 10, height: 10)
                                     .foregroundColor(AppColors.slate0)
@@ -31,7 +31,7 @@ struct AppStepper: View {
                         }
 
                         else if step == currentStep {
-                            Text("\(step + 1)")
+                            Text(String(step + 1))
                                 .font(AppTypography.s6)
                                 .foregroundColor(AppColors.purple500)
                                 .frame(width: 20, height: 20)
@@ -42,7 +42,7 @@ struct AppStepper: View {
                         }
 
                         else {
-                            Text("\(step + 1)")
+                            Text(String(step + 1))
                                 .font(AppTypography.s6)
                                 .foregroundColor(AppColors.slate100)
                                 .frame(width: 20, height: 20)

@@ -54,10 +54,10 @@ struct FinishedExaminationCard: View {
                     .cornerRadius(Decimal.d6)
             }
             
-            Text("Pasien")
+            Text(AppMedical.patient)
                 .font(AppTypography.s6)
                 .foregroundStyle(AppColors.slate300)
-            Text("\(patientName) (\(patientDOB))")
+            Text(AppData.makeSentence([patientName, patientDOB]))
                 .font(AppTypography.p3)
                 .foregroundStyle(AppColors.slate900)
             

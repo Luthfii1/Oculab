@@ -15,7 +15,7 @@ struct StatusTagComponent: View {
         case .INPROGRESS:
             VStack(alignment: .leading) {
                 HStack(spacing: Decimal.d8) {
-                    Image(systemName: "clock.fill").resizable()
+                    Image(systemName: AppIcon.clockFill).resizable()
                         .frame(width: Decimal.d12 + Decimal.d6, height: Decimal.d12 + Decimal.d6)
                         .foregroundStyle(AppColors.orange500)
                     Text(StatusType.INPROGRESS.description)
@@ -31,7 +31,7 @@ struct StatusTagComponent: View {
         case .FINISHED:
             VStack(alignment: .leading) {
                 HStack(spacing: Decimal.d8) {
-                    Image(systemName: "checkmark.circle.fill").resizable()
+                    Image(systemName: AppIcon.success).resizable()
                         .frame(width: Decimal.d12 + Decimal.d6, height: Decimal.d12 + Decimal.d6)
                         .foregroundStyle(AppColors.green500)
                     Text(StatusType.FINISHED.description)
@@ -47,7 +47,7 @@ struct StatusTagComponent: View {
         case .NEEDVALIDATION:
             VStack(alignment: .leading) {
                 HStack(spacing: Decimal.d8) {
-                    Image(systemName: "clock.fill").resizable()
+                    Image(systemName: AppIcon.clockFill).resizable()
                         .frame(width: Decimal.d12 + Decimal.d6, height: Decimal.d12 + Decimal.d6)
                         .foregroundStyle(AppColors.orange500)
                     Text(StatusType.NEEDVALIDATION.description)
@@ -66,7 +66,7 @@ struct StatusTagComponent: View {
         case .NOTSTARTED:
             VStack(alignment: .leading) {
                 HStack(spacing: Decimal.d8) {
-                    Image(systemName: "exclamationmark.circle.fill").resizable()
+                    Image(systemName: AppIcon.alert).resizable()
                         .frame(width: Decimal.d12 + Decimal.d6, height: Decimal.d12 + Decimal.d6)
                         .foregroundStyle(AppColors.red500)
                     Text(StatusType.NOTSTARTED.description)
@@ -83,12 +83,6 @@ struct StatusTagComponent: View {
 }
 
 #Preview {
-    // case INPROGRESS = "Sedang dianalisa sistem"
-    // case NEEDVALIDATION = "Sedang Berlangsung"
-    // case NOTSTARTED = "Belum Dimulai"
-    // case FINISHED = "Selesai"
-    // case NONE = ""
-
     StatusTagComponent(
         type: .FINISHED
     )

@@ -15,11 +15,15 @@ struct InstructionRecordView: View {
             ScrollView {
                 Spacer().frame(height: Decimal.d12)
                 VStack(spacing: Decimal.d24) {
-                    AppCard(icon: AppIcon.preparationSection, title: AppTextVideoRecordInstruction.preparationSectionTitle, spacing: Decimal.d16) {
+                    AppCard(
+                        icon: AppIcon.preparationSection,
+                        title: AppTextVideoRecordInstruction.preparationSectionTitle,
+                        spacing: Decimal.d16
+                    ) {
                         VStack(alignment: .leading, spacing: Decimal.d16) {
                             ForEach(videoRecordPresenter.preRecordingInstructions, id: \.self) { instruction in
                                 HStack(alignment: .top) {
-                                    Text("•")
+                                    Text(AppValue.bullet)
                                     Text(instruction)
                                 }
                             }
@@ -28,14 +32,18 @@ struct InstructionRecordView: View {
                         .font(AppTypography.p3)
                     }
 
-                    AppCard(icon: AppIcon.cameraFill, title: AppTextVideoRecordInstruction.recordingSectionTitle, spacing: Decimal.d16) {
+                    AppCard(
+                        icon: AppIcon.cameraFill,
+                        title: AppTextVideoRecordInstruction.recordingSectionTitle,
+                        spacing: Decimal.d16
+                    ) {
                         VStack(spacing: Decimal.d16) {
                             ForEach(videoRecordPresenter.duringRecordingInstructions.indices, id: \.self) { index in
                                 if index == 2 {
-                                    Image("Instruction")
+                                    Image(AppImage.instruction)
                                 }
                                 HStack(alignment: .top) {
-                                    Text("•")
+                                    Text(AppValue.bullet)
                                     Text(videoRecordPresenter.duringRecordingInstructions[index])
                                 }
                             }
@@ -64,7 +72,7 @@ struct InstructionRecordView: View {
                         Router.shared.navigateBack()
                     }) {
                         HStack {
-                            Image("back")
+                            Image(AppIcon.back)
                         }
                     }
                 }
@@ -74,6 +82,6 @@ struct InstructionRecordView: View {
     }
 }
 
-#Preview {
-    InstructionRecordView()
-}
+//#Preview {
+//    InstructionRecordView()
+//}

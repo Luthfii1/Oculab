@@ -9,13 +9,13 @@ import SwiftUI
 
 struct AppTextBox: View {
     var title: String
-    var placeholder: String = ""
+    var placeholder: String = AppValue.empty
     var isRequired: Bool = false
     var description: String? = nil
     var isDisabled: Bool = false
     @Binding var text: String
 
-    @State private var internalText: String = ""
+    @State private var internalText: String = AppValue.empty 
 
     // Colors based on the state (disabled or normal)
     private var textColor: Color {
@@ -38,7 +38,7 @@ struct AppTextBox: View {
                     .font(AppTypography.s4_1)
                     .foregroundColor(textColor)
                 if isRequired {
-                    Text("*")
+                    Text(AppValue.required)
                         .foregroundColor(AppColors.red500)
                 }
             }

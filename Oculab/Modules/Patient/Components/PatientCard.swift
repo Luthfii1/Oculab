@@ -30,8 +30,8 @@ import SwiftUI
                     .font(AppTypography.s4_1)
                     .foregroundColor(AppColors.slate900)
                     .lineLimit(2)
-                
-                Text("\(AppTextPatientCompCard.birthDatePrefix)\(birthDate)")
+
+                Text(AppData.makeSentence([AppTextPatientCompCard.birthDatePrefix, birthDate]))
                     .font(AppTypography.p4)
                     .foregroundColor(AppColors.slate900)
             }

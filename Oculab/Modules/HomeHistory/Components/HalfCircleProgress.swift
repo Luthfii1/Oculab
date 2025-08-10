@@ -29,7 +29,7 @@ struct HalfCircleProgress: View {
 
                 // Text Display
                 VStack {
-                    Text("\(Int(progress * 100))\(AppValue.percentage)") // TODO: Create func to create sentence
+                    Text(AppData.makeSentence([Int(progress * 100), AppValue.percentage]))
                         .foregroundStyle(AppColors.slate900)
                         .font(AppTypography.h6)
 

@@ -18,14 +18,14 @@ class AccountPresenter: ObservableObject {
 
     @Published var isUserLoading = false
     
-    @Published var name = ""
-    @Published var role: String = ""
-    @Published var userId: String = ""
-    @Published var email: String = "" {
+    @Published var name = AppValue.empty
+    @Published var role: String = AppValue.empty
+    @Published var userId: String = AppValue.empty
+    @Published var email: String = AppValue.empty {
         didSet {
             if !validateEmail(email) {
                 isError = true
-                editError = "Format email tidak valid"
+                editError = AppTextUserMgmtView.invalidEmailFormat
             } else {
                 editError = nil
                 isError = false
@@ -35,7 +35,7 @@ class AccountPresenter: ObservableObject {
     
     @Published var isRegistering = false
     @Published var registrationError: String? = nil
-    @Published var registrationSuccess: (name: String, role: String) = ("", "")
+    @Published var registrationSuccess: (name: String, role: String) = (AppValue.empty, AppValue.empty)
     @Published var showSuccessPopup = false
     
     @Published var isDeleting = false
@@ -48,17 +48,17 @@ class AccountPresenter: ObservableObject {
     @Published var isEditing = false
     @Published var editError: String? = nil
     @Published var isError = false
-    @Published var editSuccess: (name: String, role: String) = ("", "")
+    @Published var editSuccess: (name: String, role: String) = (AppValue.empty, AppValue.empty)
     private var debounceTime: TimeInterval = 0.3
 
-    @Published var searchText: String = "" {
+    @Published var searchText: String = AppValue.empty {
         didSet {
             // Cancel any existing timer
             searchTimer?.invalidate()
             
             // Create a new timer
             searchTimer = Timer.scheduledTimer(withTimeInterval: debounceTime, repeats: false) { [weak self] _ in
-                self?.searchAccounts(query: self?.searchText ?? "")
+                self?.searchAccounts(query: self?.searchText ?? AppValue.empty)
             }
         }
     }
@@ -194,7 +194,7 @@ class AccountPresenter: ObservableObject {
     }
     
     func clearSearch() {
-        searchText = ""
+        searchText = AppValue.empty
         filteredGroupedAccounts = [:]
         filteredSortedGroupedAccounts = []
     }
@@ -224,12 +224,12 @@ class AccountPresenter: ObservableObject {
                     await fetchAllAccount()
                 }
             } else {
-                registrationError = "Failed to register account: No response from server"
+                registrationError = AppTextUserMgmtView.failedRegistration
             }
             
-            self.name = ""
-            self.role = ""
-            self.email = ""
+            self.name = AppValue.empty
+            self.role = AppValue.empty
+            self.email = AppValue.empty
             
         } catch {
             switch error {
@@ -325,8 +325,8 @@ class AccountPresenter: ObservableObject {
         
         do {
             let result = try await interactor.deleteAccount(userId: userId)
-            
-            deletionSuccess = (userName: result.name, message: "\(result.name) telah berhasil dihapus.")
+
+            deletionSuccess = (userName: result.name, message: AppTextUserMgmtView.successDeleteAccount(result.name))
             clearSelection()
             
             await fetchAllAccount()
@@ -408,8 +408,8 @@ class AccountPresenter: ObservableObject {
         
         do {
             let result = try await interactor.deleteAccount(userId: userToDelete.id)
-            
-            deletionSuccess = (userName: result.name, message: "\(result.name) telah berhasil dihapus.")
+
+            deletionSuccess = (userName: result.name, message: AppTextUserMgmtView.successDeleteAccount(result.name))
             clearSelection()
             
             await fetchAllAccount()

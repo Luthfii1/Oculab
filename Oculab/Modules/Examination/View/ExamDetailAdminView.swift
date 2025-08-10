@@ -22,7 +22,7 @@ struct ExamDetailAdminView: View {
                 VStack(alignment: .leading, spacing: Decimal.d24) {
                     ExtendableCard(
                         icon: AppIcon.personFill,
-                        title: "Data Pasien",
+                        title: AppTextExamDetail.titlePatientDataCard,
                         isExtendable: true,
                         data: [
                             (key: AppPatient.name, value: presenter.patientDetailData.name),
@@ -106,7 +106,7 @@ struct ExamDetailAdminView: View {
                     }
                     VStack(spacing: Decimal.d16) {
                         AppButton(
-                            title: AppAction.view("PDF"),
+                            title: AppTextExamDetail.buttonViewPDF,
                             rightIcon: AppIcon.document,
                             colorType: .secondary,
                             size: .small,

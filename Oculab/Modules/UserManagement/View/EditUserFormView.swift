@@ -18,11 +18,11 @@ struct EditUserFormView: View {
                 if presenter.showSuccessPopup {
                     AppPopup(
                         image: AppImage.success,
-                        title: AppState.success("mengubah Akun"),
-                        description: "\(AppTextUserMgmtEditUserForm.successDescriptionPrefix) \(presenter.editSuccess.name) \(AppTextUserMgmtEditUserForm.successDescriptionSuffix) \(presenter.editSuccess.role)",
+                        title: AppTextUserMgmtEditUserForm.successUpdateAccount,
+                        description: AppData.makeSentence([AppTextUserMgmtEditUserForm.successDescriptionPrefix, presenter.editSuccess.name, AppTextUserMgmtEditUserForm.successDescriptionSuffix, presenter.editSuccess.role]),
                         buttons: [
                             AppButton(
-                                title: AppAction.backTo("Daftar Akun"),
+                                title: AppTextUserMgmt.backToAccountList,
                                 colorType: .secondary,
                                 size: .large,
                                 isEnabled: true,
@@ -129,7 +129,7 @@ struct EditUserFormView: View {
         .dismissKeyboardOnTap()
         // Error alert
         .alert(
-            AppState.failed("Mengubah"),
+            AppTextUserMgmtEditUserForm.failedUpdateAccount,
             isPresented: Binding(
                 get: { presenter.editError != nil },
                 set: { if !$0 { presenter.editError = nil } }
