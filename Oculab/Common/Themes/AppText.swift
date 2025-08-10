@@ -100,6 +100,8 @@ enum AppText {
         static let success = "Success"
         static let robot = "robot"
         static let instruction = "Instruction"
+        static let logoSplashScreen = "LogoSplashScreen"
+        static let login = "LoginImage"
     }
     
     // MARK: - Universal Actions (Used across all modules)

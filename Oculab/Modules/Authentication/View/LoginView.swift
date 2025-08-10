@@ -15,7 +15,7 @@ struct LoginView: View {
         NavigationView {
             VStack {
                 if !presenter.isKeyboardVisible {
-                    Image(.login)
+                    Image(AppImage.login)
                         .resizable()
                         .scaledToFit()
                         .transition(.opacity)
