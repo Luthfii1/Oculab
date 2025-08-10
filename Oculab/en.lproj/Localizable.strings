@@ -378,3 +378,32 @@
 
 // Header View Component
 "examination.header.new_examination_title" = "New Examination";
+
+// MARK: - HomeHistory Module
+// Main HomeHistory
+"home_history.no_examination_message" = "No examinations completed on";
+"home_history.navigation_title_home" = "Examination Tasks";
+"home_history.navigation_title_history" = "Examination History";
+"home_history.task_section_title" = "Examination Tasks";
+"home_history.new_examination_button" = "New Examination";
+"home_history.no_task_message" = "You have not been assigned to perform examinations";
+"home_history.examination_data" = "your examination data";
+
+// Finished Examination Card Component
+"home_history.finished_card.dpjp_label" = "DPJP";
+"home_history.finished_card.positive_keyword" = "positive";
+"home_history.finished_card.positive_alt_keyword" = "positive";
+
+// Statistic Component
+"home_history.statistic.title" = "Examination Statistics";
+"home_history.statistic.tasks_completed_suffix" = "Tasks Completed";
+"home_history.statistic.from_tasks_prefix" = "of";
+"home_history.statistic.tasks_total_suffix" = "Tasks";
+"home_history.statistic.positive_label" = "Positive";
+"home_history.statistic.negative_label" = "Negative";
+
+// Weekly Calendar Component
+"home_history.weekly_calendar.title" = "Examinations Completed";
+
+// Home Activity Component
+"home_history.home_activity.officer_label" = "Examination Officer";

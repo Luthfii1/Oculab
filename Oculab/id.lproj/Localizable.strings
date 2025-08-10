@@ -396,3 +396,32 @@
 
 // Header View Component
 "examination.header.new_examination_title" = "Pemeriksaan Baru";
+
+// MARK: - HomeHistory Module
+// Main HomeHistory
+"home_history.no_examination_message" = "Tidak ada pemeriksaan diselesaikan pada";
+"home_history.navigation_title_home" = "Tugas Pemeriksaan";
+"home_history.navigation_title_history" = "Riwayat Pemeriksaan";
+"home_history.task_section_title" = "Tugas Pemeriksaan";
+"home_history.new_examination_button" = "Pemeriksaan Baru";
+"home_history.no_task_message" = "Anda belum ditugaskan untuk melakukan pemeriksaan";
+"home_history.examination_data" = "data pemeriksaan anda";
+
+// Finished Examination Card Component
+"home_history.finished_card.dpjp_label" = "DPJP";
+"home_history.finished_card.positive_keyword" = "positif";
+"home_history.finished_card.positive_alt_keyword" = "positif";
+
+// Statistic Component
+"home_history.statistic.title" = "Statistik Pemeriksaan";
+"home_history.statistic.tasks_completed_suffix" = "Tugas Selesai";
+"home_history.statistic.from_tasks_prefix" = "dari";
+"home_history.statistic.tasks_total_suffix" = "Tugas";
+"home_history.statistic.positive_label" = "Positif";
+"home_history.statistic.negative_label" = "Negatif";
+
+// Weekly Calendar Component
+"home_history.weekly_calendar.title" = "Pemeriksaan Selesai";
+
+// Home Activity Component
+"home_history.home_activity.officer_label" = "Petugas Pemeriksaan";

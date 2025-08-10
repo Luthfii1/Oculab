@@ -18,37 +18,37 @@ typealias AppTextHomeHistCompHalfCircleProgress = AppText.HomeHistory.HalfCircle
 
 extension AppText {
     enum HomeHistory {
-        static let noExaminationMessage = "Tidak ada pemeriksaan diselesaikan pada"
+        static let noExaminationMessage = "home_history.no_examination_message".localized
         static let emptyStateImageName = "Empty"
 
-        static let navigationTitleHome = "Tugas Pemeriksaan"
-        static let navigationTitleHistory = "Riwayat Pemeriksaan"
-        static let taskSectionTitle = "Tugas Pemeriksaan"
-        static let newExaminationButton = "Pemeriksaan Baru"
-        static let noTaskMessage = "Anda belum ditugaskan untuk melakukan pemeriksaan"
-        static let loadingState = AppState.loading("data pemeriksaan anda")
+        static let navigationTitleHome = "home_history.navigation_title_home".localized
+        static let navigationTitleHistory = "home_history.navigation_title_history".localized
+        static let taskSectionTitle = "home_history.task_section_title".localized
+        static let newExaminationButton = "home_history.new_examination_button".localized
+        static let noTaskMessage = "home_history.no_task_message".localized
+        static let loadingState = AppState.loading("home_history.examination_data".localized)
 
         enum FinishedExaminationCardComponent {
-            static let dpjpLabel = "DPJP"
-            static let positiveKeyword = "positif"
-            static let positiveAltKeyword = "positif"
+            static let dpjpLabel = "home_history.finished_card.dpjp_label".localized
+            static let positiveKeyword = "home_history.finished_card.positive_keyword".localized
+            static let positiveAltKeyword = "home_history.finished_card.positive_alt_keyword".localized
         }
         
         enum StatisticComponent {
-            static let title = "Statistik Pemeriksaan"
-            static let tasksCompletedSuffix = "Tugas Selesai"
-            static let fromTasksPrefix = "dari"
-            static let tasksInTotalSuffix = "Tugas"
-            static let positiveLabel = "Positif"
-            static let negativeLabel = "Negatif"
+            static let title = "home_history.statistic.title".localized
+            static let tasksCompletedSuffix = "home_history.statistic.tasks_completed_suffix".localized
+            static let fromTasksPrefix = "home_history.statistic.from_tasks_prefix".localized
+            static let tasksInTotalSuffix = "home_history.statistic.tasks_total_suffix".localized
+            static let positiveLabel = "home_history.statistic.positive_label".localized
+            static let negativeLabel = "home_history.statistic.negative_label".localized
         }
         
         enum WeeklyCalendarComponent {
-            static let title = "Pemeriksaan Selesai"
+            static let title = "home_history.weekly_calendar.title".localized
         }
         
         enum HomeActivityComponent {
-            static let examinationOfficerLabel = "Petugas Pemeriksaan"
+            static let examinationOfficerLabel = "home_history.home_activity.officer_label".localized
         }
         
         enum ButtonActivityComponent {
