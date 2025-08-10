@@ -419,7 +419,7 @@ enum AppText {
             var sentence = String(describing: words[0])
             
             for word in words.dropFirst() {
-                sentence += ", \(String(describing: word))"
+                sentence += " \(String(describing: word))"
             }
             
             return sentence
