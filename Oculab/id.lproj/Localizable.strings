@@ -574,3 +574,41 @@
 "video_record.video_input_component.create_video_button" = "Gambar";
 "video_record.video_input_component.view_video_button" = "Video";
 "video_record.video_input_component.video_playback_error_title" = "Memutar Video";
+
+// MARK: - Status Type Enum
+// StatusType Enum
+"status_type.in_progress" = "Sedang Dianalisa Sistem";
+"status_type.need_validation" = "Perlu Validasi";
+"status_type.not_started" = "Belum Dimulai";
+"status_type.finished" = "Selesai";
+"status_type.none" = "Tidak Ada";
+
+// GradingType Enum
+"grading_type.negative" = "Negatif";
+"grading_type.scanty" = "Scanty";
+"grading_type.plus1" = "Positif 1+";
+"grading_type.plus2" = "Positif 2+";
+"grading_type.plus3" = "Positif 3+";
+"grading_type.unknown" = "Unknown";
+
+// GradingType Descriptions
+"grading_type.description.negative" = "Tidak ditemukan BTA dari 100 gambar lapangan pandang";
+"grading_type.description.scanty" = "Ditemukan %@ BTA dari 100 gambar lapangan pandang";
+"grading_type.description.plus1" = "Ditemukan %@ BTA dari 100 gambar lapangan pandang";
+"grading_type.description.plus2" = "Ditemukan 1-9 BTA BTA dari %@ gambar lapangan pandang";
+"grading_type.description.plus3" = "Ditemukan ≥ 10 BTA BTA dari %@ gambar lapangan pandang";
+"grading_type.description.unknown" = "null";
+
+// ConfidenceLevel Enum
+"confidence_level.full_confidence" = "Tidak ada keraguan dari sistem";
+"confidence_level.high_confidence" = "90% - 99%";
+"confidence_level.medium_confidence" = "70% - 89%";
+"confidence_level.low_confidence" = "50% - 69%";
+"confidence_level.very_low_confidence" = "10% - 50%";
+"confidence_level.unpredicted" = "0% - 9%";
+
+// LatestActivityType Enum
+"latest_activity_type.all" = "Semua Pemeriksaan";
+"latest_activity_type.need_verification" = "Butuh Verifikasi";
+"latest_activity_type.not_started" = "Belum Dimulai";
+"latest_activity_type.in_progress" = "Sedang Berlangsung";

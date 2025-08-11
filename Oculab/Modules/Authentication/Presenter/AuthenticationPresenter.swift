@@ -320,6 +320,10 @@ class AuthenticationPresenter: ObservableObject {
     
     // MARK: USER AUTHENTICATION
 
+    func isUserLoggedIn() -> Bool {
+        return UserDefaults.standard.bool(forKey: UserDefaultType.isUserLoggedIn.rawValue)
+    }
+
     @MainActor
     func getAccountById() async {
         do {
@@ -344,25 +348,38 @@ class AuthenticationPresenter: ObservableObject {
             case let NetworkError.apiError(apiResponse):
                 print("Error type: \(apiResponse.data.errorType)")
                 print("Error description: \(apiResponse.data.description)")
+                handleErrorState(isError: true, errorData: apiResponse.data)
 
             case let NetworkError.networkError(message):
                 print("Network error: \(message)")
+                handleErrorState(
+                    isError: true,
+                    errorData: ApiErrorData(errorType: "NETWORK_ERROR", description: message)
+                )
 
             default:
                 print("Unknown error: \(error.localizedDescription)")
+                handleErrorState(
+                    isError: true,
+                    errorData: ApiErrorData(errorType: "AUTHENTICATION_ERROR", description: error.localizedDescription)
+                )
             }
         }
     }
 
     @MainActor
-    func login() async {
+    func login() async -> Bool {
         isLoading = true
         defer { isLoading = false }
 
         do {
             _ = try await interactor.login(email: email, password: password)
             handleErrorState(isError: false)
+            return true
         } catch {
+            // Clear any partial login state on failure
+            clearLoginState()
+            
             switch error {
             case let NetworkError.apiError(apiResponse):
                 handleErrorState(isError: true, errorData: apiResponse.data)
@@ -377,7 +394,15 @@ class AuthenticationPresenter: ObservableObject {
                     errorData: ApiErrorData(errorType: "UNKNOW_ERROR", description: error.localizedDescription)
                 )
             }
+            return false
         }
+    }
+
+    private func clearLoginState() {
+        UserDefaults.standard.removeObject(forKey: UserDefaultType.isUserLoggedIn.rawValue)
+        UserDefaults.standard.removeObject(forKey: UserDefaultType.userId.rawValue)
+        UserDefaults.standard.removeObject(forKey: UserDefaultType.accessToken.rawValue)
+        UserDefaults.standard.removeObject(forKey: UserDefaultType.refreshToken.rawValue)
     }
 
     @MainActor

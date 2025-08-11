@@ -556,3 +556,41 @@
 "video_record.video_input_component.create_video_button" = "Image";
 "video_record.video_input_component.view_video_button" = "Video";
 "video_record.video_input_component.video_playback_error_title" = "Playing Video";
+
+// MARK: - Status Type Enum
+// StatusType Enum
+"status_type.in_progress" = "Analyzing by System"; 
+"status_type.need_validation" = "Need Validation";
+"status_type.not_started" = "Not Started";
+"status_type.finished" = "Finished";
+"status_type.none" = "None";
+
+// GradingType Enum
+"grading_type.negative" = "Negative";
+"grading_type.scanty" = "Scanty";
+"grading_type.plus1" = "Positive 1+";
+"grading_type.plus2" = "Positive 2+";
+"grading_type.plus3" = "Positive 3+";
+"grading_type.unknown" = "Unknown";
+
+// GradingType Descriptions
+"grading_type.description.negative" = "No AFB found from 100 field of view images";
+"grading_type.description.scanty" = "Found %@ AFB from 100 field of view images";
+"grading_type.description.plus1" = "Found %@ AFB from 100 field of view images";
+"grading_type.description.plus2" = "Found 1-9 AFB from %@ field of view images";
+"grading_type.description.plus3" = "Found ≥ 10 AFB from %@ field of view images";
+"grading_type.description.unknown" = "null";
+
+// ConfidenceLevel Enum
+"confidence_level.full_confidence" = "No doubt from the system";
+"confidence_level.high_confidence" = "90% - 99%";
+"confidence_level.medium_confidence" = "70% - 89%";
+"confidence_level.low_confidence" = "50% - 69%";
+"confidence_level.very_low_confidence" = "10% - 50%";
+"confidence_level.unpredicted" = "0% - 9%";
+
+// LatestActivityType Enum
+"latest_activity_type.all" = "All Examinations";
+"latest_activity_type.need_verification" = "Need Verification";
+"latest_activity_type.not_started" = "Not Started";
+"latest_activity_type.in_progress" = "In Progress";

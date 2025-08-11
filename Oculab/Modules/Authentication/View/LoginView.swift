@@ -58,8 +58,10 @@ struct LoginView: View {
                             isEnabled: presenter.isFilled
                         ) {
                             Task {
-                                await presenter.login()
-                                await presenter.getAccountById()
+                                let loginSuccess = await presenter.login()
+                                if loginSuccess {
+                                    await presenter.getAccountById()
+                                }
                             }
                         }
                         HStack {

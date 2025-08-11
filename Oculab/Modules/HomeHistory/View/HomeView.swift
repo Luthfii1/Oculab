@@ -37,7 +37,7 @@ struct HomeView: View {
                             
                             ForEach(activityTypes, id: \.self) { activityType in
                                 ButtonActivity(
-                                    labelButton: activityType.rawValue,
+                                    labelButton: activityType.displayValue,
                                     isSelected: presenter.selectedLatestActivity == activityType,
                                     action: {
                                         Task {

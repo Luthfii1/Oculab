@@ -28,29 +28,29 @@ enum GradingType: String, Codable, CaseIterable {
     
     var displayValue: String {
         switch self {
-        case .NEGATIVE: return "Negatif"
-        case .SCANTY: return "SCANTY"
-        case .Plus1: return "Positif 1+"
-        case .Plus2: return "Positif 2+"
-        case .Plus3: return "Positif 3+"
-        case .unknown: return "Unknown"
+        case .NEGATIVE: return "grading_type.negative".localized
+        case .SCANTY: return "grading_type.scanty".localized
+        case .Plus1: return "grading_type.plus1".localized
+        case .Plus2: return "grading_type.plus2".localized
+        case .Plus3: return "grading_type.plus3".localized
+        case .unknown: return "grading_type.unknown".localized
         }
     }
 
     func description(withValues value: Int) -> String {
         switch self {
         case .NEGATIVE:
-            return "Tidak ditemukan BTA dari 100 gambar lapangan pandang"
+            return "grading_type.description.negative".localized
         case .SCANTY:
-            return "Ditemukan \(value) BTA dari 100 gambar lapangan pandang"
+            return "grading_type.description.scanty".localized(with: "\(value)")
         case .Plus1:
-            return "Ditemukan \(value) BTA dari 100 gambar lapangan pandang"
+            return "grading_type.description.plus1".localized(with: "\(value)")
         case .Plus2:
-            return "Ditemukan 1-9 BTA BTA dari \(value) gambar lapangan pandang"
+            return "grading_type.description.plus2".localized(with: "\(value)")
         case .Plus3:
-            return "Ditemukan ≥ 10 BTA BTA dari \(value) gambar lapangan pandang"
+            return "grading_type.description.plus3".localized(with: "\(value)")
         case .unknown:
-            return "null"
+            return "grading_type.description.unknown".localized
         }
     }
 }

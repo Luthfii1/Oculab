@@ -5,6 +5,8 @@
 //  Created by Risa on 14/10/24.
 //
 
+import Foundation
+
 enum StatusType: String, Codable, CaseIterable {
     case INPROGRESS
     case NEEDVALIDATION
@@ -22,11 +24,11 @@ enum StatusType: String, Codable, CaseIterable {
 extension StatusType {
     var description: String {
         switch self {
-        case .INPROGRESS: return "Sedang Dianalisa Sistem"
-        case .NEEDVALIDATION: return "Butuh Konfirmasi"
-        case .NOTSTARTED: return "Belum Dimulai"
-        case .FINISHED: return "Selesai"
-        case .NONE: return "None"
+        case .INPROGRESS: return "status_type.in_progress".localized
+        case .NEEDVALIDATION: return "status_type.need_validation".localized
+        case .NOTSTARTED: return "status_type.not_started".localized
+        case .FINISHED: return "status_type.finished".localized
+        case .NONE: return "status_type.none".localized
         }
     }
 }

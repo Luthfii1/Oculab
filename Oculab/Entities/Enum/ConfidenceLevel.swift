@@ -16,17 +16,17 @@ enum ConfidenceLevel: String, CaseIterable {
     var confidenceRange: String {
         switch self {
         case .fullConfidence:
-            return "Tidak ada keraguan dari sistem"
+            return "confidence_level.full_confidence".localized
         case .highConfidence:
-            return "90% - 99%"
+            return "confidence_level.high_confidence".localized
         case .mediumConfidence:
-            return "70% - 89%"
+            return "confidence_level.medium_confidence".localized
         case .lowConfidence:
-            return "50% - 69%"
+            return "confidence_level.low_confidence".localized
         case .veryLowConfidence:
-            return "10% - 50%"
+            return "confidence_level.very_low_confidence".localized
         case .unpredicted:
-            return "0% - 9%"
+            return "confidence_level.unpredicted".localized
         }
     }
 
