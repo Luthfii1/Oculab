@@ -50,6 +50,7 @@ class HomeInteractor {
 
         let unfinishedExaminationResponse = response.data.map { exam in
             let dateFormatter = DateFormatter()
+            dateFormatter.locale = Locale.current // Use current locale for localization
             dateFormatter.dateFormat = "dd MMMM yyyy"
             
             var formattedDate = ""
@@ -101,6 +102,7 @@ class HomeInteractor {
 
         let adminExaminationResponse = response.data.map { exam in
             let dateFormatter = DateFormatter()
+            dateFormatter.locale = Locale.current // Use current locale for localization
             dateFormatter.dateFormat = "dd MMMM yyyy"
             
             var formattedDate = ""
