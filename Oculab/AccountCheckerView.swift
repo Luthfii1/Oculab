@@ -37,7 +37,12 @@ struct AccountCheckerView: View {
                 }
             }
             Task {
-                await authPresenter.getAccountById()
+                if authPresenter.isUserLoggedIn() {
+                    await authPresenter.getAccountById()
+                } else {
+                    // User is not logged in, redirect to login
+                    Router.shared.navigateTo(.login)
+                }
             }
         }
         .environmentObject(Router.shared)

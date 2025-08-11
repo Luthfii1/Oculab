@@ -65,9 +65,9 @@ class AuthenticationInteractor: ObservableObject {
     func getAccountById() async throws -> User {
         guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
             throw NSError(
-                domain: "UserIdNotFound",
+                domain: "AuthenticationError",
                 code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "User ID not found"]
+                userInfo: [NSLocalizedDescriptionKey: "Please login first to access user data"]
             )
         }
 
