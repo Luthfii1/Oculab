@@ -67,6 +67,7 @@ enum AppText {
         static let textBadgeCheckmark = "text.badge.checkmark"
         static let docOnDocFill = "doc.on.doc.fill"
         static let docBadgePlus = "doc.badge.plus"
+        static let deleteLeft = "delete.left"
         static let deleteLeftFill = "delete.left.fill"
         static let robot = "robot"
         static let rectangleStackFill = "rectangle.stack.fill"

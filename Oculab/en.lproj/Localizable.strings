@@ -29,6 +29,13 @@
 "common.edit_data" = "Edit Data";
 "common.delete_data" = "Delete Data";
 
+// MARK: - App State & Loading
+"splash.title" = "Welcome to Oculab";
+"loading.title" = "Loading...";
+"loading.authentication" = "Authenticating...";
+"loading.data" = "Loading data...";
+"loading.user_data" = "Loading user data...";
+
 // Dynamic action patterns
 "common.save_item" = "Save %@";
 "common.add_item" = "Add %@";

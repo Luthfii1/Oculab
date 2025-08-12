@@ -33,7 +33,8 @@ struct LoginView: View {
                             title: AppLabel.email,
                             isRequired: true,
                             placeholder: AppTextAuthLogin.emailPlaceholder,
-                            isError: presenter.isError,
+                            description: presenter.emailError.isEmpty ? nil : presenter.emailError,
+                            isError: !presenter.emailError.isEmpty,
                             isDisabled: presenter.isLoading,
                             text: $presenter.email
                         )
@@ -41,9 +42,9 @@ struct LoginView: View {
                             title: AppLabel.password,
                             isRequired: true,
                             placeholder: AppTextAuthLogin.passwordPlaceholder,
-                            description: presenter.description,
+                            description: presenter.passwordError.isEmpty ? (presenter.isError ? presenter.description : nil) : presenter.passwordError,
                             rightIcon: AppIcon.eye,
-                            isError: presenter.isError,
+                            isError: !presenter.passwordError.isEmpty || presenter.isError,
                             isDisabled: presenter.isLoading,
                             text: $presenter.password
                         )
@@ -57,10 +58,16 @@ struct LoginView: View {
                             size: .large,
                             isEnabled: presenter.isFilled
                         ) {
+                            print("🔘 Login button tapped - isFilled: \(presenter.isFilled)")
                             Task {
+                                print("🔘 Starting login task...")
                                 let loginSuccess = await presenter.login()
+                                print("🔘 Login result: \(loginSuccess)")
                                 if loginSuccess {
+                                    print("🔘 Login successful, getting account...")
                                     await presenter.getAccountById()
+                                } else {
+                                    print("🔘 Login failed")
                                 }
                             }
                         }

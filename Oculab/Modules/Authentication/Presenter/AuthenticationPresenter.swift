@@ -26,8 +26,18 @@ class AuthenticationPresenter: ObservableObject {
     // MARK: - Authentication State
     @Published var user: User = .init()
     @Published var isPinAuthorized: Bool = false
-    @Published var email = AppValue.empty
-    @Published var password = AppValue.empty
+    @Published var email = AppValue.empty {
+        didSet {
+            updateValidationErrors()
+        }
+    }
+    @Published var password = AppValue.empty {
+        didSet {
+            updateValidationErrors()
+        }
+    }
+    @Published var emailError: String = AppValue.empty
+    @Published var passwordError: String = AppValue.empty
     
     // MARK: - PIN Management State
     @Published var firstPin = AppValue.empty
@@ -66,10 +76,15 @@ class AuthenticationPresenter: ObservableObject {
 
     // MARK: - Dependencies
     private var interactor: AuthenticationInteractor
+    weak var appStateManager: AppStateManager?
 
     // MARK: - Computed Properties
     var isFilled: Bool {
-        ValidationHelpers.isLoginFormValid(email: email, password: password) && !isLoading
+        let isEmailValid = ValidationHelpers.isValidEmail(email)
+        let isPasswordValid = ValidationHelpers.isValidPassword(password)
+        let isFormValid = isEmailValid && isPasswordValid && !isLoading
+        
+        return isFormValid
     }
     
     var loginButtonText: String {
@@ -108,7 +123,9 @@ class AuthenticationPresenter: ObservableObject {
     
     @MainActor
     func handlePinInput(_ pin: String) async {
-        guard ValidationHelpers.isValidPIN(pin) else { return }
+        guard ValidationHelpers.isValidPIN(pin) else { 
+            return 
+        }
 
         switch state {
         case .create:
@@ -131,7 +148,7 @@ class AuthenticationPresenter: ObservableObject {
                     await createAccessPin()
                     await interactor.updateUserLocalData(user: user)
                     isPinAuthorized = true
-                    Router.shared.popToRoot()
+                    // State transition handled by AccountCheckerView onChange
                 }
             } else {
                 isError = true
@@ -140,14 +157,12 @@ class AuthenticationPresenter: ObservableObject {
             }
 
         case .authenticate:
-            Task {
-                if await self.isValidPin() {
-                    isPinAuthorized = true
-                    Router.shared.popToRoot()
-                } else {
-                    inputPin = AppValue.empty
-                    // Error description is already set in isValidPin()
-                }
+            if await self.isValidPin() {
+                isPinAuthorized = true
+                // State transition handled by AccountCheckerView onChange
+            } else {
+                inputPin = AppValue.empty
+                // Error description is already set in isValidPin()
             }
 
         case .changePIN:
@@ -296,7 +311,24 @@ class AuthenticationPresenter: ObservableObject {
     func clearInput() {
         email = AppValue.empty
         password = AppValue.empty
+        emailError = AppValue.empty
+        passwordError = AppValue.empty
         isError = false
+    }
+    
+    private func updateValidationErrors() {
+        // Only show errors if user has started typing
+        if !email.isEmpty && !ValidationHelpers.isValidEmail(email) {
+            emailError = ValidationHelpers.ErrorMessage.invalidEmail
+        } else {
+            emailError = AppValue.empty
+        }
+        
+        if !password.isEmpty && !ValidationHelpers.isValidPassword(password) {
+            passwordError = ValidationHelpers.ErrorMessage.invalidPassword
+        } else {
+            passwordError = AppValue.empty
+        }
     }
 
     private func handleErrorState(isError: Bool, errorData: ApiErrorData? = nil) {
@@ -328,7 +360,10 @@ class AuthenticationPresenter: ObservableObject {
     @MainActor
     func getAccountById() async {
         do {
-            let getAccountResponse = try await interactor.getAccountById()
+            // Add timeout handling
+            let getAccountResponse = try await withTimeout(seconds: 30) { [self] in
+                try await self.interactor.getAccountById()
+            }
             user = getAccountResponse
 
             // Reset the pin input state
@@ -340,15 +375,18 @@ class AuthenticationPresenter: ObservableObject {
                 // User needs to create PIN
                 state = .create
                 isPinAuthorized = false
+                appStateManager?.setRequiresPin(hasExistingPin: false)
             } else {
                 // User needs to authenticate with existing PIN
                 state = .authenticate
                 isPinAuthorized = false
+                appStateManager?.setRequiresPin(hasExistingPin: true)
             }
         } catch {
             // Handle error and ensure user goes back to login
             isPinAuthorized = false
             clearLoginState()
+            appStateManager?.setUnauthenticated()
             
             switch error {
             case let NetworkError.apiError(apiResponse):
@@ -375,11 +413,30 @@ class AuthenticationPresenter: ObservableObject {
 
     @MainActor
     func login() async -> Bool {
+        // Clear previous errors
+        isError = false
+        emailError = AppValue.empty
+        passwordError = AppValue.empty
+        
+        // Validate before attempting login
+        guard ValidationHelpers.isValidEmail(email) else {
+            emailError = ValidationHelpers.ErrorMessage.invalidEmail
+            return false
+        }
+        
+        guard ValidationHelpers.isValidPassword(password) else {
+            passwordError = ValidationHelpers.ErrorMessage.invalidPassword
+            return false
+        }
+        
         isLoading = true
-        defer { isLoading = false }
+        defer { 
+            isLoading = false 
+        }
 
         do {
-            _ = try await interactor.login(email: email, password: password)
+            let response = try await interactor.login(email: email, password: password)
+            
             handleErrorState(isError: false)
             return true
         } catch {
@@ -397,7 +454,7 @@ class AuthenticationPresenter: ObservableObject {
             default:
                 handleErrorState(
                     isError: true,
-                    errorData: ApiErrorData(errorType: "UNKNOW_ERROR", description: error.localizedDescription)
+                    errorData: ApiErrorData(errorType: "UNKNOWN_ERROR", description: error.localizedDescription)
                 )
             }
             return false
@@ -482,6 +539,7 @@ class AuthenticationPresenter: ObservableObject {
                         continuation.resume(returning: ())
                         DispatchQueue.main.async {
                             self.isPinAuthorized = true
+                            // State transition handled by AccountCheckerView onChange
                             Router.shared.popToRoot()
                         }
                     } else {
@@ -542,13 +600,44 @@ class AuthenticationPresenter: ObservableObject {
     // MARK: - SwiftData Refresh
     @MainActor
     func refreshUserFromSwiftData() async {
-        do {
-            if let userData = await interactor.getUserLocalData() {
-                user = userData
-            }
-        } catch {
-            print("Error refreshing user from SwiftData: \(error.localizedDescription)")
+        if let userData = await interactor.getUserLocalData() {
+            user = userData
         }
+    }
+    
+    // MARK: - State Reset
+    @MainActor
+    func resetAuthenticationState() {
+        // Reset authentication state
+        isPinAuthorized = false
+        
+        // Clear user data
+        user = User()
+        
+        // Clear PIN state
+        firstPin = AppValue.empty
+        secondPin = AppValue.empty
+        inputPin = AppValue.empty
+        oldAccessPin = AppValue.empty
+        newAccessPin = AppValue.empty
+        isAccessPinChangeInProgress = false
+        showAccessPinSuccessPopup = false
+        
+        // Clear login credentials and validation errors
+        email = AppValue.empty
+        password = AppValue.empty
+        emailError = AppValue.empty
+        passwordError = AppValue.empty
+        
+        // Reset UI state
+        isError = false
+        isLoading = false
+        description = AppValue.empty
+        state = .authenticate
+        
+        // Reset colors
+        textColor = AppColors.slate900
+        pinColor = AppColors.purple500
     }
 }
 
@@ -560,5 +649,22 @@ private extension AuthenticationPresenter {
         }
         textColor = isError ? AppColors.red500 : AppColors.slate900
         pinColor = isError ? AppColors.red500 : AppColors.purple500
+    }
+    
+    func withTimeout<T>(seconds: TimeInterval, operation: @escaping () async throws -> T) async throws -> T {
+        return try await withThrowingTaskGroup(of: T.self) { group in
+            group.addTask {
+                try await operation()
+            }
+            
+            group.addTask {
+                try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+                throw NSError(domain: "TimeoutError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Operation timed out"])
+            }
+            
+            let result = try await group.next()!
+            group.cancelAll()
+            return result
+        }
     }
 }

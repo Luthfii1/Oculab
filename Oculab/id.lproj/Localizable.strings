@@ -1,5 +1,17 @@
 /* 
-  Localizable.strings (Indonesian)
+  Localizable.string// Common button patterns
+"common.save_changes" = "Simpan Perubahan";
+"common.save_data" = "Simpan Data";
+"common.add_new" = "Tambah Baru";
+"common.edit_data" = "Edit Data";
+"common.delete_data" = "Hapus Data";
+
+// MARK: - App State & Loading
+"splash.title" = "Selamat Datang di Oculab";
+"loading.title" = "Memuat...";
+"loading.authentication" = "Mengautentikasi...";
+"loading.data" = "Memuat data...";
+"loading.user_data" = "Memuat data pengguna...";onesian)
   Oculab
 */
 

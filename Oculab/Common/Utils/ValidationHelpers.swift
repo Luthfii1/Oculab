@@ -51,7 +51,7 @@ struct ValidationHelpers {
 extension ValidationHelpers {
     enum ErrorMessage {
         static let invalidEmail = "validation.invalid_email".localized
-        static let invalidPassword = "validation.invalid_password".localized(with: ["\(ValidationConstants.minPasswordLength)"])
+        static let invalidPassword = "validation.invalid_password".localized(with: "\(ValidationConstants.minPasswordLength)")
         static let invalidPIN = "validation.invalid_pin".localized(with: ["\(AppConstants.pinLength)"])
         static let invalidName = "validation.invalid_name".localized
         static let pinMismatch = "validation.pin_mismatch".localized

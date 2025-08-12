@@ -130,7 +130,9 @@ struct ProfileView: View {
                     )
 
                     AppButton(title: AppAction.exit, rightIcon: AppIcon.doorRightHandOpen, colorType: .destructive(.secondary)) {
-                        profilePresenter.logout()
+                        Task {
+                            await profilePresenter.logout()
+                        }
                     }
 
                     Spacer()
