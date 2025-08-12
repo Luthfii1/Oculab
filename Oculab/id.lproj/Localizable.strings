@@ -612,3 +612,24 @@
 "latest_activity_type.need_verification" = "Butuh Verifikasi";
 "latest_activity_type.not_started" = "Belum Dimulai";
 "latest_activity_type.in_progress" = "Sedang Berlangsung";
+
+// MARK: - Validation Messages
+"validation.invalid_email" = "Harap masukkan alamat email yang valid";
+"validation.invalid_password" = "Kata sandi harus minimal %@ karakter";
+"validation.invalid_pin" = "PIN harus tepat %@ digit";
+"validation.invalid_name" = "Nama tidak boleh kosong";
+"validation.pin_mismatch" = "PIN tidak cocok";
+
+// MARK: - Error Messages
+"error.network_error" = "Kesalahan jaringan: %@";
+"error.authentication_required" = "Silakan masuk kembali untuk melanjutkan";
+"error.no_internet_connection" = "Silakan periksa koneksi internet Anda";
+"error.request_timeout" = "Permintaan habis waktu. Silakan coba lagi";
+"error.unexpected_error" = "Terjadi kesalahan tak terduga. Silakan coba lagi";
+
+// MARK: - Loading Messages
+"loading.default_message" = "Memuat...";
+"loading.user_data" = "Memuat data pengguna...";
+"loading.authentication" = "Mengotentikasi...";
+"loading.saving" = "Menyimpan...";
+"loading.processing" = "Memproses...";

@@ -62,19 +62,14 @@ class AuthenticationPresenter: ObservableObject {
     }
     
     // MARK: - Constants
-    let numbers = [
-        ["1", "2", "3"],
-        ["4", "5", "6"],
-        ["7", "8", "9"],
-        ["!", "0", "delete.left.fill"]
-    ]
+    let numbers = AppConstants.pinNumbers
 
     // MARK: - Dependencies
     private var interactor: AuthenticationInteractor
 
     // MARK: - Computed Properties
     var isFilled: Bool {
-        !email.isEmpty && !password.isEmpty && !isLoading
+        ValidationHelpers.isLoginFormValid(email: email, password: password) && !isLoading
     }
     
     var loginButtonText: String {
@@ -113,7 +108,7 @@ class AuthenticationPresenter: ObservableObject {
     
     @MainActor
     func handlePinInput(_ pin: String) async {
-        guard pin.count == 4 else { return }
+        guard ValidationHelpers.isValidPIN(pin) else { return }
 
         switch state {
         case .create:

@@ -1,0 +1,40 @@
+//
+//  AppConstants.swift
+//  Oculab
+//
+//  Created by Luthfi Misbachul Munir on 12/08/25.
+//
+
+import Foundation
+
+// MARK: - App Constants
+enum AppConstants {
+    // MARK: - Timing
+    static let splashScreenDuration: TimeInterval = 3.0
+    static let pinLength: Int = 4
+    static let animationDuration: Double = 0.3
+    
+    // MARK: - UI
+    static let loadingIndicatorScale: CGFloat = 1.5
+    static let defaultPadding: CGFloat = 16
+    static let cornerRadius: CGFloat = 12
+    
+    // MARK: - Network
+    static let requestTimeout: TimeInterval = 30.0
+    static let maxRetryAttempts: Int = 3
+    
+    // MARK: - PIN Configuration
+    static let pinNumbers = [
+        ["1", "2", "3"],
+        ["4", "5", "6"],
+        ["7", "8", "9"],
+        ["!", "0", "delete.left.fill"]
+    ]
+}
+
+// MARK: - Validation Constants
+enum ValidationConstants {
+    static let emailRegexPattern = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"
+    static let minPasswordLength = 8
+    static let maxPasswordLength = 128
+}

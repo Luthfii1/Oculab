@@ -594,3 +594,24 @@
 "latest_activity_type.need_verification" = "Need Verification";
 "latest_activity_type.not_started" = "Not Started";
 "latest_activity_type.in_progress" = "In Progress";
+
+// MARK: - Validation Messages
+"validation.invalid_email" = "Please enter a valid email address";
+"validation.invalid_password" = "Password must be at least %@ characters";
+"validation.invalid_pin" = "PIN must be exactly %@ digits";
+"validation.invalid_name" = "Name cannot be empty";
+"validation.pin_mismatch" = "PINs do not match";
+
+// MARK: - Error Messages
+"error.network_error" = "Network error: %@";
+"error.authentication_required" = "Please log in again to continue";
+"error.no_internet_connection" = "Please check your internet connection";
+"error.request_timeout" = "Request timed out. Please try again";
+"error.unexpected_error" = "An unexpected error occurred. Please try again";
+
+// MARK: - Loading Messages
+"loading.default_message" = "Loading...";
+"loading.user_data" = "Loading user data...";
+"loading.authentication" = "Authenticating...";
+"loading.saving" = "Saving...";
+"loading.processing" = "Processing...";

@@ -38,11 +38,11 @@ private extension AccountCheckerView {
         VStack {
             ProgressView()
                 .progressViewStyle(CircularProgressViewStyle())
-                .scaleEffect(1.5)
+                .scaleEffect(AppConstants.loadingIndicatorScale)
             Text(AppState.loading("user data"))
                 .font(AppTypography.p3)
                 .foregroundColor(AppColors.slate600)
-                .padding(.top, 16)
+                .padding(.top, AppConstants.defaultPadding)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(AppColors.slate50)
@@ -85,8 +85,8 @@ private extension AccountCheckerView {
     }
     
     func startSplashScreenTimer() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            withAnimation {
+        DispatchQueue.main.asyncAfter(deadline: .now() + AppConstants.splashScreenDuration) {
+            withAnimation(.easeInOut(duration: AppConstants.animationDuration)) {
                 authPresenter.isSplashScreenVisible = false
             }
         }

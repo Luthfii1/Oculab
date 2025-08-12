@@ -7,6 +7,10 @@
 3. **DependencyInjection.swift** - Better organization with extensions and safe model context
 4. **AuthenticationPresenter.swift** - Reorganized properties into logical sections with proper MARK comments
 5. **OculabApp.swift** - Cleaner initialization with better error handling
+6. **AppConstants.swift** - Centralized all magic numbers and configuration values ✨ NEW
+7. **ValidationHelpers.swift** - Centralized input validation logic ✨ NEW
+8. **ErrorHandler.swift** - Standardized error handling and logging ✨ NEW
+9. **LoadingStateManager.swift** - Consistent loading state management ✨ NEW
 
 ## Next Recommended Improvements
 
