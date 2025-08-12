@@ -330,20 +330,25 @@ class AuthenticationPresenter: ObservableObject {
             let getAccountResponse = try await interactor.getAccountById()
             user = getAccountResponse
 
-            // Reset the pin input state before navigation
+            // Reset the pin input state
             inputPin = AppValue.empty
             firstPin = AppValue.empty
             secondPin = AppValue.empty
 
             if getAccountResponse.accessPin == nil {
+                // User needs to create PIN
                 state = .create
-                Router.shared.navigateTo(.userAccessPin(state: .create))
+                isPinAuthorized = false
             } else {
+                // User needs to authenticate with existing PIN
                 state = .authenticate
-                Router.shared.navigateTo(.userAccessPin(state: .authenticate))
+                isPinAuthorized = false
             }
         } catch {
-            // Handle error
+            // Handle error and ensure user goes back to login
+            isPinAuthorized = false
+            clearLoginState()
+            
             switch error {
             case let NetworkError.apiError(apiResponse):
                 print("Error type: \(apiResponse.data.errorType)")
