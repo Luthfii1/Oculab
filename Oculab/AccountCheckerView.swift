@@ -14,76 +14,93 @@ struct AccountCheckerView: View {
 
     var body: some View {
         RouterView {
-            if authPresenter.isSplashScreenVisible {
-                SplashScreenView()
-            } else if isInitializing {
-                // Show loading state while checking user authentication
-                VStack {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle())
-                        .scaleEffect(1.5)
-                    Text(AppState.loading("user data"))
-                        .font(AppTypography.p3)
-                        .foregroundColor(AppColors.slate600)
-                        .padding(.top, 16)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(AppColors.slate50)
-            } else {
-                if isUserLoggedIn {
-                    if authPresenter.isPinAuthorized {
-                        ContentView()
-                            .environmentObject(authPresenter)
-                    } else {
-                        // Show PIN input based on whether user has PIN or not
-                        if authPresenter.user.accessPin == nil {
-                            UserAccessPinView(state: .create)
-                                .environmentObject(authPresenter)
-                        } else {
-                            UserAccessPinView(state: .authenticate)
-                                .environmentObject(authPresenter)
-                        }
-                    }
-                } else {
-                    LoginView()
-                        .environmentObject(authPresenter)
-                }
-            }
+            currentView
         }
-        .onAppear {
-            initializeApp()
-        }
+        .onAppear(perform: initializeApp)
         .environmentObject(Router.shared)
     }
-    
-    private func initializeApp() {
-        // Show splash screen for 3 seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            withAnimation {
-                authPresenter.isSplashScreenVisible = false
-            }
+}
+
+// MARK: - View Builder
+private extension AccountCheckerView {
+    @ViewBuilder
+    var currentView: some View {
+        if authPresenter.isSplashScreenVisible {
+            SplashScreenView()
+        } else if isInitializing {
+            loadingView
+        } else {
+            mainContentView
         }
-        
-        // Initialize user authentication state
+    }
+    
+    var loadingView: some View {
+        VStack {
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle())
+                .scaleEffect(1.5)
+            Text(AppState.loading("user data"))
+                .font(AppTypography.p3)
+                .foregroundColor(AppColors.slate600)
+                .padding(.top, 16)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(AppColors.slate50)
+    }
+    
+    @ViewBuilder
+    var mainContentView: some View {
+        if isUserLoggedIn {
+            authenticatedUserView
+        } else {
+            LoginView()
+                .environmentObject(authPresenter)
+        }
+    }
+    
+    @ViewBuilder
+    var authenticatedUserView: some View {
+        if authPresenter.isPinAuthorized {
+            ContentView()
+                .environmentObject(authPresenter)
+        } else {
+            pinInputView
+        }
+    }
+    
+    @ViewBuilder
+    var pinInputView: some View {
+        let pinState: PinMode = authPresenter.user.accessPin == nil ? .create : .authenticate
+        UserAccessPinView(state: pinState)
+            .environmentObject(authPresenter)
+    }
+}
+// MARK: - Initialization Logic
+private extension AccountCheckerView {
+    func initializeApp() {
+        startSplashScreenTimer()
         Task {
             await initializeUserState()
         }
     }
     
-    @MainActor
-    private func initializeUserState() async {
-        defer {
-            isInitializing = false
+    func startSplashScreenTimer() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            withAnimation {
+                authPresenter.isSplashScreenVisible = false
+            }
         }
+    }
+    
+    @MainActor
+    func initializeUserState() async {
+        defer { isInitializing = false }
         
-        // Check if user is logged in
         guard authPresenter.isUserLoggedIn() else {
-            // User is not logged in, clear any stale state
             authPresenter.isPinAuthorized = false
             return
         }
         
-        // User is logged in, get account data
         await authPresenter.getAccountById()
     }
 }

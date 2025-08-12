@@ -14,21 +14,24 @@ enum PinMode {
 }
 
 class AuthenticationPresenter: ObservableObject {
+    // MARK: - UI State Properties
     @Published var isSplashScreenVisible = true
     @Published var description: String = AppValue.empty
     @Published var textColor: Color = AppColors.slate900
     @Published var pinColor: Color = AppColors.purple500
-    @Published var email = AppValue.empty
-    @Published var password = AppValue.empty
+    @Published var isLoading = false
     @Published var isKeyboardVisible = false
-    @Published var firstPin = AppValue.empty
-    @Published var secondPin = AppValue.empty
     @Published var isOpeningApp = false
+    
+    // MARK: - Authentication State
     @Published var user: User = .init()
     @Published var isPinAuthorized: Bool = false
-    @Published var descriptionPIN: String = AppValue.empty
-    @Published var isFaceIdAvailable: Bool = false
-    @Published var isFaceIdEnabledFromUserDefaults: Bool = UserDefaults.standard.bool(forKey: UserDefaultType.isFaceIdEnabled.rawValue)
+    @Published var email = AppValue.empty
+    @Published var password = AppValue.empty
+    
+    // MARK: - PIN Management State
+    @Published var firstPin = AppValue.empty
+    @Published var secondPin = AppValue.empty
     @Published var inputPin = AppValue.empty {
         didSet {
             if !inputPin.isEmpty {
@@ -36,6 +39,29 @@ class AuthenticationPresenter: ObservableObject {
             }
         }
     }
+    @Published var oldAccessPin = AppValue.empty
+    @Published var newAccessPin = AppValue.empty
+    @Published var isAccessPinChangeInProgress = false
+    @Published var showAccessPinSuccessPopup = false
+    @Published var descriptionPIN: String = AppValue.empty
+    @Published var state: PinMode = .authenticate {
+        didSet {
+            setDescriptionPIN()
+        }
+    }
+    
+    // MARK: - Biometric Authentication
+    @Published var isFaceIdAvailable: Bool = false
+    @Published var isFaceIdEnabledFromUserDefaults: Bool = UserDefaults.standard.bool(forKey: UserDefaultType.isFaceIdEnabled.rawValue)
+    
+    // MARK: - Error Handling
+    @Published var isError: Bool = false {
+        didSet {
+            updateUIForErrorState()
+        }
+    }
+    
+    // MARK: - Constants
     let numbers = [
         ["1", "2", "3"],
         ["4", "5", "6"],
@@ -43,39 +69,19 @@ class AuthenticationPresenter: ObservableObject {
         ["!", "0", "delete.left.fill"]
     ]
 
-    @Published var isLoading = false
+    // MARK: - Dependencies
+    private var interactor: AuthenticationInteractor
 
-    @Published var isError: Bool = false {
-        didSet {
-            if !isError {
-                description = AppValue.empty
-            }
-            textColor = isError ? AppColors.red500 : AppColors.slate900
-            pinColor = isError ? AppColors.red500 : AppColors.purple500
-        }
-    }
-
-    @Published var state: PinMode = .authenticate {
-        didSet {
-            setDescriptionPIN()
-        }
-    }
-
-    @Published var oldAccessPin = AppValue.empty
-    @Published var newAccessPin = AppValue.empty
-    @Published var isAccessPinChangeInProgress = false
-    @Published var showAccessPinSuccessPopup = false
-
+    // MARK: - Computed Properties
     var isFilled: Bool {
         !email.isEmpty && !password.isEmpty && !isLoading
     }
     
     var loginButtonText: String {
-        return isLoading ? AppState.loading : AppTextAuthLogin.buttonText
+        isLoading ? AppState.loading : AppTextAuthLogin.buttonText
     }
 
-    private var interactor: AuthenticationInteractor
-
+    // MARK: - Initialization
     init(interactor: AuthenticationInteractor) {
         self.interactor = interactor
         setDescriptionPIN()
@@ -548,5 +554,16 @@ class AuthenticationPresenter: ObservableObject {
         } catch {
             print("Error refreshing user from SwiftData: \(error.localizedDescription)")
         }
+    }
+}
+
+// MARK: - Helper Methods
+private extension AuthenticationPresenter {
+    func updateUIForErrorState() {
+        if !isError {
+            description = AppValue.empty
+        }
+        textColor = isError ? AppColors.red500 : AppColors.slate900
+        pinColor = isError ? AppColors.red500 : AppColors.purple500
     }
 }

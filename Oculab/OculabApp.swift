@@ -16,11 +16,11 @@ struct OculabApp: App {
     init() {
         do {
             self.container = try ModelContainer(for: User.self)
-            DependencyInjection.shared.initializer(modelContext: container.mainContext)
-            
         } catch {
-            fatalError("[FATAL] Failed to initialize SwiftData [FATAL]")
+            fatalError("Failed to initialize SwiftData ModelContainer: \(error.localizedDescription)")
         }
+        
+        DependencyInjection.shared.initializer(modelContext: container.mainContext)
     }
 
     var body: some Scene {
