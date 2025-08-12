@@ -245,14 +245,15 @@ class PatientPresenter: ObservableObject {
     func formatDate(_ date: Date?) -> String {
         guard let date = date else { return AppValue.empty }
         let formatter = DateFormatter()
+        formatter.locale = Locale.current // Use current locale for localization
         formatter.dateFormat = "dd/MM/yyyy"
         return formatter.string(from: date)
     }
     
     func formatDateTime(_ date: Date) -> String {
         let formatter = DateFormatter()
+        formatter.locale = Locale.current // Use current locale for localization
         formatter.dateFormat = "dd MMMM yyyy HH:mm"
-        formatter.locale = Locale(identifier: "en_US_POSIX")
         return formatter.string(from: date)
     }
 
