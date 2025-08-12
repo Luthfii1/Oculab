@@ -2,12 +2,12 @@
 //  MockNetworkService.swift
 //  Oculab
 //
-//  Created by Cline on 7/5/25.
+//  Created by Luthfi Misbachul Munir on 7/5/25.
 //
 
 import Foundation
 
-class MockNetworkService: NetworkService {
+class MockNetworkService: NetworkServiceProtocol {
     var getShouldSucceed = true
     var postShouldSucceed = true
     var updateShouldSucceed = true

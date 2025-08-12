@@ -16,6 +16,12 @@ class DependencyInjection: ObservableObject {
     // MARK: - Core Dependencies
     private var modelContext: ModelContext?
     
+    // MARK: - Network Dependencies
+    lazy var networkRetryManager: NetworkRetryManager = NetworkRetryManager()
+    lazy var networkService: NetworkServiceProtocol = {
+        NetworkService(retryManager: networkRetryManager)
+    }()
+    
     // MARK: - Stored Properties for All Modules
     private var authenticationPresenterInstance: AuthenticationPresenter?
     lazy var authenticationInteractor: AuthenticationInteractor = {

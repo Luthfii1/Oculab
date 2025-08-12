@@ -21,6 +21,8 @@ typealias AppData = AppText.Data
 typealias AppIcon = AppText.SystemIcon
 typealias AppImage = AppText.AppIcon
 typealias AppFeature = AppText.Feature
+typealias AppNetwork = AppText.Network
+typealias AppNetworkIcon = AppText.SystemIcon
 
 enum AppText {
     // MARK: - Core System Icons (Reusable across all modules)
@@ -81,6 +83,13 @@ enum AppText {
         static let circle = "circle"
         static let largecircleFillCircle = "largecircle.fill.circle"
         static let buttonProgrammable = "button.programmable"
+        
+        // Network related icons
+        static let network = "network"
+        static let wifi = "wifi"
+        static let antennaRadiowaves = "antenna.radiowaves.left.and.right"
+        static let cableConnector = "cable.connector"
+        static let arrowClockwise = "arrow.clockwise"
     }
     
     // MARK: - App Specific Icons
@@ -429,6 +438,29 @@ enum AppText {
             }
             
             return sentence
+        }
+    }
+    
+    // MARK: - Network Status
+    enum Network {
+        static let status = "network.status".localized
+        static let connected = "network.connected".localized
+        static let noConnection = "network.no_connection".localized
+        static let disconnected = "network.disconnected".localized
+        static let connectionStatus = "network.connection_status".localized
+        
+        enum ConnectionType {
+            static let wifi = "network.connection_type.wifi".localized
+            static let cellular = "network.connection_type.cellular".localized
+            static let ethernet = "network.connection_type.ethernet".localized
+            static let unknown = "network.connection_type.unknown".localized
+        }
+        
+        enum Tips {
+            static let title = "network.tips.title".localized
+            static let wifi = "network.tips.wifi".localized
+            static let cellular = "network.tips.cellular".localized
+            static let retry = "network.tips.retry".localized
         }
     }
     

@@ -2,13 +2,13 @@
 //  AlamofireNetworkService.swift
 //  Oculab
 //
-//  Created by Cline on 7/5/25.
+//  Created by Luthfi Misbachul Munir on 7/5/25.
 //
 
 import Foundation
 import Alamofire
 
-class AlamofireNetworkService: NetworkService {
+class AlamofireNetworkService: NetworkServiceProtocol {
     private static let decoder = JSONDecoder()
     
     func get<T: Decodable>(urlString: String, headers: [String: String]?) async throws -> APIResponse<T> {

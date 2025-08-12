@@ -639,6 +639,21 @@
 "error.request_timeout" = "Permintaan habis waktu. Silakan coba lagi";
 "error.unexpected_error" = "Terjadi kesalahan tak terduga. Silakan coba lagi";
 
+// MARK: - Network Status
+"network.status" = "Status Jaringan";
+"network.connected" = "Terhubung";
+"network.no_connection" = "Tidak Ada Koneksi";
+"network.disconnected" = "Terputus";
+"network.connection_status" = "Status Koneksi";
+"network.connection_type.wifi" = "Koneksi Wi-Fi";
+"network.connection_type.cellular" = "Koneksi Seluler";
+"network.connection_type.ethernet" = "Koneksi Ethernet";
+"network.connection_type.unknown" = "Jenis Koneksi Tidak Diketahui";
+"network.tips.title" = "Tips untuk Performa Lebih Baik";
+"network.tips.wifi" = "Gunakan Wi-Fi bila tersedia untuk kecepatan terbaik";
+"network.tips.cellular" = "Pindah ke area dengan sinyal lebih baik jika menggunakan seluler";
+"network.tips.retry" = "Aplikasi secara otomatis mencoba ulang permintaan yang gagal";
+
 // MARK: - Loading Messages
 "loading.default_message" = "Memuat...";
 "loading.user_data" = "Memuat data pengguna...";

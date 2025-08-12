@@ -9,9 +9,9 @@ import Foundation
 import UIKit
 
 class VideoInteractor {
-    private let networkService: NetworkService
+    private let networkService: NetworkServiceProtocol
 
-    init(networkService: NetworkService = AlamofireNetworkService()) {
+    init(networkService: NetworkServiceProtocol = AlamofireNetworkService()) {
         self.networkService = networkService
     }
     

@@ -8,9 +8,9 @@
 import Foundation
 
 class AnalysisResultInteractor {
-    private let networkService: NetworkService
+    private let networkService: NetworkServiceProtocol
 
-    init(networkService: NetworkService = AlamofireNetworkService()) {
+    init(networkService: NetworkServiceProtocol = AlamofireNetworkService()) {
         self.networkService = networkService
     }
     
@@ -60,16 +60,6 @@ class AnalysisResultInteractor {
                 examId.lowercased(), headers: nil)
         return response.data
     }
-
-//    func submitTrackingDuration(examId: String) async throws -> ExpertExamResult {
-//
-//
-//        let response: APIResponse<ExpertExamResult> = try await NetworkHelper.shared.post(
-//            urlString: API.BE + "/examinationAnalysisDuration/create-analysis-duration/" + examId,
-//            body: body)
-//
-//        return response.data
-//    }
 
     func submitTrackingDuration(examId: String, body: TrackingDurationRequest) async throws -> TrackingDurationRequest {
         print(examId)

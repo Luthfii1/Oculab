@@ -8,7 +8,7 @@
 import Foundation
 
 class AccountInteractor: ObservableObject {
-    private let networkService: NetworkService
+    private let networkService: NetworkServiceProtocol
     private let apiGetAllAccount = API.BE + "/user/get-all-user-data"
     private let apiRegisterAccount = API.BE + "/user/register"
     private let apiDeleteAccount = API.BE + "/user/delete-user/"
@@ -19,7 +19,7 @@ class AccountInteractor: ObservableObject {
     init(
         authInteractor: AuthenticationInteractor,
         authPresenter: AuthenticationPresenter? = nil,
-        networkService: NetworkService = AlamofireNetworkService()
+        networkService: NetworkServiceProtocol = AlamofireNetworkService()
     ) {
         self.authInteractor = authInteractor
         self.authPresenter = authPresenter

@@ -616,6 +616,29 @@
 "error.request_timeout" = "Request timed out. Please try again";
 "error.unexpected_error" = "An unexpected error occurred. Please try again";
 
+// MARK: - Enhanced Network Error Messages
+"error.network_retry_failed" = "Connection failed after multiple attempts. Please check your internet connection and try again";
+"error.operation_in_progress" = "Please wait, another operation is in progress";
+"error.server_error" = "Server error occurred. Please try again later";
+"error.server_temporarily_unavailable" = "Server is temporarily unavailable. Please try again in a few moments";
+"error.cannot_connect_to_server" = "Cannot connect to server. Please check your internet connection";
+"error.connection_lost" = "Connection was lost. Please check your internet connection and try again";
+
+// MARK: - Network Status
+"network.status" = "Network Status";
+"network.connected" = "Connected";
+"network.no_connection" = "No Connection";
+"network.disconnected" = "Disconnected";
+"network.connection_status" = "Connection Status";
+"network.connection_type.wifi" = "Wi-Fi Connection";
+"network.connection_type.cellular" = "Cellular Connection";
+"network.connection_type.ethernet" = "Ethernet Connection";
+"network.connection_type.unknown" = "Unknown Connection Type";
+"network.tips.title" = "Tips for Better Performance";
+"network.tips.wifi" = "Use Wi-Fi when available for fastest speeds";
+"network.tips.cellular" = "Move to an area with better signal if using cellular";
+"network.tips.retry" = "The app automatically retries failed requests";
+
 // MARK: - Loading Messages
 "loading.default_message" = "Loading...";
 "loading.user_data" = "Loading user data...";
