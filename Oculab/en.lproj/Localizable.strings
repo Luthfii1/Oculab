@@ -165,6 +165,35 @@
 "form.select" = "Select %@";
 "form.search" = "Search %@";
 
+// MARK: - Detailed Validation Messages
+"email_required" = "Email address is required";
+"email_invalid" = "Please enter a valid email address";
+"password_required" = "Password is required";
+"password_min_length" = "Password must be at least %d characters long";
+"password_uppercase_required" = "Password must contain at least one uppercase letter";
+"password_lowercase_required" = "Password must contain at least one lowercase letter";
+"password_number_required" = "Password must contain at least one number";
+"password_special_char_required" = "Password must contain at least one special character";
+"pin_required" = "PIN is required";
+"pin_length_invalid" = "PIN must be exactly %d digits";
+"pin_numbers_only" = "PIN must contain only numbers";
+"phone_required" = "Phone number is required";
+"phone_invalid_length" = "Phone number must be between 10-15 digits";
+"name_required" = "Name is required";
+"name_min_length" = "Name must be at least %d characters long";
+"name_invalid_characters" = "Name can only contain letters, spaces, hyphens, and apostrophes";
+"fields_do_not_match" = "Fields do not match";
+"field_required" = "This field is required";
+"date_required" = "Date is required";
+"date_future_not_allowed" = "Future dates are not allowed";
+"date_past_not_allowed" = "Past dates are not allowed";
+"minimum_age_required" = "Minimum age of %d years is required";
+"min_length_required" = "Minimum length of %d characters is required";
+"max_length_exceeded" = "Maximum length of %d characters exceeded";
+"numbers_only" = "Only numbers are allowed";
+"letters_only" = "Only letters are allowed";
+"alphanumeric_only" = "Only letters and numbers are allowed";
+
 // MARK: - Navigation
 "nav.profile" = "Profile";
 "nav.history" = "History";
@@ -609,6 +638,20 @@
 "validation.invalid_name" = "Name cannot be empty";
 "validation.pin_mismatch" = "PINs do not match";
 
+// Enhanced validation messages
+"validation.nik_required" = "NIK is required";
+"validation.nik_invalid_length" = "NIK must be exactly 16 digits";
+"validation.nik_numbers_only" = "NIK must contain only numbers";
+"validation.medical_record_required" = "Medical record number is required";
+"validation.medical_record_invalid_length" = "Medical record number must be 6-12 characters";
+"validation.medical_record_alphanumeric_only" = "Medical record number must contain only letters and numbers";
+"validation.age_required" = "Age is required";
+"validation.age_too_young" = "Age must be at least %d years";
+"validation.age_too_old" = "Age cannot exceed %d years";
+"validation.date_required" = "Date is required";
+"validation.date_past_invalid" = "Date cannot be in the past";
+"validation.date_range_invalid" = "Date must be between %@ and %@";
+
 // MARK: - Error Messages
 "error.network_error" = "Network error: %@";
 "error.authentication_required" = "Please log in again to continue";
@@ -619,6 +662,20 @@
 // MARK: - Enhanced Network Error Messages
 "error.network_retry_failed" = "Connection failed after multiple attempts. Please check your internet connection and try again";
 "error.operation_in_progress" = "Please wait, another operation is in progress";
+
+// MARK: - Error Messages
+
+// MARK: - User-Friendly Network Banners
+"network.banner.poor_connection" = "Poor connection detected. Some features may be slow.";
+"network.banner.slow_cellular" = "Using cellular data. Consider switching to Wi-Fi.";
+"network.banner.checking_connection" = "Checking connection quality...";
+
+// MARK: - Smart Connection Helper
+"network.helper.get_tips" = "Get connection tips";
+"network.helper.poor_connection" = "Poor connection may affect %@ performance";
+"network.helper.slow_upload" = "%@ may take longer on current connection";
+"network.helper.slow_media" = "Media upload may be slower on current connection";
+"network.helper.optimizing" = "Connection is being optimized for best performance";
 "error.server_error" = "Server error occurred. Please try again later";
 "error.server_temporarily_unavailable" = "Server is temporarily unavailable. Please try again in a few moments";
 "error.cannot_connect_to_server" = "Cannot connect to server. Please check your internet connection";

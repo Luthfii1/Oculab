@@ -170,6 +170,36 @@
 "form.select" = "Pilih %@";
 "form.search" = "Cari %@";
 
+// MARK: - Detailed Validation Messages
+"email_required" = "Alamat email wajib diisi";
+"email_invalid" = "Silakan masukkan alamat email yang valid";
+"password_required" = "Password wajib diisi";
+"password_min_length" = "Password harus minimal %d karakter";
+"password_uppercase_required" = "Password harus mengandung setidaknya satu huruf besar";
+"password_lowercase_required" = "Password harus mengandung setidaknya satu huruf kecil";
+"password_number_required" = "Password harus mengandung setidaknya satu angka";
+"password_special_char_required" = "Password harus mengandung setidaknya satu karakter khusus";
+"pin_required" = "PIN wajib diisi";
+"pin_length_invalid" = "PIN harus tepat %d digit";
+"pin_numbers_only" = "PIN hanya boleh berisi angka";
+"phone_required" = "Nomor telepon wajib diisi";
+"phone_invalid_length" = "Nomor telepon harus antara 10-15 digit";
+"name_required" = "Nama wajib diisi";
+"name_min_length" = "Nama harus minimal %d karakter";
+"name_invalid_characters" = "Nama hanya boleh berisi huruf, spasi, tanda hubung, dan apostrof";
+"fields_do_not_match" = "Field tidak cocok";
+"field_required" = "Field ini wajib diisi";
+"date_required" = "Tanggal wajib diisi";
+"date_future_not_allowed" = "Tanggal masa depan tidak diizinkan";
+"date_past_not_allowed" = "Tanggal masa lalu tidak diizinkan";
+"minimum_age_required" = "Usia minimum %d tahun diperlukan";
+"min_length_required" = "Panjang minimum %d karakter diperlukan";
+"max_length_exceeded" = "Panjang maksimum %d karakter terlampaui";
+"numbers_only" = "Hanya angka yang diizinkan";
+"letters_only" = "Hanya huruf yang diizinkan";
+"alphanumeric_only" = "Hanya huruf dan angka yang diizinkan";
+"form.search" = "Cari %@";
+
 // MARK: - Navigation
 "nav.profile" = "Profil";
 "nav.history" = "Riwayat";
@@ -632,6 +662,20 @@
 "validation.invalid_name" = "Nama tidak boleh kosong";
 "validation.pin_mismatch" = "PIN tidak cocok";
 
+// Enhanced validation messages
+"validation.nik_required" = "NIK wajib diisi";
+"validation.nik_invalid_length" = "NIK harus terdiri dari 16 digit";
+"validation.nik_numbers_only" = "NIK hanya boleh berisi angka";
+"validation.medical_record_required" = "Nomor rekam medis wajib diisi";
+"validation.medical_record_invalid_length" = "Nomor rekam medis harus 6-12 karakter";
+"validation.medical_record_alphanumeric_only" = "Nomor rekam medis hanya boleh berisi huruf dan angka";
+"validation.age_required" = "Umur wajib diisi";
+"validation.age_too_young" = "Umur minimal %d tahun";
+"validation.age_too_old" = "Umur tidak boleh lebih dari %d tahun";
+"validation.date_required" = "Tanggal wajib diisi";
+"validation.date_past_invalid" = "Tanggal tidak boleh di masa lalu";
+"validation.date_range_invalid" = "Tanggal harus antara %@ dan %@";
+
 // MARK: - Error Messages
 "error.network_error" = "Kesalahan jaringan: %@";
 "error.authentication_required" = "Silakan masuk kembali untuk melanjutkan";
@@ -653,6 +697,10 @@
 "network.tips.wifi" = "Gunakan Wi-Fi bila tersedia untuk kecepatan terbaik";
 "network.tips.cellular" = "Pindah ke area dengan sinyal lebih baik jika menggunakan seluler";
 "network.tips.retry" = "Aplikasi secara otomatis mencoba ulang permintaan yang gagal";
+
+// MARK: - Enhanced Network Error Messages  
+"error.network_retry_failed" = "Koneksi gagal setelah beberapa percobaan. Harap periksa koneksi internet Anda dan coba lagi";
+"error.operation_in_progress" = "Harap tunggu, operasi lain sedang berjalan";
 
 // MARK: - Loading Messages
 "loading.default_message" = "Memuat...";
