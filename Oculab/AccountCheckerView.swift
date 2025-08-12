@@ -10,80 +10,144 @@ import SwiftUI
 struct AccountCheckerView: View {
     @AppStorage(UserDefaultType.isUserLoggedIn.rawValue) var isUserLoggedIn: Bool = false
     @EnvironmentObject var authPresenter: AuthenticationPresenter
-    @State private var isInitializing = true
+    @StateObject private var appStateManager = AppStateManager()
 
     var body: some View {
         RouterView {
-            if authPresenter.isSplashScreenVisible {
-                SplashScreenView()
-            } else if isInitializing {
-                // Show loading state while checking user authentication
-                VStack {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle())
-                        .scaleEffect(1.5)
-                    Text(AppState.loading("user data"))
-                        .font(AppTypography.p3)
-                        .foregroundColor(AppColors.slate600)
-                        .padding(.top, 16)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(AppColors.slate50)
-            } else {
-                if isUserLoggedIn {
-                    if authPresenter.isPinAuthorized {
-                        ContentView()
-                            .environmentObject(authPresenter)
-                    } else {
-                        // Show PIN input based on whether user has PIN or not
-                        if authPresenter.user.accessPin == nil {
-                            UserAccessPinView(state: .create)
-                                .environmentObject(authPresenter)
-                        } else {
-                            UserAccessPinView(state: .authenticate)
-                                .environmentObject(authPresenter)
-                        }
-                    }
-                } else {
-                    LoginView()
-                        .environmentObject(authPresenter)
-                }
-            }
+            currentView
         }
         .onAppear {
+            // Inject appStateManager into authPresenter
+            authPresenter.appStateManager = appStateManager
             initializeApp()
         }
         .environmentObject(Router.shared)
-    }
-    
-    private func initializeApp() {
-        // Show splash screen for 3 seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            withAnimation {
-                authPresenter.isSplashScreenVisible = false
+        .environmentObject(appStateManager)
+        .onChange(of: authPresenter.isPinAuthorized) { _, newValue in
+            if newValue {
+                // Only set authenticated if we're not already in authenticated state
+                if appStateManager.initializationState != .authenticated {
+                    appStateManager.setAuthenticated()
+                }
             }
         }
+        .onChange(of: isUserLoggedIn) { _, newValue in
+            if !newValue {
+                // User logged out - reset all state
+                authPresenter.isPinAuthorized = false
+                authPresenter.resetAuthenticationState()
+                appStateManager.setUnauthenticated()
+            }
+        }
+    }
+}
+
+// MARK: - View Builder
+private extension AccountCheckerView {
+    @ViewBuilder
+    var currentView: some View {
+        switch appStateManager.initializationState {
+        case .splash:
+            SplashScreenView()
+            
+        case .loading:
+            LoadingView.authentication
+            
+        case .authenticated:
+            ContentView()
+                .environmentObject(authPresenter)
+            
+        case .requiresPinCreation:
+            UserAccessPinView(state: .create)
+                .environmentObject(authPresenter)
+            
+        case .requiresPinAuthentication:
+            UserAccessPinView(state: .authenticate)
+                .environmentObject(authPresenter)
+            
+        case .unauthenticated:
+            LoginView()
+                .environmentObject(authPresenter)
+            
+        case .error(let message):
+            ErrorView(message: message) {
+                Task {
+                    await initializeUserState()
+                }
+            }
+        }
+    }
+}
+// MARK: - Initialization Logic
+private extension AccountCheckerView {
+    func initializeApp() {
+        appStateManager.startAppInitialization()
         
-        // Initialize user authentication state
-        Task {
-            await initializeUserState()
+        // Check if user is logged in but needs PIN authentication
+        if authPresenter.isUserLoggedIn() {
+            // For logged-in users, we need to fetch account data to determine PIN status
+            // This is essential because PIN requirement is determined server-side
+            Task {
+                await initializeUserStateWithSplash()
+            }
+        } else {
+            // User not logged in - skip authentication and show login after splash
+            Task {
+                await initializeUserStateWithSplash()
+            }
         }
     }
     
     @MainActor
-    private func initializeUserState() async {
-        defer {
-            isInitializing = false
+    func initializeUserStateWithSplash() async {
+        // Run splash screen and authentication concurrently
+        async let splashDelay: () = Task.sleep(nanoseconds: UInt64(AppConstants.splashScreenDuration * 1_000_000_000))
+        async let authenticationTask: () = performAuthentication()
+        
+        // Wait for both to complete
+        do {
+            let _ = try await (splashDelay, authenticationTask)
+            
+            // Don't change state if PIN was already authorized during the flow
+            if authPresenter.isPinAuthorized {
+                return
+            }
+            
+            // Don't change state if we're already in a PIN authentication state
+            if appStateManager.initializationState == .requiresPinAuthentication || 
+               appStateManager.initializationState == .requiresPinCreation {
+                return
+            }
+            
+            // After both complete, check if we need to show login
+            if !authPresenter.isUserLoggedIn() {
+                appStateManager.setUnauthenticated()
+                authPresenter.isPinAuthorized = false
+            }
+        } catch {
+            appStateManager.setUnauthenticated()
+        }
+    }
+    
+    @MainActor
+    func performAuthentication() async {
+        guard authPresenter.isUserLoggedIn() else {
+            // Don't set state here - let splash finish first
+            return
         }
         
-        // Check if user is logged in
+        await authPresenter.getAccountById()
+    }
+    
+    @MainActor
+    func initializeUserState() async {
+        // Fallback method for error recovery
         guard authPresenter.isUserLoggedIn() else {
-            // User is not logged in, clear any stale state
+            appStateManager.setUnauthenticated()
             authPresenter.isPinAuthorized = false
             return
         }
         
-        // User is logged in, get account data
         await authPresenter.getAccountById()
     }
 }

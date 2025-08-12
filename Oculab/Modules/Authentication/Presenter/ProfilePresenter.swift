@@ -82,10 +82,14 @@ class ProfilePresenter: ObservableObject {
     }
 
     @MainActor
-    func logout() {
+    func logout() async {
+        // Clear all UserDefaults except onboarding status
         for item in UserDefaultType.allCases where item != .hasSeenOnboarding {
             UserDefaults.standard.removeObject(forKey: item.rawValue)
         }
+        
+        // The AccountCheckerView will observe the isUserLoggedIn change
+        // and automatically trigger state reset and navigation
     }
 
     func isPasswordEditButtonEnabled() -> Bool {
