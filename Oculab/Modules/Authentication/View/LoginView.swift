@@ -29,24 +29,27 @@ struct LoginView: View {
                         .foregroundStyle(AppColors.slate900)
                         .multilineTextAlignment(.center)
                     VStack(spacing: 8) {
-                        AppTextField(
+                        ValidatedTextField(
                             title: AppLabel.email,
                             isRequired: true,
                             placeholder: AppTextAuthLogin.emailPlaceholder,
-                            description: presenter.emailError.isEmpty ? nil : presenter.emailError,
-                            isError: !presenter.emailError.isEmpty,
+                            leftIcon: AppIcon.envelope,
                             isDisabled: presenter.isLoading,
-                            text: $presenter.email
+                            text: $presenter.email,
+                            fieldName: .loginEmail,
+                            validationType: .email
                         )
-                        AppTextField(
+                        
+                        ValidatedTextField(
                             title: AppLabel.password,
                             isRequired: true,
                             placeholder: AppTextAuthLogin.passwordPlaceholder,
-                            description: presenter.passwordError.isEmpty ? (presenter.isError ? presenter.description : nil) : presenter.passwordError,
+                            leftIcon: AppIcon.lock,
                             rightIcon: AppIcon.eye,
-                            isError: !presenter.passwordError.isEmpty || presenter.isError,
                             isDisabled: presenter.isLoading,
-                            text: $presenter.password
+                            text: $presenter.password,
+                            fieldName: .loginPassword,
+                            validationType: .password
                         )
                     }
                     .padding(.horizontal)
@@ -60,15 +63,7 @@ struct LoginView: View {
                         ) {
                             print("🔘 Login button tapped - isFilled: \(presenter.isFilled)")
                             Task {
-                                print("🔘 Starting login task...")
-                                let loginSuccess = await presenter.login()
-                                print("🔘 Login result: \(loginSuccess)")
-                                if loginSuccess {
-                                    print("🔘 Login successful, getting account...")
-                                    await presenter.getAccountById()
-                                } else {
-                                    print("🔘 Login failed")
-                                }
+                                await presenter.loginWithValidation()
                             }
                         }
                         HStack {

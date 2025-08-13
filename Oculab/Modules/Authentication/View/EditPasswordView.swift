@@ -41,41 +41,44 @@ struct EditPasswordView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 52) {
                         VStack(alignment: .leading, spacing: 24) {
-                            AppTextField(
+                            ValidatedTextField(
                                 title: AppTextAuthEditPassword.currentPasswordTitle,
                                 placeholder: AppTextAuthEditPassword.currentPasswordPlaceholder,
-                                description: profilePresenter.descriptionOldPassword,
+                                leftIcon: AppIcon.lock,
                                 rightIcon: AppIcon.eye,
-                                isError: profilePresenter.isOldPasswordError,
-                                text: $profilePresenter.oldPassword
+                                text: $profilePresenter.oldPassword,
+                                fieldName: .currentPassword,
+                                validationType: .required
                             )
 
-                            AppTextField(
+                            ValidatedTextField(
                                 title: AppTextAuthEditPassword.newPasswordTitle,
                                 placeholder: AppTextAuthEditPassword.newPasswordPlaceholder,
-                                description: AppTextAuthEditPassword.newPasswordDescription,
+                                leftIcon: AppIcon.lock,
                                 rightIcon: AppIcon.eye,
-                                text: $profilePresenter.inputPassword
+                                text: $profilePresenter.inputPassword,
+                                fieldName: .newPassword,
+                                validationType: .password
                             )
 
-                            AppTextField(
+                            ValidatedTextField(
                                 title: AppTextAuthEditPassword.confirmPasswordTitle,
                                 placeholder: AppTextAuthEditPassword.confirmPasswordPlaceholder,
-                                description: profilePresenter.descriptionPasswordConfirm,
+                                leftIcon: AppIcon.lock,
                                 rightIcon: AppIcon.eye,
-                                isError: profilePresenter.isError,
-                                text: $profilePresenter.confirmPassword
+                                text: $profilePresenter.confirmPassword,
+                                fieldName: .confirmPassword,
+                                validationType: .required
                             )
                         }
 
                         AppButton(
                             title: profilePresenter.saveChangesButtonText,
                             rightIcon: AppIcon.checkmark,
-                            isEnabled: profilePresenter.isPasswordEditButtonEnabled()
+                            isEnabled: profilePresenter.isFormValid
                         ) {
                             Task {
-                                await profilePresenter
-                                    .postEditPassword(authPresenter: DependencyInjection.shared.createAuthPresenter())
+                                await profilePresenter.postEditPasswordWithValidation(authPresenter: DependencyInjection.shared.createAuthPresenter())
                             }
                         }
 
