@@ -7,31 +7,132 @@
 
 import Foundation
 import SwiftUI
+import Observation
 
-class PatientPresenter: ObservableObject {
+@Observable
+class PatientPresenter {
     var interactor: PatientInteractor? = PatientInteractor()
     
-    @Published var isPatientLoading = false
-    @Published var patientNameDoB: [(String, String)] = []
-    @Published var searchText: String = AppValue.empty
-    @Published var filteredPatientNameDoB: [(String, String)] = []
+    // MARK: - Form Validation
+    var formValidation = FormValidationViewModel()
     
-    @Published var patient: Patient = .init(
+    // MARK: - UI State
+    var isPatientLoading = false
+    var patientNameDoB: [(String, String)] = []
+    var searchText: String = AppValue.empty
+    var filteredPatientNameDoB: [(String, String)] = []
+    
+    // MARK: - Patient Data with Validation
+    var patient: Patient = .init(
         _id: UUID().uuidString.lowercased(),
         name: AppValue.empty,
         NIK: AppValue.empty,
         DoB: Date(),
         sex: .UNKNOWN
-    )
+    ) {
+        didSet {
+            validatePatientFields()
+        }
+    }
     
-    @Published var selectedSex: String = AppValue.empty
-    @Published var BPJSnumber: String = AppValue.empty
-    @Published var selectedDoB: Date = Date()
+    var selectedSex: String = AppValue.empty
+    var BPJSnumber: String = AppValue.empty {
+        didSet {
+            validateBPJSField()
+        }
+    }
+    var selectedDoB: Date = Date()
     
-    @Published var examinationList: [ExaminationResultCardData] = []
-    @Published var isLoadingPatient: Bool = false
-    @Published var isLoadingExaminations: Bool = false
-    @Published var errorMessage: String?
+    // MARK: - Validation Error States
+    var nameError: String = AppValue.empty
+    var nikError: String = AppValue.empty
+    var bpjsError: String = AppValue.empty
+    
+    // MARK: - Other States
+    var examinationList: [ExaminationResultCardData] = []
+    var isLoadingPatient: Bool = false
+    var isLoadingExaminations: Bool = false
+    var errorMessage: String?
+    
+    // MARK: - Computed Properties
+    var isFormValid: Bool {
+        return validatePatientForm() && !isPatientLoading
+    }
+}
+
+// MARK: - Form Validation
+extension PatientPresenter {
+    func validatePatientForm() -> Bool {
+        return formValidation.validatePatientForm(
+            name: patient.name,
+            nik: patient.NIK,
+            bpjs: BPJSnumber.isEmpty ? nil : BPJSnumber
+        )
+    }
+    
+    private func validatePatientFields() {
+        validateNameField()
+        validateNIKField()
+    }
+    
+    private func validateNameField() {
+        if !patient.name.isEmpty {
+            let isValid = ValidationManager.shared.validateName(patient.name, fieldName: ValidationFieldName.patientName.rawValue)
+            nameError = isValid ? AppValue.empty : (ValidationManager.shared.getError(for: ValidationFieldName.patientName.rawValue) ?? AppValue.empty)
+        } else {
+            nameError = AppValue.empty
+            ValidationManager.shared.clearError(for: ValidationFieldName.patientName.rawValue)
+        }
+    }
+    
+    private func validateNIKField() {
+        if !patient.NIK.isEmpty {
+            let isValid = ValidationManager.shared.validateNIK(patient.NIK, fieldName: ValidationFieldName.patientNIK.rawValue)
+            nikError = isValid ? AppValue.empty : (ValidationManager.shared.getError(for: ValidationFieldName.patientNIK.rawValue) ?? AppValue.empty)
+        } else {
+            nikError = AppValue.empty
+            ValidationManager.shared.clearError(for: ValidationFieldName.patientNIK.rawValue)
+        }
+    }
+    
+    private func validateBPJSField() {
+        if !BPJSnumber.isEmpty {
+            let isValid = ValidationManager.shared.validateWithRules(BPJSnumber, fieldName: ValidationFieldName.patientBPJS.rawValue, rules: [
+                .numbersOnly(),
+                .minLength(13),
+                .maxLength(13)
+            ])
+            bpjsError = isValid ? AppValue.empty : (ValidationManager.shared.getError(for: ValidationFieldName.patientBPJS.rawValue) ?? AppValue.empty)
+        } else {
+            bpjsError = AppValue.empty
+            ValidationManager.shared.clearError(for: ValidationFieldName.patientBPJS.rawValue)
+        }
+    }
+}
+
+// MARK: - Patient Data Management
+extension PatientPresenter {
+    @MainActor
+    func addNewPatientWithValidation() async {
+        guard validatePatientForm() else {
+            print("🔘 Patient form validation failed")
+            return
+        }
+        
+        formValidation.clearAllErrors()
+        await addNewPatient()
+    }
+    
+    @MainActor
+    func updatePatientWithValidation() async {
+        guard validatePatientForm() else {
+            print("🔘 Patient form validation failed")
+            return
+        }
+        
+        formValidation.clearAllErrors()
+        await updatePatient()
+    }
     
     @MainActor
     func getAllPatient() async {
@@ -55,37 +156,7 @@ class PatientPresenter: ObservableObject {
                 filterPatients()
             }
         } catch {
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-            }
-        }
-    }
-    
-    func searchPatients() {
-        filterPatients()
-    }
-    
-    func clearSearch() {
-        searchText = AppValue.empty
-        filterPatients()
-    }
-    
-    private func filterPatients() {
-        if searchText.isEmpty {
-            filteredPatientNameDoB = patientNameDoB
-        } else {
-            filteredPatientNameDoB = patientNameDoB.filter { nameWithDoB, _ in
-                let name = nameWithDoB.components(separatedBy: " (").first ?? AppValue.empty
-                return name.localizedCaseInsensitiveContains(searchText)
-            }
+            handleError(error)
         }
     }
     
@@ -114,17 +185,7 @@ class PatientPresenter: ObservableObject {
                 }
             }
         } catch {
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-            }
+            handleError(error)
         }
     }
 
@@ -144,20 +205,7 @@ class PatientPresenter: ObservableObject {
                 Router.shared.navigateBack()
             }
         } catch {
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-                errorMessage = apiResponse.data.description
-
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-                errorMessage = message
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-                errorMessage = error.localizedDescription
-            }
+            handleErrorWithMessage(error)
         }
     }
     
@@ -188,23 +236,36 @@ class PatientPresenter: ObservableObject {
                 Router.shared.navigateBack()
             }
         } catch {
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-                errorMessage = apiResponse.data.description
+            handleErrorWithMessage(error)
+        }
+    }
+}
 
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-                errorMessage = message
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-                errorMessage = error.localizedDescription
+// MARK: - Search and Filter Operations
+extension PatientPresenter {
+    func searchPatients() {
+        filterPatients()
+    }
+    
+    func clearSearch() {
+        searchText = AppValue.empty
+        filterPatients()
+    }
+    
+    private func filterPatients() {
+        if searchText.isEmpty {
+            filteredPatientNameDoB = patientNameDoB
+        } else {
+            filteredPatientNameDoB = patientNameDoB.filter { nameWithDoB, _ in
+                let name = nameWithDoB.components(separatedBy: " (").first ?? AppValue.empty
+                return name.localizedCaseInsensitiveContains(searchText)
             }
         }
     }
-    
+}
+
+// MARK: - Examination Management
+extension PatientPresenter {
     @MainActor
     func getExaminationsByPatientId(patientId: String) async {
         isLoadingExaminations = true
@@ -220,20 +281,13 @@ class PatientPresenter: ObservableObject {
             }
 
         } catch {
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-            }
+            handleError(error)
         }
     }
-    
+}
+
+// MARK: - Navigation
+extension PatientPresenter {
     func navigateTo(_ destination: Router.Route) {
         Router.shared.navigateTo(destination)
     }
@@ -241,7 +295,10 @@ class PatientPresenter: ObservableObject {
     func navigateBack() {
         Router.shared.navigateBack()
     }
-    
+}
+
+// MARK: - Helper Methods
+extension PatientPresenter {
     func formatDate(_ date: Date?) -> String {
         guard let date = date else { return AppValue.empty }
         let formatter = DateFormatter()
@@ -255,5 +312,35 @@ class PatientPresenter: ObservableObject {
         formatter.locale = Locale(identifier: "en_US_POSIX")
         return formatter.string(from: date)
     }
+    
+    private func handleError(_ error: Error) {
+        switch error {
+        case let NetworkError.apiError(apiResponse):
+            print("Error type: \(apiResponse.data.errorType)")
+            print("Error description: \(apiResponse.data.description)")
 
+        case let NetworkError.networkError(message):
+            print("Network error: \(message)")
+
+        default:
+            print("Unknown error: \(error.localizedDescription)")
+        }
+    }
+    
+    private func handleErrorWithMessage(_ error: Error) {
+        switch error {
+        case let NetworkError.apiError(apiResponse):
+            print("Error type: \(apiResponse.data.errorType)")
+            print("Error description: \(apiResponse.data.description)")
+            errorMessage = apiResponse.data.description
+
+        case let NetworkError.networkError(message):
+            print("Network error: \(message)")
+            errorMessage = message
+
+        default:
+            print("Unknown error: \(error.localizedDescription)")
+            errorMessage = error.localizedDescription
+        }
+    }
 }

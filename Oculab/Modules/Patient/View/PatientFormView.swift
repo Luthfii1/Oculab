@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PatientFormView: View {
     let patientId: String?
-    @StateObject private var presenter = PatientPresenter()
+    @State private var presenter = PatientPresenter()
     
     private var isAddingNewPatient: Bool {
         patientId == nil
@@ -37,13 +37,14 @@ struct PatientFormView: View {
 
                     AppButton(
                         title: isAddingNewPatient ? AppTextPatientCompCard.buttonCreatePatient : AppTextPatientCompCard.buttonSavePatient,
-                        leftIcon: isAddingNewPatient ? AppIcon.add : AppIcon.checkmark
+                        leftIcon: isAddingNewPatient ? AppIcon.add : AppIcon.checkmark,
+                        isEnabled: presenter.isFormValid
                     ) {
                         Task {
                             if isAddingNewPatient {
-                                await presenter.addNewPatient()
+                                await presenter.addNewPatientWithValidation()
                             } else {
-                                await presenter.updatePatient()
+                                await presenter.updatePatientWithValidation()
                             }
                         }
                     }

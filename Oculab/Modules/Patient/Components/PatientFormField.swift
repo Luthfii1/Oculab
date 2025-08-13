@@ -12,7 +12,8 @@ struct PatientFormField: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
-            AppTextField(
+            ValidatedTextField(
+                fieldName: .patientName,
                 title: AppPatient.name,
                 isRequired: true,
                 placeholder: AppTextPatientCompFormField.namePlaceholder,
@@ -20,7 +21,8 @@ struct PatientFormField: View {
                 text: $presenter.patient.name
             )
             
-            AppTextField(
+            ValidatedTextField(
+                fieldName: .patientNIK,
                 title: AppPatient.nik,
                 isRequired: true,
                 placeholder: AppPatient.Placeholder.nik,
@@ -58,7 +60,8 @@ struct PatientFormField: View {
                 }
             }
 
-            AppTextField(
+            ValidatedTextField(
+                fieldName: .patientBPJS,
                 title: AppPatient.bpjsNumber,
                 placeholder: AppPatient.Placeholder.bpjs,
                 isNumberOnly: true,

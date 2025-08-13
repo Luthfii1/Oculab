@@ -156,19 +156,7 @@ extension AuthenticationPresenter {
             isError = true
             
             switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-                description = apiResponse.data.description
-                
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-                description = message
-                
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-                description = error.localizedDescription
-            }
+            handleErrorWithMessage(error)
             
             return false
         }
@@ -186,20 +174,7 @@ extension AuthenticationPresenter {
             isLogin = true
             
         } catch {
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-                description = apiResponse.data.description
-                
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-                description = message
-                
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-                description = error.localizedDescription
-            }
+            handleErrorWithMessage(error)
             
             isError = true
         }
@@ -318,21 +293,7 @@ extension AuthenticationPresenter {
             resetPinChangeFlow()
             
         } catch {
-            isError = true
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-                description = apiResponse.data.description
-
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-                description = message
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-                description = error.localizedDescription
-            }
+            handleErrorWithMessage(error)
         }
     }
     
@@ -608,26 +569,7 @@ extension AuthenticationPresenter {
             clearLoginState()
             appStateManager?.setUnauthenticated()
             
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-                handleErrorState(isError: true, errorData: apiResponse.data)
-
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-                handleErrorState(
-                    isError: true,
-                    errorData: ApiErrorData(errorType: "NETWORK_ERROR", description: message)
-                )
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-                handleErrorState(
-                    isError: true,
-                    errorData: ApiErrorData(errorType: "AUTHENTICATION_ERROR", description: error.localizedDescription)
-                )
-            }
+            handleErrorWithMessage(error)
         }
     }
     
@@ -639,17 +581,7 @@ extension AuthenticationPresenter {
             user = response
             Router.shared.popToRoot()
         } catch {
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-            }
+            handleErrorWithMessage(error)
         }
     }
     
@@ -710,8 +642,6 @@ extension AuthenticationPresenter {
     private func handleErrorState(isError: Bool, errorData: ApiErrorData? = nil) {
         DispatchQueue.main.async {
             if isError, let errorData = errorData {
-                print("Error type: \(errorData.errorType)")
-                print("Error description: \(errorData.description)")
                 self.description = errorData.description
             }
             self.isError = isError
@@ -786,6 +716,23 @@ private extension AuthenticationPresenter {
             let result = try await group.next()!
             group.cancelAll()
             return result
+        }
+    }
+
+    private func handleErrorWithMessage(_ error: Error) {
+        switch error {
+        case let NetworkError.apiError(apiResponse):
+            print("Error type: \(apiResponse.data.errorType)")
+            print("Error description: \(apiResponse.data.description)")
+            errorMessage = apiResponse.data.description
+
+        case let NetworkError.networkError(message):
+            print("Network error: \(message)")
+            errorMessage = message
+
+        default:
+            print("Unknown error: \(error.localizedDescription)")
+            errorMessage = error.localizedDescription
         }
     }
 }

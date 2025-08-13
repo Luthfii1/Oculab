@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PatientListView: View {
-    @StateObject private var presenter = PatientPresenter()
+    @State private var presenter = PatientPresenter()
     
     var body: some View {
         NavigationView {
