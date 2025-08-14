@@ -19,6 +19,15 @@ enum AppConstants {
     static let defaultPadding: CGFloat = 16
     static let cornerRadius: CGFloat = 12
     
+    // MARK: - Login Screen
+    static let loginImageMaxHeight: CGFloat = 300
+    static let loginKeyboardTopSpacing: CGFloat = 50
+    static let loginBottomSpacing: CGFloat = 100
+    static let loginContentPaddingKeyboard: CGFloat = 20
+    static let loginContentPaddingNormal: CGFloat = 24
+    static let loginFieldsTopPadding: CGFloat = 12
+    static let loginButtonTopPadding: CGFloat = 18
+    
     // MARK: - Network
     static let requestTimeout: TimeInterval = 30.0
     static let maxRetryAttempts: Int = 3

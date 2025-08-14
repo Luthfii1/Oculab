@@ -47,11 +47,13 @@ struct InterpretationSectionComponent: View {
             .focused($focusedField, equals: .grading)
 
             if presenter.selectedTBGrade == GradingType.SCANTY.rawValue {
-                AppTextField(
+                ValidatedTextField(
                     title: AppMedical.Examination.bacteriaCount,
                     placeholder: AppTextExamCompInterpretationSection.btaCountPlaceholder,
                     isNumberOnly: true,
-                    text: $presenter.numOfBTA
+                    text: $presenter.numOfBTA,
+                    fieldName: .bacteriaCount,
+                    validationType: .none
                 )
                 .focused($focusedField, equals: .countBta)
             }

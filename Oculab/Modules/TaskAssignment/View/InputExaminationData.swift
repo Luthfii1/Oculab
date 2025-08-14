@@ -85,10 +85,12 @@ struct InputExaminationData: View {
                                     }
                                 }
 
-                                AppTextField(
+                                ValidatedTextField(
                                     title: AppTextTaskAssignInputExam.slideId1Title,
                                     placeholder: AppTextTaskAssignInputExam.slideId1Placeholder,
-                                    text: $presenter.examination.slideId
+                                    text: $presenter.examination.slideId,
+                                    fieldName: .slideId1,
+                                    validationType: .none
                                 )
 
                                 AppRadioButton(
@@ -108,10 +110,12 @@ struct InputExaminationData: View {
                                     }
                                 }
 
-                                AppTextField(
+                                ValidatedTextField(
                                     title: AppTextTaskAssignInputExam.slideId2Title,
                                     placeholder: AppTextTaskAssignInputExam.slideId2Placeholder,
-                                    text: $presenter.examination2.slideId
+                                    text: $presenter.examination2.slideId,
+                                    fieldName: .slideId2,
+                                    validationType: .none
                                 )
 
                                 AppRadioButton(
@@ -195,6 +199,6 @@ struct InputExaminationData: View {
     }
 }
 
-#Preview {
-    InputExaminationData(selectedPIC: AppValue.empty, selectedPatient: AppValue.empty)
-}
+//#Preview {
+//    InputExaminationData(selectedPIC: AppValue.empty, selectedPatient: AppValue.empty)
+//}

@@ -249,7 +249,7 @@ struct ValidatedTextField: View {
             return .emailAddress
         case .phone:
             return .phonePad
-        case .nik, .medicalRecord:
+        case .nik, .bpjs, .medicalRecord:
             return .numberPad
         default:
             return .default
@@ -260,7 +260,7 @@ struct ValidatedTextField: View {
         var updatedValue = newValue
         
         // Apply character filtering
-        if isNumberOnly || validationType == .nik || validationType == .phone {
+        if isNumberOnly || validationType == .nik || validationType == .bpjs || validationType == .phone {
             updatedValue = newValue.filter { $0.isNumber }
         }
         
@@ -294,6 +294,14 @@ struct ValidatedTextField: View {
             validationManager.validatePhoneNumber(text, fieldName: fieldName)
         case .nik:
             validationManager.validateNIK(text, fieldName: fieldName)
+        case .bpjs:
+            if !text.isEmpty {
+                validationManager.validateWithRules(text, fieldName: fieldName, rules: [
+                    .numbersOnly(),
+                    .minLength(13),
+                    .maxLength(13)
+                ])
+            }
         case .medicalRecord:
             validationManager.validateMedicalRecordNumber(text, fieldName: fieldName)
         case .required:
@@ -321,6 +329,7 @@ enum ValidationType {
     case name
     case phone
     case nik
+    case bpjs
     case medicalRecord
     case required
     case custom

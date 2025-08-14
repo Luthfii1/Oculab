@@ -65,13 +65,14 @@ struct EditUserFormView: View {
                                 fieldName: .userName
                             )
                             
-                            AppTextField(
+                            ValidatedTextField(
                                 title: AppLabel.email,
                                 isRequired: true,
                                 placeholder: AppTextUserMgmtEditUserForm.emailPlaceholder,
-                                description: AppTextUserMgmtEditUserForm.emailDisabledDescription,
                                 isDisabled: true,
-                                text: .constant(account.email)
+                                text: .constant(account.email),
+                                fieldName: .userEmail,
+                                validationType: .email
                             )
 
                             // Save button

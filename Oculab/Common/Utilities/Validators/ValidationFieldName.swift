@@ -51,6 +51,9 @@ enum ValidationFieldName: String, CaseIterable {
     case examinationType = "examination_type"
     case examinationNotes = "examination_notes"
     case examinationResult = "examination_result"
+    case bacteriaCount = "bacteria_count"
+    case slideId1 = "slide_id_1"
+    case slideId2 = "slide_id_2"
     
     // MARK: - Task Assignment Fields
     case taskTitle = "task_title"
@@ -150,6 +153,9 @@ enum ValidationFieldName: String, CaseIterable {
         case .examinationType: return "Examination Type"
         case .examinationNotes: return "Examination Notes"
         case .examinationResult: return "Examination Result"
+        case .bacteriaCount: return "Bacteria Count"
+        case .slideId1: return "Slide ID 1"
+        case .slideId2: return "Slide ID 2"
             
         // Task Assignment
         case .taskTitle: return "Task Title"
@@ -215,7 +221,7 @@ enum ValidationFieldName: String, CaseIterable {
             return .medical
         case .currentPassword, .newPassword, .confirmPassword, .oldPassword:
             return .password
-        case .examinationDate, .examinationType, .examinationNotes, .examinationResult:
+        case .examinationDate, .examinationType, .examinationNotes, .examinationResult, .bacteriaCount, .slideId1, .slideId2:
             return .examination
         case .taskTitle, .taskDescription, .taskAssignee, .taskDueDate, .taskPriority:
             return .taskAssignment

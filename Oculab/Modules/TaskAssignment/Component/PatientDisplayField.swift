@@ -19,14 +19,16 @@ struct PatientDisplayField: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
-            AppTextField(
+            ValidatedTextField(
                 title: AppPatient.nik,
                 isRequired: true,
                 placeholder: AppPatient.Placeholder.nik,
                 isDisabled: presenter.patientFound,
                 isNumberOnly: true,
                 length: 16,
-                text: $presenter.patient.NIK
+                text: $presenter.patient.NIK,
+                fieldName: .patientNIK,
+                validationType: .nik
             )
             .focused($focusedField, equals: .nik)
 
@@ -60,13 +62,13 @@ struct PatientDisplayField: View {
                 }
             }
 
-            AppTextField(
+            ValidatedTextField(
                 title: AppPatient.bpjsNumber,
                 placeholder: AppPatient.Placeholder.bpjs,
                 isDisabled: presenter.patientFound,
-                isNumberOnly: true,
-                length: 13,
-                text: $presenter.BPJSnumber
+                text: $presenter.BPJSnumber,
+                fieldName: .patientBPJS,
+                validationType: .bpjs
             )
             .focused($focusedField, equals: .bpjs)
             .onChange(of: presenter.BPJSnumber) {
