@@ -172,6 +172,7 @@ struct WeeklyCalendarView: View {
 
     private func getMonthAndYear(for date: Date) -> String {
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.current // Use current locale for localization
         dateFormatter.dateFormat = "MMMM yyyy" // TODO: create enum for dateFormatter
         return dateFormatter.string(from: date)
     }

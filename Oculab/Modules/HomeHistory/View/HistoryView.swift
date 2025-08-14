@@ -90,7 +90,7 @@ struct HistoryView: View {
 
     private func formatDate(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "id_ID") // Bahasa Indonesia
+        dateFormatter.locale = Locale.current // Use current system locale for localization
         dateFormatter.dateFormat = "dd MMMM yyyy"
         return dateFormatter.string(from: date)
     }
