@@ -8,27 +8,27 @@
 import SwiftUI
 
 struct PatientFormField: View {
-    @EnvironmentObject var presenter: PatientPresenter
+    @Bindable var presenter: PatientPresenter
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
             ValidatedTextField(
-                fieldName: .patientName,
                 title: AppPatient.name,
                 isRequired: true,
                 placeholder: AppTextPatientCompFormField.namePlaceholder,
                 leftIcon: AppIcon.personFill,
-                text: $presenter.patient.name
+                text: $presenter.patient.name,
+                fieldName: .patientName
             )
             
             ValidatedTextField(
-                fieldName: .patientNIK,
                 title: AppPatient.nik,
                 isRequired: true,
                 placeholder: AppPatient.Placeholder.nik,
                 isNumberOnly: true,
                 length: 16,
-                text: $presenter.patient.NIK
+                text: $presenter.patient.NIK,
+                fieldName: .patientNIK
             )
 
             DateField(
@@ -61,12 +61,12 @@ struct PatientFormField: View {
             }
 
             ValidatedTextField(
-                fieldName: .patientBPJS,
                 title: AppPatient.bpjsNumber,
                 placeholder: AppPatient.Placeholder.bpjs,
                 isNumberOnly: true,
                 length: 13,
-                text: $presenter.BPJSnumber
+                text: $presenter.BPJSnumber,
+                fieldName: .patientBPJS
             )
             .onChange(of: presenter.BPJSnumber) {
                 presenter.patient.BPJS = presenter.BPJSnumber.isEmpty ? nil : presenter.BPJSnumber
@@ -84,6 +84,5 @@ struct PatientFormField: View {
 }
 
 #Preview {
-    PatientFormField()
-        .environmentObject(PatientPresenter())
+    PatientFormField(presenter: PatientPresenter())
 }

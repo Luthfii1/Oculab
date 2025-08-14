@@ -28,8 +28,7 @@ struct PatientFormView: View {
                 } else {
                     ScrollView {
                         VStack(alignment: .leading, spacing: Decimal.d24) {
-                            PatientFormField()
-                                .environmentObject(presenter)
+                            PatientFormField(presenter: presenter)
                         }
                     }
 

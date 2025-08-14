@@ -14,7 +14,11 @@ class PatientPresenter {
     var interactor: PatientInteractor? = PatientInteractor()
     
     // MARK: - Form Validation
-    var formValidation = FormValidationViewModel()
+    var formValidation: FormValidationViewModel
+    
+    init() {
+        self.formValidation = FormValidationViewModel()
+    }
     
     // MARK: - UI State
     var isPatientLoading = false

@@ -9,7 +9,6 @@ import Foundation
 import SwiftUI
 
 /// Comprehensive validation system for all form inputs
-@MainActor
 class ValidationManager: ObservableObject {
     
     // MARK: - Published Properties

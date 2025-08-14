@@ -96,6 +96,11 @@ enum ValidationFieldName: String, CaseIterable {
     case name = "name"
     case required = "required"
     
+    // MARK: - Legacy Fields (for backward compatibility)
+    case legacyEmail = "legacy_email"
+    case legacyName = "legacy_name"
+    case legacyRole = "legacy_role"
+    
     // MARK: - Helper Properties
     
     /// The string value of the field name
@@ -189,6 +194,11 @@ enum ValidationFieldName: String, CaseIterable {
         case .email: return "Email"
         case .name: return "Name"
         case .required: return "Required Field"
+        
+        // Legacy fields
+        case .legacyEmail: return "Email"
+        case .legacyName: return "Name"
+        case .legacyRole: return "Role"
         }
     }
     
@@ -218,6 +228,8 @@ enum ValidationFieldName: String, CaseIterable {
         case .boundingBoxCoordinates, .boundingBoxAccuracy, .boundingBoxValidation:
             return .boundingBox
         case .title, .description, .notes, .comments, .dateOfBirth, .age, .gender, .address, .phone, .email, .name, .required:
+            return .generic
+        case .legacyEmail, .legacyName, .legacyRole:
             return .generic
         }
     }
@@ -265,6 +277,124 @@ extension ValidationFieldName {
             return true
         default:
             return false
+        }
+    }
+}
+
+// MARK: - Form Field Collections
+extension ValidationFieldName {
+    
+    /// Common field name combinations for forms
+    struct FormFields {
+        
+        // MARK: - Authentication Forms
+        static let login: [ValidationFieldName] = [.loginEmail, .loginPassword]
+        
+        // MARK: - User Management Forms
+        static let userRegistration: [ValidationFieldName] = [.userName, .userEmail, .userRole]
+        static let userProfile: [ValidationFieldName] = [.userName, .userEmail, .userPhone]
+        
+        // MARK: - Patient Forms
+        static let patientBasic: [ValidationFieldName] = [.patientName, .patientNIK]
+        static let patientComplete: [ValidationFieldName] = [
+            .patientName, .patientNIK, .patientBPJS,
+            .patientPhone, .patientAddress, .patientDateOfBirth
+        ]
+        
+        // MARK: - Medical Forms
+        static let medicalRecord: [ValidationFieldName] = [
+            .medicalRecordNumber, .diagnosis, .symptoms
+        ]
+        static let medicalHistory: [ValidationFieldName] = [
+            .medicalHistory, .allergies, .medications
+        ]
+        
+        // MARK: - Password Forms
+        static let passwordChange: [ValidationFieldName] = [
+            .currentPassword, .newPassword, .confirmPassword
+        ]
+        
+        // MARK: - Examination Forms
+        static let examination: [ValidationFieldName] = [
+            .examinationDate, .examinationType, .examinationNotes
+        ]
+        
+        // MARK: - Task Assignment Forms
+        static let taskAssignment: [ValidationFieldName] = [
+            .taskTitle, .taskDescription, .taskAssignee, .taskDueDate
+        ]
+        
+        // MARK: - Video Recording Forms
+        static let videoRecord: [ValidationFieldName] = [
+            .videoTitle, .videoDescription, .videoQuality
+        ]
+    }
+    
+    /// Quick access to commonly used field names
+    struct Quick {
+        static let name = ValidationFieldName.name
+        static let email = ValidationFieldName.email
+        static let phone = ValidationFieldName.phone
+        static let password = ValidationFieldName.newPassword
+        static let confirmPassword = ValidationFieldName.confirmPassword
+        static let nik = ValidationFieldName.patientNIK
+        static let bpjs = ValidationFieldName.patientBPJS
+        static let medicalRecord = ValidationFieldName.medicalRecord
+    }
+}
+
+// MARK: - Array Extensions
+extension Array where Element == ValidationFieldName {
+    
+    /// Get all field names as strings
+    var fieldNames: [String] {
+        return self.map { $0.fieldName }
+    }
+    
+    /// Get all display names
+    var displayNames: [String] {
+        return self.map { $0.displayName }
+    }
+    
+    /// Filter by category
+    func fields(in category: ValidationFieldCategory) -> [ValidationFieldName] {
+        return self.filter { $0.category == category }
+    }
+    
+    /// Get medical fields only
+    var medicalFields: [ValidationFieldName] {
+        return self.filter { $0.isMedicalField }
+    }
+    
+    /// Get authentication fields only
+    var authenticationFields: [ValidationFieldName] {
+        return self.filter { $0.isAuthenticationField }
+    }
+    
+    /// Get fields that require special validation
+    var specialValidationFields: [ValidationFieldName] {
+        return self.filter { $0.requiresSpecialValidation }
+    }
+}
+
+// MARK: - Presenter Extensions Helper
+extension ValidationFieldName {
+    
+    /// Get the property name that would be used in presenter for error state
+    var errorPropertyName: String {
+        switch self {
+        case .patientName: return "nameError"
+        case .patientNIK: return "nikError"
+        case .patientBPJS: return "bpjsError"
+        case .userName: return "nameError"
+        case .userEmail: return "emailError"
+        case .userRole: return "roleError"
+        case .currentPassword, .oldPassword: return "oldPasswordError"
+        case .newPassword: return "newPasswordError"
+        case .confirmPassword: return "confirmPasswordError"
+        case .loginEmail: return "emailError"
+        case .loginPassword: return "passwordError"
+        default: return "\(self.rawValue.replacingOccurrences(of: "_", with: ""))Error"
         }
     }
 }

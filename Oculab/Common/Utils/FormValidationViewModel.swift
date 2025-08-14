@@ -10,7 +10,6 @@ import SwiftUI
 import Combine
 
 /// View model to handle form validation state and logic
-@MainActor
 class FormValidationViewModel: ObservableObject {
     
     @Published var isFormValid: Bool = false
@@ -76,6 +75,47 @@ class FormValidationViewModel: ObservableObject {
     /// Clear error for specific field (string-based for legacy support)
     func clearError(for fieldName: String) {
         validationManager.clearError(for: fieldName)
+    }
+    
+    /// Validate multiple fields at once with field-value mapping
+    func validateBatch(fields: [ValidationFieldName], values: [ValidationFieldName: String]) -> Bool {
+        var isValid = true
+        
+        for field in fields {
+            guard let value = values[field] else { continue }
+            
+            let fieldValid: Bool
+            switch field {
+            case .loginEmail, .userEmail, .profileEmail:
+                fieldValid = validationManager.validateEmail(value, fieldName: field.fieldName)
+            case .loginPassword, .currentPassword, .newPassword, .confirmPassword:
+                fieldValid = validationManager.validateRequired(value, fieldName: field.fieldName)
+            case .userName, .patientName, .profileName:
+                fieldValid = validationManager.validateName(value, fieldName: field.fieldName)
+            case .userRole:
+                fieldValid = validationManager.validateRequired(value, fieldName: field.fieldName)
+            case .patientNIK:
+                fieldValid = validationManager.validateNIK(value, fieldName: field.fieldName)
+            case .patientBPJS:
+                if !value.isEmpty {
+                    fieldValid = validationManager.validateWithRules(value, fieldName: field.fieldName, rules: [
+                        .numbersOnly(),
+                        .minLength(13),
+                        .maxLength(13)
+                    ])
+                } else {
+                    fieldValid = true // BPJS is optional
+                }
+            default:
+                fieldValid = validationManager.validateRequired(value, fieldName: field.fieldName)
+            }
+            
+            if !fieldValid {
+                isValid = false
+            }
+        }
+        
+        return isValid
     }
     
     // MARK: - Form-specific Validation
@@ -252,5 +292,76 @@ struct FormSubmissionState {
     mutating func reset() {
         isSubmitting = false
         hasAttemptedSubmission = false
+    }
+}
+
+// MARK: - FormValidationViewModel Extensions
+extension FormValidationViewModel {
+    
+    /// Convenience method to get errors for multiple fields
+    func getErrors(for fieldNames: [ValidationFieldName]) -> [String: String] {
+        var errors: [String: String] = [:]
+        for fieldName in fieldNames {
+            if let error = getError(for: fieldName) {
+                errors[fieldName.fieldName] = error
+            }
+        }
+        return errors
+    }
+    
+    /// Check if any field in the array has errors
+    func hasAnyError(for fieldNames: [ValidationFieldName]) -> Bool {
+        return fieldNames.contains { hasError(for: $0) }
+    }
+    
+    /// Clear errors for multiple fields
+    func clearErrors(for fieldNames: [ValidationFieldName]) {
+        fieldNames.forEach { clearError(for: $0) }
+    }
+    
+    /// Validate multiple fields are not empty
+    func validateRequired(fields: [(value: String, fieldName: ValidationFieldName)]) -> Bool {
+        let validations = fields.map { field in
+            return { self.validationManager.validateRequired(field.value, fieldName: field.fieldName.fieldName) }
+        }
+        return validateForm(validations: validations)
+    }
+    
+    /// Batch validate different field types
+    func validateMixedFields(
+        names: [(value: String, fieldName: ValidationFieldName)] = [],
+        emails: [(value: String, fieldName: ValidationFieldName)] = [],
+        phones: [(value: String, fieldName: ValidationFieldName)] = [],
+        passwords: [(value: String, fieldName: ValidationFieldName)] = [],
+        required: [(value: String, fieldName: ValidationFieldName)] = []
+    ) -> Bool {
+        var validations: [() -> Bool] = []
+        
+        // Add name validations
+        validations.append(contentsOf: names.map { field in
+            return { self.validationManager.validateName(field.value, fieldName: field.fieldName.fieldName) }
+        })
+        
+        // Add email validations
+        validations.append(contentsOf: emails.map { field in
+            return { self.validationManager.validateEmail(field.value, fieldName: field.fieldName.fieldName) }
+        })
+        
+        // Add phone validations
+        validations.append(contentsOf: phones.map { field in
+            return { self.validationManager.validatePhoneNumber(field.value, fieldName: field.fieldName.fieldName) }
+        })
+        
+        // Add password validations
+        validations.append(contentsOf: passwords.map { field in
+            return { self.validationManager.validatePassword(field.value, fieldName: field.fieldName.fieldName) }
+        })
+        
+        // Add required validations
+        validations.append(contentsOf: required.map { field in
+            return { self.validationManager.validateRequired(field.value, fieldName: field.fieldName.fieldName) }
+        })
+        
+        return validateForm(validations: validations)
     }
 }

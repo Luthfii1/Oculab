@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct EditUserFormView: View {
-    @EnvironmentObject var presenter: AccountPresenter
+    @EnvironmentObject private var presenter: AccountPresenter
     let account: Account
     
     var body: some View {
@@ -57,11 +57,12 @@ struct EditUserFormView: View {
                                 selectedChoice: $presenter.role
                             )
                             
-                            AppTextField(
+                            ValidatedTextField(
                                 title: AppLabel.name,
                                 isRequired: true,
                                 placeholder: AppTextUserMgmtEditUserForm.namePlaceholder,
-                                text: $presenter.name
+                                text: $presenter.name,
+                                fieldName: .userName
                             )
                             
                             AppTextField(
@@ -78,10 +79,10 @@ struct EditUserFormView: View {
                                 AppButton(
                                     title: presenter.isEditing ? AppValue.empty : AppAction.saveChanges,
                                     rightIcon: presenter.isEditing ? nil : AppIcon.forward,
-                                    isEnabled: !presenter.isEditing,
+                                    isEnabled: presenter.isFormValid,
                                     action: {
                                         Task {
-                                            await presenter.editSelectedUser(
+                                            await presenter.editSelectedUserWithValidation(
                                                 role: presenter.role,
                                                 name: presenter.name,
                                                 userId: presenter.userId

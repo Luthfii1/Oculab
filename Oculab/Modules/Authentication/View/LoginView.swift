@@ -61,9 +61,8 @@ struct LoginView: View {
                             size: .large,
                             isEnabled: presenter.isFilled
                         ) {
-                            print("🔘 Login button tapped - isFilled: \(presenter.isFilled)")
                             Task {
-                                await presenter.loginWithValidation()
+                                await presenter.handleLogin()
                             }
                         }
                         HStack {

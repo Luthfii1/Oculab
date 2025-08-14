@@ -26,8 +26,8 @@ class AuthenticationPresenter: ObservableObject {
     @Published var isKeyboardVisible = false
     @Published var isOpeningApp = false
     
-    // Form Validation
-    @Published var formValidation = FormValidationViewModel()
+    // Form Validation  
+    @Published var formValidation: FormValidationViewModel
     
     // Authentication State
     @Published var user: User = .init()
@@ -68,6 +68,7 @@ class AuthenticationPresenter: ObservableObject {
             updateUIForErrorState()
         }
     }
+    @Published var errorMessage: String = AppValue.empty
     
     // MARK: - Constants & Dependencies
     let numbers = AppConstants.pinNumbers
@@ -90,8 +91,9 @@ class AuthenticationPresenter: ObservableObject {
     // MARK: - Initialization
     init(interactor: AuthenticationInteractor) {
         self.interactor = interactor
-        setDescriptionPIN()
-        setupFormValidation()
+        self.formValidation = FormValidationViewModel()
+        self.setupFormValidation()
+        // setDescriptionPIN() will be called by state's didSet during initialization
     }
 }
 
@@ -108,8 +110,8 @@ extension AuthenticationPresenter {
         let isValid = await formValidation.validateBatch(
             fields: ValidationFieldName.FormFields.login,
             values: [
-                .email: email,
-                .password: password
+                .loginEmail: email,
+                .loginPassword: password
             ]
         )
 
@@ -143,10 +145,7 @@ extension AuthenticationPresenter {
                 password: password
             )
             
-            // Store auth tokens
-            await interactor.updateAccessTokenInKeychain(accessToken: response.accessToken)
-            await interactor.updateRefreshTokenInKeychain(refreshToken: response.refreshToken)
-            
+            // Tokens are stored automatically in the login method
             isLoading = false
             isSuccess = true
             
@@ -155,7 +154,6 @@ extension AuthenticationPresenter {
             isLoading = false
             isError = true
             
-            switch error {
             handleErrorWithMessage(error)
             
             return false
@@ -163,7 +161,7 @@ extension AuthenticationPresenter {
     }
     
     @MainActor
-    private func getAccountById() async {
+    func getAccountById() async {
         do {
             let account = try await interactor.getAccountById()
             
@@ -319,7 +317,7 @@ extension AuthenticationPresenter {
             
             _ = try await interactor.editNewPIN(
                 newAccessPin: firstPin,
-                previousAccessPin: nil
+                previousAccessPin: AppValue.empty
             )
             
             // Update local user data
@@ -663,24 +661,20 @@ extension AuthenticationPresenter {
     private func setupFormValidation() {
         isFormValid = { [weak self] in
             guard let self = self else { return false }
-            // Check if both fields have content and no validation errors
-            return !self.email.isEmpty && 
-                   !self.password.isEmpty && 
-                   !self.formValidation.hasError(for: .loginEmail) && 
-                   !self.formValidation.hasError(for: .loginPassword)
+            // Simple validation without using main actor isolated methods
+            return !self.email.isEmpty && !self.password.isEmpty
         }
     }
     
     /// Validate all login form fields at once
     func validateAllFields() -> Bool {
-        let emailValid = formValidation.validationManager.validateEmail(email, fieldName: ValidationFieldName.loginEmail.fieldName)
-        let passwordValid = formValidation.validationManager.validateRequired(password, fieldName: ValidationFieldName.loginPassword.fieldName)
-        return emailValid && passwordValid
+        return formValidation.validateLoginForm(email: email, password: password)
     }
     
     /// Clear all validation errors
     func clearValidationErrors() {
-        formValidation.clearErrors(for: ValidationFieldName.FormFields.login)
+        let loginFields = ValidationFieldName.FormFields.login
+        formValidation.clearErrors(for: loginFields)
     }
     
     /// Clear all input fields and reset validation state
@@ -694,14 +688,6 @@ extension AuthenticationPresenter {
 
 // MARK: - Helper Methods
 private extension AuthenticationPresenter {
-    func updateUIForErrorState() {
-        if !isError {
-            description = AppValue.empty
-        }
-        textColor = isError ? AppColors.red500 : AppColors.slate900
-        pinColor = isError ? AppColors.red500 : AppColors.purple500
-    }
-    
     func withTimeout<T>(seconds: TimeInterval, operation: @escaping () async throws -> T) async throws -> T {
         return try await withThrowingTaskGroup(of: T.self) { group in
             group.addTask {

@@ -14,7 +14,7 @@ class ProfilePresenter: ObservableObject {
     private var authInteractor: AuthenticationInteractor
 
     // MARK: - Form Validation
-    @Published var formValidation = FormValidationViewModel()
+    @Published var formValidation: FormValidationViewModel
 
     // MARK: - User Data
     @Published var user: User = .init()
@@ -70,6 +70,7 @@ class ProfilePresenter: ObservableObject {
     
     // MARK: - Initialization
     init(interactor: ProfileInteractorProtocol, authInteractor: AuthenticationInteractor) {
+        self.formValidation = FormValidationViewModel()
         self.interactor = interactor
         self.authInteractor = authInteractor
         Task {
