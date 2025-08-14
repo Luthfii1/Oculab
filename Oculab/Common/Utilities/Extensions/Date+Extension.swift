@@ -28,24 +28,15 @@ extension Date {
     }
 
     func formattedDDMMYYYY() -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale.current // Use current locale for localization
-        formatter.dateFormat = "dd/MM/yyyy"
-        return formatter.string(from: self)
+        return DateFormatterHelper.shared.formatDDMMYYYY(self)
     }
 
     func formattedDayMonthYear() -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale.current // Use current locale for localization
-        formatter.dateFormat = "dd MMM yyyy"
-        return formatter.string(from: self)
+        return DateFormatterHelper.shared.formatDayMonthYear(self)
     }
     
     func formattedDayMonthYearTime() -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale.current // Use current locale for localization
-        formatter.dateFormat = "dd MMM yyyy HH:mm"
-        return formatter.string(from: self)
+        return DateFormatterHelper.shared.formatDayMonthYearTime(self)
     }
     
     func formattedYearMonthDay() -> String {
