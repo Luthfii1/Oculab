@@ -8,9 +8,9 @@
 import Foundation
 
 class ExamInteractor {
-    private let networkService: NetworkService
+    private let networkService: NetworkServiceProtocol
 
-    init(networkService: NetworkService = AlamofireNetworkService()) {
+    init(networkService: NetworkServiceProtocol = AlamofireNetworkService()) {
         self.networkService = networkService
     }
     

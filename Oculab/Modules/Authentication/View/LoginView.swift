@@ -10,106 +10,137 @@ import SwiftUI
 struct LoginView: View {
     @EnvironmentObject var presenter: AuthenticationPresenter
     @StateObject private var contactPresenter = ContactPresenter(interactor: ContactInteractor())
+    @FocusState private var isEmailFocused: Bool
+    @FocusState private var isPasswordFocused: Bool
 
     var body: some View {
         NavigationView {
-            VStack {
-                if !presenter.isKeyboardVisible {
-                    Image(AppImage.login)
-                        .resizable()
-                        .scaledToFit()
-                        .transition(.opacity)
-                }
+            ScrollView {
                 VStack {
-                    if presenter.isKeyboardVisible {
-                        Spacer()
+                    if !presenter.isKeyboardVisible {
+                        Image(AppImage.login)
+                            .resizable()
+                            .scaledToFit()
+                            .transition(.asymmetric(
+                                insertion: .opacity.combined(with: .scale),
+                                removal: .opacity.combined(with: .scale)
+                            ))
+                            .animation(.easeInOut(duration: AppConstants.animationDuration), value: presenter.isKeyboardVisible)
                     }
-                    Text(AppTextAuthLogin.title)
-                        .font(AppTypography.h1)
-                        .foregroundStyle(AppColors.slate900)
-                        .multilineTextAlignment(.center)
-                    VStack(spacing: 8) {
-                        AppTextField(
-                            title: AppLabel.email,
-                            isRequired: true,
-                            placeholder: AppTextAuthLogin.emailPlaceholder,
-                            description: presenter.emailError.isEmpty ? nil : presenter.emailError,
-                            isError: !presenter.emailError.isEmpty,
-                            isDisabled: presenter.isLoading,
-                            text: $presenter.email
-                        )
-                        AppTextField(
-                            title: AppLabel.password,
-                            isRequired: true,
-                            placeholder: AppTextAuthLogin.passwordPlaceholder,
-                            description: presenter.passwordError.isEmpty ? (presenter.isError ? presenter.description : nil) : presenter.passwordError,
-                            rightIcon: AppIcon.eye,
-                            isError: !presenter.passwordError.isEmpty || presenter.isError,
-                            isDisabled: presenter.isLoading,
-                            text: $presenter.password
-                        )
-                    }
-                    .padding(.horizontal)
-                    .padding(.top, 12)
-                    VStack(alignment: .center, spacing: 16) {
-                        AppButton(
-                            title: presenter.loginButtonText, 
-                            colorType: .primary,
-                            size: .large,
-                            isEnabled: presenter.isFilled
-                        ) {
-                            print("🔘 Login button tapped - isFilled: \(presenter.isFilled)")
-                            Task {
-                                print("🔘 Starting login task...")
-                                let loginSuccess = await presenter.login()
-                                print("🔘 Login result: \(loginSuccess)")
-                                if loginSuccess {
-                                    print("🔘 Login successful, getting account...")
-                                    await presenter.getAccountById()
-                                } else {
-                                    print("🔘 Login failed")
-                                }
-                            }
+                    VStack {
+                        if presenter.isKeyboardVisible {
+                            Spacer(minLength: AppConstants.loginKeyboardTopSpacing) // Add some top spacing when keyboard is visible
                         }
-                        HStack {
-                            Spacer()
-                            Text(AppTextAuthLogin.faskesNotRegisteredYet)
-                                .font(AppTypography.p3)
-                                .foregroundStyle(AppColors.slate900)
+                        Text(AppTextAuthLogin.title)
+                            .font(AppTypography.h1)
+                            .foregroundStyle(AppColors.slate900)
+                            .multilineTextAlignment(.center)
+                        VStack(spacing: 8) {
+                            ValidatedTextField(
+                                title: AppLabel.email,
+                                isRequired: true,
+                                placeholder: AppTextAuthLogin.emailPlaceholder,
+                                leftIcon: AppIcon.envelope,
+                                isDisabled: presenter.isLoading,
+                                text: $presenter.email,
+                                fieldName: .loginEmail,
+                                validationType: .email
+                            )
+                            .focused($isEmailFocused)
+                            
+                            ValidatedTextField(
+                                title: AppLabel.password,
+                                isRequired: true,
+                                placeholder: AppTextAuthLogin.passwordPlaceholder,
+                                leftIcon: AppIcon.lock,
+                                rightIcon: AppIcon.eye,
+                                isDisabled: presenter.isLoading,
+                                text: $presenter.password,
+                                fieldName: .loginPassword,
+                                validationType: .password
+                            )
+                            .focused($isPasswordFocused)
+                        }
+                        .padding(.horizontal, AppConstants.defaultPadding)
+                        .padding(.top, AppConstants.loginFieldsTopPadding)
+                        VStack(alignment: .center, spacing: 16) {
                             AppButton(
-                                title: AppTextAuthLogin.registerFaskesButtonText,
-                                colorType: .tertiary,
+                                title: presenter.loginButtonText, 
+                                colorType: .primary,
                                 size: .large,
-                                isEnabled: true
+                                isEnabled: presenter.isFilled
                             ) {
                                 Task {
-                                    await contactPresenter.directToWhatsapp()
+                                    await presenter.handleLogin()
                                 }
                             }
-                            .multilineTextAlignment(.leading)
-                            Spacer()
+                            HStack {
+                                Spacer()
+                                Text(AppTextAuthLogin.faskesNotRegisteredYet)
+                                    .font(AppTypography.p3)
+                                    .foregroundStyle(AppColors.slate900)
+                                AppButton(
+                                    title: AppTextAuthLogin.registerFaskesButtonText,
+                                    colorType: .tertiary,
+                                    size: .large,
+                                    isEnabled: true
+                                ) {
+                                    Task {
+                                        await contactPresenter.directToWhatsapp()
+                                    }
+                                }
+                                .multilineTextAlignment(.leading)
+                                Spacer()
+                            }
                         }
+                        .padding(.horizontal, AppConstants.defaultPadding)
+                        .padding(.top, AppConstants.loginButtonTopPadding)
+                        Spacer(minLength: AppConstants.loginBottomSpacing) // Add bottom spacing for keyboard
                     }
-                    .padding(.horizontal)
-                    .padding(.top, 18)
-                    if presenter.isKeyboardVisible {
-                        Spacer()
-                    }
+                    .padding(.top, presenter.isKeyboardVisible ? AppConstants.loginContentPaddingKeyboard : AppConstants.loginContentPaddingNormal)
                 }
-                .padding(.top, 24)
-                .adaptsToKeyboard(isKeyboardVisible: $presenter.isKeyboardVisible)
-                Spacer()
             }
             .ignoresSafeArea()
+            .dismissKeyboardOnTap()
         }
         .onAppear {
             presenter.clearInput()
         }
+        .onChange(of: isEmailFocused) { _, focused in
+            withAnimation(.easeInOut(duration: AppConstants.animationDuration)) {
+                presenter.isKeyboardVisible = focused || isPasswordFocused
+            }
+        }
+        .onChange(of: isPasswordFocused) { _, focused in
+            withAnimation(.easeInOut(duration: AppConstants.animationDuration)) {
+                presenter.isKeyboardVisible = isEmailFocused || focused
+            }
+        }
         .navigationBarBackButtonHidden()
+        // Error alert for login failures
+        .alert(
+            AppTextAuthLogin.loginFailedText,
+            isPresented: Binding(
+                get: { presenter.isError && !presenter.description.isEmpty },
+                set: { if !$0 { 
+                    presenter.isError = false
+                    presenter.description = AppValue.empty
+                } }
+            ),
+            actions: {
+                Button(AppAction.ok) {
+                    presenter.isError = false
+                    presenter.description = AppValue.empty
+                }
+            },
+            message: {
+                Text(presenter.description)
+            }
+        )
     }
 }
 
-#Preview {
-    LoginView()
-        .environmentObject(DependencyInjection.shared.createAuthPresenter())
-}
+//#Preview {
+//    LoginView()
+//        .environmentObject(DependencyInjection.shared.createAuthPresenter())
+//}

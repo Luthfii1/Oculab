@@ -11,73 +11,78 @@ import SwiftUI
 class AccountPresenter: ObservableObject {
     private var interactor: AccountInteractor
     private var searchTimer: Timer?
+    private var debounceTime: TimeInterval = 0.3
     
-    init(interactor: AccountInteractor) {
-        self.interactor = interactor
-    }
-
-    @Published var isUserLoading = false
+    // MARK: - Form Validation
+    var formValidation: FormValidationViewModel
     
-    @Published var name = AppValue.empty
-    @Published var role: String = AppValue.empty
-    @Published var userId: String = AppValue.empty
-    @Published var email: String = AppValue.empty {
+    // MARK: - UI State
+    var isUserLoading = false
+    var isRegistering = false
+    var isEditing = false
+    var isDeleting = false
+    var isSearching: Bool = false
+    
+    // MARK: - Form Fields with Validation
+    var name = AppValue.empty {
         didSet {
-            if !validateEmail(email) {
-                isError = true
-                editError = AppTextUserMgmtView.invalidEmailFormat
-            } else {
-                editError = nil
-                isError = false
-            }
+            validateNameField()
+        }
+    }
+    var role: String = AppValue.empty {
+        didSet {
+            validateRoleField()
+        }
+    }
+    var userId: String = AppValue.empty
+    var email: String = AppValue.empty {
+        didSet {
+            validateEmailField()
         }
     }
     
-    @Published var isRegistering = false
-    @Published var registrationError: String? = nil
-    @Published var registrationSuccess: (name: String, role: String) = (AppValue.empty, AppValue.empty)
-    @Published var showSuccessPopup = false
+    // MARK: - Validation Error States
+    var nameError: String = AppValue.empty
+    var emailError: String = AppValue.empty
+    var roleError: String = AppValue.empty
+    var isError = false
+    var editError: String? = nil
+    var registrationError: String? = nil
+    var deletionError: String? = nil
     
-    @Published var isDeleting = false
-    @Published var deletionError: String? = nil
-    @Published var deletionSuccess: (userName: String, message: String)? = nil
-    @Published var showDeleteSuccessAlert = false
-    @Published var showDeleteConfirmationPopup = false
-    @Published var userToDelete: SelectedUser? = nil
+    // MARK: - Success States
+    var registrationSuccess: (name: String, role: String) = (AppValue.empty, AppValue.empty)
+    var editSuccess: (name: String, role: String) = (AppValue.empty, AppValue.empty)
+    var deletionSuccess: (userName: String, message: String)? = nil
     
-    @Published var isEditing = false
-    @Published var editError: String? = nil
-    @Published var isError = false
-    @Published var editSuccess: (name: String, role: String) = (AppValue.empty, AppValue.empty)
-    private var debounceTime: TimeInterval = 0.3
-
-    @Published var searchText: String = AppValue.empty {
+    // MARK: - Alert States
+    var showSuccessPopup = false
+    var showDeleteSuccessAlert = false
+    var showDeleteConfirmationPopup = false
+    
+    // MARK: - Search and Data
+    var searchText: String = AppValue.empty {
         didSet {
-            // Cancel any existing timer
             searchTimer?.invalidate()
-            
-            // Create a new timer
             searchTimer = Timer.scheduledTimer(withTimeInterval: debounceTime, repeats: false) { [weak self] _ in
                 self?.searchAccounts(query: self?.searchText ?? AppValue.empty)
             }
         }
     }
-    @Published var isSearching: Bool = false
-    @Published var filteredGroupedAccounts: [String: [Account]] = [:]
-    @Published var filteredSortedGroupedAccounts: [String] = []
+    var filteredGroupedAccounts: [String: [Account]] = [:]
+    var filteredSortedGroupedAccounts: [String] = []
+    var groupedAccounts: [String: [Account]] = [:]
+    var sortedGroupedAccounts: [String] = []
     
-    @Published var groupedAccounts: [String: [Account]] = [:]
-    @Published var sortedGroupedAccounts: [String] = []
+    // MARK: - User Selection
+    var selectedUser: SelectedUser? = nil
+    var userToDelete: SelectedUser? = nil
     
-    @Published var selectedUser: SelectedUser? = nil
-    
-    // Model for selected user
-    struct SelectedUser: Identifiable {
-        var id: String
-        var name: String
+    // MARK: - Computed Properties
+    var isFormValid: Bool {
+        return validateUserForm() && !isRegistering && !isEditing
     }
     
-    // Computed property to get accounts based on search state
     var displayedGroupedAccounts: [String: [Account]] {
         return searchText.isEmpty ? groupedAccounts : filteredGroupedAccounts
     }
@@ -86,34 +91,117 @@ class AccountPresenter: ObservableObject {
         return searchText.isEmpty ? sortedGroupedAccounts : filteredSortedGroupedAccounts
     }
     
+    init(interactor: AccountInteractor) {
+        self.interactor = interactor
+        self.formValidation = FormValidationViewModel()
+    }
+    
     deinit {
         searchTimer?.invalidate()
     }
-    
-    // User selection methods
-    func selectUser(_ account: Account) {
-        selectedUser = SelectedUser(id: account.id, name: account.name)
-    }
-    
-    func clearSelection() {
-        selectedUser = nil
-    }
-    
-    func groupAccountsByName(accounts: [Account]) -> [String: [Account]] {
-        var grouped: [String: [Account]] = [:]
+}
 
-        for account in accounts {
-            guard let firstLetter = account.name.first?.uppercased() else { continue }
-            grouped[firstLetter, default: []].append(account)
+// MARK: - Models
+extension AccountPresenter {
+    struct SelectedUser: Identifiable {
+        var id: String
+        var name: String
+    }
+}
+
+// MARK: - Form Validation
+extension AccountPresenter {
+    func validateUserForm() -> Bool {
+        return formValidation.validateUserForm(
+            name: name,
+            email: email,
+            role: role
+        )
+    }
+    
+    private func validateNameField() {
+        if !name.isEmpty {
+            let isValid = ValidationManager.shared.validateName(name, fieldName: ValidationFieldName.userName.rawValue)
+            nameError = isValid ? AppValue.empty : (ValidationManager.shared.getError(for: ValidationFieldName.userName.rawValue) ?? AppValue.empty)
+        } else {
+            nameError = AppValue.empty
+            ValidationManager.shared.clearError(for: ValidationFieldName.userName.rawValue)
         }
-
-        for key in grouped.keys {
-            grouped[key]?.sort { $0.name < $1.name }
-        }
-
-        return grouped
     }
+    
+    private func validateEmailField() {
+        if !email.isEmpty {
+            let isValid = ValidationManager.shared.validateEmail(email, fieldName: ValidationFieldName.userEmail.rawValue)
+            emailError = isValid ? AppValue.empty : (ValidationManager.shared.getError(for: ValidationFieldName.userEmail.rawValue) ?? AppValue.empty)
+            
+            // Update legacy error state for backward compatibility
+            if !isValid {
+                isError = true
+                editError = emailError
+            } else {
+                editError = nil
+                isError = false
+            }
+        } else {
+            emailError = AppValue.empty
+            editError = nil
+            isError = false
+            ValidationManager.shared.clearError(for: ValidationFieldName.userEmail.rawValue)
+        }
+    }
+    
+    private func validateRoleField() {
+        if !role.isEmpty {
+            let isValid = ValidationManager.shared.validateRequired(role, fieldName: ValidationFieldName.userRole.rawValue)
+            roleError = isValid ? AppValue.empty : (ValidationManager.shared.getError(for: ValidationFieldName.userRole.rawValue) ?? AppValue.empty)
+        } else {
+            roleError = AppValue.empty
+            ValidationManager.shared.clearError(for: ValidationFieldName.userRole.rawValue)
+        }
+    }
+    
+    // Legacy validation methods for backward compatibility
+    func validateEmail(_ email: String) -> Bool {
+        return ValidationManager.shared.validateEmail(email, fieldName: ValidationFieldName.legacyEmail.rawValue)
+    }
+    
+    func validateName(_ name: String) -> Bool {
+        return ValidationManager.shared.validateName(name, fieldName: ValidationFieldName.legacyName.rawValue)
+    }
+    
+    func validateRole(_ role: String) -> Bool {
+        return ValidationManager.shared.validateRequired(role, fieldName: ValidationFieldName.legacyRole.rawValue)
+    }
+    
+    func isFormValid(name: String, email: String, role: String) -> Bool {
+        return formValidation.validateUserForm(name: name, email: email, role: role)
+    }
+}
 
+// MARK: - Account Data Management
+extension AccountPresenter {
+    @MainActor
+    func registerNewAccountWithValidation(role: String, name: String, email: String) async {
+        guard validateUserForm() else {
+            print("🔘 User form validation failed")
+            return
+        }
+        
+        formValidation.clearAllErrors()
+        await registerNewAccount(role: role, name: name, email: email)
+    }
+    
+    @MainActor
+    func editSelectedUserWithValidation(role: String, name: String, userId: String) async {
+        guard validateUserForm() else {
+            print("🔘 User form validation failed")
+            return
+        }
+        
+        formValidation.clearAllErrors()
+        await editSelectedUser(role: role, name: name, userId: userId)
+    }
+    
     @MainActor
     func fetchAllAccount() async {
         isUserLoading = true
@@ -131,81 +219,14 @@ class AccountPresenter: ObservableObject {
             }
 
         } catch {
-            // Handle error
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-            }
+            handleError(error)
         }
-    }
-    
-    // Search functionality
-    func searchAccounts(query: String) {
-        if query.isEmpty {
-            // Reset filtered results when query is empty
-            filteredGroupedAccounts = [:]
-            filteredSortedGroupedAccounts = []
-            return
-        }
-        
-        // Set searching state
-        isSearching = true
-        
-        // Filter accounts based on the query
-        var newFilteredGroups: [String: [Account]] = [:]
-        
-        // Iterate through all accounts in all groups
-        for (_, accounts) in groupedAccounts {
-            for account in accounts {
-                // Check if the account name or email contains the query (case insensitive)
-                if account.name.lowercased().contains(query.lowercased()) ||
-                   account.email.lowercased().contains(query.lowercased()) {
-                    
-                    // Get the first letter to use as the group key
-                    guard let firstLetter = account.name.first?.uppercased() else { continue }
-                    
-                    // Add to filtered results
-                    if newFilteredGroups[firstLetter] != nil {
-                        newFilteredGroups[firstLetter]?.append(account)
-                    } else {
-                        newFilteredGroups[firstLetter] = [account]
-                    }
-                }
-            }
-        }
-        
-        // Sort accounts within each group by name
-        for key in newFilteredGroups.keys {
-            newFilteredGroups[key]?.sort { $0.name < $1.name }
-        }
-        
-        // Update filtered results
-        filteredGroupedAccounts = newFilteredGroups
-        filteredSortedGroupedAccounts = newFilteredGroups.keys.sorted()
-        
-        isSearching = false
-    }
-    
-    func clearSearch() {
-        searchText = AppValue.empty
-        filteredGroupedAccounts = [:]
-        filteredSortedGroupedAccounts = []
-    }
-    
-    func performSearch() {
-        searchAccounts(query: searchText)
     }
     
     @MainActor
     func registerNewAccount(role: String, name: String, email: String) async {
         isRegistering = true
+        defer { isRegistering = false }
         
         do {
             let roleType = getRoleType(from: role)
@@ -227,63 +248,15 @@ class AccountPresenter: ObservableObject {
                 registrationError = AppTextUserMgmtView.failedRegistration
             }
             
-            self.name = AppValue.empty
-            self.role = AppValue.empty
-            self.email = AppValue.empty
+            clearForm()
             
         } catch {
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                registrationError = apiResponse.data.description
-                
-            case let NetworkError.networkError(message):
-                registrationError = message
-                
-            default:
-                registrationError = error.localizedDescription
-            }
+            handleRegistrationError(error)
         }
-        isRegistering = false
-    }
-    
-    func getRoleType(from roleString: String) -> RolesType {
-        return RolesType(rawValue: roleString) ?? .LAB
-    }
-    
-    func resetForm() {
-        showSuccessPopup = false
-    }
-    
-    func validateEmail(_ email: String) -> Bool {
-        let emailRegex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"
-        return email.range(of: emailRegex, options: .regularExpression) != nil
-    }
-    
-    func validateName(_ name: String) -> Bool {
-        return !name.isEmpty
-    }
-    
-    func validateRole(_ role: String) -> Bool {
-        return !role.isEmpty
-    }
-    
-    func isFormValid(name: String, email: String, role: String) -> Bool {
-        return validateName(name) && validateEmail(email) && validateRole(role)
-    }
-    
-    func findAccountById(_ id: String) -> Account? {
-        for (_, accounts) in groupedAccounts {
-            if let account = accounts.first(where: { $0.id == id }) {
-                return account
-            }
-        }
-        
-        return nil
     }
     
     @MainActor
     func editSelectedUser(role: String, name: String, userId: String) async {
-        
         isEditing = true
         defer { isEditing = false }
         
@@ -303,16 +276,7 @@ class AccountPresenter: ObservableObject {
             }
             
         } catch {
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                editError = apiResponse.data.description
-                
-            case let NetworkError.networkError(message):
-                editError = message
-                
-            default:
-                editError = error.localizedDescription
-            }
+            handleEditError(error)
         }
     }
     
@@ -337,64 +301,8 @@ class AccountPresenter: ObservableObject {
             showDeleteSuccessAlert = true
             
         } catch {
-            let errorFeedback = UINotificationFeedbackGenerator()
-            errorFeedback.notificationOccurred(.error)
-            
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                deletionError = apiResponse.data.description
-                
-            case let NetworkError.networkError(message):
-                deletionError = message
-                
-            default:
-                deletionError = error.localizedDescription
-            }
+            handleDeleteError(error)
         }
-    }
-
-    func navigateTo(_ destination: Router.Route) {
-        Router.shared.navigateTo(destination)
-    }
-    
-    func navigateBack() {
-        Router.shared.navigateBack()
-    }
-    
-    func setAccount(account: Account) {
-        self.name = account.name
-        self.role = account.role.rawValue
-        self.userId = account.id
-    }
-    
-    func dismissDeleteAlert() {
-        showDeleteSuccessAlert = false
-        deletionSuccess = nil
-    }
-    
-    func isCurrentUser(_ userId: String) -> Bool {
-        guard let currentUserId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
-            return false
-        }
-        return currentUserId == userId
-    }
-    
-    func showDeleteConfirmation() {
-        guard let selectedUser = selectedUser else { return }
-        
-        // Check if user is trying to delete themselves
-        if let currentUserId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue),
-           currentUserId == selectedUser.id {
-            return
-        }
-        
-        userToDelete = selectedUser
-        showDeleteConfirmationPopup = true
-    }
-    
-    func dismissDeleteConfirmation() {
-        showDeleteConfirmationPopup = false
-        userToDelete = nil
     }
     
     @MainActor
@@ -420,22 +328,217 @@ class AccountPresenter: ObservableObject {
             showDeleteSuccessAlert = true
             
         } catch {
-            let errorFeedback = UINotificationFeedbackGenerator()
-            errorFeedback.notificationOccurred(.error)
-            
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                deletionError = apiResponse.data.description
-                
-            case let NetworkError.networkError(message):
-                deletionError = message
-                
-            default:
-                deletionError = error.localizedDescription
-            }
+            handleDeleteError(error)
         }
         
         self.userToDelete = nil
+    }
+    
+    private func groupAccountsByName(accounts: [Account]) -> [String: [Account]] {
+        var grouped: [String: [Account]] = [:]
+
+        for account in accounts {
+            guard let firstLetter = account.name.first?.uppercased() else { continue }
+            grouped[firstLetter, default: []].append(account)
+        }
+
+        for key in grouped.keys {
+            grouped[key]?.sort { $0.name < $1.name }
+        }
+
+        return grouped
+    }
+}
+
+// MARK: - Search and Filter Operations
+extension AccountPresenter {
+    func searchAccounts(query: String) {
+        if query.isEmpty {
+            filteredGroupedAccounts = [:]
+            filteredSortedGroupedAccounts = []
+            return
+        }
+        
+        isSearching = true
+        defer { isSearching = false }
+        
+        var newFilteredGroups: [String: [Account]] = [:]
+        
+        for (_, accounts) in groupedAccounts {
+            for account in accounts {
+                if account.name.lowercased().contains(query.lowercased()) ||
+                   account.email.lowercased().contains(query.lowercased()) {
+                    
+                    guard let firstLetter = account.name.first?.uppercased() else { continue }
+                    
+                    if newFilteredGroups[firstLetter] != nil {
+                        newFilteredGroups[firstLetter]?.append(account)
+                    } else {
+                        newFilteredGroups[firstLetter] = [account]
+                    }
+                }
+            }
+        }
+        
+        for key in newFilteredGroups.keys {
+            newFilteredGroups[key]?.sort { $0.name < $1.name }
+        }
+        
+        filteredGroupedAccounts = newFilteredGroups
+        filteredSortedGroupedAccounts = newFilteredGroups.keys.sorted()
+    }
+    
+    func clearSearch() {
+        searchText = AppValue.empty
+        filteredGroupedAccounts = [:]
+        filteredSortedGroupedAccounts = []
+    }
+    
+    func performSearch() {
+        searchAccounts(query: searchText)
+    }
+}
+
+// MARK: - User Selection Management
+extension AccountPresenter {
+    func selectUser(_ account: Account) {
+        selectedUser = SelectedUser(id: account.id, name: account.name)
+    }
+    
+    func clearSelection() {
+        selectedUser = nil
+    }
+    
+    func setAccount(account: Account) {
+        self.name = account.name
+        self.role = account.role.rawValue
+        self.userId = account.id
+    }
+    
+    func findAccountById(_ id: String) -> Account? {
+        for (_, accounts) in groupedAccounts {
+            if let account = accounts.first(where: { $0.id == id }) {
+                return account
+            }
+        }
+        return nil
+    }
+    
+    func isCurrentUser(_ userId: String) -> Bool {
+        guard let currentUserId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
+            return false
+        }
+        return currentUserId == userId
+    }
+}
+
+// MARK: - Dialog and Alert Management
+extension AccountPresenter {
+    func showDeleteConfirmation() {
+        guard let selectedUser = selectedUser else { return }
+        
+        // Check if user is trying to delete themselves
+        if let currentUserId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue),
+           currentUserId == selectedUser.id {
+            return
+        }
+        
+        userToDelete = selectedUser
+        showDeleteConfirmationPopup = true
+    }
+    
+    func dismissDeleteConfirmation() {
+        showDeleteConfirmationPopup = false
+        userToDelete = nil
+    }
+    
+    func dismissDeleteAlert() {
+        showDeleteSuccessAlert = false
+        deletionSuccess = nil
+    }
+    
+    func resetForm() {
+        showSuccessPopup = false
+    }
+}
+
+// MARK: - Navigation
+extension AccountPresenter {
+    func navigateTo(_ destination: Router.Route) {
+        Router.shared.navigateTo(destination)
+    }
+    
+    func navigateBack() {
+        Router.shared.navigateBack()
+    }
+}
+
+// MARK: - Helper Methods
+extension AccountPresenter {
+    func getRoleType(from roleString: String) -> RolesType {
+        return RolesType(rawValue: roleString) ?? .LAB
+    }
+    
+    private func clearForm() {
+        self.name = AppValue.empty
+        self.role = AppValue.empty
+        self.email = AppValue.empty
+    }
+    
+    private func handleError(_ error: Error) {
+        switch error {
+        case let NetworkError.apiError(apiResponse):
+            print("Error type: \(apiResponse.data.errorType)")
+            print("Error description: \(apiResponse.data.description)")
+
+        case let NetworkError.networkError(message):
+            print("Network error: \(message)")
+
+        default:
+            print("Unknown error: \(error.localizedDescription)")
+        }
+    }
+    
+    private func handleRegistrationError(_ error: Error) {
+        switch error {
+        case let NetworkError.apiError(apiResponse):
+            registrationError = apiResponse.data.description
+            
+        case let NetworkError.networkError(message):
+            registrationError = message
+            
+        default:
+            registrationError = error.localizedDescription
+        }
+    }
+    
+    private func handleEditError(_ error: Error) {
+        switch error {
+        case let NetworkError.apiError(apiResponse):
+            editError = apiResponse.data.description
+            
+        case let NetworkError.networkError(message):
+            editError = message
+            
+        default:
+            editError = error.localizedDescription
+        }
+    }
+    
+    private func handleDeleteError(_ error: Error) {
+        let errorFeedback = UINotificationFeedbackGenerator()
+        errorFeedback.notificationOccurred(.error)
+        
+        switch error {
+        case let NetworkError.apiError(apiResponse):
+            deletionError = apiResponse.data.description
+            
+        case let NetworkError.networkError(message):
+            deletionError = message
+            
+        default:
+            deletionError = error.localizedDescription
+        }
     }
 }
 

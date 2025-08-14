@@ -8,9 +8,9 @@
 import Foundation
 
 class InputPatientInteractor {
-    private let networkService: NetworkService
+    private let networkService: NetworkServiceProtocol
 
-    init(networkService: NetworkService = AlamofireNetworkService()) {
+    init(networkService: NetworkServiceProtocol = AlamofireNetworkService()) {
         self.networkService = networkService
     }
     
@@ -90,20 +90,6 @@ class InputPatientInteractor {
         return response.data
     }
 
-//    func addNewExamination(
-//        patientId: String,
-//        examinations: [ExaminationRequest]
-//    ) async throws -> AddExaminationResponseWrapper {
-//        let response: APIResponse<AddExaminationResponseWrapper> = try await NetworkHelper.shared.post(
-//            urlString: urlCreateExam + patientId,
-//            body: examinations
-//        )
-//        print("response: \(response.code)")
-//        print("response: \(response.status)")
-//        print("response: \(response.message)")
-//
-//        return response.data
-//    }
     func addNewExamination(
         patientId: String,
         examinations: [ExaminationRequest]
@@ -122,21 +108,6 @@ class InputPatientInteractor {
         
         return response.data
     }
-//    func addNewExamination(
-//        patientId: String,
-//        examinations: [ExaminationRequest]
-//    ) async throws -> [AddExaminationResponse] {
-//        let response: APIResponse<[AddExaminationResponse]> = try await NetworkHelper.shared.post(
-//            urlString: urlCreateExam + patientId,
-//            body: examinations
-//        )
-//        print("response: \(response.code)")
-//        print("response: \(response.status)")
-//        print("response: \(response.message)")
-//
-//        return response.data
-//    }
-
 }
 
 struct ErrorMessage: Decodable {

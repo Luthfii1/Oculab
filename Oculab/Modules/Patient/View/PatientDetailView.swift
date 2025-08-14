@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PatientDetailView: View {
     let patientId: String
-    @StateObject private var presenter = PatientPresenter()
+    @State private var presenter = PatientPresenter()
     
     var body: some View {
         NavigationView {

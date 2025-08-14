@@ -30,6 +30,57 @@ struct ProfileView: View {
                         titleCard: authPresenter.user.name
                     )
 
+                    // Network Status Section
+                    HStack {
+                        Image(systemName: AppNetworkIcon.network)
+                            .foregroundColor(AppColors.purple500)
+                            .font(AppTypography.s5)
+                        
+                        Text(AppNetwork.status)
+                            .font(AppTypography.s5)
+                            .foregroundColor(AppColors.slate900)
+                        
+                        Spacer()
+                        
+                        NetworkStatusView()
+                    }
+                    .padding(AppConstants.defaultPadding)
+                    .background(.white)
+                    .cornerRadius(AppConstants.cornerRadius)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: AppConstants.cornerRadius)
+                            .stroke(AppColors.slate100)
+                    )
+
+                    if authPresenter.isFaceIdAvailable {
+                        HStack {
+                            Image(systemName: AppIcon.faceId)
+                                .foregroundColor(AppColors.purple500)
+                            Toggle(AppTextAuthProfile.faceIdToggle, isOn: Binding(
+                                get: { authPresenter.isFaceIdEnabledFromUserDefaults },
+                                set: { newValue in
+                                    Task {
+                                        if newValue {
+                                            await authPresenter.requestFaceIDActivation()
+                                        } else {
+                                            authPresenter.updateFaceIdPreference(false)
+                                        }
+                                    }
+                                }
+                            ))
+                            .toggleStyle(SwitchToggleStyle(tint: AppColors.purple500))
+                            .font(AppTypography.s5)
+                        }
+                        .padding(.vertical, Decimal.d16)
+                        .padding(.horizontal, 16)
+                        .background(.white)
+                        .cornerRadius(Decimal.d12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: Decimal.d12)
+                                .stroke(AppColors.slate100)
+                        )
+                    }
+
                     if authPresenter.user.role == .ADMIN {
                         AppButton(
                             title: AppNav.accountManagement,
@@ -82,35 +133,6 @@ struct ProfileView: View {
                         RoundedRectangle(cornerRadius: Decimal.d12)
                             .stroke(AppColors.slate100)
                     )
-
-                    if authPresenter.isFaceIdAvailable {
-                        HStack {
-                            Image(systemName: AppIcon.faceId)
-                                .foregroundColor(AppColors.purple500)
-                            Toggle(AppTextAuthProfile.faceIdToggle, isOn: Binding(
-                                get: { authPresenter.isFaceIdEnabledFromUserDefaults },
-                                set: { newValue in
-                                    Task {
-                                        if newValue {
-                                            await authPresenter.requestFaceIDActivation()
-                                        } else {
-                                            authPresenter.updateFaceIdPreference(false)
-                                        }
-                                    }
-                                }
-                            ))
-                            .toggleStyle(SwitchToggleStyle(tint: AppColors.purple500))
-                            .font(AppTypography.s5)
-                        }
-                        .padding(.vertical, Decimal.d16)
-                        .padding(.horizontal, 16)
-                        .background(.white)
-                        .cornerRadius(Decimal.d12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: Decimal.d12)
-                                .stroke(AppColors.slate100)
-                        )
-                    }
 
                     AppButton(
                         title: AppTextAuthProfile.privacyPolicyButton,

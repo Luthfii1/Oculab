@@ -37,9 +37,9 @@ struct CreateAccessPinResponse: Codable {
 
 class AuthenticationInteractor: ObservableObject {
     private var modelContext: ModelContext
-    private let networkService: NetworkService
+    private let networkService: NetworkServiceProtocol
 
-    init(modelContext: ModelContext, networkService: NetworkService = AlamofireNetworkService()) {
+    init(modelContext: ModelContext, networkService: NetworkServiceProtocol = AlamofireNetworkService()) {
         self.modelContext = modelContext
         self.networkService = networkService
     }

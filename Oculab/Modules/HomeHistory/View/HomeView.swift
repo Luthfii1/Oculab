@@ -123,6 +123,11 @@ struct HomeView: View {
                 }
             }
             .navigationTitle(AppTextHomeHistory.navigationTitleHome)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    CompactNetworkStatusView()
+                }
+            }
         }
         .ignoresSafeArea()
         .onAppear {

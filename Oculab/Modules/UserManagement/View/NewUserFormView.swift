@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct NewUserFormView: View {
-    @EnvironmentObject var presenter: AccountPresenter
+    @EnvironmentObject private var presenter: AccountPresenter
 
     var body: some View {
         NavigationView {
@@ -69,21 +69,21 @@ struct NewUserFormView: View {
                             )
                             
                             // Name field
-                            AppTextField(
+                            ValidatedTextField(
                                 title: AppLabel.name,
                                 isRequired: true,
                                 placeholder: AppTextUserMgmtNewUserForm.namePlaceholder,
-                                text: $presenter.name
+                                text: $presenter.name,
+                                fieldName: .userName
                             )
                             
                             // Email field
-                            AppTextField(
+                            ValidatedTextField(
                                 title: AppLabel.email,
                                 isRequired: true,
                                 placeholder: AppTextUserMgmtNewUserForm.emailPlaceholder,
-                                description: presenter.editError,
-                                isError: presenter.isError,
-                                text: $presenter.email
+                                text: $presenter.email,
+                                fieldName: .userEmail
                             )
                             
                             // Register button
@@ -91,14 +91,10 @@ struct NewUserFormView: View {
                                 AppButton(
                                     title: presenter.isRegistering ? AppValue.empty : AppTextUserMgmtNewUserForm.saveAccount,
                                     rightIcon: presenter.isRegistering ? nil : AppIcon.forward,
-                                    isEnabled: presenter.isFormValid(
-                                        name: presenter.name,
-                                        email: presenter.email,
-                                        role: presenter.role
-                                    ) && !presenter.isRegistering,
+                                    isEnabled: presenter.isFormValid,
                                     action: {
                                         Task {
-                                            await presenter.registerNewAccount(
+                                            await presenter.registerNewAccountWithValidation(
                                                 role: presenter.role,
                                                 name: presenter.name,
                                                 email: presenter.email

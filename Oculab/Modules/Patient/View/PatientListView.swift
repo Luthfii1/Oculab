@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PatientListView: View {
-    @StateObject private var presenter = PatientPresenter()
+    @State private var presenter = PatientPresenter()
     
     var body: some View {
         NavigationView {
@@ -17,6 +17,10 @@ struct PatientListView: View {
                     Text(AppTextPatientList.navigationTitle)
                         .font(AppTypography.h1)
                         .foregroundColor(AppColors.slate900)
+                    
+                    Spacer()
+                    
+                    CompactNetworkStatusView()
                 }
                 
                 AppSearchBar(

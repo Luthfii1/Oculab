@@ -8,13 +8,16 @@
 import Foundation
 import LocalAuthentication
 import SwiftUI
+import Combine
 
 enum PinMode {
     case create, revalidate, authenticate, changePIN
 }
 
+// MARK: - Main AuthenticationPresenter Class
 class AuthenticationPresenter: ObservableObject {
-    // MARK: - UI State Properties
+    // MARK: - Published Properties
+    // UI State
     @Published var isSplashScreenVisible = true
     @Published var description: String = AppValue.empty
     @Published var textColor: Color = AppColors.slate900
@@ -23,23 +26,18 @@ class AuthenticationPresenter: ObservableObject {
     @Published var isKeyboardVisible = false
     @Published var isOpeningApp = false
     
-    // MARK: - Authentication State
+    // Form Validation  
+    @Published var formValidation: FormValidationViewModel
+    
+    // Authentication State
     @Published var user: User = .init()
     @Published var isPinAuthorized: Bool = false
-    @Published var email = AppValue.empty {
-        didSet {
-            updateValidationErrors()
-        }
-    }
-    @Published var password = AppValue.empty {
-        didSet {
-            updateValidationErrors()
-        }
-    }
-    @Published var emailError: String = AppValue.empty
-    @Published var passwordError: String = AppValue.empty
+    @Published var isSuccess: Bool = false
+    @Published var isLogin: Bool = false
+    @Published var email = AppValue.empty
+    @Published var password = AppValue.empty
     
-    // MARK: - PIN Management State
+    // PIN Management State
     @Published var firstPin = AppValue.empty
     @Published var secondPin = AppValue.empty
     @Published var inputPin = AppValue.empty {
@@ -60,31 +58,30 @@ class AuthenticationPresenter: ObservableObject {
         }
     }
     
-    // MARK: - Biometric Authentication
+    // Biometric Authentication
     @Published var isFaceIdAvailable: Bool = false
     @Published var isFaceIdEnabledFromUserDefaults: Bool = UserDefaults.standard.bool(forKey: UserDefaultType.isFaceIdEnabled.rawValue)
     
-    // MARK: - Error Handling
+    // Error Handling
     @Published var isError: Bool = false {
         didSet {
             updateUIForErrorState()
         }
     }
+    @Published var errorMessage: String = AppValue.empty
     
-    // MARK: - Constants
+    // MARK: - Constants & Dependencies
     let numbers = AppConstants.pinNumbers
-
-    // MARK: - Dependencies
     private var interactor: AuthenticationInteractor
     weak var appStateManager: AppStateManager?
 
     // MARK: - Computed Properties
     var isFilled: Bool {
-        let isEmailValid = ValidationHelpers.isValidEmail(email)
-        let isPasswordValid = ValidationHelpers.isValidPassword(password)
-        let isFormValid = isEmailValid && isPasswordValid && !isLoading
-        
-        return isFormValid
+        return isLoginFormValidAndFilled() && !isLoading
+    }
+    
+    var isFormValid: () -> Bool = {
+        return false // Will be updated in init
     }
     
     var loginButtonText: String {
@@ -94,11 +91,123 @@ class AuthenticationPresenter: ObservableObject {
     // MARK: - Initialization
     init(interactor: AuthenticationInteractor) {
         self.interactor = interactor
-        setDescriptionPIN()
+        self.formValidation = FormValidationViewModel()
+        self.setupFormValidation()
+        // setDescriptionPIN() will be called by state's didSet during initialization
+    }
+}
+
+// MARK: - Authentication Methods
+extension AuthenticationPresenter {
+    @MainActor
+    func updateLoadingState(_ loading: Bool) {
+        isLoading = loading
     }
     
-    // MARK: ACCESS PIN
+    @MainActor
+    func handleLogin() async -> Bool {
+        // Validate all required fields
+        let isValid = await formValidation.validateBatch(
+            fields: ValidationFieldName.FormFields.login,
+            values: [
+                .loginEmail: email,
+                .loginPassword: password
+            ]
+        )
+
+        // Check if form is valid
+        guard isValid && isFormValid() else {
+            return false
+        }
+        
+        // Clear any previous general errors since validation passed
+        isError = false
+        
+        // Proceed with login
+        let loginSuccess = await login()
+        
+        if loginSuccess {
+            await getAccountById()
+        } else {
+            isError = true
+            // Use the backend error message if available, otherwise use generic message
+            if !errorMessage.isEmpty {
+                description = errorMessage
+            } else {
+                description = AppTextAuthLogin.loginFailedText
+            }
+        }
+        
+        return loginSuccess
+    }
     
+    @MainActor
+    private func login() async -> Bool {
+        isLoading = true
+        do {
+            let response = try await interactor.login(
+                email: email,
+                password: password
+            )
+            
+            // Tokens are stored automatically in the login method
+            isLoading = false
+            isSuccess = true
+            
+            return true
+        } catch {
+            isLoading = false
+            isError = true
+            
+            handleErrorWithMessage(error)
+            
+            return false
+        }
+    }
+    
+    @MainActor
+    func getAccountById() async {
+        do {
+            let account = try await interactor.getAccountById()
+            
+            // Store the user data locally
+            await interactor.updateUserLocalData(user: account)
+            
+            user = account
+            isLogin = true
+            
+            // Clear any PIN state
+            inputPin = AppValue.empty
+            firstPin = AppValue.empty
+            secondPin = AppValue.empty
+
+            if account.accessPin == nil {
+                // User needs to create PIN
+                state = .create
+                isPinAuthorized = false
+                appStateManager?.setRequiresPin(hasExistingPin: false)
+            } else {
+                // User needs to authenticate with existing PIN
+                state = .authenticate
+                isPinAuthorized = false
+                appStateManager?.setRequiresPin(hasExistingPin: true)
+            }
+            
+        } catch {
+            handleErrorWithMessage(error)
+            
+            // Handle error and ensure user goes back to login
+            isPinAuthorized = false
+            clearLoginState()
+            appStateManager?.setUnauthenticated()
+            
+            isError = true
+        }
+    }
+}
+
+// MARK: - PIN Management
+extension AuthenticationPresenter {
     @MainActor
     func isValidPin() async -> Bool {
         // For PIN change flow, we should check against oldAccessPin, not the stored PIN
@@ -116,9 +225,13 @@ class AuthenticationPresenter: ObservableObject {
                 return false
             }
         }
-        
-        isError = false
         return true
+    }
+    
+    func updateInputPin(newPin: String) {
+        inputPin = newPin
+        isError = false
+        description = AppValue.empty
     }
     
     @MainActor
@@ -141,7 +254,7 @@ class AuthenticationPresenter: ObservableObject {
                 if isAccessPinChangeInProgress {
                     // This is part of PIN change flow - call the PIN update API
                     newAccessPin = secondPin
-                    await postEditAccessPin()
+                    await editAccessPin()
                 } else {
                     // This is initial PIN setup - just update locally and authorize
                     user.accessPin = secondPin
@@ -166,29 +279,27 @@ class AuthenticationPresenter: ObservableObject {
             }
 
         case .changePIN:
-            Task {
-                if await self.isValidPin() {
-                    oldAccessPin = inputPin // Store the old PIN
-                    isAccessPinChangeInProgress = true
-                    inputPin = AppValue.empty
-                    firstPin = AppValue.empty
-                    secondPin = AppValue.empty
-                    state = .create
-                    
-                    Router.shared.navigateTo(.userAccessPin(state: .create))
-                } else {
-                    inputPin = AppValue.empty
-                    // Error description is already set in isValidPin()
-                }
+            if await self.isValidPin() {
+                oldAccessPin = inputPin // Store the old PIN
+                isAccessPinChangeInProgress = true
+                inputPin = AppValue.empty
+                firstPin = AppValue.empty
+                secondPin = AppValue.empty
+                state = .create
+                
+                Router.shared.navigateTo(.userAccessPin(state: .create))
+            } else {
+                inputPin = AppValue.empty
+                // Error description is already set in isValidPin()
             }
         }
     }
     
     @MainActor
-    func postEditAccessPin() async {
-        guard !newAccessPin.isEmpty, !oldAccessPin.isEmpty else {
-            print("PIN fields are empty")
+    func editAccessPin() async {
+        guard let user = await interactor.getUserLocalData() else {
             isError = true
+            description = "User not found"
             return
         }
         
@@ -207,21 +318,7 @@ class AuthenticationPresenter: ObservableObject {
             resetPinChangeFlow()
             
         } catch {
-            isError = true
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-                description = apiResponse.data.description
-
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-                description = message
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-                description = error.localizedDescription
-            }
+            handleErrorWithMessage(error)
         }
     }
     
@@ -232,44 +329,84 @@ class AuthenticationPresenter: ObservableObject {
             return
         }
         
-        if firstPin != secondPin {
+        guard firstPin == secondPin else {
+            description = AppTextAuthCompPin.invalidPinMatchText
             isError = true
+            return
         }
         
         do {
-            _ = try await interactor.createAccessPin(accessPin: secondPin)
+            guard let user = await interactor.getUserLocalData() else {
+                isError = true
+                description = "User not found"
+                return
+            }
             
-            // Show success and reset
+            _ = try await interactor.editNewPIN(
+                newAccessPin: firstPin,
+                previousAccessPin: AppValue.empty
+            )
+            
+            // Update local user data
+            user.accessPin = firstPin
+            await interactor.updateUserLocalData(user: user)
+            
+            // Success - navigate or show confirmation
             showAccessPinSuccessPopup = true
-            resetPinChangeFlow()
+            
         } catch {
             isError = true
             switch error {
             case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
                 description = apiResponse.data.description
-
             case let NetworkError.networkError(message):
-                print("Network error: \(message)")
                 description = message
-
             default:
-                print("Unknown error: \(error.localizedDescription)")
                 description = error.localizedDescription
             }
         }
     }
     
-    func resetPinChangeFlow() {
-        oldAccessPin = AppValue.empty
-        newAccessPin = AppValue.empty
-        firstPin = AppValue.empty
-        secondPin = AppValue.empty
-        inputPin = AppValue.empty
-        isAccessPinChangeInProgress = false
-        isError = false
-        description = AppValue.empty
+    func onPinCreation() {
+        var description: String = AppValue.empty
+        
+        if state == .create {
+            if isAccessPinChangeInProgress {
+                description = AppTextAuthCompPin.titleCreateChangePin
+            } else {
+                description = AppTextAuthCompPin.titleCreatePin
+            }
+        } else {
+            switch state {
+            case .create:
+                description = isAccessPinChangeInProgress ? AppTextAuthCompPin.titleCreateChangePin : AppTextAuthCompPin.titleCreatePin
+            case .revalidate:
+                if isAccessPinChangeInProgress {
+                    description = AppTextAuthCompPin.revalidateChangePinTitle
+                } else {
+                    description = AppTextAuthCompPin.revalidatePinTitle
+                }
+            case .authenticate:
+                description = AppTextAuthCompPin.titleAuthenticatePin
+            case .changePIN:
+                description = AppTextAuthCompPin.changePinTitle
+            }
+        }
+        
+        descriptionPIN = description
+    }
+    
+    var title: String {
+        switch state {
+        case .create:
+            return isAccessPinChangeInProgress ? AppTextAuthCompPin.titleCreateChangePin : AppTextAuthCompPin.titleCreatePin
+        case .revalidate:
+            return isAccessPinChangeInProgress ? AppTextAuthCompPin.revalidateChangePinTitle : AppTextAuthCompPin.revalidatePinTitle
+        case .authenticate:
+            return AppTextAuthCompPin.titleAuthenticatePin
+        case .changePIN:
+            return AppTextAuthCompPin.titleChangePin
+        }
     }
     
     func setDescriptionPIN() {
@@ -294,53 +431,6 @@ class AuthenticationPresenter: ObservableObject {
             }
         }
     }
-        
-    var title: String {
-        switch state {
-        case .create:
-            return isAccessPinChangeInProgress ? AppTextAuthCompPin.titleCreateChangePin : AppTextAuthCompPin.titleCreatePin
-        case .revalidate:
-            return isAccessPinChangeInProgress ? AppTextAuthCompPin.revalidateChangePinTitle : AppTextAuthCompPin.revalidatePinTitle
-        case .authenticate:
-            return AppTextAuthCompPin.titleAuthenticatePin
-        case .changePIN:
-            return AppTextAuthCompPin.titleChangePin
-        }
-    }
-
-    func clearInput() {
-        email = AppValue.empty
-        password = AppValue.empty
-        emailError = AppValue.empty
-        passwordError = AppValue.empty
-        isError = false
-    }
-    
-    private func updateValidationErrors() {
-        // Only show errors if user has started typing
-        if !email.isEmpty && !ValidationHelpers.isValidEmail(email) {
-            emailError = ValidationHelpers.ErrorMessage.invalidEmail
-        } else {
-            emailError = AppValue.empty
-        }
-        
-        if !password.isEmpty && !ValidationHelpers.isValidPassword(password) {
-            passwordError = ValidationHelpers.ErrorMessage.invalidPassword
-        } else {
-            passwordError = AppValue.empty
-        }
-    }
-
-    private func handleErrorState(isError: Bool, errorData: ApiErrorData? = nil) {
-        DispatchQueue.main.async {
-            if isError, let errorData = errorData {
-                print("Error type: \(errorData.errorType)")
-                print("Error description: \(errorData.description)")
-                self.description = errorData.description
-            }
-            self.isError = isError
-        }
-    }
     
     private func revalidatePinMatched() -> Bool {
         let matched = firstPin == secondPin
@@ -351,147 +441,20 @@ class AuthenticationPresenter: ObservableObject {
         return matched
     }
     
-    // MARK: USER AUTHENTICATION
-
-    func isUserLoggedIn() -> Bool {
-        return UserDefaults.standard.bool(forKey: UserDefaultType.isUserLoggedIn.rawValue)
-    }
-
-    @MainActor
-    func getAccountById() async {
-        do {
-            // Add timeout handling
-            let getAccountResponse = try await withTimeout(seconds: 30) { [self] in
-                try await self.interactor.getAccountById()
-            }
-            user = getAccountResponse
-
-            // Reset the pin input state
-            inputPin = AppValue.empty
-            firstPin = AppValue.empty
-            secondPin = AppValue.empty
-
-            if getAccountResponse.accessPin == nil {
-                // User needs to create PIN
-                state = .create
-                isPinAuthorized = false
-                appStateManager?.setRequiresPin(hasExistingPin: false)
-            } else {
-                // User needs to authenticate with existing PIN
-                state = .authenticate
-                isPinAuthorized = false
-                appStateManager?.setRequiresPin(hasExistingPin: true)
-            }
-        } catch {
-            // Handle error and ensure user goes back to login
-            isPinAuthorized = false
-            clearLoginState()
-            appStateManager?.setUnauthenticated()
-            
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-                handleErrorState(isError: true, errorData: apiResponse.data)
-
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-                handleErrorState(
-                    isError: true,
-                    errorData: ApiErrorData(errorType: "NETWORK_ERROR", description: message)
-                )
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-                handleErrorState(
-                    isError: true,
-                    errorData: ApiErrorData(errorType: "AUTHENTICATION_ERROR", description: error.localizedDescription)
-                )
-            }
-        }
-    }
-
-    @MainActor
-    func login() async -> Bool {
-        // Clear previous errors
+    func resetPinChangeFlow() {
+        isAccessPinChangeInProgress = false
+        oldAccessPin = AppValue.empty
+        newAccessPin = AppValue.empty
+        firstPin = AppValue.empty
+        secondPin = AppValue.empty
+        inputPin = AppValue.empty
         isError = false
-        emailError = AppValue.empty
-        passwordError = AppValue.empty
-        
-        // Validate before attempting login
-        guard ValidationHelpers.isValidEmail(email) else {
-            emailError = ValidationHelpers.ErrorMessage.invalidEmail
-            return false
-        }
-        
-        guard ValidationHelpers.isValidPassword(password) else {
-            passwordError = ValidationHelpers.ErrorMessage.invalidPassword
-            return false
-        }
-        
-        isLoading = true
-        defer { 
-            isLoading = false 
-        }
-
-        do {
-            let response = try await interactor.login(email: email, password: password)
-            
-            handleErrorState(isError: false)
-            return true
-        } catch {
-            // Clear any partial login state on failure
-            clearLoginState()
-            
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                handleErrorState(isError: true, errorData: apiResponse.data)
-            case let NetworkError.networkError(message):
-                handleErrorState(
-                    isError: true,
-                    errorData: ApiErrorData(errorType: "NETWORK_ERROR", description: message)
-                )
-            default:
-                handleErrorState(
-                    isError: true,
-                    errorData: ApiErrorData(errorType: "UNKNOWN_ERROR", description: error.localizedDescription)
-                )
-            }
-            return false
-        }
+        description = AppValue.empty
     }
+}
 
-    private func clearLoginState() {
-        UserDefaults.standard.removeObject(forKey: UserDefaultType.isUserLoggedIn.rawValue)
-        UserDefaults.standard.removeObject(forKey: UserDefaultType.userId.rawValue)
-        UserDefaults.standard.removeObject(forKey: UserDefaultType.accessToken.rawValue)
-        UserDefaults.standard.removeObject(forKey: UserDefaultType.refreshToken.rawValue)
-    }
-
-    @MainActor
-    func updateAccount(updateUser: User) async {
-        do {
-            let response = try await interactor.updateUserById(user: updateUser)
-
-            user = response
-            Router.shared.popToRoot()
-        } catch {
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-            }
-        }
-    }
-    
-    // MARK: FACE ID AUTHORIZATION
-
+// MARK: - Biometric Authentication
+extension AuthenticationPresenter {
     func checkFaceIDAvailability() {
         let context = LAContext()
         var error: NSError?
@@ -596,8 +559,57 @@ class AuthenticationPresenter: ObservableObject {
             isFaceIdEnabledFromUserDefaults = false
         }
     }
+}
+
+// MARK: - User Management
+extension AuthenticationPresenter {
+    @MainActor
+    func getAccount() async {
+        do {
+            let getAccountResponse = try await interactor.getAccountById()
+            
+            // Store the user data
+            user = getAccountResponse
+            await interactor.updateUserLocalData(user: getAccountResponse)
+            
+            // Clear any PIN state
+            inputPin = AppValue.empty
+            firstPin = AppValue.empty
+            secondPin = AppValue.empty
+
+            if getAccountResponse.accessPin == nil {
+                // User needs to create PIN
+                state = .create
+                isPinAuthorized = false
+                appStateManager?.setRequiresPin(hasExistingPin: false)
+            } else {
+                // User needs to authenticate with existing PIN
+                state = .authenticate
+                isPinAuthorized = false
+                appStateManager?.setRequiresPin(hasExistingPin: true)
+            }
+        } catch {
+            // Handle error and ensure user goes back to login
+            isPinAuthorized = false
+            clearLoginState()
+            appStateManager?.setUnauthenticated()
+            
+            handleErrorWithMessage(error)
+        }
+    }
     
-    // MARK: - SwiftData Refresh
+    @MainActor
+    func updateAccount(updateUser: User) async {
+        do {
+            let response = try await interactor.updateUserById(user: updateUser)
+
+            user = response
+            Router.shared.popToRoot()
+        } catch {
+            handleErrorWithMessage(error)
+        }
+    }
+    
     @MainActor
     func refreshUserFromSwiftData() async {
         if let userData = await interactor.getUserLocalData() {
@@ -605,7 +617,20 @@ class AuthenticationPresenter: ObservableObject {
         }
     }
     
-    // MARK: - State Reset
+    private func clearLoginState() {
+        UserDefaults.standard.removeObject(forKey: UserDefaultType.isUserLoggedIn.rawValue)
+        UserDefaults.standard.removeObject(forKey: UserDefaultType.userId.rawValue)
+        UserDefaults.standard.removeObject(forKey: UserDefaultType.accessToken.rawValue)
+        UserDefaults.standard.removeObject(forKey: UserDefaultType.refreshToken.rawValue)
+    }
+    
+    func isUserLoggedIn() -> Bool {
+        return UserDefaults.standard.bool(forKey: UserDefaultType.isUserLoggedIn.rawValue)
+    }
+}
+
+// MARK: - State Management
+extension AuthenticationPresenter {
     @MainActor
     func resetAuthenticationState() {
         // Reset authentication state
@@ -626,8 +651,7 @@ class AuthenticationPresenter: ObservableObject {
         // Clear login credentials and validation errors
         email = AppValue.empty
         password = AppValue.empty
-        emailError = AppValue.empty
-        passwordError = AppValue.empty
+        clearValidationErrors()
         
         // Reset UI state
         isError = false
@@ -639,18 +663,73 @@ class AuthenticationPresenter: ObservableObject {
         textColor = AppColors.slate900
         pinColor = AppColors.purple500
     }
-}
-
-// MARK: - Helper Methods
-private extension AuthenticationPresenter {
-    func updateUIForErrorState() {
+    
+    private func handleErrorState(isError: Bool, errorData: ApiErrorData? = nil) {
+        DispatchQueue.main.async {
+            if isError, let errorData = errorData {
+                self.description = errorData.description
+            }
+            self.isError = isError
+        }
+    }
+    
+    private func updateUIForErrorState() {
         if !isError {
             description = AppValue.empty
         }
         textColor = isError ? AppColors.red500 : AppColors.slate900
         pinColor = isError ? AppColors.red500 : AppColors.purple500
     }
+}
+
+// MARK: - Form Validation Extension
+extension AuthenticationPresenter {
+    /// Setup form validation logic
+    private func setupFormValidation() {
+        isFormValid = { [weak self] in
+            guard let self = self else { return false }
+            // Simple validation without using main actor isolated methods
+            return !self.email.isEmpty && !self.password.isEmpty
+        }
+    }
     
+    /// Validate all login form fields at once
+    func validateAllFields() -> Bool {
+        return formValidation.validateLoginForm(email: email, password: password)
+    }
+    
+    /// Clear all validation errors
+    func clearValidationErrors() {
+        let loginFields = ValidationFieldName.FormFields.login
+        formValidation.clearErrors(for: loginFields)
+    }
+    
+    /// Check if login form is both filled and has no validation errors
+    func isLoginFormValidAndFilled() -> Bool {
+        // Check if fields are filled
+        guard !email.isEmpty && !password.isEmpty else { return false }
+        guard password.count >= 8 else { return false }
+        
+        // Check if there are no validation errors for login fields
+        let hasEmailError = formValidation.hasError(for: .loginEmail)
+        let hasPasswordError = formValidation.hasError(for: .loginPassword)
+        
+        return !hasEmailError && !hasPasswordError
+    }
+    
+    /// Clear all input fields and reset validation state
+    func clearInput() {
+        email = AppValue.empty
+        password = AppValue.empty
+        clearValidationErrors()
+        isError = false
+        description = AppValue.empty
+        errorMessage = AppValue.empty
+    }
+}
+
+// MARK: - Helper Methods
+private extension AuthenticationPresenter {
     func withTimeout<T>(seconds: TimeInterval, operation: @escaping () async throws -> T) async throws -> T {
         return try await withThrowingTaskGroup(of: T.self) { group in
             group.addTask {
@@ -665,6 +744,23 @@ private extension AuthenticationPresenter {
             let result = try await group.next()!
             group.cancelAll()
             return result
+        }
+    }
+
+    private func handleErrorWithMessage(_ error: Error) {
+        switch error {
+        case let NetworkError.apiError(apiResponse):
+            print("Error type: \(apiResponse.data.errorType)")
+            print("Error description: \(apiResponse.data.description)")
+            errorMessage = apiResponse.data.description
+
+        case let NetworkError.networkError(message):
+            print("Network error: \(message)")
+            errorMessage = message
+
+        default:
+            print("Unknown error: \(error.localizedDescription)")
+            errorMessage = error.localizedDescription
         }
     }
 }

@@ -24,6 +24,7 @@ extension AppText {
             static let buttonText = "auth.login.button".localized
             static let faskesNotRegisteredYet = "auth.login.not_registered".localized
             static let registerFaskesButtonText = "auth.login.register_facility".localized
+            static let loginFailedText = "auth.login.failed".localized
         }
         
         enum EditPasswordView {
