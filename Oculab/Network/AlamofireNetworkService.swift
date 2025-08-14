@@ -47,25 +47,44 @@ class AlamofireNetworkService: NetworkServiceProtocol {
     }
 
     private func handleRequest<T: Decodable>(_ request: DataRequest) async throws -> APIResponse<T> {
-        let dataResponse = await request.validate().serializingData().response
-        switch dataResponse.result {
-        case .success(let data):
-            do {
-                let decodedResponse = try Self.decoder.decode(APIResponse<T>.self, from: data)
-                if decodedResponse.status == StatusResponseType.ERROR.rawValue {
-                    if let errorResponse = try? Self.decoder.decode(APIResponse<ApiErrorData>.self, from: data) {
-                        throw NetworkError.apiError(errorResponse)
-                    }
+        let dataResponse = await request.serializingData().response
+        
+        // Get the data regardless of success or failure
+        guard let data = dataResponse.data else {
+            throw NetworkError.networkError("No data received from server")
+        }
+        
+        // Debug: Print raw response for troubleshooting
+        if let statusCode = dataResponse.response?.statusCode {
+            print("DEBUG: HTTP Status Code: \(statusCode)")
+        }
+        
+        if let rawString = String(data: data, encoding: .utf8) {
+            print("DEBUG: Raw Response: \(rawString)")
+        }
+        
+        // Always try to decode the response as our standard API format first
+        if let errorResponse = try? Self.decoder.decode(APIResponse<ApiErrorData>.self, from: data) {
+            print("DEBUG: Successfully decoded as APIResponse<ApiErrorData>")
+            throw NetworkError.apiError(errorResponse)
+        }
+        
+        // If it's not an error response, try to decode as success
+        do {
+            let decodedResponse = try Self.decoder.decode(APIResponse<T>.self, from: data)
+            if decodedResponse.status == StatusResponseType.ERROR.rawValue {
+                if let errorResponse = try? Self.decoder.decode(APIResponse<ApiErrorData>.self, from: data) {
+                    throw NetworkError.apiError(errorResponse)
                 }
-                return decodedResponse
-            } catch {
-                if let decodedError = try? Self.decoder.decode(APIResponse<ApiErrorData>.self, from: data) {
-                    throw NetworkError.apiError(decodedError)
-                }
-                throw NetworkError.networkError("Decoding error: \(error.localizedDescription)")
             }
-        case .failure(let error):
-            throw NetworkError.networkError(error.localizedDescription)
+            return decodedResponse
+        } catch {
+            print("DEBUG: Failed to decode as success response: \(error)")
+            // If we can't decode the response, fall back to the original error
+            if let originalError = dataResponse.error {
+                throw NetworkError.networkError(originalError.localizedDescription)
+            }
+            throw NetworkError.networkError("Decoding error: \(error.localizedDescription)")
         }
     }
 }

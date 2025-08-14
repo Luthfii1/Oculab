@@ -22,8 +22,8 @@ class ContactInteractor {
     
     let urlGetWhatsappLink = API.BE + "/contact/get-whatsapp-link/"
 
-    func getWhatsappLinkById(contactId: String) async throws -> ContactResponse {
-        let urlString = "\(urlGetWhatsappLink)\(contactId)"
+    func getWhatsappLinkById() async throws -> ContactResponse {
+        let urlString = "\(urlGetWhatsappLink)"
 
         let response: APIResponse<ContactResponse> = try await networkService.get(
             urlString: urlString,

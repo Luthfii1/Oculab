@@ -48,7 +48,7 @@ class ValidationManager: ObservableObject {
                          minLength: Int = 8,
                          requireUppercase: Bool = true,
                          requireLowercase: Bool = true,
-                         requireNumbers: Bool = true,
+                         requireNumbers: Bool = false,
                          requireSpecialChars: Bool = false) -> Bool {
         clearError(for: fieldName)
         

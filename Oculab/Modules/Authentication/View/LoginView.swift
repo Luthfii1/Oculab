@@ -95,15 +95,39 @@ struct LoginView: View {
                 Spacer()
             }
             .ignoresSafeArea()
+            .onTapGesture {
+                // Hide keyboard when tapping outside text fields
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            }
         }
         .onAppear {
             presenter.clearInput()
         }
         .navigationBarBackButtonHidden()
+        // Error alert for login failures
+        .alert(
+            AppTextAuthLogin.loginFailedText,
+            isPresented: Binding(
+                get: { presenter.isError && !presenter.description.isEmpty },
+                set: { if !$0 { 
+                    presenter.isError = false
+                    presenter.description = AppValue.empty
+                } }
+            ),
+            actions: {
+                Button(AppAction.ok) {
+                    presenter.isError = false
+                    presenter.description = AppValue.empty
+                }
+            },
+            message: {
+                Text(presenter.description)
+            }
+        )
     }
 }
 
-#Preview {
-    LoginView()
-        .environmentObject(DependencyInjection.shared.createAuthPresenter())
-}
+//#Preview {
+//    LoginView()
+//        .environmentObject(DependencyInjection.shared.createAuthPresenter())
+//}

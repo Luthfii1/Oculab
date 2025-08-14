@@ -47,11 +47,8 @@ private extension AccountCheckerView {
     @ViewBuilder
     var currentView: some View {
         switch appStateManager.initializationState {
-        case .splash:
+        case .splash, .loading:
             SplashScreenView()
-            
-        case .loading:
-            LoadingView.authentication
             
         case .authenticated:
             ContentView()
@@ -152,7 +149,7 @@ private extension AccountCheckerView {
     }
 }
 
-#Preview {
-    AccountCheckerView()
-        .environmentObject(DependencyInjection.shared.createAuthPresenter())
-}
+//#Preview {
+//    AccountCheckerView()
+//        .environmentObject(DependencyInjection.shared.createAuthPresenter())
+//}

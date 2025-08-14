@@ -20,9 +20,9 @@ class ContactPresenter: ObservableObject {
     }
 
     @MainActor
-    func fetchData(contactId: String) async {
+    func fetchData() async {
         do {
-            let contactResponse = try await interactor.getWhatsappLinkById(contactId: contactId)
+            let contactResponse = try await interactor.getWhatsappLinkById()
 
             contactData = contactResponse
         } catch {
@@ -42,6 +42,7 @@ class ContactPresenter: ObservableObject {
     }
     
     func directToWhatsapp() async {
+        await fetchData()
         if let url = URL(string: contactData.whatsappLink) {
             await MainActor.run {
                 UIApplication.shared.open(url)

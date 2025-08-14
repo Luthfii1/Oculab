@@ -313,6 +313,7 @@
 "auth.login.button" = "Login";
 "auth.login.not_registered" = "Faskes belum terdaftar?";
 "auth.login.register_facility" = "Daftarkan Faskes";
+"auth.login.failed" = "Login Gagal";
 
 // Edit Password View
 "auth.edit_password.success_title" = "Berhasil mengubah kata sandi";

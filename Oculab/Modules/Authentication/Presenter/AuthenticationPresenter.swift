@@ -77,7 +77,7 @@ class AuthenticationPresenter: ObservableObject {
 
     // MARK: - Computed Properties
     var isFilled: Bool {
-        return isFormValid() && !isLoading
+        return isLoginFormValidAndFilled() && !isLoading
     }
     
     var isFormValid: () -> Bool = {
@@ -130,7 +130,12 @@ extension AuthenticationPresenter {
             await getAccountById()
         } else {
             isError = true
-            description = AppTextAuthLogin.loginFailedText
+            // Use the backend error message if available, otherwise use generic message
+            if !errorMessage.isEmpty {
+                description = errorMessage
+            } else {
+                description = AppTextAuthLogin.loginFailedText
+            }
         }
         
         return loginSuccess
@@ -171,8 +176,30 @@ extension AuthenticationPresenter {
             user = account
             isLogin = true
             
+            // Clear any PIN state
+            inputPin = AppValue.empty
+            firstPin = AppValue.empty
+            secondPin = AppValue.empty
+
+            if account.accessPin == nil {
+                // User needs to create PIN
+                state = .create
+                isPinAuthorized = false
+                appStateManager?.setRequiresPin(hasExistingPin: false)
+            } else {
+                // User needs to authenticate with existing PIN
+                state = .authenticate
+                isPinAuthorized = false
+                appStateManager?.setRequiresPin(hasExistingPin: true)
+            }
+            
         } catch {
             handleErrorWithMessage(error)
+            
+            // Handle error and ensure user goes back to login
+            isPinAuthorized = false
+            clearLoginState()
+            appStateManager?.setUnauthenticated()
             
             isError = true
         }
@@ -677,12 +704,27 @@ extension AuthenticationPresenter {
         formValidation.clearErrors(for: loginFields)
     }
     
+    /// Check if login form is both filled and has no validation errors
+    func isLoginFormValidAndFilled() -> Bool {
+        // Check if fields are filled
+        guard !email.isEmpty && !password.isEmpty else { return false }
+        guard password.count >= 8 else { return false }
+        
+        // Check if there are no validation errors for login fields
+        let hasEmailError = formValidation.hasError(for: .loginEmail)
+        let hasPasswordError = formValidation.hasError(for: .loginPassword)
+        
+        return !hasEmailError && !hasPasswordError
+    }
+    
     /// Clear all input fields and reset validation state
     func clearInput() {
         email = AppValue.empty
         password = AppValue.empty
         clearValidationErrors()
         isError = false
+        description = AppValue.empty
+        errorMessage = AppValue.empty
     }
 }
 
