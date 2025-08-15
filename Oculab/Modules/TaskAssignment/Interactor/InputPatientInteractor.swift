@@ -101,9 +101,9 @@ class InputPatientInteractor {
         )
         
         let createdExams = response.data.examinations
-        print("✅ Successfully created \(createdExams.count) examination(s)")
+        Logger.info("Successfully created \(createdExams.count) examination(s)", category: .taskAssignment)
         for exam in createdExams {
-            print("- ID: \(exam._id), Slide: \(exam.slideId), Type: \(exam.preparationType)")
+            Logger.debug("Created exam - ID: \(exam._id), Slide: \(exam.slideId), Type: \(exam.preparationType)", category: .taskAssignment)
         }
         
         return response.data

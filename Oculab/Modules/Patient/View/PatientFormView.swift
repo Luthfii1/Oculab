@@ -10,10 +10,6 @@ import SwiftUI
 struct PatientFormView: View {
     let patientId: String?
     @State private var presenter = PatientPresenter()
-    
-    private var isAddingNewPatient: Bool {
-        patientId == nil
-    }
 
     init(patientId: String? = nil) {
         self.patientId = patientId
@@ -27,7 +23,7 @@ struct PatientFormView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     ScrollView {
-                        VStack(alignment: .leading, spacing: Decimal.d24) {
+                        VStack(alignment: .leading, spacing: AppConstants.PatientUI.fieldSpacing) {
                             PatientFormField(presenter: presenter)
                         }
                     }
@@ -35,23 +31,19 @@ struct PatientFormView: View {
                     Spacer()
 
                     AppButton(
-                        title: isAddingNewPatient ? AppTextPatientCompCard.buttonCreatePatient : AppTextPatientCompCard.buttonSavePatient,
-                        leftIcon: isAddingNewPatient ? AppIcon.add : AppIcon.checkmark,
+                        title: presenter.buttonTitle,
+                        leftIcon: presenter.buttonIcon,
                         isEnabled: presenter.isFormValid
                     ) {
                         Task {
-                            if isAddingNewPatient {
-                                await presenter.addNewPatientWithValidation()
-                            } else {
-                                await presenter.updatePatientWithValidation()
-                            }
+                            await presenter.handleFormSubmission()
                         }
                     }
                 }
             }
-            .padding(.horizontal, Decimal.d20)
-            .padding(.vertical, Decimal.d24)
-            .navigationTitle(isAddingNewPatient ? AppTextPatientForm.newPatientNavigationTitle : AppTextPatientForm.editPatientNavigationTitle)
+            .padding(.horizontal, AppConstants.PatientUI.horizontalPadding)
+            .padding(.vertical, AppConstants.PatientUI.fieldSpacing)
+            .navigationTitle(presenter.navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -65,16 +57,13 @@ struct PatientFormView: View {
                 }
             }
             .onAppear {
-                if let patientId = patientId {
-                    Task {
-                        await presenter.getPatientById(patientId: patientId)
-                    }
-                }
+                presenter.setupForm(patientId: patientId)
             }
-            .alert(AppValue.unknownError, isPresented: .constant(presenter.errorMessage != nil)) {
-                Button(AppAction.ok) {
-                    presenter.errorMessage = nil
-                }
+            .alert(AppValue.unknownError, isPresented: Binding(
+                get: { presenter.errorMessage != nil },
+                set: { _ in presenter.errorMessage = nil }
+            )) {
+                Button(AppAction.ok) { }
             } message: {
                 if let errorMessage = presenter.errorMessage {
                     Text(errorMessage)

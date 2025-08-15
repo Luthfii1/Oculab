@@ -11,7 +11,7 @@ struct PatientFormField: View {
     @Bindable var presenter: PatientPresenter
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 24) {
+        VStack(alignment: .leading, spacing: AppConstants.PatientUI.fieldSpacing) {
             ValidatedTextField(
                 title: AppPatient.name,
                 isRequired: true,
@@ -26,7 +26,7 @@ struct PatientFormField: View {
                 isRequired: true,
                 placeholder: AppPatient.Placeholder.nik,
                 isNumberOnly: true,
-                length: 16,
+                length: AppConstants.PatientUI.nikLength,
                 text: $presenter.patient.NIK,
                 fieldName: .patientNIK
             )
@@ -39,7 +39,7 @@ struct PatientFormField: View {
                 date: $presenter.selectedDoB
             )
             .onChange(of: presenter.selectedDoB) {
-                presenter.patient.DoB = presenter.selectedDoB
+                presenter.handleDateOfBirthChange()
             }
 
             AppRadioButton(
@@ -50,33 +50,26 @@ struct PatientFormField: View {
                 selectedChoice: $presenter.selectedSex
             )
             .onChange(of: presenter.selectedSex) {
-                switch presenter.selectedSex {
-                case AppPatient.Gender.female:
-                    presenter.patient.sex = .FEMALE
-                case AppPatient.Gender.male:
-                    presenter.patient.sex = .MALE
-                default:
-                    presenter.patient.sex = .UNKNOWN
-                }
+                presenter.handleGenderChange()
             }
 
             ValidatedTextField(
                 title: AppPatient.bpjsNumber,
                 placeholder: AppPatient.Placeholder.bpjs,
                 isNumberOnly: true,
-                length: 13,
+                length: AppConstants.PatientUI.bpjsLength,
                 text: $presenter.BPJSnumber,
                 fieldName: .patientBPJS
             )
             .onChange(of: presenter.BPJSnumber) {
-                presenter.patient.BPJS = presenter.BPJSnumber.isEmpty ? nil : presenter.BPJSnumber
+                presenter.handleBPJSChange()
             }
         }
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
                 Spacer()
                 Button(AppAction.done) {
-                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                    presenter.dismissKeyboard()
                 }
             }
         }

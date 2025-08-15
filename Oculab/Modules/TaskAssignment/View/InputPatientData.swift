@@ -21,11 +21,11 @@ struct InputPatientData: View {
         NavigationView {
             ScrollView(showsIndicators: false) {
                 VStack {
-                    Spacer().frame(height: Decimal.d24)
+                    Spacer().frame(height: AppConstants.TaskAssignmentUI.verticalSpacing)
                     AppStepper(stepTitles: AppTextTaskAssignInputPatient.stepTitles, currentStep: AppTextTaskAssignInputPatient.currentStepIndex)
-                    Spacer().frame(height: Decimal.d24)
+                    Spacer().frame(height: AppConstants.TaskAssignmentUI.verticalSpacing)
                     
-                    VStack(alignment: .leading, spacing: Decimal.d24) {
+                    VStack(alignment: .leading, spacing: AppConstants.TaskAssignmentUI.verticalSpacing) {
                         // PIC Dropdown
                         AppDropdown(
                                 title: AppTextTaskAssignInputPatient.picTitle,
@@ -68,7 +68,7 @@ struct InputPatientData: View {
                             Spacer()
                         }
                     }
-                    .padding(.horizontal, Decimal.d20)
+                    .padding(.horizontal, AppConstants.TaskAssignmentUI.horizontalPadding)
                 }
                 .navigationTitle(AppTextTaskAssignInputPatient.navigationTitle)
                 .navigationBarTitleDisplayMode(.inline)
@@ -105,7 +105,7 @@ struct InputPatientData: View {
             }
             .onChange(of: presenter.selectedPatient) { _, newValue in
                 Task {
-                    print(presenter.selectedPatient)
+                    Logger.info("Selected patient changed: \(presenter.selectedPatient)", category: .taskAssignment)
                     // Only fetch if it's not already auto-filled
                     if patientId == nil || newValue != patientId {
                         await presenter.getPatientById(patientId: newValue)

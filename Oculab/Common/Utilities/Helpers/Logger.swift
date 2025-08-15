@@ -14,6 +14,7 @@ enum LogCategory: String {
     case general = "APP"
     case patient = "PATIENT"
     case user = "USER"
+    case taskAssignment = "TASK"
 }
 
 enum LogLevel: String {

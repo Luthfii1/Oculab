@@ -12,20 +12,20 @@ import SwiftUI
     let birthDate: String
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: AppConstants.PatientUI.cardSpacing) {
             HStack {
                 // Patient icon
                 Image(systemName: AppIcon.personFill)
                     .foregroundColor(AppColors.orange500)
-                    .frame(width: 32, height: 32)
-                    .background(Color.orange.opacity(0.2))
+                    .frame(width: AppConstants.PatientUI.cardIconSize, height: AppConstants.PatientUI.cardIconSize)
+                    .background(Color.orange.opacity(AppConstants.PatientUI.cardIconOpacity))
                     .clipShape(Rectangle())
-                    .cornerRadius(8)
+                    .cornerRadius(AppConstants.PatientUI.cardCornerRadius)
                 
                 Spacer()
             }
             
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: AppConstants.PatientUI.cardContentSpacing) {
                 Text(name)
                     .font(AppTypography.s4_1)
                     .foregroundColor(AppColors.slate900)
@@ -37,13 +37,13 @@ import SwiftUI
             }
             
         }
-        .padding(12)
-        .frame(height: 100)
+        .padding(AppConstants.PatientUI.cardPadding)
+        .frame(height: AppConstants.PatientUI.cardHeight)
         .background(AppColors.slate0)
-        .cornerRadius(12)
+        .cornerRadius(AppConstants.PatientUI.cardBorderRadius)
         .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(AppColors.slate100, lineWidth: 1)
+            RoundedRectangle(cornerRadius: AppConstants.PatientUI.cardBorderRadius)
+                .stroke(AppColors.slate100, lineWidth: AppConstants.PatientUI.cardStrokeWidth)
         )
     }
 }

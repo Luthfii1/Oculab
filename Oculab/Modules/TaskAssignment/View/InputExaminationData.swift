@@ -9,17 +9,8 @@ import SwiftUI
 
 struct InputExaminationData: View {
     @ObservedObject var presenter: InputPatientPresenter = .init()
-
     @State var selectedPIC: String
-    @State var selectedPatient: String
-    @State var goalString: String = AppValue.empty
-    @State var typeString: String = AppValue.empty
-
-    @State var typeString2: String = AppValue.empty
-
-    @State var isAddingNewPatient: Bool = false
-
-    @State var isSubmitPopUpVisible: Bool = false
+    @State var selectedPatient: String 
 
     var body: some View {
         NavigationView {
@@ -47,42 +38,30 @@ struct InputExaminationData: View {
                             colorType: .tertiary,
                             isEnabled: true
                         ) {
-                            isSubmitPopUpVisible = false
-                            print("Kembali ke Pemeriksaan")
+                            presenter.hideSubmitPopup()
+                            Logger.info("User returned to examination review", category: .taskAssignment)
                         }
                     ],
-                    isVisible: $isSubmitPopUpVisible
+                    isVisible: $presenter.isSubmitPopUpVisible
                 )
 
                 VStack {
                     ScrollView(showsIndicators: false) {
                         VStack {
-                            Spacer().frame(height: Decimal.d24)
+                            Spacer().frame(height: AppConstants.TaskAssignmentUI.verticalSpacing)
 
                             AppStepper(stepTitles: AppTextTaskAssignInputExam.stepTitles, currentStep: AppTextTaskAssignInputExam.currentStepIndex)
-                            Spacer().frame(height: Decimal.d24)
+                            Spacer().frame(height: AppConstants.TaskAssignmentUI.verticalSpacing)
 
-                            VStack(alignment: .leading, spacing: Decimal.d24) {
+                            VStack(alignment: .leading, spacing: AppConstants.TaskAssignmentUI.verticalSpacing) {
                                 AppRadioButton(
                                     title: AppMedical.Examination.purpose,
                                     isRequired: true,
                                     choices: [AppTextTaskAssignInputExam.screeningChoice, AppTextTaskAssignInputExam.followUpChoice],
                                     isDisabled: false,
-                                    selectedChoice: $goalString
-                                ).onChange(of: goalString) {
-                                    switch goalString {
-                                    case AppMedical.Examination.goalScreening:
-                                        presenter.examination.goal = .SCREENING
-                                        presenter.examination2.goal = .SCREENING
-
-                                    case AppMedical.Examination.goalFollowUp:
-                                        presenter.examination.goal = .TREATMENT
-                                        presenter.examination2.goal = .TREATMENT
-
-                                    default:
-                                        presenter.examination.goal = .SCREENING
-                                        presenter.examination2.goal = .SCREENING
-                                    }
+                                    selectedChoice: $presenter.goalString
+                                ).onChange(of: presenter.goalString) {
+                                    presenter.handleGoalChange()
                                 }
 
                                 ValidatedTextField(
@@ -98,16 +77,9 @@ struct InputExaminationData: View {
                                     isRequired: true,
                                     choices: [AppTextTaskAssignInputExam.morningChoice, AppTextTaskAssignInputExam.anytimeChoice],
                                     isDisabled: false,
-                                    selectedChoice: $typeString
-                                ).onChange(of: typeString) {
-                                    switch typeString {
-                                    case AppMedical.Examination.preparationTypeMorning:
-                                        presenter.examination.preparationType = .SP
-                                    case AppMedical.Examination.preparationTypeAnytime:
-                                        presenter.examination.preparationType = .SPS
-                                    default:
-                                        presenter.examination.preparationType = .SPS
-                                    }
+                                    selectedChoice: $presenter.typeString
+                                ).onChange(of: presenter.typeString) {
+                                    presenter.handleFirstSlideTypeChange()
                                 }
 
                                 ValidatedTextField(
@@ -123,16 +95,9 @@ struct InputExaminationData: View {
                                     isRequired: true,
                                     choices: [AppTextTaskAssignInputExam.morningChoice, AppTextTaskAssignInputExam.anytimeChoice],
                                     isDisabled: false,
-                                    selectedChoice: $typeString2
-                                ).onChange(of: typeString2) {
-                                    switch typeString2 {
-                                    case AppMedical.Examination.preparationTypeMorning:
-                                        presenter.examination2.preparationType = .SP
-                                    case AppMedical.Examination.preparationTypeAnytime:
-                                        presenter.examination2.preparationType = .SPS
-                                    default:
-                                        presenter.examination2.preparationType = .SPS
-                                    }
+                                    selectedChoice: $presenter.typeString2
+                                ).onChange(of: presenter.typeString2) {
+                                    presenter.handleSecondSlideTypeChange()
                                 }
                                 
                                 Spacer()
@@ -155,17 +120,15 @@ struct InputExaminationData: View {
                                         title: AppTextTaskAssignInputExam.createTaskFinalButton,
                                         rightIcon: AppIcon.arrowRight,
                                         size: .large,
-                                        isEnabled: (goalString != AppValue.empty && typeString != AppValue.empty && presenter.examination.slideId != AppValue.empty && typeString2 != AppValue.empty && presenter.examination2.slideId != AppValue.empty)
+                                        isEnabled: presenter.isFormValid
                                     ) {
-                                        presenter.isError = false
-                                        presenter.errorMessage = AppValue.empty
-                                        isSubmitPopUpVisible = true
+                                        presenter.showSubmitPopup()
                                     }
                                     .frame(maxWidth: .infinity)
                                 }
                             }
 
-                            .padding(.horizontal, Decimal.d20)
+                            .padding(.horizontal, AppConstants.TaskAssignmentUI.horizontalPadding)
                         }
 
                         .navigationTitle(AppTextTaskAssignInputExam.navigationTitle)
@@ -185,14 +148,7 @@ struct InputExaminationData: View {
                 }
             }
             .onAppear {
-                Task {
-                    await presenter.getPatientById(patientId: selectedPatient)
-                    print(selectedPatient)
-                    print(presenter.patient.name)
-                    await presenter.getUserById(userId: selectedPIC)
-
-                    print(presenter.patient.name)
-                }
+                presenter.setupExaminationData(selectedPIC: selectedPIC, selectedPatient: selectedPatient)
             }
         }
         .navigationBarBackButtonHidden(true)
