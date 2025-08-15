@@ -12,7 +12,7 @@ struct VideoRecordView: View {
     @StateObject private var videoRecordPresenter = VideoRecordPresenter.shared
     @Environment(\.dismiss) private var dismiss
     @State private var showGuidelines = false
-    @State private var didFinishOnboarding = false
+    @State private var didFinishOnboarding = false 
 
     var body: some View {
         NavigationView {
