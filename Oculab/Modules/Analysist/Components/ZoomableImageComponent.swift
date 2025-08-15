@@ -7,6 +7,7 @@
 
 import SwiftUI
 import UIKit
+import AVFoundation
 
 struct ZoomableImageComponent: UIViewRepresentable {
     let imageURL: URL?
