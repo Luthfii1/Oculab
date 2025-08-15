@@ -48,6 +48,8 @@ enum AppConstants {
     static let fovCornerRadius: CGFloat = 2
     static let fovSuccessIconSize: CGFloat = 20
     static let fovSuccessIconPadding: CGFloat = 4
+    
+    // MARK: - Authentication
 }
 
 // MARK: - Validation Constants

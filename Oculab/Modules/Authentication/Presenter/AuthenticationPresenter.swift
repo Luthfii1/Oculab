@@ -143,7 +143,9 @@ extension AuthenticationPresenter {
     
     @MainActor
     private func login() async -> Bool {
+        defer { isLoading = false }
         isLoading = true
+        
         do {
             let response = try await interactor.login(
                 email: email,
@@ -151,14 +153,11 @@ extension AuthenticationPresenter {
             )
             
             // Tokens are stored automatically in the login method
-            isLoading = false
             isSuccess = true
             
             return true
         } catch {
-            isLoading = false
             isError = true
-            
             errorMessage = ErrorHandler.shared.handleError(error, context: .login)
             
             return false
@@ -225,6 +224,7 @@ extension AuthenticationPresenter {
                 return false
             }
         }
+        
         return true
     }
     
@@ -297,6 +297,9 @@ extension AuthenticationPresenter {
     
     @MainActor
     func editAccessPin() async {
+        defer { isLoading = false }
+        isLoading = true
+        
         guard let user = await interactor.getUserLocalData() else {
             isError = true
             description = "User not found"
@@ -496,7 +499,7 @@ extension AuthenticationPresenter {
             try await withCheckedThrowingContinuation { continuation in
                 context.evaluatePolicy(
                     .deviceOwnerAuthenticationWithBiometrics,
-                    localizedReason: "Autentikasi untuk mengakses aplikasi"
+                    localizedReason: AppTextAuthBiometric.activationPrompt
                 ) { success, authenticationError in
                     if success {
                         continuation.resume(returning: ())
@@ -541,7 +544,7 @@ extension AuthenticationPresenter {
             try await withCheckedThrowingContinuation { continuation in
                 context.evaluatePolicy(
                     .deviceOwnerAuthenticationWithBiometrics,
-                    localizedReason: "Aktifkan Face ID untuk keamanan aplikasi"
+                    localizedReason: AppTextAuthBiometric.prompt
                 ) { success, authenticationError in
                     if success {
                         continuation.resume()
@@ -563,43 +566,12 @@ extension AuthenticationPresenter {
 
 // MARK: - User Management
 extension AuthenticationPresenter {
-    @MainActor
-    func getAccount() async {
-        do {
-            let getAccountResponse = try await interactor.getAccountById()
-            
-            // Store the user data
-            user = getAccountResponse
-            await interactor.updateUserLocalData(user: getAccountResponse)
-            
-            // Clear any PIN state
-            inputPin = AppValue.empty
-            firstPin = AppValue.empty
-            secondPin = AppValue.empty
-
-            if getAccountResponse.accessPin == nil {
-                // User needs to create PIN
-                state = .create
-                isPinAuthorized = false
-                appStateManager?.setRequiresPin(hasExistingPin: false)
-            } else {
-                // User needs to authenticate with existing PIN
-                state = .authenticate
-                isPinAuthorized = false
-                appStateManager?.setRequiresPin(hasExistingPin: true)
-            }
-        } catch {
-            // Handle error and ensure user goes back to login
-            isPinAuthorized = false
-            clearLoginState()
-            appStateManager?.setUnauthenticated()
-
-            errorMessage = ErrorHandler.shared.handleError(error, context: .login)
-        }
-    }
     
     @MainActor
     func updateAccount(updateUser: User) async {
+        defer { isLoading = false }
+        isLoading = true
+        
         do {
             let response = try await interactor.updateUserById(user: updateUser)
 
@@ -728,22 +700,22 @@ extension AuthenticationPresenter {
     }
 }
 
-// MARK: - Helper Methods
-private extension AuthenticationPresenter {
-    func withTimeout<T>(seconds: TimeInterval, operation: @escaping () async throws -> T) async throws -> T {
-        return try await withThrowingTaskGroup(of: T.self) { group in
-            group.addTask {
-                try await operation()
-            }
-            
-            group.addTask {
-                try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
-                throw NSError(domain: "TimeoutError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Operation timed out"])
-            }
-            
-            let result = try await group.next()!
-            group.cancelAll()
-            return result
-        }
-    }
-}
+//// MARK: - Helper Methods
+//private extension AuthenticationPresenter {
+//    func withTimeout<T>(seconds: TimeInterval, operation: @escaping () async throws -> T) async throws -> T {
+//        return try await withThrowingTaskGroup(of: T.self) { group in
+//            group.addTask {
+//                try await operation()
+//            }
+//            
+//            group.addTask {
+//                try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+//                throw NSError(domain: "TimeoutError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Operation timed out"])
+//            }
+//            
+//            let result = try await group.next()!
+//            group.cancelAll()
+//            return result
+//        }
+//    }
+//}

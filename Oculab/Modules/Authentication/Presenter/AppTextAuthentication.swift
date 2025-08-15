@@ -14,9 +14,15 @@ typealias AppTextAuthUserAccessPin = AppText.Authentication.UserAccessPinView
 typealias AppTextAuthProfile = AppText.Authentication.ProfileView
 typealias AppTextAuthPrivacyPolicy = AppText.Authentication.PrivacyPolicyView
 typealias AppTextAuthCompPin = AppText.Authentication.PinComponent
+typealias AppTextAuthBiometric = AppText.Authentication.Biometric
 
 extension AppText {
     enum Authentication {
+        enum Biometric {
+            static let prompt = "auth.biometric.prompt".localized
+            static let activationPrompt = "auth.biometric.activation_prompt".localized
+        }
+        
         enum LoginView {
             static let title = "auth.login.title".localized
             static let emailPlaceholder = "auth.login.email.placeholder".localized
