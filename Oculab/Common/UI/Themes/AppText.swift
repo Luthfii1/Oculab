@@ -50,6 +50,8 @@ enum AppText {
         static let cameraFill = "camera.fill"
         static let photo = "photo"
         static let document = "doc.text"
+        static let play = "play.fill"
+        static let playCircle = "play.circle.fill"
         static let documentFill = "doc.text.fill"
         static let share = "square.and.arrow.up"
         static let refresh = "arrow.counterclockwise"

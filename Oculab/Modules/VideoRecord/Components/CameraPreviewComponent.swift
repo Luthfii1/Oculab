@@ -15,6 +15,7 @@ struct CameraPreviewComponent: UIViewRepresentable {
 
     func makeUIView(context: Context) -> UIView {
         let view = UIView(frame: CGRect(origin: .zero, size: size))
+        view.backgroundColor = .black
 
         let previewLayer = AVCaptureVideoPreviewLayer(session: videoRecordPresenter.session)
         previewLayer.frame = view.bounds
@@ -26,17 +27,8 @@ struct CameraPreviewComponent: UIViewRepresentable {
             self.videoRecordPresenter.preview = previewLayer
         }
 
-        // Add pinch gesture recognizer
-        let pinchGesture = UIPinchGestureRecognizer(
-            target: context.coordinator,
-            action: #selector(Coordinator.handlePinch(_:))
-        )
-        view.addGestureRecognizer(pinchGesture)
-
-        // Starting session
-        DispatchQueue.global(qos: .background).async {
-            self.videoRecordPresenter.session.startRunning()
-        }
+        // Add gesture recognizers
+        addGestureRecognizers(to: view, context: context)
 
         return view
     }
@@ -51,6 +43,33 @@ struct CameraPreviewComponent: UIViewRepresentable {
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
+    
+    private func addGestureRecognizers(to view: UIView, context: Context) {
+        // Pinch gesture for zoom
+        let pinchGesture = UIPinchGestureRecognizer(
+            target: context.coordinator,
+            action: #selector(Coordinator.handlePinch(_:))
+        )
+        view.addGestureRecognizer(pinchGesture)
+        
+        // Tap gesture for focus
+        let tapGesture = UITapGestureRecognizer(
+            target: context.coordinator,
+            action: #selector(Coordinator.handleTap(_:))
+        )
+        view.addGestureRecognizer(tapGesture)
+        
+        // Double tap for auto zoom
+        let doubleTapGesture = UITapGestureRecognizer(
+            target: context.coordinator,
+            action: #selector(Coordinator.handleDoubleTap(_:))
+        )
+        doubleTapGesture.numberOfTapsRequired = 2
+        view.addGestureRecognizer(doubleTapGesture)
+        
+        // Ensure single tap doesn't interfere with double tap
+        tapGesture.require(toFail: doubleTapGesture)
+    }
 
     class Coordinator: NSObject {
         let parent: CameraPreviewComponent
@@ -60,48 +79,155 @@ struct CameraPreviewComponent: UIViewRepresentable {
             self.parent = parent
         }
 
+        @MainActor
         @objc func handlePinch(_ gesture: UIPinchGestureRecognizer) {
             switch gesture.state {
             case .began:
                 startZoom = parent.videoRecordPresenter.zoomFactor
             case .changed:
                 let newScaleFactor = startZoom * gesture.scale
-                parent.videoRecordPresenter.updateZoom(factor: newScaleFactor)
+                Task { @MainActor in
+                    parent.videoRecordPresenter.updateZoom(factor: newScaleFactor)
+                }
             default:
                 break
+            }
+        }
+        
+        @MainActor
+        @objc func handleTap(_ gesture: UITapGestureRecognizer) {
+            let tapPoint = gesture.location(in: gesture.view)
+            guard let view = gesture.view else { return }
+            
+            // Convert tap point to camera coordinate system
+            let devicePoint = CGPoint(
+                x: tapPoint.y / view.bounds.height,
+                y: 1.0 - (tapPoint.x / view.bounds.width)
+            )
+            
+            focusCamera(at: devicePoint)
+        }
+        
+        @objc func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
+            Task { @MainActor in
+                let currentZoom = parent.videoRecordPresenter.zoomFactor
+                let targetZoom: CGFloat = currentZoom > 1.5 ? 1.0 : 3.0
+                
+                parent.videoRecordPresenter.updateZoom(factor: targetZoom)
+            }
+        }
+        
+        @MainActor
+        private func focusCamera(at point: CGPoint) {
+            guard let device = parent.videoRecordPresenter.session.inputs.first as? AVCaptureDeviceInput else {
+                return
+            }
+            
+            let cameraDevice = device.device
+            
+            do {
+                try cameraDevice.lockForConfiguration()
+                
+                // Set focus point
+                if cameraDevice.isFocusPointOfInterestSupported &&
+                   cameraDevice.isFocusModeSupported(.autoFocus) {
+                    cameraDevice.focusPointOfInterest = point
+                    cameraDevice.focusMode = .autoFocus
+                }
+                
+                // Set exposure point
+                if cameraDevice.isExposurePointOfInterestSupported &&
+                   cameraDevice.isExposureModeSupported(.autoExpose) {
+                    cameraDevice.exposurePointOfInterest = point
+                    cameraDevice.exposureMode = .autoExpose
+                }
+                
+                cameraDevice.unlockForConfiguration()
+                
+                Logger.info("Camera focused at point: \(point)", category: .videoRecord)
+                
+            } catch {
+                Logger.error("Failed to focus camera: \(error.localizedDescription)", category: .videoRecord)
             }
         }
     }
 }
 
+// MARK: - Video Player Components
 struct VideoPlayerView: View {
     @State private var player = AVPlayer()
+    @State private var isLoading = true
 
     var body: some View {
-        VideoPlayer(player: player)
-            .edgesIgnoringSafeArea(.all)
-            .navigationBarBackButtonHidden()
-            .onAppear {
-                let url = URL(string: "https://is3.cloudhost.id/oculab-fov/DummyStitch.mp4")!
-
-                player = AVPlayer(url: url)
-                player.play()
+        ZStack {
+            VideoPlayer(player: player)
+                .onAppear {
+                    setupPlayer()
+                }
+                .onDisappear {
+                    player.pause()
+                }
+            
+            if isLoading {
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    .scaleEffect(0.8)
             }
-            .onDisappear {
-                player.pause()
-            }
+        }
+        .background(Color.black)
+        .cornerRadius(8)
     }
+    
+    private func setupPlayer() {
+        guard let url = URL(string: "https://is3.cloudhost.id/oculab-fov/DummyStitch.mp4") else {
+            Logger.error("Invalid video URL", category: .videoRecord)
+            return
+        }
+        
+        player = AVPlayer(url: url)
+        
+        // Monitor player status
+        player.publisher(for: \.status)
+            .receive(on: DispatchQueue.main)
+            .sink { status in
+                switch status {
+                case .readyToPlay:
+                    isLoading = false
+                    player.play()
+                case .failed:
+                    Logger.error("Video player failed to load", category: .videoRecord)
+                    isLoading = false
+                default:
+                    break
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    @State private var cancellables = Set<AnyCancellable>()
 }
 
 struct CustomVideoPlayerView: UIViewControllerRepresentable {
     let player: AVPlayer
+    let showsPlaybackControls: Bool
+
+    init(player: AVPlayer, showsPlaybackControls: Bool = false) {
+        self.player = player
+        self.showsPlaybackControls = showsPlaybackControls
+    }
 
     func makeUIViewController(context: Context) -> AVPlayerViewController {
         let controller = AVPlayerViewController()
         controller.player = player
-        controller.showsPlaybackControls = false // Hide controls
+        controller.showsPlaybackControls = showsPlaybackControls
+        controller.videoGravity = .resizeAspectFill
         return controller
     }
 
-    func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {}
+    func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {
+        // No updates needed
+    }
 }
+
+// MARK: - Import Combine for publishers
+import Combine
