@@ -34,6 +34,9 @@ class DependencyInjection: ObservableObject {
             authPresenter: createAuthPresenter()
         )
     }()
+    lazy var examInteractor: ExamInteractor = {
+        ExamInteractor(networkService: networkService)
+    }()
     
     func initializer(modelContext: ModelContext) {
         self.modelContext = modelContext
@@ -74,5 +77,12 @@ extension DependencyInjection {
 extension DependencyInjection {
     func createAccountPresenter() -> AccountPresenter {
         return AccountPresenter(interactor: accountInteractor)
+    }
+}
+
+// MARK: - Examination Module
+extension DependencyInjection {
+    func createExamDataPresenter() -> ExamDataPresenter {
+        return ExamDataPresenter(interactor: examInteractor)
     }
 }

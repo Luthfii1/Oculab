@@ -10,48 +10,261 @@ import SwiftUI
 
 struct VideoPreview: View {
     @EnvironmentObject private var videoRecordPresenter: VideoRecordPresenter
+    @Environment(\.dismiss) private var dismiss
+    @State private var player: AVPlayer?
+    @State private var isPlaying = false
+    @State private var showingFullScreen = false
+    @State private var currentTime: Double = 0
+    @State private var duration: Double = 0
+    @State private var isSaving = false
 
     var body: some View {
         ZStack {
+            // Video player
             if let url = videoRecordPresenter.previewURL {
-                VideoPlayer(player: AVPlayer(url: url))
+                VideoPlayer(player: player ?? AVPlayer())
                     .ignoresSafeArea()
+                    .onAppear {
+                        setupPlayer(with: url)
+                    }
+                    .onDisappear {
+                        player?.pause()
+                    }
+                    .onTapGesture {
+                        showingFullScreen = true
+                    }
+            } else {
+                // Fallback content
+                Rectangle()
+                    .fill(Color.black)
+                    .ignoresSafeArea()
+                    .overlay(
+                        VStack {
+                            Image(systemName: "video.slash")
+                                .font(.system(size: 60))
+                                .foregroundColor(.gray)
+                            Text("No video available")
+                                .foregroundColor(.gray)
+                                .font(.headline)
+                        }
+                    )
             }
 
-            // Control buttons (Retake & Save) at the bottom
-            VStack(alignment: .center, spacing: Decimal.d16) {
-                // Button to save video
-                AppButton(
-                    title: AppTextVideoRecordCompPreview.saveVideoButton,
-                    rightIcon: AppIcon.checkmark,
-                    colorType: .neutral(.primary),
-                    size: .large,
-                    cornerRadius: 8
-                ) {
-                    videoRecordPresenter.navigateBack()
+            // Control overlay
+            VStack {
+                Spacer()
+                
+                // Video information
+                if duration > 0 {
+                    videoInfoOverlay
                 }
-
-                // Button to retake video
-                AppButton(
-                    title: AppTextVideoRecordCompPreview.retakeVideoButton,
-                    leftIcon: AppIcon.refresh,
-                    colorType: .neutral(.secondary),
-                    size: .large
-                ) {
-                    videoRecordPresenter.previewURL = nil
-                }
+                
+                // Control buttons
+                controlButtonsOverlay
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 52)
-            .frame(maxHeight: .infinity, alignment: .bottom)
         }
         .ignoresSafeArea()
+        .sheet(isPresented: $showingFullScreen) {
+            if let url = videoRecordPresenter.previewURL {
+                FullScreenVideoPlayerView(videoURL: url) {
+                    showingFullScreen = false
+                }
+            }
+        }
     }
+    
+    // MARK: - Subviews
+    private var videoInfoOverlay: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Duration: \(formatTime(duration))")
+                    .font(.caption)
+                    .foregroundColor(.white)
+                
+                if let url = videoRecordPresenter.previewURL {
+                    Text("Size: \(getFileSize(url))")
+                        .font(.caption)
+                        .foregroundColor(.white)
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(Color.black.opacity(0.6))
+            .cornerRadius(8)
+            
+            Spacer()
+            
+            // Playback control
+            Button(action: {
+                togglePlayback()
+            }) {
+                Image(systemName: isPlaying ? "pause.circle.fill" : "play.circle.fill")
+                    .font(.title)
+                    .foregroundColor(.white)
+                    .shadow(radius: 2)
+            }
+        }
+        .padding(.bottom, 16)
+    }
+    
+    private var controlButtonsOverlay: some View {
+        VStack(alignment: .center, spacing: 16) {
+            // Primary action - Save video
+            AppButton(
+                title: isSaving ? "Saving..." : AppTextVideoRecordCompPreview.saveVideoButton,
+                rightIcon: AppText.SystemIcon.success,
+                colorType: .neutral(.primary),
+                size: .large,
+                cornerRadius: 8,
+                isEnabled: !videoRecordPresenter.isLoading && !isSaving
+            ) {
+                guard !isSaving else { return }
+                
+                Task {
+                    isSaving = true
+                    await videoRecordPresenter.saveVideoWithoutNavigation()
+                    await videoRecordPresenter.cleanup()
+                    
+                    // Use router navigation to go back one level
+                    await MainActor.run {
+                        isSaving = false
+                        videoRecordPresenter.navigateBack()
+                    }
+                }
+            }
+
+            // Secondary action - Retake video
+            AppButton(
+                title: AppTextVideoRecordCompPreview.retakeVideoButton,
+                leftIcon: AppText.SystemIcon.refresh,
+                colorType: .neutral(.secondary),
+                size: .large,
+                cornerRadius: 8,
+                isEnabled: !videoRecordPresenter.isLoading
+            ) {
+                retakeVideo()
+            }
+        }
+    }
+    
+    // MARK: - Methods
+    private func setupPlayer(with url: URL) {
+        player = AVPlayer(url: url)
+        
+        // Monitor player status
+        if let player = player {
+            // Get duration
+            let asset = AVAsset(url: url)
+            Task {
+                do {
+                    let duration = try await asset.load(.duration)
+                    await MainActor.run {
+                        self.duration = CMTimeGetSeconds(duration)
+                    }
+                } catch {
+                    Logger.error("Failed to load video duration: \(error)", category: .videoRecord)
+                }
+            }
+            
+            // Monitor playback state
+            player.publisher(for: \.timeControlStatus)
+                .receive(on: DispatchQueue.main)
+                .sink { status in
+                    isPlaying = (status == .playing)
+                }
+                .store(in: &cancellables)
+        }
+    }
+    
+    private func togglePlayback() {
+        guard let player = player else { return }
+        
+        if isPlaying {
+            player.pause()
+        } else {
+            player.play()
+        }
+    }
+    
+    private func retakeVideo() {
+        // Clean up current video
+        player?.pause()
+        player = nil
+        
+        // Delete temporary file
+        if let url = videoRecordPresenter.previewURL {
+            deleteTemporaryFile(at: url)
+        }
+        
+        // Reset presenter state
+        videoRecordPresenter.previewURL = nil
+        videoRecordPresenter.stitchedImage = nil
+        
+        Logger.info("Video retake initiated", category: .videoRecord)
+    }
+    
+    private func shareVideo() {
+        guard let url = videoRecordPresenter.previewURL else { return }
+        
+        let activityViewController = UIActivityViewController(
+            activityItems: [url],
+            applicationActivities: nil
+        )
+        
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = windowScene.windows.first {
+            window.rootViewController?.present(activityViewController, animated: true)
+        }
+    }
+    
+    private func deleteVideo() {
+        guard let url = videoRecordPresenter.previewURL else { return }
+        
+        deleteTemporaryFile(at: url)
+        videoRecordPresenter.previewURL = nil
+        videoRecordPresenter.navigateBack()
+    }
+    
+    private func deleteTemporaryFile(at url: URL) {
+        do {
+            try FileManager.default.removeItem(at: url)
+            Logger.info("Temporary video file deleted: \(url.lastPathComponent)", category: .videoRecord)
+        } catch {
+            Logger.error("Failed to delete temporary file: \(error.localizedDescription)", category: .videoRecord)
+        }
+    }
+    
+    private func formatTime(_ time: Double) -> String {
+        let minutes = Int(time) / 60
+        let seconds = Int(time) % 60
+        return String(format: "%02d:%02d", minutes, seconds)
+    }
+    
+    private func getFileSize(_ url: URL) -> String {
+        do {
+            let attributes = try FileManager.default.attributesOfItem(atPath: url.path)
+            if let fileSize = attributes[.size] as? Int64 {
+                let formatter = ByteCountFormatter()
+                formatter.allowedUnits = [.useBytes, .useKB, .useMB, .useGB]
+                formatter.countStyle = .file
+                return formatter.string(fromByteCount: fileSize)
+            }
+        } catch {
+            Logger.error("Failed to get file size: \(error.localizedDescription)", category: .videoRecord)
+        }
+        return "Unknown"
+    }
+    
+    @State private var cancellables = Set<AnyCancellable>()
 }
 
 #Preview {
     let videoRecordPresenter = VideoRecordPresenter.shared
-
     VideoPreview()
         .environmentObject(videoRecordPresenter)
 }
+
+// MARK: - Import Combine
+import Combine

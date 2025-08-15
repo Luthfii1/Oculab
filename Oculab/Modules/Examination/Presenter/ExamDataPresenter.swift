@@ -69,6 +69,7 @@ class ExamDataPresenter: ObservableObject {
 
 // MARK: - Video Management Methods
 extension ExamDataPresenter {
+    @MainActor
     func saveVideo() {
         recordVideo = videoPresenter.previewURL
     }

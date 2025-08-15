@@ -36,13 +36,13 @@ struct GuidelinesOnboardingView: View {
                                 .font(AppTypography.s1)
                                 .fontWeight(.bold)
                                 .multilineTextAlignment(.center)
-                                .foregroundColor(.primary)
+                                .foregroundColor(AppColors.slate900)
                                 .padding(.horizontal)
 
                             Text(pages[index].description)
                                 .font(AppTypography.p2)
                                 .multilineTextAlignment(.center)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(AppColors.slate900)
                                 .padding(.horizontal)
 
                             Spacer()
@@ -81,6 +81,7 @@ struct GuidelinesOnboardingView: View {
                     }
                 }
             }
+            .background(AppColors.slate0)
         }
     }
 }
