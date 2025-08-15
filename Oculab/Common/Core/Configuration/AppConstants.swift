@@ -39,6 +39,15 @@ enum AppConstants {
         ["7", "8", "9"],
         ["!", "0", "delete.left.fill"]
     ]
+    
+    // MARK: - FOV Analysis
+    static let fovThumbnailSize: CGFloat = 74
+    static let fovGridSpacing: CGFloat = 10
+    static let fovGridMinItemSize: CGFloat = 74
+    static let fovBorderWidth: CGFloat = 4
+    static let fovCornerRadius: CGFloat = 2
+    static let fovSuccessIconSize: CGFloat = 20
+    static let fovSuccessIconPadding: CGFloat = 4
 }
 
 // MARK: - Validation Constants

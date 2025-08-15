@@ -36,7 +36,7 @@ class FOVDetailPresenter: ObservableObject {
                 boxes = result.boxes
             }
         } catch {
-            errorMessage = ErrorHandler.shared.handleError(error)
+            errorMessage = ErrorHandler.shared.handleError(error, context: .examination)
             isError = true
         }
     }
@@ -46,7 +46,7 @@ class FOVDetailPresenter: ObservableObject {
         do {
             _ = try await interactor?.verifyingFOV(fovId: fovId)
         } catch {
-            errorMessage = ErrorHandler.shared.handleError(error)
+            errorMessage = ErrorHandler.shared.handleError(error, context: .examination)
             isError = true
         }
     }

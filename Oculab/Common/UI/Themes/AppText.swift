@@ -24,6 +24,7 @@ typealias AppFeature = AppText.Feature
 typealias AppError = AppText.Error
 typealias AppNetwork = AppText.Network
 typealias AppNetworkIcon = AppText.SystemIcon
+typealias AppCommon = AppText.Action
 
 enum AppText {
     // MARK: - Core System Icons (Reusable across all modules)
