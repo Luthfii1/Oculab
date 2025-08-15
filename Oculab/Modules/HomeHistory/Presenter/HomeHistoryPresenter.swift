@@ -8,9 +8,11 @@
 import Foundation
 
 class HomeHistoryPresenter: ObservableObject {
+    // MARK: - Dependencies
     var view: HomeView?
-    var interactor: HomeInteractor? = HomeInteractor()
+    private var interactor: HomeInteractor? = HomeInteractor()
 
+    // MARK: - Published Properties
     @Published var selectedLatestActivity: LatestActivityType = .belumDimulai
     @Published var selectedDate: Date = .init()
 
@@ -26,7 +28,18 @@ class HomeHistoryPresenter: ObservableObject {
 
     @Published var isAllExamsLoading: Bool = false
     @Published var isStatisticLoading: Bool = false
+    
+    // MARK: - Constants
+    private struct Constants {
+        static let dateDisplayFormat = "dd MMMM yyyy"
+        static let localeIdentifier = "en_US_POSIX"
+        static let maxProgress: CGFloat = 1.0
+        static let minProgress: CGFloat = 0.0
+    }
+}
 
+// MARK: - Statistics Methods
+extension HomeHistoryPresenter {
     @MainActor
     func getStatisticData() async {
         isStatisticLoading = true
@@ -37,59 +50,76 @@ class HomeHistoryPresenter: ObservableObject {
 
             if let data {
                 statisticExam = data
-            }
-
-            // Calculate progress only for Lab users (when totalFinished and totalNotFinished are available)
-            if statisticExam.totalFinished != nil && statisticExam.totalNotFinished != nil {
-                let totalFinished = statisticExam.totalFinished ?? 0
-                let totalNotFinished = statisticExam.totalNotFinished ?? 0
-                
-                if totalFinished + totalNotFinished > 0 {
-                    progress = CGFloat(
-                        Double(totalFinished) / Double(totalFinished + totalNotFinished)
-                    )
-                } else if totalFinished != 0 && totalNotFinished == 0 {
-                    progress = 1.0
-                } else {
-                    progress = 0.0
-                }
+                calculateProgress()
             }
             
         } catch {
+            Logger.error("Failed to fetch statistics: \(error.localizedDescription)", category: .general)
             _ = ErrorHandler.shared.handleError(error)
         }
     }
+    
+    private func calculateProgress() {
+        guard let totalFinished = statisticExam.totalFinished,
+              let totalNotFinished = statisticExam.totalNotFinished else {
+            progress = Constants.minProgress
+            return
+        }
+        
+        let totalExaminations = totalFinished + totalNotFinished
+        
+        if totalExaminations > 0 {
+            progress = CGFloat(Double(totalFinished) / Double(totalExaminations))
+        } else if totalFinished > 0 && totalNotFinished == 0 {
+            progress = Constants.maxProgress
+        } else {
+            progress = Constants.minProgress
+        }
+    }
+}
 
+// MARK: - Filtering Methods
+extension HomeHistoryPresenter {
     @MainActor
     func filterLatestActivity(typeActivity: LatestActivityType) async {
         selectedLatestActivity = typeActivity
-
-        switch typeActivity {
-            case .semua:
-                filteredExamination = latestExamination
-            case .butuhVerifikasi:
-                filteredExamination = latestExamination.filter { $0.statusExamination == .NEEDVALIDATION }
-            case .belumDimulai:
-                filteredExamination = latestExamination.filter { $0.statusExamination == .NOTSTARTED }
-            case .belumDisimpulkan:
-                filteredExamination = latestExamination
-                    .filter { $0.statusExamination == .NEEDVALIDATION || $0.statusExamination == .INPROGRESS }
+        filteredExamination = getFilteredExaminations(by: typeActivity)
+    }
+    
+    private func getFilteredExaminations(by type: LatestActivityType) -> [ExaminationCardData] {
+        switch type {
+        case .semua:
+            return latestExamination
+        case .butuhVerifikasi:
+            return latestExamination.filter { $0.statusExamination == .NEEDVALIDATION }
+        case .belumDimulai:
+            return latestExamination.filter { $0.statusExamination == .NOTSTARTED }
+        case .belumDisimpulkan:
+            return latestExamination.filter { 
+                $0.statusExamination == .NEEDVALIDATION || $0.statusExamination == .INPROGRESS 
+            }
         }
     }
 
     func filterLatestActivityByDate(date: Date) {
         selectedDate = date
-
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd MMMM yyyy"
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-
-        let selectedDateString = dateFormatter.string(from: selectedDate)
-
-        filteredExaminationByDate = latestExamination
-            .filter { $0.date == selectedDateString && $0.statusExamination == .FINISHED }
+        let selectedDateString = formatDateForDisplay(date)
+        
+        filteredExaminationByDate = latestExamination.filter { 
+            $0.date == selectedDateString && $0.statusExamination == .FINISHED 
+        }
     }
     
+    private func formatDateForDisplay(_ date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = Constants.dateDisplayFormat
+        dateFormatter.locale = Locale(identifier: Constants.localeIdentifier)
+        return dateFormatter.string(from: date)
+    }
+}
+
+// MARK: - Data Fetching Methods
+extension HomeHistoryPresenter {
     @MainActor
     func fetchFinishedExaminationsByDate(date: Date) async {
         let dateString = date.formattedYearMonthDay()
@@ -97,25 +127,27 @@ class HomeHistoryPresenter: ObservableObject {
         isAllExamsLoading = true
         finishedExaminationsByDate.removeAll()
         
-        defer {
-            isAllExamsLoading = false
-        }
+        defer { isAllExamsLoading = false }
         
         do {
             let response = try await interactor?.getFinishedDataCard(date: dateString)
             
-            if let response = response, !response.isEmpty {
-                finishedExaminationsByDate = response
-                print("📊 Successfully loaded \(response.count) examinations for date: \(dateString)")
-            } else {
-                finishedExaminationsByDate = []
-                print("📭 No examinations found for date: \(dateString)")
-            }
+            handleFinishedExaminationsResponse(response, for: dateString)
             
         } catch {
             finishedExaminationsByDate = []
-            
+            Logger.error("Failed to fetch examinations for date \(dateString): \(error.localizedDescription)", category: .general)
             _ = ErrorHandler.shared.handleError(error)
+        }
+    }
+    
+    private func handleFinishedExaminationsResponse(_ response: [FinishedExaminationCardData]?, for dateString: String) {
+        if let response = response, !response.isEmpty {
+            finishedExaminationsByDate = response
+            Logger.info("Successfully loaded \(response.count) examinations for date: \(dateString)", category: .general)
+        } else {
+            finishedExaminationsByDate = []
+            Logger.info("No examinations found for date: \(dateString)", category: .general)
         }
     }
     
@@ -125,20 +157,23 @@ class HomeHistoryPresenter: ObservableObject {
         defer { isAllExamsLoading = false }
 
         do {
-            let response: [ExaminationCardData]?
+            let response = try await getExaminationData(for: userRole)
             
-            if userRole == .ADMIN {
-                response = try await interactor?.getAllDataAdmin()
-            } else {
-                response = try await interactor?.getAllData()
-            }
-
             if let response {
                 latestExamination = response
                 await filterLatestActivity(typeActivity: selectedLatestActivity)
             }
         } catch {
+            Logger.error("Failed to fetch examination data for role \(userRole): \(error.localizedDescription)", category: .general)
             _ = ErrorHandler.shared.handleError(error)
+        }
+    }
+    
+    private func getExaminationData(for userRole: RolesType) async throws -> [ExaminationCardData]? {
+        if userRole == .ADMIN {
+            return try await interactor?.getAllDataAdmin()
+        } else {
+            return try await interactor?.getAllData()
         }
     }
 }

@@ -17,7 +17,9 @@ struct HistoryView: View {
         NavigationView {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: Decimal.d16) {
-                    WeeklyCalendarView(selectedDate: $selectedDate)
+                    WeeklyCalendar(selectedDate: $selectedDate) { newDate in
+                        selectedDate = newDate
+                    }
 
                     if presenter.isAllExamsLoading {
                         Spacer().frame(height: Decimal.d24)
@@ -96,6 +98,6 @@ struct HistoryView: View {
     }
 }
 
-#Preview {
-    HistoryView(selectedDate: Date())
-}
+//#Preview {
+//    HistoryView(selectedDate: Date())
+//}
