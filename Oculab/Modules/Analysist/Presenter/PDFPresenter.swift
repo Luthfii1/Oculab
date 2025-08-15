@@ -12,6 +12,7 @@ class PDFPresenter: ObservableObject {
     
     @Published var description: String?
     @Published var isError: Bool = false
+    @Published var errorMessage: String?
     @Published var data: PDFEntity?
     
     @MainActor
@@ -20,31 +21,8 @@ class PDFPresenter: ObservableObject {
             let response = try await interactor.getPDFData(examinationId: examinationId)
             self.data = response
         } catch {
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                handleErrorState(isError: true, errorData: apiResponse.data)
-            case let NetworkError.networkError(message):
-                handleErrorState(
-                    isError: true,
-                    errorData: ApiErrorData(errorType: "NETWORK_ERROR", description: message)
-                )
-            default:
-                handleErrorState(
-                    isError: true,
-                    errorData: ApiErrorData(errorType: "UNKNOW_ERROR", description: error.localizedDescription)
-                )
-            }
-        }
-    }
-    
-    private func handleErrorState(isError: Bool, errorData: ApiErrorData? = nil) {
-        DispatchQueue.main.async {
-            if isError, let errorData = errorData {
-                print("Error type: \(errorData.errorType)")
-                print("Error description: \(errorData.description)")
-                self.description = errorData.description
-            }
-            self.isError = isError
+            errorMessage = ErrorHandler.shared.handleError(error)
+            isError = true
         }
     }
     

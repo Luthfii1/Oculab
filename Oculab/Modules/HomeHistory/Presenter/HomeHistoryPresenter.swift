@@ -56,18 +56,7 @@ class HomeHistoryPresenter: ObservableObject {
             }
             
         } catch {
-            // Handle error
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-
-            case let NetworkError.networkError(message):
-                print("Network error getStatisticData: \(message)")
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-            }
+            _ = ErrorHandler.shared.handleError(error)
         }
     }
 
@@ -126,17 +115,7 @@ class HomeHistoryPresenter: ObservableObject {
         } catch {
             finishedExaminationsByDate = []
             
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-
-            case let NetworkError.networkError(message):
-                print("Network error getStatisticData: \(message)")
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-            }
+            _ = ErrorHandler.shared.handleError(error)
         }
     }
     
@@ -159,18 +138,7 @@ class HomeHistoryPresenter: ObservableObject {
                 await filterLatestActivity(typeActivity: selectedLatestActivity)
             }
         } catch {
-            // Handle error
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-            }
+            _ = ErrorHandler.shared.handleError(error)
         }
     }
 }

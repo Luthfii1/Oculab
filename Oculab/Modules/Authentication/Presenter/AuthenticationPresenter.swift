@@ -159,7 +159,7 @@ extension AuthenticationPresenter {
             isLoading = false
             isError = true
             
-            handleErrorWithMessage(error)
+            errorMessage = ErrorHandler.shared.handleError(error, context: .login)
             
             return false
         }
@@ -194,7 +194,7 @@ extension AuthenticationPresenter {
             }
             
         } catch {
-            handleErrorWithMessage(error)
+            errorMessage = ErrorHandler.shared.handleError(error, context: .login)
             
             // Handle error and ensure user goes back to login
             isPinAuthorized = false
@@ -318,7 +318,7 @@ extension AuthenticationPresenter {
             resetPinChangeFlow()
             
         } catch {
-            handleErrorWithMessage(error)
+            errorMessage = ErrorHandler.shared.handleError(error, context: .profile)
         }
     }
     
@@ -593,8 +593,8 @@ extension AuthenticationPresenter {
             isPinAuthorized = false
             clearLoginState()
             appStateManager?.setUnauthenticated()
-            
-            handleErrorWithMessage(error)
+
+            errorMessage = ErrorHandler.shared.handleError(error, context: .login)
         }
     }
     
@@ -606,7 +606,7 @@ extension AuthenticationPresenter {
             user = response
             Router.shared.popToRoot()
         } catch {
-            handleErrorWithMessage(error)
+            errorMessage = ErrorHandler.shared.handleError(error, context: .profile)
         }
     }
     
@@ -744,23 +744,6 @@ private extension AuthenticationPresenter {
             let result = try await group.next()!
             group.cancelAll()
             return result
-        }
-    }
-
-    private func handleErrorWithMessage(_ error: Error) {
-        switch error {
-        case let NetworkError.apiError(apiResponse):
-            print("Error type: \(apiResponse.data.errorType)")
-            print("Error description: \(apiResponse.data.description)")
-            errorMessage = apiResponse.data.description
-
-        case let NetworkError.networkError(message):
-            print("Network error: \(message)")
-            errorMessage = message
-
-        default:
-            print("Unknown error: \(error.localizedDescription)")
-            errorMessage = error.localizedDescription
         }
     }
 }

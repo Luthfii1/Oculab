@@ -72,18 +72,7 @@ class AnalysisResultPresenter: ObservableObject {
             print("Tracking duration submitted successfully.")
 
         } catch {
-            // Handle error
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-            }
+            errorMessage = ErrorHandler.shared.handleError(error, context: .examination)
         }
     }
 
@@ -106,18 +95,7 @@ class AnalysisResultPresenter: ObservableObject {
             isVerifPopUpVisible = false
             Router.shared.popToRoot()
         } catch {
-            // Handle error
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-            }
+            errorMessage = ErrorHandler.shared.handleError(error, context: .examination)
         }
     }
 
@@ -135,18 +113,7 @@ class AnalysisResultPresenter: ObservableObject {
                 checkIsAllFOVsVerified()
             }
         } catch {
-            // Handle error
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-            }
+            errorMessage = ErrorHandler.shared.handleError(error, context: .examination)
         }
     }
 

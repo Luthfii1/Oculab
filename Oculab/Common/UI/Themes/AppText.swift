@@ -21,6 +21,7 @@ typealias AppData = AppText.Data
 typealias AppIcon = AppText.SystemIcon
 typealias AppImage = AppText.AppIcon
 typealias AppFeature = AppText.Feature
+typealias AppError = AppText.Error
 typealias AppNetwork = AppText.Network
 typealias AppNetworkIcon = AppText.SystemIcon
 
@@ -247,6 +248,22 @@ enum AppText {
         static let required = "*"
         static let unknownError = "common.unknown_error".localized
         static let unknownMessage = "common.unknown_message".localized
+    }
+    
+    // MARK: - Error Messages
+    enum Error {
+        static let generic = "error.generic".localized
+        static let networkConnection = "error.network_connection".localized
+        static let unknownError = "error.unknown".localized
+        
+        enum Context {
+            static let login = "error.context.login".localized
+            static let registration = "error.context.registration".localized
+            static let profile = "error.context.profile".localized
+            static let patientManagement = "error.context.patient_management".localized
+            static let examination = "error.context.examination".localized
+            static let networkConnection = "error.context.network_connection".localized
+        }
     }
     
     // MARK: - Patient Data (Reusable across modules)
