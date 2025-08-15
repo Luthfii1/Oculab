@@ -49,26 +49,25 @@ struct ExamDetailAdminView: View {
                                 .font(AppTypography.s5)
                                 .foregroundColor(AppColors.slate300)
                                 
-                                let interpretasiPetugas = presenter.examinations.first?.expertResult ?? AppState.notAvailable
-                                
-                                if interpretasiPetugas != AppState.notAvailable {
-                                    GradingCardComponent(
-                                        type: GradingType(rawValue: interpretasiPetugas) ?? .unknown,
-                                        confidenceLevel: .lowConfidence,
-                                        isExpert: true
-                                    )
-                                } else {
-                                    Text(AppState.notAvailable)
-                                        .font(AppTypography.p4)
-                                        .padding(.vertical, 8)
-                                        .padding(.horizontal, 16)
-                                        .background(AppColors.slate50)
-                                        .cornerRadius(20)
-                                }
+                            // Staff interpretation component
+                            if presenter.staffInterpretation != AppState.notAvailable {
+                                GradingCardComponent(
+                                    type: GradingType(rawValue: presenter.staffInterpretation) ?? .unknown,
+                                    confidenceLevel: .lowConfidence,
+                                    isExpert: true
+                                )
+                            } else {
+                                Text(AppState.notAvailable)
+                                    .font(AppTypography.p4)
+                                    .padding(.vertical, 8)
+                                    .padding(.horizontal, 16)
+                                    .background(AppColors.slate50)
+                                    .cornerRadius(20)
+                            }
                         }
                         ExtendedCard(data: [
-                            (AppMedical.Examination.slideId, presenter.examinations.first?.slideId ?? AppValue.empty),
-                            (AppMedical.Examination.specimenType, presenter.examinations.first?.preparationType ?? AppValue.empty)
+                            (AppMedical.Examination.slideId, presenter.firstExamination?.slideId ?? AppValue.empty),
+                            (AppMedical.Examination.specimenType, presenter.firstExamination?.preparationType ?? AppValue.empty)
                         ], titleSize: AppTypography.s5)
                     }
 
@@ -100,8 +99,8 @@ struct ExamDetailAdminView: View {
                             }
                         }
                         ExtendedCard(data: [
-                            (AppMedical.Examination.slideId, presenter.examinations.count > 1 ? presenter.examinations[1].slideId : AppValue.empty),
-                            (AppMedical.Examination.specimenType, presenter.examinations.count > 1 ? presenter.examinations[1].preparationType : AppValue.empty)
+                            (AppMedical.Examination.slideId, presenter.secondExamination?.slideId ?? AppValue.empty),
+                            (AppMedical.Examination.specimenType, presenter.secondExamination?.preparationType ?? AppValue.empty)
                         ], titleSize: AppTypography.s5)
                     }
                     VStack(spacing: Decimal.d16) {
@@ -119,9 +118,9 @@ struct ExamDetailAdminView: View {
                             title: AppTextExamDetail.reportToSitbButton,
                             rightIcon: AppIcon.paperplane,
                             size: .small,
-                            isEnabled: true
+                            isEnabled: false // Disable until functionality is implemented
                         ) {
-                            print("Lihat PDF Tapped")
+                            Logger.debug("View PDF button tapped", category: .examination)
                         }
                     }
                 }

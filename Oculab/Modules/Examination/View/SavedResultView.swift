@@ -52,40 +52,17 @@ struct SavedResultView: View {
                                 .font(AppTypography.p3)
                                 .foregroundStyle(AppColors.slate300)
 
-                            RoundedRectangle(cornerRadius: Decimal.d8)
-                                .foregroundStyle(AppColors.slate50)
-                                .frame(height: 200)
-
-                            if resultPresenter.groupedFOVs?.bta0.isEmpty != true {
-                                Button {
-                                    resultPresenter.navigateToAlbum(fovGroup: .BTA0)
-                                } label: {
-                                    FolderCardComponent(
-                                        title: .BTA0,
-                                        numOfImage: resultPresenter.groupedFOVs?.bta0.count ?? 0
-                                    )
-                                }
-                            }
-
-                            if resultPresenter.groupedFOVs?.bta1to9.isEmpty != true {
-                                Button {
-                                    resultPresenter.navigateToAlbum(fovGroup: .BTA1TO9)
-                                } label: {
-                                    FolderCardComponent(
-                                        title: .BTA1TO9,
-                                        numOfImage: resultPresenter.groupedFOVs?.bta1to9.count ?? 0
-                                    )
-                                }
-                            }
-
-                            if resultPresenter.groupedFOVs?.btaabove9.isEmpty != true {
-                                Button {
-                                    resultPresenter.navigateToAlbum(fovGroup: .BTAABOVE9)
-                                } label: {
-                                    FolderCardComponent(
-                                        title: .BTAABOVE9,
-                                        numOfImage: resultPresenter.groupedFOVs?.btaabove9.count ?? 0
-                                    )
+                            // FOV folder buttons
+                            ForEach([FOVType.BTA0, FOVType.BTA1TO9, FOVType.BTAABOVE9], id: \.self) { fovType in
+                                if let count = resultPresenter.fovCount(for: fovType), count > 0 {
+                                    Button {
+                                        resultPresenter.navigateToAlbum(fovGroup: fovType)
+                                    } label: {
+                                        FolderCardComponent(
+                                            title: fovType,
+                                            numOfImage: count
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -121,46 +98,12 @@ struct SavedResultView: View {
                                     .font(AppTypography.p4)
                             }
 
-                            if resultPresenter.examinationResult?.systemGrading == .NEGATIVE {
-                                GradingCardComponent(
-                                    type: resultPresenter.examinationResult?.systemGrading ?? .unknown,
-                                    confidenceLevel: ConfidenceLevel
-                                        .classify(
-                                            aggregatedConfidence: resultPresenter.examinationResult?
-                                                .confidenceLevelAggregated ?? 0.0
-                                        )
-                                )
-                            } else if resultPresenter.examinationResult?.systemGrading == .Plus2 {
-                                GradingCardComponent(
-                                    type: resultPresenter.examinationResult?.systemGrading ?? .unknown,
-                                    confidenceLevel: ConfidenceLevel
-                                        .classify(
-                                            aggregatedConfidence: resultPresenter.examinationResult?
-                                                .confidenceLevelAggregated ?? 0.0
-                                        ),
-                                    n: resultPresenter.groupedFOVs?.bta1to9.count ?? 0
-                                )
-                            } else if resultPresenter.examinationResult?.systemGrading == .Plus3 {
-                                GradingCardComponent(
-                                    type: resultPresenter.examinationResult?.systemGrading ?? .unknown,
-                                    confidenceLevel: ConfidenceLevel
-                                        .classify(
-                                            aggregatedConfidence: resultPresenter.examinationResult?
-                                                .confidenceLevelAggregated ?? 0.0
-                                        ),
-                                    n: resultPresenter.groupedFOVs?.btaabove9.count ?? 0
-                                )
-                            } else {
-                                GradingCardComponent(
-                                    type: resultPresenter.examinationResult?.systemGrading ?? .unknown,
-                                    confidenceLevel: ConfidenceLevel
-                                        .classify(
-                                            aggregatedConfidence: resultPresenter.examinationResult?
-                                                .confidenceLevelAggregated ?? 0.0
-                                        ),
-                                    n: resultPresenter.examinationResult?.bacteriaTotalCount ?? 0
-                                )
-                            }
+                            // System grading component with conditional count
+                            GradingCardComponent(
+                                type: resultPresenter.systemGrading,
+                                confidenceLevel: resultPresenter.systemConfidenceLevel,
+                                n: resultPresenter.systemGradingCount
+                            )
                         }
 
                         VStack(alignment: .leading, spacing: Decimal.d16) {
@@ -178,9 +121,9 @@ struct SavedResultView: View {
                                 title: AppTextExamDetail.reportToSitbButton,
                                 rightIcon: AppIcon.paperplane,
                                 size: .small,
-                                isEnabled: true
+                                isEnabled: false
                             ) {
-                                print("Lihat PDF Tapped")
+                                Logger.debug("View PDF button tapped", category: .examination)
                             }
                         }
                     }

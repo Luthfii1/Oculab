@@ -82,7 +82,7 @@ struct ExamDetailView: View {
                         title: presenter.buttonTitle,
                         rightIcon: AppIcon.arrowRight,
                         size: .large,
-                        isEnabled: presenter.buttonEnabled()
+                        isEnabled: presenter.isButtonEnabled
                     ) {
                         Task {
                             await presenter.handleSubmit()
@@ -118,7 +118,7 @@ struct ExamDetailView: View {
         .onAppear {
             Task {
                 await presenter.fetchData(examId: examId, patientId: patientId, userRole: .LAB)
-                print(presenter.isLoading)
+                Logger.debug("Loading state: \(presenter.isLoading)", category: .examination)
             }
         }
         .onChange(of: videoRecordPresenter.previewURL) {

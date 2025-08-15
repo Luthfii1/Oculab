@@ -83,4 +83,12 @@ struct DateFormatterHelper {
             return "Invalid Date"
         }
     }
+    
+    /// Format Date to ISO8601 string format for API requests
+    func formatToISO8601(_ date: Date) -> String {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        return formatter.string(from: date)
+    }
 }

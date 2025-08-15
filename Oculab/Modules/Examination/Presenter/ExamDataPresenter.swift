@@ -8,20 +8,19 @@
 import SwiftUI
 
 class ExamDataPresenter: ObservableObject {
+    // MARK: - Dependencies
+    private let interactor: ExamInteractor
     let videoPresenter = VideoRecordPresenter.shared
+    
+    // MARK: - Published Properties
     @Published var isLoading: Bool = false {
         didSet {
-            if isLoading {
-                buttonTitle = AppTextExam.buttonSubmitting
-            } else {
-                buttonTitle = AppTextExam.buttonStartAnalysis
-            }
+            updateButtonTitle()
         }
     }
 
     @Published var recordVideo: URL?
     @Published var buttonTitle: String = AppTextExam.buttonStartAnalysis
-
     @Published var examDetailData: ExaminationDetailData = .init(
         examinationId: AppValue.empty,
         pic: AppValue.empty,
@@ -38,66 +37,60 @@ class ExamDataPresenter: ObservableObject {
         sex: AppValue.empty,
         bpjs: AppValue.empty
     )
-    
     @Published var examinations: [AdminExaminationData] = []
 
-    private let interactor: ExamInteractor
-
+    // MARK: - Initialization
     init(interactor: ExamInteractor) {
         self.interactor = interactor
     }
-
-    func buttonEnabled() -> Bool {
-        return (recordVideo != nil) && !isLoading
+    
+    // MARK: - Computed Properties
+    var isButtonEnabled: Bool {
+        return recordVideo != nil && !isLoading
     }
-
-    @MainActor
-    func handleSubmit() async {
-        isLoading = true
-        defer { isLoading = false }
-
-        guard let fileURL = recordVideo else {
-            print("Submit button was pressed but recordVideo URL is nil.")
-            return
-        }
-
-        do {
-            let videoData = try Data(contentsOf: fileURL)
-            print("Video data loaded successfully with size: \(videoData.count) bytes")
-
-            let response = try await interactor.submitExamination(
-                examVideo: videoData,
-                examinationId: examDetailData.examinationId,
-                patientId: patientDetailData.patientId
-            )
-
-            print("Examination submitted successfully with response: \(response)")
-
-            recordVideo = nil
-            videoPresenter.previewURL = nil
-            deleteTemporaryFile(at: fileURL)
-
-        } catch {
-            print("Error submitting or loading video data: \(error)")
-        }
+    
+    var firstExamination: AdminExaminationData? {
+        examinations.first
     }
-
-    func deleteTemporaryFile(at url: URL) {
-        let fileManager = FileManager.default
-        if fileManager.fileExists(atPath: url.path) {
-            do {
-                try fileManager.removeItem(at: url)
-                print("Successfully deleted temporary video file at: \(url.path)")
-            } catch {
-                print("Error deleting temporary video file: \(error.localizedDescription)")
-            }
-        }
+    
+    var secondExamination: AdminExaminationData? {
+        examinations.count > 1 ? examinations[1] : nil
     }
+    
+    var staffInterpretation: String {
+        firstExamination?.expertResult ?? AppState.notAvailable
+    }
+    
+    // MARK: - Private Methods
+    private func updateButtonTitle() {
+        buttonTitle = isLoading ? AppTextExam.buttonSubmitting : AppTextExam.buttonStartAnalysis
+    }
+}
 
+// MARK: - Video Management Methods
+extension ExamDataPresenter {
     func saveVideo() {
         recordVideo = videoPresenter.previewURL
     }
 
+    private func deleteTemporaryFile(at url: URL) {
+        let fileManager = FileManager.default
+        guard fileManager.fileExists(atPath: url.path) else {
+            Logger.warning("Temporary file does not exist at path: \(url.path)", category: .examination)
+            return
+        }
+        
+        do {
+            try fileManager.removeItem(at: url)
+            Logger.info("Successfully deleted temporary video file at: \(url.path)", category: .examination)
+        } catch {
+            Logger.error("Error deleting temporary video file: \(error.localizedDescription)", category: .examination)
+        }
+    }
+}
+
+// MARK: - Navigation Methods
+extension ExamDataPresenter {
     func newVideoRecord() {
         Router.shared.navigateTo(.videoRecord)
     }
@@ -105,7 +98,46 @@ class ExamDataPresenter: ObservableObject {
     func navigateToAnalysisResult(examinationId: String) {
         Router.shared.navigateTo(.analysisResult(examinationId: examinationId))
     }
+}
 
+// MARK: - Submission Methods
+extension ExamDataPresenter {
+    @MainActor
+    func handleSubmit() async {
+        isLoading = true
+        defer { isLoading = false }
+
+        guard let fileURL = recordVideo else {
+            Logger.warning("Submit button pressed but recordVideo URL is nil", category: .examination)
+            return
+        }
+
+        do {
+            let videoData = try Data(contentsOf: fileURL)
+            Logger.info("Video data loaded successfully with size: \(videoData.count) bytes", category: .examination)
+
+            let response = try await interactor.submitExamination(
+                examVideo: videoData,
+                examinationId: examDetailData.examinationId,
+                patientId: patientDetailData.patientId
+            )
+
+            Logger.info("Examination submitted successfully with response: \(response)", category: .examination)
+
+            // Clear video data and cleanup
+            recordVideo = nil
+            videoPresenter.previewURL = nil
+            deleteTemporaryFile(at: fileURL)
+
+        } catch {
+            Logger.error("Error submitting or loading video data: \(error)", category: .examination)
+            _ = ErrorHandler.shared.handleError(error, context: .examination)
+        }
+    }
+}
+
+// MARK: - Data Fetching Methods
+extension ExamDataPresenter {
     @MainActor
     func fetchData(examId: String, patientId: String, userRole: RolesType) async {
         isLoading = true
@@ -116,27 +148,45 @@ class ExamDataPresenter: ObservableObject {
             patientDetailData = patientResponse
             
             if userRole == .ADMIN {
-                // Fetch admin examination detail data
-                let examinationResponse = try await interactor.getAdminExamDetail(observationId: examId)
-                examinations = examinationResponse.examinations
-                
-                // Map admin data to examDetailData for compatibility
-                examDetailData = ExaminationDetailData(
-                    examinationId: examinationResponse.observationId,
-                    pic: examinationResponse.picName,
-                    slideId: examinationResponse.examinations.first?.slideId ?? AppValue.empty,
-                    examinationGoal: examinationResponse.goal,
-                    type: examinationResponse.examinations.first?.preparationType ?? AppValue.empty,
-                    dpjp: examinationResponse.dpjpName
-                )
+                await fetchAdminExaminationData(examId: examId)
             } else {
-                // Fetch regular examination data for LAB users
-                let examinationResponse = try await interactor.getExamById(examId: examId)
-                examDetailData = examinationResponse
-                examinations = []
+                await fetchRegularExaminationData(examId: examId)
             }
             
         } catch {
+            _ = ErrorHandler.shared.handleError(error, context: .examination)
+        }
+    }
+    
+    @MainActor
+    private func fetchAdminExaminationData(examId: String) async {
+        do {
+            let examinationResponse = try await interactor.getAdminExamDetail(observationId: examId)
+            examinations = examinationResponse.examinations
+            
+            // Map admin data to examDetailData for compatibility
+            examDetailData = ExaminationDetailData(
+                examinationId: examinationResponse.observationId,
+                pic: examinationResponse.picName,
+                slideId: examinationResponse.examinations.first?.slideId ?? AppValue.empty,
+                examinationGoal: examinationResponse.goal,
+                type: examinationResponse.examinations.first?.preparationType ?? AppValue.empty,
+                dpjp: examinationResponse.dpjpName
+            )
+        } catch {
+            Logger.error("Failed to fetch admin examination data: \(error)", category: .examination)
+            _ = ErrorHandler.shared.handleError(error, context: .examination)
+        }
+    }
+    
+    @MainActor
+    private func fetchRegularExaminationData(examId: String) async {
+        do {
+            let examinationResponse = try await interactor.getExamById(examId: examId)
+            examDetailData = examinationResponse
+            examinations = []
+        } catch {
+            Logger.error("Failed to fetch regular examination data: \(error)", category: .examination)
             _ = ErrorHandler.shared.handleError(error, context: .examination)
         }
     }

@@ -12,30 +12,15 @@ struct FOVAlbum: View {
     @ObservedObject var presenter: AnalysisResultPresenter = .init()
     var examId: String
 
-    let columns = [
-        GridItem(.adaptive(minimum: AppConstants.fovGridMinItemSize))
-    ]
-
-    var selectedFOVs: [FOVData] {
-        switch fovGroup {
-        case .BTA0:
-            return presenter.groupedFOVs?.bta0 ?? []
-        case .BTA1TO9:
-            return presenter.groupedFOVs?.bta1to9 ?? []
-        case .BTAABOVE9:
-            return presenter.groupedFOVs?.btaabove9 ?? []
-        }
-    }
-
     var body: some View {
         NavigationView {
             ScrollView {
                 Spacer().frame(height: Decimal.d24)
 
-                LazyVGrid(columns: columns, spacing: AppConstants.fovGridSpacing) {
-                    ForEach(Array(selectedFOVs.enumerated()), id: \.element._id) { index, fov in
+                LazyVGrid(columns: presenter.columnsFOVAlbum, spacing: AppConstants.fovGridSpacing) {
+                    ForEach(Array(presenter.selectedFOVs(for: fovGroup).enumerated()), id: \.element._id) { index, fov in
                         Button {
-                            presenter.navigateToDetailed(fovData: fov, order: index, total: selectedFOVs.count, examId: examId)
+                            presenter.navigateToDetailed(fovData: fov, order: index, total: presenter.selectedFOVs(for: fovGroup).count, examId: examId)
                         } label: {
                             RetryableImageView(
                                 imageURL: fov.image,

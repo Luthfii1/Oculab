@@ -19,15 +19,6 @@ enum AppConstants {
     static let defaultPadding: CGFloat = 16
     static let cornerRadius: CGFloat = 12
     
-    // MARK: - Login Screen
-    static let loginImageMaxHeight: CGFloat = 300
-    static let loginKeyboardTopSpacing: CGFloat = 50
-    static let loginBottomSpacing: CGFloat = 100
-    static let loginContentPaddingKeyboard: CGFloat = 20
-    static let loginContentPaddingNormal: CGFloat = 24
-    static let loginFieldsTopPadding: CGFloat = 12
-    static let loginButtonTopPadding: CGFloat = 18
-    
     // MARK: - Network
     static let requestTimeout: TimeInterval = 30.0
     static let maxRetryAttempts: Int = 3
@@ -39,20 +30,6 @@ enum AppConstants {
         ["7", "8", "9"],
         ["!", "0", "delete.left.fill"]
     ]
-    
-    // MARK: - FOV Analysis
-    static let fovThumbnailSize: CGFloat = 74
-    static let fovGridSpacing: CGFloat = 10
-    static let fovGridMinItemSize: CGFloat = 74
-    static let fovBorderWidth: CGFloat = 4
-    static let fovCornerRadius: CGFloat = 2
-    static let fovSuccessIconSize: CGFloat = 20
-    static let fovSuccessIconPadding: CGFloat = 4
-    
-        // MARK: - Default Values
-    static let defaultUnknownValue = "Unknown"
-    static let defaultNoGoalValue = "No goal specified"
-    static let defaultNoTypeValue = "No type specified"
 }
 
 // MARK: - Validation Constants

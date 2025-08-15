@@ -8,23 +8,35 @@
 import Foundation
 
 class AnalysisResultInteractor {
+    // MARK: - Dependencies
     private let networkService: NetworkServiceProtocol
+    
+    // MARK: - API Endpoints
+    private struct APIEndpoints {
+        static let examination = API.BE + "/examination/get-examination-by-id/"
+        static let expertResult = API.BE + "/expertResult/post-expert-result/"
+        static let trackingDuration = API.BE + "/tracking/post-tracking-duration/"
+    }
 
+    // MARK: - Initialization
     init(networkService: NetworkServiceProtocol = AlamofireNetworkService()) {
         self.networkService = networkService
     }
     
+    // MARK: - Private Methods
     private func createURL(with examinationId: String) -> URL? {
-        let examinationURL = API.BE + "/examination/get-examination-by-id/"
-        print(examinationURL + examinationId.lowercased())
-        return URL(string: examinationURL + examinationId.lowercased())
+        let urlString = APIEndpoints.examination + examinationId.lowercased()
+        Logger.debug("Creating URL: \(urlString)", category: .examination)
+        return URL(string: urlString)
     }
 
+    // MARK: - Public Methods
     func submitExpertResult(examId: String, expertResult: ExpertExamResult) async throws -> ExpertExamResult {
         let response: APIResponse<ExpertExamResult> = try await networkService.post(
-            urlString: API.BE + "/expertResult/post-expert-result/" + examId,
+            urlString: APIEndpoints.expertResult + examId,
             headers: nil,
-            body: expertResult)
+            body: expertResult
+        )
 
         return response.data
     }
@@ -36,7 +48,7 @@ class AnalysisResultInteractor {
         let examinationDetail = ExaminationResultData(
             examinationId: response.data._id,
             slideId: response.data.slideId,
-            imagePreview: response.data.imagePreview ?? "",
+            imagePreview: response.data.imagePreview ?? AppValue.empty,
 
             fov: response.data.FOV ?? [],
             confidenceLevelAggregated: response.data.systemResult?.confidenceLevelAggregated ?? 0,
@@ -48,7 +60,10 @@ class AnalysisResultInteractor {
                 rawValue: response.data.expertResult?.finalGrading.rawValue ?? GradingType.NEGATIVE
                     .rawValue) ?? .unknown,
             bacteriaTotalCount: response.data.systemResult?.systemBacteriaTotalCount ?? 0,
-            expertNote: response.data.expertResult?.notes ?? "",
+            expertNote: {
+                let notes = response.data.expertResult?.notes ?? AppValue.empty
+                return notes.isEmpty ? "examination.interpretation.no_staff_notes".localized : notes
+            }(),
             statusExamination: response.data.statusExamination)
 
         return examinationDetail
@@ -56,17 +71,20 @@ class AnalysisResultInteractor {
 
     func fetchFOVData(examId: String) async throws -> FOVGrouping {
         let response: APIResponse<FOVGrouping> = try await networkService.get(
-            urlString: API.BE + "/fov/get-all-fov-by-examination-id/" +
-                examId.lowercased(), headers: nil)
+            urlString: API.BE + "/fov/get-all-fov-by-examination-id/" + examId.lowercased(), 
+            headers: nil
+        )
         return response.data
     }
 
     func submitTrackingDuration(examId: String, body: TrackingDurationRequest) async throws -> TrackingDurationRequest {
-        print(examId)
+        Logger.info("Submitting tracking duration for exam: \(examId)", category: .examination)
+        
         let response: APIResponse<TrackingDurationRequest> = try await networkService.post(
             urlString: API.BE + "/examinationAnalysisDuration/create-analysis-duration/" + examId,
             headers: nil,
-            body: body)
+            body: body
+        )
 
         return response.data
     }
