@@ -17,66 +17,68 @@ class AccountPresenter: ObservableObject {
     var formValidation: FormValidationViewModel
     
     // MARK: - UI State
-    var isUserLoading = false
-    var isRegistering = false
-    var isEditing = false
-    var isDeleting = false
-    var isSearching: Bool = false
+    @Published var isUserLoading = false
+    @Published var isRegistering = false
+    @Published var isEditing = false
+    @Published var isDeleting = false
+    @Published var isSearching: Bool = false
     
     // MARK: - Form Fields with Validation
-    var name = AppValue.empty {
+    @Published var name = AppValue.empty {
         didSet {
             validateNameField()
         }
     }
-    var role: String = AppValue.empty {
+    @Published var role: String = AppValue.empty {
         didSet {
             validateRoleField()
         }
     }
-    var userId: String = AppValue.empty
-    var email: String = AppValue.empty {
+    @Published var userId: String = AppValue.empty
+    @Published var email: String = AppValue.empty {
         didSet {
             validateEmailField()
         }
     }
     
     // MARK: - Validation Error States
-    var nameError: String = AppValue.empty
-    var emailError: String = AppValue.empty
-    var roleError: String = AppValue.empty
-    var isError = false
-    var editError: String? = nil
-    var registrationError: String? = nil
-    var deletionError: String? = nil
+    @Published var nameError: String = AppValue.empty
+    @Published var emailError: String = AppValue.empty
+    @Published var roleError: String = AppValue.empty
+    @Published var isError = false
+    @Published var editError: String? = nil
+    @Published var registrationError: String? = nil
+    @Published var deletionError: String? = nil
     
     // MARK: - Success States
-    var registrationSuccess: (name: String, role: String) = (AppValue.empty, AppValue.empty)
-    var editSuccess: (name: String, role: String) = (AppValue.empty, AppValue.empty)
-    var deletionSuccess: (userName: String, message: String)? = nil
+    @Published var registrationSuccess: (name: String, role: String) = (AppValue.empty, AppValue.empty)
+    @Published var editSuccess: (name: String, role: String) = (AppValue.empty, AppValue.empty)
+    @Published var deletionSuccess: (userName: String, message: String)? = nil
     
     // MARK: - Alert States
-    var showSuccessPopup = false
-    var showDeleteSuccessAlert = false
-    var showDeleteConfirmationPopup = false
+    @Published var showSuccessPopup = false
+    @Published var showDeleteSuccessAlert = false
+    @Published var showDeleteConfirmationPopup = false
     
     // MARK: - Search and Data
-    var searchText: String = AppValue.empty {
+    @Published var searchText: String = AppValue.empty {
         didSet {
             searchTimer?.invalidate()
             searchTimer = Timer.scheduledTimer(withTimeInterval: debounceTime, repeats: false) { [weak self] _ in
-                self?.searchAccounts(query: self?.searchText ?? AppValue.empty)
+                Task { @MainActor in
+                    self?.searchAccounts(query: self?.searchText ?? AppValue.empty)
+                }
             }
         }
     }
-    var filteredGroupedAccounts: [String: [Account]] = [:]
-    var filteredSortedGroupedAccounts: [String] = []
-    var groupedAccounts: [String: [Account]] = [:]
-    var sortedGroupedAccounts: [String] = []
+    @Published var filteredGroupedAccounts: [String: [Account]] = [:]
+    @Published var filteredSortedGroupedAccounts: [String] = []
+    @Published var groupedAccounts: [String: [Account]] = [:]
+    @Published var sortedGroupedAccounts: [String] = []
     
     // MARK: - User Selection
-    var selectedUser: SelectedUser? = nil
-    var userToDelete: SelectedUser? = nil
+    @Published var selectedUser: SelectedUser? = nil
+    @Published var userToDelete: SelectedUser? = nil
     
     // MARK: - Computed Properties
     var isFormValid: Bool {
@@ -219,7 +221,7 @@ extension AccountPresenter {
             }
 
         } catch {
-            _ = ErrorHandler.shared.handleError(error)
+            handleFetchError(error)
         }
     }
     
@@ -231,21 +233,18 @@ extension AccountPresenter {
         do {
             let roleType = getRoleType(from: role)
             
-            let result = try await interactor.registerAccount(
+            _ = try await interactor.registerAccount(
                 roleType: roleType,
                 name: name,
                 email: email
             )
             
-            if result != nil {
-                registrationSuccess = (name: name, role: roleType.rawValue)
-                showSuccessPopup = true
-                
-                Task {
-                    await fetchAllAccount()
-                }
-            } else {
-                registrationError = AppTextUserMgmtView.failedRegistration
+            // Registration successful - result is non-nil
+            registrationSuccess = (name: name, role: roleType.rawValue)
+            showSuccessPopup = true
+            
+            Task {
+                await fetchAllAccount()
             }
             
             clearForm()
@@ -352,6 +351,7 @@ extension AccountPresenter {
 
 // MARK: - Search and Filter Operations
 extension AccountPresenter {
+    @MainActor
     func searchAccounts(query: String) {
         if query.isEmpty {
             filteredGroupedAccounts = [:]
@@ -394,6 +394,7 @@ extension AccountPresenter {
         filteredSortedGroupedAccounts = []
     }
     
+    @MainActor
     func performSearch() {
         searchAccounts(query: searchText)
     }
@@ -458,7 +459,27 @@ extension AccountPresenter {
     }
     
     func resetForm() {
+        clearForm()
+        clearErrors()
         showSuccessPopup = false
+    }
+    
+    private func clearForm() {
+        self.name = AppValue.empty
+        self.role = AppValue.empty
+        self.email = AppValue.empty
+        self.userId = AppValue.empty
+    }
+    
+    private func clearErrors() {
+        nameError = AppValue.empty
+        emailError = AppValue.empty
+        roleError = AppValue.empty
+        isError = false
+        editError = nil
+        registrationError = nil
+        deletionError = nil
+        formValidation.clearAllErrors()
     }
 }
 
@@ -479,10 +500,10 @@ extension AccountPresenter {
         return RolesType(rawValue: roleString) ?? .LAB
     }
     
-    private func clearForm() {
-        self.name = AppValue.empty
-        self.role = AppValue.empty
-        self.email = AppValue.empty
+    private func handleFetchError(_ error: Error) {
+        Logger.error("Failed to fetch accounts: \(error.localizedDescription)", category: .user)
+        // Could show a toast or alert to user about fetch failure
+        // For now, we'll just log it as the UI will show empty state
     }
     
     private func handleRegistrationError(_ error: Error) {
