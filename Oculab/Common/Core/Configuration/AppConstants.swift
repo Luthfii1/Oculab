@@ -49,10 +49,44 @@ enum AppConstants {
     static let fovSuccessIconSize: CGFloat = 20
     static let fovSuccessIconPadding: CGFloat = 4
     
-        // MARK: - Default Values
+    // MARK: - Default Values
     static let defaultUnknownValue = "Unknown"
     static let defaultNoGoalValue = "No goal specified"
     static let defaultNoTypeValue = "No type specified"
+
+    // MARK: - Patient Module UI
+    enum PatientUI {
+        static let defaultEmptyValue: String = ""
+        static let viewSpacing: CGFloat = 24
+        static let searchSpacing: CGFloat = 20
+        static let gridSpacing: CGFloat = 16
+        static let gridItemSpacing: CGFloat = 12
+        static let noResultsIconSize: CGFloat = 48
+        static let horizontalPadding: CGFloat = 20
+        static let topPadding: CGFloat = 40
+        
+        // Card constants
+        static let cardIconSize: CGFloat = 32
+        static let cardCornerRadius: CGFloat = 8
+        static let cardBorderRadius: CGFloat = 12
+        static let cardPadding: CGFloat = 12
+        static let cardHeight: CGFloat = 100
+        static let cardSpacing: CGFloat = 8
+        static let cardContentSpacing: CGFloat = 4
+        static let cardStrokeWidth: CGFloat = 1
+        static let cardIconOpacity: Double = 0.2
+        
+        // Form constants
+        static let fieldSpacing: CGFloat = 24
+        static let nikLength: Int = 16
+        static let bpjsLength: Int = 13
+        static let bpjsMinLength: Int = 13
+        static let bpjsMaxLength: Int = 13
+        
+        // Date formatting
+        static let dateFormat: String = "dd/MM/yyyy"
+        static let dateTimeFormat: String = "dd MMMM yyyy HH:mm"
+    }
 }
 
 // MARK: - Validation Constants

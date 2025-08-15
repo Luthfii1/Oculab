@@ -12,7 +12,7 @@ struct PatientListView: View {
     
     var body: some View {
         NavigationView {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: AppConstants.PatientUI.viewSpacing) {
                 HStack {
                     Text(AppTextPatientList.navigationTitle)
                         .font(AppTypography.h1)
@@ -43,11 +43,11 @@ struct PatientListView: View {
                 if presenter.isPatientLoading {
                     ProgressView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .padding(.top, 40)
+                        .padding(.top, AppConstants.PatientUI.topPadding)
                 } else if !presenter.searchText.isEmpty && presenter.filteredPatientNameDoB.isEmpty {
-                    VStack(spacing: 20) {
+                    VStack(spacing: AppConstants.PatientUI.searchSpacing) {
                         Image(systemName: AppIcon.search)
-                            .font(.system(size: 48))
+                            .font(.system(size: AppConstants.PatientUI.noResultsIconSize))
                             .foregroundColor(AppColors.slate300)
                         
                         Text(AppSearch.noResults(presenter.searchText))
@@ -67,16 +67,16 @@ struct PatientListView: View {
                 } else {
                     ScrollView {
                         LazyVGrid(columns: [
-                            GridItem(.flexible(), spacing: 12),
-                            GridItem(.flexible(), spacing: 12)
-                        ], spacing: 16) {
+                            GridItem(.flexible(), spacing: AppConstants.PatientUI.gridItemSpacing),
+                            GridItem(.flexible(), spacing: AppConstants.PatientUI.gridItemSpacing)
+                        ], spacing: AppConstants.PatientUI.gridSpacing) {
                             ForEach(presenter.filteredPatientNameDoB, id: \.1) { nameWithDoB, patientId in
                                 Button {
                                     presenter.navigateTo(.patientDetail(patientId: patientId))
                                 } label: {
                                     PatientCard(
-                                        name: nameWithDoB.components(separatedBy: " (").first ?? AppValue.empty,
-                                        birthDate: nameWithDoB.components(separatedBy: " (").last?.replacingOccurrences(of: ")", with: AppValue.empty) ?? AppValue.empty
+                                        name: nameWithDoB.components(separatedBy: " (").first ?? AppConstants.PatientUI.defaultEmptyValue,
+                                        birthDate: nameWithDoB.components(separatedBy: " (").last?.replacingOccurrences(of: ")", with: AppConstants.PatientUI.defaultEmptyValue) ?? AppConstants.PatientUI.defaultEmptyValue
                                     )
                                 }
                             }
@@ -85,7 +85,7 @@ struct PatientListView: View {
                 }
                 
             }
-            .padding(.horizontal, Decimal.d20)
+            .padding(.horizontal, AppConstants.PatientUI.horizontalPadding)
             .background(Color(.systemBackground))
             .onAppear {
                 Task {

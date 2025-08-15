@@ -11,11 +11,13 @@ import Observation
 
 @Observable
 class PatientPresenter {
-    var interactor: PatientInteractor? = PatientInteractor()
+    // MARK: - Dependencies
+    private var interactor: PatientInteractor? = PatientInteractor()
     
     // MARK: - Form Validation
     var formValidation: FormValidationViewModel
     
+    // MARK: - Initialization
     init() {
         self.formValidation = FormValidationViewModel()
     }
@@ -23,14 +25,14 @@ class PatientPresenter {
     // MARK: - UI State
     var isPatientLoading = false
     var patientNameDoB: [(String, String)] = []
-    var searchText: String = AppValue.empty
+    var searchText: String = AppConstants.PatientUI.defaultEmptyValue
     var filteredPatientNameDoB: [(String, String)] = []
     
     // MARK: - Patient Data with Validation
     var patient: Patient = .init(
         _id: UUID().uuidString.lowercased(),
-        name: AppValue.empty,
-        NIK: AppValue.empty,
+        name: AppConstants.PatientUI.defaultEmptyValue,
+        NIK: AppConstants.PatientUI.defaultEmptyValue,
         DoB: Date(),
         sex: .UNKNOWN
     ) {
@@ -39,8 +41,8 @@ class PatientPresenter {
         }
     }
     
-    var selectedSex: String = AppValue.empty
-    var BPJSnumber: String = AppValue.empty {
+    var selectedSex: String = AppConstants.PatientUI.defaultEmptyValue
+    var BPJSnumber: String = AppConstants.PatientUI.defaultEmptyValue {
         didSet {
             validateBPJSField()
         }
@@ -48,9 +50,9 @@ class PatientPresenter {
     var selectedDoB: Date = Date()
     
     // MARK: - Validation Error States
-    var nameError: String = AppValue.empty
-    var nikError: String = AppValue.empty
-    var bpjsError: String = AppValue.empty
+    var nameError: String = AppConstants.PatientUI.defaultEmptyValue
+    var nikError: String = AppConstants.PatientUI.defaultEmptyValue
+    var bpjsError: String = AppConstants.PatientUI.defaultEmptyValue
     
     // MARK: - Other States
     var examinationList: [ExaminationResultCardData] = []
@@ -61,6 +63,68 @@ class PatientPresenter {
     // MARK: - Computed Properties
     var isFormValid: Bool {
         return validatePatientForm() && !isPatientLoading
+    }
+    
+    // MARK: - Form View Properties
+    var buttonTitle: String {
+        isAddingNewPatient ? AppTextPatientCompCard.buttonCreatePatient : AppTextPatientCompCard.buttonSavePatient
+    }
+    
+    var buttonIcon: String {
+        isAddingNewPatient ? AppIcon.add : AppIcon.checkmark
+    }
+    
+    var navigationTitle: String {
+        isAddingNewPatient ? AppTextPatientForm.newPatientNavigationTitle : AppTextPatientForm.editPatientNavigationTitle
+    }
+    
+    private var isAddingNewPatient: Bool {
+        return patient._id.isEmpty || patient.name.isEmpty
+    }
+}
+
+// MARK: - Form Management
+extension PatientPresenter {
+    func setupForm(patientId: String?) {
+        guard let patientId = patientId else { return }
+        Task {
+            await getPatientById(patientId: patientId)
+        }
+    }
+    
+    func handleFormSubmission() async {
+        if isAddingNewPatient {
+            await addNewPatientWithValidation()
+        } else {
+            await updatePatientWithValidation()
+        }
+    }
+    
+    // MARK: - Field Change Handlers
+    func handleDateOfBirthChange() {
+        patient.DoB = selectedDoB
+        Logger.debug("Date of birth updated", category: .patient)
+    }
+    
+    func handleGenderChange() {
+        switch selectedSex {
+        case AppPatient.Gender.female:
+            patient.sex = .FEMALE
+        case AppPatient.Gender.male:
+            patient.sex = .MALE
+        default:
+            patient.sex = .UNKNOWN
+        }
+        Logger.debug("Gender updated to: \(patient.sex)", category: .patient)
+    }
+    
+    func handleBPJSChange() {
+        patient.BPJS = BPJSnumber.isEmpty ? nil : BPJSnumber
+        Logger.debug("BPJS number updated", category: .patient)
+    }
+
+    func dismissKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
 
@@ -82,9 +146,9 @@ extension PatientPresenter {
     private func validateNameField() {
         if !patient.name.isEmpty {
             let isValid = ValidationManager.shared.validateName(patient.name, fieldName: ValidationFieldName.patientName.rawValue)
-            nameError = isValid ? AppValue.empty : (ValidationManager.shared.getError(for: ValidationFieldName.patientName.rawValue) ?? AppValue.empty)
+            nameError = isValid ? AppConstants.PatientUI.defaultEmptyValue : (ValidationManager.shared.getError(for: ValidationFieldName.patientName.rawValue) ?? AppConstants.PatientUI.defaultEmptyValue)
         } else {
-            nameError = AppValue.empty
+            nameError = AppConstants.PatientUI.defaultEmptyValue
             ValidationManager.shared.clearError(for: ValidationFieldName.patientName.rawValue)
         }
     }
@@ -92,9 +156,9 @@ extension PatientPresenter {
     private func validateNIKField() {
         if !patient.NIK.isEmpty {
             let isValid = ValidationManager.shared.validateNIK(patient.NIK, fieldName: ValidationFieldName.patientNIK.rawValue)
-            nikError = isValid ? AppValue.empty : (ValidationManager.shared.getError(for: ValidationFieldName.patientNIK.rawValue) ?? AppValue.empty)
+            nikError = isValid ? AppConstants.PatientUI.defaultEmptyValue : (ValidationManager.shared.getError(for: ValidationFieldName.patientNIK.rawValue) ?? AppConstants.PatientUI.defaultEmptyValue)
         } else {
-            nikError = AppValue.empty
+            nikError = AppConstants.PatientUI.defaultEmptyValue
             ValidationManager.shared.clearError(for: ValidationFieldName.patientNIK.rawValue)
         }
     }
@@ -103,12 +167,12 @@ extension PatientPresenter {
         if !BPJSnumber.isEmpty {
             let isValid = ValidationManager.shared.validateWithRules(BPJSnumber, fieldName: ValidationFieldName.patientBPJS.rawValue, rules: [
                 .numbersOnly(),
-                .minLength(13),
-                .maxLength(13)
+                .minLength(AppConstants.PatientUI.bpjsMinLength),
+                .maxLength(AppConstants.PatientUI.bpjsMaxLength)
             ])
-            bpjsError = isValid ? AppValue.empty : (ValidationManager.shared.getError(for: ValidationFieldName.patientBPJS.rawValue) ?? AppValue.empty)
+            bpjsError = isValid ? AppConstants.PatientUI.defaultEmptyValue : (ValidationManager.shared.getError(for: ValidationFieldName.patientBPJS.rawValue) ?? AppConstants.PatientUI.defaultEmptyValue)
         } else {
-            bpjsError = AppValue.empty
+            bpjsError = AppConstants.PatientUI.defaultEmptyValue
             ValidationManager.shared.clearError(for: ValidationFieldName.patientBPJS.rawValue)
         }
     }
@@ -119,7 +183,7 @@ extension PatientPresenter {
     @MainActor
     func addNewPatientWithValidation() async {
         guard validatePatientForm() else {
-            print("🔘 Patient form validation failed")
+            Logger.warning("Patient form validation failed", category: .patient)
             return
         }
         
@@ -130,7 +194,7 @@ extension PatientPresenter {
     @MainActor
     func updatePatientWithValidation() async {
         guard validatePatientForm() else {
-            print("🔘 Patient form validation failed")
+            Logger.warning("Patient form validation failed", category: .patient)
             return
         }
         
@@ -149,18 +213,17 @@ extension PatientPresenter {
             let response = try await interactor?.getAllPatient()
 
             if let response {
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "dd/MM/yyyy"
-
                 patientNameDoB.removeAll()
                 for patient in response {
-                    let formattedDoB = patient.DoB.map { dateFormatter.string(from: $0) } ?? AppValue.empty
+                    let formattedDoB = formatDate(patient.DoB)
                     patientNameDoB.append((patient.name + String(formattedDoB), patient._id))
                 }
                 filterPatients()
+                Logger.info("Successfully fetched \(response.count) patients", category: .patient)
             }
         } catch {
             errorMessage = ErrorHandler.shared.handleError(error)
+            Logger.error("Failed to fetch patients: \(error.localizedDescription)", category: .patient)
         }
     }
     
@@ -176,7 +239,7 @@ extension PatientPresenter {
 
             if let fetchedPatient = response {
                 self.patient = fetchedPatient
-                self.BPJSnumber = fetchedPatient.BPJS ?? AppValue.empty
+                self.BPJSnumber = fetchedPatient.BPJS ?? AppConstants.PatientUI.defaultEmptyValue
                 self.selectedDoB = fetchedPatient.DoB ?? Date()
                 
                 switch fetchedPatient.sex {
@@ -185,11 +248,13 @@ extension PatientPresenter {
                 case .MALE:
                     self.selectedSex = AppPatient.Gender.male
                 default:
-                    self.selectedSex = AppValue.empty
+                    self.selectedSex = AppConstants.PatientUI.defaultEmptyValue
                 }
+                Logger.info("Successfully fetched patient with ID: \(patientId)", category: .patient)
             }
         } catch {
             errorMessage = ErrorHandler.shared.handleError(error)
+            Logger.error("Failed to fetch patient with ID \(patientId): \(error.localizedDescription)", category: .patient)
         }
     }
 
@@ -206,10 +271,12 @@ extension PatientPresenter {
         do {
             let response = try await interactor?.addNewPatient(patient: patient)
             if response != nil {
+                Logger.info("Successfully added new patient: \(patient.name)", category: .patient)
                 Router.shared.navigateBack()
             }
         } catch {
             errorMessage = ErrorHandler.shared.handleError(error)
+            Logger.error("Failed to add new patient: \(error.localizedDescription)", category: .patient)
         }
     }
     
@@ -237,10 +304,12 @@ extension PatientPresenter {
 
             if let updatedPatient = response {
                 self.patient = updatedPatient
+                Logger.info("Successfully updated patient: \(patient.name)", category: .patient)
                 Router.shared.navigateBack()
             }
         } catch {
             errorMessage = ErrorHandler.shared.handleError(error)
+            Logger.error("Failed to update patient: \(error.localizedDescription)", category: .patient)
         }
     }
 }
@@ -252,7 +321,7 @@ extension PatientPresenter {
     }
     
     func clearSearch() {
-        searchText = AppValue.empty
+        searchText = AppConstants.PatientUI.defaultEmptyValue
         filterPatients()
     }
     
@@ -261,7 +330,7 @@ extension PatientPresenter {
             filteredPatientNameDoB = patientNameDoB
         } else {
             filteredPatientNameDoB = patientNameDoB.filter { nameWithDoB, _ in
-                let name = nameWithDoB.components(separatedBy: " (").first ?? AppValue.empty
+                let name = nameWithDoB.components(separatedBy: " (").first ?? AppConstants.PatientUI.defaultEmptyValue
                 return name.localizedCaseInsensitiveContains(searchText)
             }
         }
@@ -276,16 +345,17 @@ extension PatientPresenter {
         defer { isLoadingExaminations = false }
         
         do {
-            print("Fetching examinations for patient: \(patientId)")
+            Logger.info("Fetching examinations for patient: \(patientId)", category: .patient)
             let response = try await interactor?.getAllExamByPatientId(patientId: patientId)
             
             if let examinations = response {
-                print("Received \(examinations.count) examinations")
+                Logger.info("Successfully received \(examinations.count) examinations", category: .patient)
                 self.examinationList = examinations
             }
 
         } catch {
             errorMessage = ErrorHandler.shared.handleError(error)
+            Logger.error("Failed to fetch examinations for patient \(patientId): \(error.localizedDescription)", category: .patient)
             isLoadingExaminations = false
         }
     }
@@ -305,17 +375,17 @@ extension PatientPresenter {
 // MARK: - Helper Methods
 extension PatientPresenter {
     func formatDate(_ date: Date?) -> String {
-        guard let date = date else { return AppValue.empty }
+        guard let date = date else { return AppConstants.PatientUI.defaultEmptyValue }
         let formatter = DateFormatter()
-        formatter.locale = Locale.current // Use current locale for localization
-        formatter.dateFormat = "dd/MM/yyyy"
+        formatter.locale = Locale.current
+        formatter.dateFormat = AppConstants.PatientUI.dateFormat
         return formatter.string(from: date)
     }
     
     func formatDateTime(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale.current // Use current locale for localization
-        formatter.dateFormat = "dd MMMM yyyy HH:mm"
+        formatter.locale = Locale.current
+        formatter.dateFormat = AppConstants.PatientUI.dateTimeFormat
         return formatter.string(from: date)
     }
 }
