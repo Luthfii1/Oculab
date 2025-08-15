@@ -52,39 +52,16 @@ struct ImageSectionComponent: View {
                 .cornerRadius(Decimal.d8)
             }
 
-            if !(presenter.groupedFOVs?.bta0.isEmpty ?? true) {
-                // Checking if the `data` array within each group is not empty
-                Button {
-                    presenter.navigateToAlbum(fovGroup: .BTA0)
-                } label: {
-                    FolderCardComponent(
-                        title: .BTA0,
-                        numOfImage: presenter.groupedFOVs?.bta0.count ?? 0
-                    )
-                }
-            }
-
-            if !(presenter.groupedFOVs?.bta1to9.isEmpty ?? true) {
-                // Checking if the `data` array within each group is not empty
-                Button {
-                    presenter.navigateToAlbum(fovGroup: .BTA1TO9)
-                } label: {
-                    FolderCardComponent(
-                        title: .BTA1TO9,
-                        numOfImage: presenter.groupedFOVs?.bta1to9.count ?? 0
-                    )
-                }
-            }
-
-            if !(presenter.groupedFOVs?.btaabove9.isEmpty ?? true) {
-                // Checking if the `data` array within each group is not empty
-                Button {
-                    presenter.navigateToAlbum(fovGroup: .BTAABOVE9)
-                } label: {
-                    FolderCardComponent(
-                        title: .BTAABOVE9,
-                        numOfImage: presenter.groupedFOVs?.btaabove9.count ?? 0
-                    )
+            ForEach(presenter.availableFOVTypes, id: \.self) { fovType in
+                if let count = presenter.fovCount(for: fovType) {
+                    Button {
+                        presenter.navigateToAlbum(fovGroup: fovType)
+                    } label: {
+                        FolderCardComponent(
+                            title: fovType,
+                            numOfImage: count
+                        )
+                    }
                 }
             }
         }

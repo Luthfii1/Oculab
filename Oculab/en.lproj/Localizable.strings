@@ -419,6 +419,7 @@
 // Interpretation Section Component
 "examination.interpretation.bta_count_placeholder" = "Example: 8";
 "examination.interpretation.staff_notes_placeholder" = "Example: Only 20 bacteria found from 60 collected fields of view";
+"examination.interpretation.no_staff_notes" = "No notes from lab technician";
 
 // Laborant Info Component
 "examination.laborant.officer_title" = "Examination Officer";

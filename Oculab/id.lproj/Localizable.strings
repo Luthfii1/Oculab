@@ -124,7 +124,7 @@
 "medical.exam.purpose" = "Tujuan Pemeriksaan";
 "medical.exam.result" = "Hasil Pemeriksaan";
 "medical.exam.interpretation" = "Interpretasi";
-"medical.exam.staff_interpretation" = "Interpretasi Petugas";
+"medical.exam.staff_interpretation" = "Interpretasi Lab Teknisi";
 "medical.exam.system_interpretation" = "Interpretasi Sistem";
 "medical.exam.bacteria_count" = "Jumlah Bakteri";
 "medical.exam.slide_id" = "ID Sediaan";
@@ -433,6 +433,7 @@
 // Interpretation Section Component
 "examination.interpretation.bta_count_placeholder" = "Contoh: 8";
 "examination.interpretation.staff_notes_placeholder" = "Contoh: Hanya terdapat 20 bakteri dari 60 lapangan pandang yang terkumpul";
+"examination.interpretation.no_staff_notes" = "Tidak ada catatan dari teknisi lab";
 
 // Laborant Info Component
 "examination.laborant.officer_title" = "Petugas Pemeriksaan";

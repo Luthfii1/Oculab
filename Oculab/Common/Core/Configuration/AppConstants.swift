@@ -49,7 +49,10 @@ enum AppConstants {
     static let fovSuccessIconSize: CGFloat = 20
     static let fovSuccessIconPadding: CGFloat = 4
     
-    // MARK: - Authentication
+        // MARK: - Default Values
+    static let defaultUnknownValue = "Unknown"
+    static let defaultNoGoalValue = "No goal specified"
+    static let defaultNoTypeValue = "No type specified"
 }
 
 // MARK: - Validation Constants
