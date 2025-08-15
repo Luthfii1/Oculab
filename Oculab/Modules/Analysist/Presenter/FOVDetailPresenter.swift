@@ -19,6 +19,7 @@ class FOVDetailPresenter: ObservableObject {
     @Published var selectedBox: BoxModel?
     @Published var fovDetail: FOVDetailData?
     @Published var errorMessage: String?
+    @Published var isBoundingBoxAvailable: Bool = true
 
     func resetView() {
         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
@@ -34,19 +35,48 @@ class FOVDetailPresenter: ObservableObject {
             if let result {
                 fovDetail = result
                 boxes = result.boxes
+                isBoundingBoxAvailable = true
+                isError = false
+                errorMessage = nil
             }
         } catch {
-            errorMessage = ErrorHandler.shared.handleError(error, context: .examination)
-            isError = true
+            let errorDetails = ErrorHandler.shared.handleError(error, context: .examination)
+            
+            // Check if this is a "no bounding box data" error (404)
+            if let networkError = error as? NetworkError,
+               case .apiError(let apiErrorResponse) = networkError,
+               apiErrorResponse.data.errorType == "RESOURCE_NOT_FOUND" {
+                
+                // This is expected - FOV exists but no bounding box data yet
+                isBoundingBoxAvailable = false
+                isError = false
+                errorMessage = AppTextAnalysisFOVDetail.boundingBoxNotAvailableMessage
+                
+                // Create a minimal fovDetail so the image can still be shown
+                fovDetail = FOVDetailData(frameWidth: 0, frameHeight: 0, boxes: [])
+                
+            } else {
+                // This is an unexpected error
+                errorMessage = errorDetails
+                isError = true
+                isBoundingBoxAvailable = false
+            }
         }
     }
 
     @MainActor
     func verifyingFOV(fovId: UUID) async {
+        // Only attempt to verify if bounding box data is available
+        guard isBoundingBoxAvailable else { 
+            Logger.info("Skipping FOV verification - no bounding box data available", category: .examination)
+            return 
+        }
+        
         do {
             _ = try await interactor?.verifyingFOV(fovId: fovId)
         } catch {
-            errorMessage = ErrorHandler.shared.handleError(error, context: .examination)
+            let errorDetails = ErrorHandler.shared.handleError(error, context: .examination)
+            errorMessage = errorDetails
             isError = true
         }
     }

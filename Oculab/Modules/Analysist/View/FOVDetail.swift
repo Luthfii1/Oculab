@@ -23,7 +23,53 @@ struct FOVDetail: View {
             ZStack {
                 Color.black.edgesIgnoringSafeArea(.all)
 
-                if presenter.fovDetail != nil {
+                if presenter.isError {
+                    // Error state
+                    VStack(spacing: 16) {
+                        Image(systemName: AppIcon.warning)
+                            .font(.system(size: 40))
+                            .foregroundColor(.yellow)
+                        
+                        Text(AppTextAnalysisFOVDetail.errorLoadingDataTitle)
+                            .font(AppTypography.h3)
+                            .foregroundColor(.white)
+                        
+                        Text(presenter.errorMessage ?? AppTextAnalysisFOVDetail.boundingBoxNotAvailableMessage)
+                            .multilineTextAlignment(.center)
+                            .font(AppTypography.p2)
+                            .foregroundColor(.white.opacity(0.8))
+                            .padding(.horizontal, 32)
+                        
+                        // Show the image even if bounding box data is not available
+                        if let imageURL = URL(string: fovData.image) {
+                            AsyncImage(url: imageURL) { image in
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(maxHeight: 300)
+                                    .cornerRadius(8)
+                            } placeholder: {
+                                Rectangle()
+                                    .fill(Color.gray.opacity(0.3))
+                                    .frame(height: 300)
+                                    .cornerRadius(8)
+                            }
+                        }
+                        
+                        Button(AppTextAnalysisFOVDetail.retryButtonTitle) {
+                            Task {
+                                await presenter.fetchData(fovId: fovData._id)
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding()
+                } else if presenter.fovDetail != nil {
                     ZoomableImageComponent(
                         imageURL: URL(string: fovData.image),
                         zoomScale: $presenter.zoomScale,
@@ -31,6 +77,34 @@ struct FOVDetail: View {
                     )
                     .environmentObject(presenter)
                     .edgesIgnoringSafeArea([.top, .bottom])
+                    
+                    // Show overlay message if bounding box data is not available
+                    if !presenter.isBoundingBoxAvailable {
+                        VStack {
+                            Spacer()
+                            
+                            HStack {
+                                Spacer()
+                                VStack(spacing: 8) {
+                                    Image(systemName: AppIcon.info)
+                                        .foregroundColor(.blue)
+                                    Text(AppTextAnalysisFOVDetail.processingInProgressTitle)
+                                        .font(AppTypography.p3)
+                                        .foregroundColor(.white)
+                                    Text(AppTextAnalysisFOVDetail.boundingBoxNotAvailableMessage)
+                                        .font(AppTypography.s4_1)
+                                        .foregroundColor(.white.opacity(0.8))
+                                }
+                                .padding()
+                                .background(Color.black.opacity(0.7))
+                                .cornerRadius(8)
+                                Spacer()
+                            }
+                            
+                            Spacer()
+                                .frame(height: 140) // Account for bottom controls
+                        }
+                    }
                 } else {
                     // view with information that the data is loading because the data is not yet fetched
                     Text(AppTextAnalysisFOVDetail.loadingDataMessage)
@@ -82,6 +156,21 @@ struct FOVDetail: View {
                             }) {
                                 Image(AppImage.comment)
                                     .foregroundColor(.white)
+                            }
+                            
+                            // Add refresh button when bounding box data is not available
+                            if !presenter.isBoundingBoxAvailable {
+                                Button(action: {
+                                    Task {
+                                        await presenter.fetchData(fovId: fovData._id)
+                                        if presenter.isBoundingBoxAvailable {
+                                            await presenter.verifyingFOV(fovId: fovData._id)
+                                        }
+                                    }
+                                }) {
+                                    Image(systemName: AppIcon.refresh)
+                                        .foregroundColor(.white)
+                                }
                             }
                         }
                         .padding(.horizontal, Decimal.d16)

@@ -49,6 +49,10 @@ extension AppText {
         
         enum FOVDetailView {
             static let loadingDataMessage = AppState.loading("analysist.examination_data".localized)
+            static let processingInProgressTitle = "Processing in Progress"
+            static let boundingBoxNotAvailableMessage = "This image is still being processed. Bounding box data is not available yet."
+            static let errorLoadingDataTitle = "Error Loading Data"
+            static let retryButtonTitle = "Retry"
         }
         
         enum PDFView {
