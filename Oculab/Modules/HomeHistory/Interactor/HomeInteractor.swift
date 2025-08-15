@@ -8,68 +8,44 @@
 import Foundation
 
 class HomeInteractor {
+    // MARK: - Dependencies
     private let networkService: NetworkServiceProtocol
 
+    // MARK: - API Endpoints
+    private struct APIEndpoints {
+        static let examination = API.BE + "/examination"
+        static let statistics = examination + "/get-statistics-todo-lab/"
+        static let numberOfExaminations = examination + "/get-number-of-examinations"
+        static let allExaminations = examination + "/get-all-examinations/"
+        static let adminExaminations = examination + "/get-examination-card-data-admin/"
+        static let finishedExaminations = examination + "/get-finished-examination-card-data/"
+        static let unfinishedExaminations = examination + "/get-unfinished-examination-card-data/"
+    }
+
+    // MARK: - Initialization
     init(networkService: NetworkServiceProtocol = AlamofireNetworkService()) {
         self.networkService = networkService
     }
-    
-    private let examinationURL = API.BE + "/examination"
-    private let apiURL = API.BE + "/examination/get-number-of-examinations"
-    private let apiGetAllData = API.BE + "/examination/get-all-examinations/"
-    private let apiGetAllDataAdmin = API.BE + "/examination/get-examination-card-data-admin/"
-    private let apiGetFinishedExaminationCardData = API.BE + "/examination/get-finished-examination-card-data/"
-    private let apiGetUnfinishedExaminationCardData = API.BE + "/examination/get-unfinished-examination-card-data/"
 
+    // MARK: - Public Methods
     func getStatisticExamination() async throws -> ExaminationStatistic {
-        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
-            throw NSError(
-                domain: "UserIDNotFound",
-                code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "User ID not found"]
-            )
-        }
-
+        let userId = try getUserId()
+        
         let response: APIResponse<ExaminationStatistic> = try await networkService
-            .get(urlString: examinationURL + "/get-statistics-todo-lab/" + userId, headers: nil)
+            .get(urlString: APIEndpoints.statistics + userId, headers: nil)
 
         return response.data
     }
 
     func getAllData() async throws -> [ExaminationCardData] {
-        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
-            throw NSError(
-                domain: "UserIDNotFound",
-                code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "User ID not found"]
-            )
-        }
-        let fullURL = apiGetUnfinishedExaminationCardData + userId
+        let userId = try getUserId()
+        let fullURL = APIEndpoints.unfinishedExaminations + userId
 
         let response: APIResponse<[UnfinishedExaminationCardData]> = try await networkService.get(urlString: fullURL, headers: nil)
 
         let unfinishedExaminationResponse = response.data.map { exam in
-            let dateFormatter = DateFormatter()
-            dateFormatter.locale = Locale.current // Use current locale for localization
-            dateFormatter.dateFormat = "dd MMMM yyyy"
+            let formattedDate = formatExaminationDate(exam.examinationPlanDate)
             
-            var formattedDate = ""
-            if let dateString = exam.examinationPlanDate {
-                let isoFormatter = ISO8601DateFormatter()
-                isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-                
-                if let date = isoFormatter.date(from: dateString) {
-                    formattedDate = date.formattedDayMonthYearTime()
-                } else {
-                    // Fallback for basic ISO format
-                    let basicFormatter = ISO8601DateFormatter()
-                    if let date = basicFormatter.date(from: dateString) {
-                        formattedDate = date.formattedDayMonthYearTime()
-                    } else {
-                        formattedDate = "Invalid Date"
-                    }
-                }
-            }
             return ExaminationCardData(
                 examinationId: exam.id,
                 statusExamination: exam.statusExamination,
@@ -89,39 +65,14 @@ class HomeInteractor {
     }
     
     func getAllDataAdmin() async throws -> [ExaminationCardData] {
-        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
-            throw NSError(
-                domain: "UserIDNotFound",
-                code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "User ID not found"]
-            )
-        }
-        let fullURL = apiGetAllDataAdmin + userId
+        let userId = try getUserId()
+        let fullURL = APIEndpoints.adminExaminations + userId
 
         let response: APIResponse<[AdminExaminationCardData]> = try await networkService.get(urlString: fullURL, headers: nil)
 
         let adminExaminationResponse = response.data.map { exam in
-            let dateFormatter = DateFormatter()
-            dateFormatter.locale = Locale.current // Use current locale for localization
-            dateFormatter.dateFormat = "dd MMMM yyyy"
+            let formattedDate = formatExaminationDate(exam.examinationPlanDate)
             
-            var formattedDate = ""
-            if let dateString = exam.examinationPlanDate {
-                let isoFormatter = ISO8601DateFormatter()
-                isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-                
-                if let date = isoFormatter.date(from: dateString) {
-                    formattedDate = date.formattedDayMonthYearTime()
-                } else {
-                    // Fallback for basic ISO format
-                    let basicFormatter = ISO8601DateFormatter()
-                    if let date = basicFormatter.date(from: dateString) {
-                        formattedDate = date.formattedDayMonthYearTime()
-                    } else {
-                        formattedDate = "Invalid Date"
-                    }
-                }
-            }
             return ExaminationCardData(
                 examinationId: exam.observationId,
                 statusExamination: .NOTSTARTED, // Default status for admin data
@@ -140,13 +91,9 @@ class HomeInteractor {
         return adminExaminationResponse
     }
 
-    
     func getFinishedDataCard(date: String) async throws -> [FinishedExaminationCardData] {
-        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
-            throw NSError(domain: "UserIDNotFound", code: -1, userInfo: [NSLocalizedDescriptionKey: "User ID not found"])
-        }
-
-        let fullURL = apiGetFinishedExaminationCardData + userId + "/" + date
+        let userId = try getUserId()
+        let fullURL = APIEndpoints.finishedExaminations + userId + "/" + date
 
         let response: APIResponse<[FinishedExaminationCardData]> = try await networkService.get(urlString: fullURL, headers: nil)
 
@@ -162,5 +109,39 @@ class HomeInteractor {
             )
         }
         return finishedExaminationResponse
+    }
+}
+
+// MARK: - Helper Methods
+extension HomeInteractor {
+    private func getUserId() throws -> String {
+        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
+            throw NSError(
+                domain: "UserIDNotFound",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "User ID not found"]
+            )
+        }
+        return userId
+    }
+    
+    private func formatExaminationDate(_ dateString: String?) -> String {
+        guard let dateString = dateString else { return "" }
+        
+        // Try with fractional seconds first
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        
+        if let date = isoFormatter.date(from: dateString) {
+            return date.formattedDayMonthYearTime()
+        }
+        
+        // Fallback for basic ISO format
+        let basicFormatter = ISO8601DateFormatter()
+        if let date = basicFormatter.date(from: dateString) {
+            return date.formattedDayMonthYearTime()
+        }
+        
+        return "Invalid Date"
     }
 }

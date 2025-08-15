@@ -7,10 +7,25 @@
 
 import SwiftUI
 
-struct WeeklyCalendarView: View {
+struct WeeklyCalendar: View {
     @Binding var selectedDate: Date
+    var onDateSelected: (Date) -> Void
+
+    @State private var currentWeekOffset = 0
+    @State private var currentDate = Date()
     @State private var currentWeek: [Date] = []
-    @State private var isDatePickerVisible: Bool = false
+    @State private var isDatePickerVisible = false
+    
+    // MARK: - Constants
+    private enum DateFormat {
+        static let dayOfWeek = "E"
+        static let monthYear = "MMMM yyyy"
+    }
+    
+    private enum Constants {
+        static let daysInWeek = 7
+        static let animationDuration: Double = 0.3
+    }
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -128,14 +143,14 @@ struct WeeklyCalendarView: View {
     }
 
     private func swipeLeft() {
-        if let nextWeekDate = Calendar.current.date(byAdding: .day, value: 7, to: selectedDate) {
+        if let nextWeekDate = Calendar.current.date(byAdding: .day, value: Constants.daysInWeek, to: selectedDate) {
             selectedDate = nextWeekDate
             currentWeek = getWeek(for: nextWeekDate)
         }
     }
 
     private func swipeRight() {
-        if let previousWeekDate = Calendar.current.date(byAdding: .day, value: -7, to: selectedDate) {
+        if let previousWeekDate = Calendar.current.date(byAdding: .day, value: -Constants.daysInWeek, to: selectedDate) {
             selectedDate = previousWeekDate
             currentWeek = getWeek(for: previousWeekDate)
         }
@@ -151,7 +166,7 @@ struct WeeklyCalendarView: View {
 
         let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: date))!
 
-        for i in 0..<7 {
+        for i in 0..<Constants.daysInWeek {
             if let weekDate = calendar.date(byAdding: .day, value: i, to: startOfWeek) {
                 weekDates.append(weekDate)
             }
@@ -161,7 +176,7 @@ struct WeeklyCalendarView: View {
 
     private func getDayOfWeek(date: Date) -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "E" // TODO: create enum for dateFormatter
+        dateFormatter.dateFormat = DateFormat.dayOfWeek
         return dateFormatter.string(from: date)
     }
 
@@ -173,7 +188,7 @@ struct WeeklyCalendarView: View {
     private func getMonthAndYear(for date: Date) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale.current // Use current locale for localization
-        dateFormatter.dateFormat = "MMMM yyyy" // TODO: create enum for dateFormatter
+        dateFormatter.dateFormat = DateFormat.monthYear
         return dateFormatter.string(from: date)
     }
 
