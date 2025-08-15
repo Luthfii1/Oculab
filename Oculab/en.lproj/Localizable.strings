@@ -234,6 +234,10 @@
 "auth.profile.privacy_policy" = "Privacy Policy";
 "auth.profile.logout" = "Logout";
 
+// Biometric Authentication
+"auth.biometric.prompt" = "Authenticate to access the application";
+"auth.biometric.activation_prompt" = "Enable Face ID for application security";
+
 // MARK: - Examination
 "exam.progress.analyzing" = "Analyzing data";
 "exam.progress.processing" = "Processing examination";

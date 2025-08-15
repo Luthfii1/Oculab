@@ -90,20 +90,24 @@ extension ProfilePresenter {
     }
     
     private func validateOldPasswordField() {
+        // Only show errors for non-empty fields or if form has been submitted
         if !oldPassword.isEmpty {
             let isValid = ValidationManager.shared.validateRequired(oldPassword, fieldName: ValidationFieldName.currentPassword.fieldName)
             oldPasswordError = isValid ? AppValue.empty : (formValidation.getError(for: .currentPassword) ?? AppValue.empty)
         } else {
+            // Don't show "required" error for empty fields unless explicitly validating
             oldPasswordError = AppValue.empty
             formValidation.clearError(for: .currentPassword)
         }
     }
     
     private func validateNewPasswordField() {
+        // Only show errors for non-empty fields
         if !inputPassword.isEmpty {
             let isValid = ValidationManager.shared.validatePassword(inputPassword, fieldName: ValidationFieldName.newPassword.fieldName)
             newPasswordError = isValid ? AppValue.empty : (formValidation.getError(for: .newPassword) ?? AppValue.empty)
         } else {
+            // Don't show "required" error for empty fields
             newPasswordError = AppValue.empty
             formValidation.clearError(for: .newPassword)
         }
@@ -221,6 +225,7 @@ extension ProfilePresenter {
     }
     
     func backToProfilePage() {
+        showSuccessPopup = false
         Router.shared.popToRoot()
     }
 }

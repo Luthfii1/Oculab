@@ -365,6 +365,10 @@
 "auth.profile.confirm_password_success" = "Password konfirmasi cocok";
 "auth.profile.empty_password_error" = "Harap masukkan baik password lama maupun baru";
 
+// Biometric Authentication
+"auth.biometric.prompt" = "Autentikasi untuk mengakses aplikasi";
+"auth.biometric.activation_prompt" = "Aktifkan Face ID untuk keamanan aplikasi";
+
 // Privacy Policy View
 "auth.privacy.navigation_title" = "Kebijakan Privasi Oculab";
 "auth.privacy.intro" = "Mohon untuk membaca seluruh kebijakan privasi yang terlampir dengan cermat dan seksama sebelum menggunakan setiap fitur dan/atau layanan yang tersedia dalam Oculab";

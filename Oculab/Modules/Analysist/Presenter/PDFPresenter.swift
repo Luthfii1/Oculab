@@ -21,7 +21,7 @@ class PDFPresenter: ObservableObject {
             let response = try await interactor.getPDFData(examinationId: examinationId)
             self.data = response
         } catch {
-            errorMessage = ErrorHandler.shared.handleError(error)
+            errorMessage = ErrorHandler.shared.handleError(error, context: .examination)
             isError = true
         }
     }

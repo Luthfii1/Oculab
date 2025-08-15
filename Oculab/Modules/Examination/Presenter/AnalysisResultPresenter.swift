@@ -16,6 +16,7 @@ class AnalysisResultPresenter: ObservableObject {
     @Published var confidenceLevel: ConfidenceLevel = .unpredicted
     @Published var resultQuantity: Int = 0
     @Published var groupedFOVs: FOVGrouping?
+    @Published var isLoading = false
 
     // MARK: State for view
 
@@ -101,6 +102,9 @@ class AnalysisResultPresenter: ObservableObject {
 
     @MainActor
     func fetchData(examinationId: String) async {
+        defer { isLoading = false }
+        isLoading = true
+        
         do {
             let result = try await interactor?.fetchData(examId: examinationId)
             if let result {

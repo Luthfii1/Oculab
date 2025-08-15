@@ -13,7 +13,7 @@ struct FOVAlbum: View {
     var examId: String
 
     let columns = [
-        GridItem(.adaptive(minimum: 74))
+        GridItem(.adaptive(minimum: AppConstants.fovGridMinItemSize))
     ]
 
     var selectedFOVs: [FOVData] {
@@ -32,46 +32,29 @@ struct FOVAlbum: View {
             ScrollView {
                 Spacer().frame(height: Decimal.d24)
 
-                LazyVGrid(columns: columns, spacing: 10) {
+                LazyVGrid(columns: columns, spacing: AppConstants.fovGridSpacing) {
                     ForEach(Array(selectedFOVs.enumerated()), id: \.element._id) { index, fov in
                         Button {
                             presenter.navigateToDetailed(fovData: fov, order: index, total: selectedFOVs.count, examId: examId)
                         } label: {
-                            AsyncImage(url: URL(string: fov.image)) { phase in
-                                switch phase {
-                                case .empty:
-                                    ProgressView().frame(height: 74)
-                                case let .success(image):
-                                    image
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: 74, height: 74)
-                                        .clipped()
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 2)
-                                                .stroke(fov.verified ? Color.green : Color.clear, lineWidth: 4)
-                                        )
-                                        .overlay(
-                                            Group {
-                                                if fov.verified {
-                                                    Image(systemName: AppIcon.success)
-                                                        .foregroundColor(.green)
-                                                        .font(.system(size: 20))
-                                                        .padding(4)
-                                                }
-                                            },
-                                            alignment: .topTrailing
-                                        )
-                                case .failure:
-                                    Image(systemName: AppIcon.warning)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(height: 114)
-                                        .foregroundColor(.red)
-                                @unknown default:
-                                    EmptyView()
-                                }
-                            }
+                            RetryableImageView(
+                                imageURL: fov.image,
+                                size: AppConstants.fovThumbnailSize,
+                                cornerRadius: AppConstants.fovCornerRadius,
+                                borderColor: fov.verified ? Color.green : Color.clear,
+                                borderWidth: AppConstants.fovBorderWidth
+                            )
+                                .overlay(
+                                    Group {
+                                        if fov.verified {
+                                            Image(systemName: AppIcon.success)
+                                                .foregroundColor(.green)
+                                                .font(.system(size: AppConstants.fovSuccessIconSize))
+                                                .padding(AppConstants.fovSuccessIconPadding)
+                                        }
+                                    },
+                                    alignment: .topTrailing
+                                )
                         }
                     }
                 }
@@ -95,6 +78,7 @@ struct FOVAlbum: View {
                     await presenter.fetchData(examinationId: examId)
                 }
             }
+            .loadingOverlay(presenter.isLoading, message: AppState.loading)
         }
         .navigationBarBackButtonHidden()
     }
