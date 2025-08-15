@@ -100,12 +100,14 @@ extension AnalysisResultPresenter {
     }
 
     func navigateToAlbum(fovGroup: FOVType) {
-        Router.shared.navigateTo(.photoAlbum(fovGroup: fovGroup, examId: examinationResult?.examinationId ?? AppValue.empty))
+        let examId = examinationResult?.examinationId ?? AppValue.empty
+        Router.shared.navigateTo(.photoAlbum(fovGroup: fovGroup, examId: examId))
     }
 
     func navigateToDetailed(fovData: FOVData, order: Int, total: Int, examId: String?) {
+        let slideId = examinationResult?.slideId ?? AppValue.empty
         Router.shared.navigateTo(.detailedPhoto(
-            slideId: examinationResult?.slideId ?? AppValue.empty,
+            slideId: slideId,
             fovData: fovData,
             order: order,
             total: total,
@@ -214,12 +216,18 @@ extension AnalysisResultPresenter {
 //            return false
 //        }
 
-        // check if the interpretation already chosen from user
+        return isValidGradingSelection()
+    }
+    
+    private func isValidGradingSelection() -> Bool {
+        guard selectedTBGrade != AppValue.empty else { return false }
+        
+        // For SCANTY grade, require bacteria count
         if selectedTBGrade == GradingType.SCANTY.rawValue {
             return !numOfBTA.isEmpty && Int(numOfBTA) != nil
-        } else {
-            return selectedTBGrade != AppValue.empty
         }
+        
+        return true
     }
 }
 
@@ -232,20 +240,12 @@ extension AnalysisResultPresenter {
             return
         }
 
-        // Check each group
-        let bta0Verified = groupedFOVs.bta0.allSatisfy { $0.verified }
-        let bta1to9Verified = groupedFOVs.bta1to9.allSatisfy { $0.verified }
-        let btaAbove9Verified = groupedFOVs.btaabove9.allSatisfy { $0.verified }
-
-        // All groups must be verified
-        let isAllVerified = bta0Verified && bta1to9Verified && btaAbove9Verified
-        isAllFOVsVerified = isAllVerified
-
-        // Update button title based on verification status
-        if isAllVerified {
-            buttonTitle = AppTextExamProgress.buttonSaveResult
-        } else {
-            buttonTitle = AppTextExamProgress.buttonVerifyAllFOVs
+        // Check all FOV types using availableFOVTypes for consistency
+        let allVerified = availableFOVTypes.allSatisfy { fovType in
+            selectedFOVs(for: fovType).allSatisfy { $0.verified }
         }
+        
+        isAllFOVsVerified = allVerified
+        buttonTitle = allVerified ? AppTextExamProgress.buttonSaveResult : AppTextExamProgress.buttonVerifyAllFOVs
     }
 }

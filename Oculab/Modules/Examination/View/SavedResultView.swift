@@ -121,7 +121,7 @@ struct SavedResultView: View {
                                 title: AppTextExamDetail.reportToSitbButton,
                                 rightIcon: AppIcon.paperplane,
                                 size: .small,
-                                isEnabled: true
+                                isEnabled: false
                             ) {
                                 Logger.debug("View PDF button tapped", category: .examination)
                             }
