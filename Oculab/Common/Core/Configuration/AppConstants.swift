@@ -87,6 +87,15 @@ enum AppConstants {
         static let dateFormat: String = "dd/MM/yyyy"
         static let dateTimeFormat: String = "dd MMMM yyyy HH:mm"
     }
+    
+    // MARK: - Task Assignment Module UI
+    enum TaskAssignmentUI {
+        static let verticalSpacing: CGFloat = 24
+        static let horizontalPadding: CGFloat = 20
+        static let elementSpacing: CGFloat = 12
+        static let buttonSpacing: CGFloat = 16
+        static let backButtonWidth: CGFloat = 3.5 // Screen width divisor
+    }
 }
 
 // MARK: - Validation Constants

@@ -109,10 +109,10 @@ struct DateField: View {
                 if let rightIcon = rightIcon {
                     Image(systemName: rightIcon)
                         .foregroundColor(iconColor) // Icon color based on state
-                        .padding(.trailing, Decimal.d12)
+                        .padding(.trailing, AppConstants.TaskAssignmentUI.elementSpacing)
                 }
             }
-            .padding(.vertical, Decimal.d12)
+            .padding(.vertical, AppConstants.TaskAssignmentUI.elementSpacing)
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(borderColor, lineWidth: 1)

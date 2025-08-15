@@ -41,7 +41,7 @@ struct PatientDisplayField: View {
                 date: $presenter.selectedDoB
             )
             .onChange(of: presenter.selectedDoB) {
-                presenter.patient.DoB = presenter.selectedDoB
+                presenter.handleDateOfBirthChange()
             }
 
             AppRadioButton(
@@ -52,14 +52,7 @@ struct PatientDisplayField: View {
                 selectedChoice: $presenter.selectedSex
             )
             .onChange(of: presenter.selectedSex) {
-                switch presenter.selectedSex {
-                case AppPatient.Gender.female:
-                    presenter.patient.sex = .FEMALE
-                case AppPatient.Gender.male:
-                    presenter.patient.sex = .MALE
-                default:
-                    presenter.patient.sex = .UNKNOWN
-                }
+                presenter.handleGenderChange()
             }
 
             ValidatedTextField(
@@ -72,7 +65,7 @@ struct PatientDisplayField: View {
             )
             .focused($focusedField, equals: .bpjs)
             .onChange(of: presenter.BPJSnumber) {
-                presenter.patient.BPJS = presenter.BPJSnumber
+                presenter.handleBPJSNumberChange()
             }
         }
         .toolbar {
