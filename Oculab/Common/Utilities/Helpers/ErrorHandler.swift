@@ -10,6 +10,7 @@ import Foundation
 // MARK: - Error Handler Protocol
 protocol ErrorHandlerProtocol {
     func handleError(_ error: Error) -> String
+    func handleError(_ error: Error, context: ErrorHandler.ErrorContext) -> String
     func logError(_ error: Error, context: String)
     func shouldShowRetryOption(for error: Error) -> Bool
     func getRetryDelay(for error: Error) -> TimeInterval?
@@ -96,7 +97,8 @@ class ErrorHandler: ErrorHandlerProtocol {
     private func mapErrorToUserMessage(_ error: Error) -> String {
         switch error {
         case let NetworkError.apiError(apiResponse):
-            return apiResponse.data.description
+            return apiResponse.data.description.isEmpty ? 
+                AppError.generic : apiResponse.data.description
             
         case let NetworkError.networkError(message):
             // Handle retry-specific messages
@@ -105,11 +107,13 @@ class ErrorHandler: ErrorHandlerProtocol {
             } else if message.contains("Operation already in progress") {
                 return "error.operation_in_progress".localized
             } else if message.contains("Request timed out") {
-                return "error.request_timeout".localized
+                return AppError.Context.networkConnection
             } else if message.contains("Server error") {
                 return "error.server_temporarily_unavailable".localized
+            } else if message.isEmpty {
+                return AppError.networkConnection
             } else {
-                return "error.network_error".localized(with: [message])
+                return message
             }
             
         case URLError.userAuthenticationRequired:
@@ -128,8 +132,26 @@ class ErrorHandler: ErrorHandlerProtocol {
             return "error.connection_lost".localized
             
         default:
-            return "error.unexpected_error".localized
+            return error.localizedDescription.isEmpty ? 
+                AppError.unknownError : error.localizedDescription
         }
+    }
+    
+    /// Handle errors with context-specific fallback messages
+    /// - Parameters:
+    ///   - error: The error to handle
+    ///   - context: The context for localized fallback
+    /// - Returns: User-friendly error message string
+    func handleError(_ error: Error, context: ErrorContext) -> String {
+        let errorMessage = mapErrorToUserMessage(error)
+        logError(error, context: context.rawValue)
+        
+        // If we got a generic message, use context-specific fallback
+        if errorMessage == AppError.generic || errorMessage == AppError.unknownError {
+            return context.localizedFallbackMessage
+        }
+        
+        return errorMessage
     }
 }
 
@@ -137,5 +159,37 @@ class ErrorHandler: ErrorHandlerProtocol {
 extension Error {
     var userFriendlyMessage: String {
         return ErrorHandler.shared.handleError(self)
+    }
+}
+
+// MARK: - Error Context Enum
+extension ErrorHandler {
+    enum ErrorContext: String, CaseIterable {
+        case login = "Login"
+        case registration = "Registration"
+        case profile = "Profile"
+        case patientManagement = "Patient Management"
+        case examination = "Examination"
+        case networkConnection = "Network Connection"
+        case generic = "Generic"
+        
+        var localizedFallbackMessage: String {
+            switch self {
+            case .login:
+                return AppTextAuthLogin.loginFailedText
+            case .registration:
+                return AppTextUserMgmtView.failedRegistration
+            case .profile:
+                return AppError.Context.profile
+            case .patientManagement:
+                return AppError.Context.patientManagement
+            case .examination:
+                return AppError.Context.examination
+            case .networkConnection:
+                return AppError.Context.networkConnection
+            case .generic:
+                return AppError.generic
+            }
+        }
     }
 }

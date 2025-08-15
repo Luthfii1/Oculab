@@ -137,18 +137,7 @@ class ExamDataPresenter: ObservableObject {
             }
             
         } catch {
-            // Handle error
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-            }
+            _ = ErrorHandler.shared.handleError(error, context: .examination)
         }
     }
 }

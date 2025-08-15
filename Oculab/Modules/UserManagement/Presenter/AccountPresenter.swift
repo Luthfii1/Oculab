@@ -219,7 +219,7 @@ extension AccountPresenter {
             }
 
         } catch {
-            handleError(error)
+            _ = ErrorHandler.shared.handleError(error)
         }
     }
     
@@ -483,20 +483,6 @@ extension AccountPresenter {
         self.name = AppValue.empty
         self.role = AppValue.empty
         self.email = AppValue.empty
-    }
-    
-    private func handleError(_ error: Error) {
-        switch error {
-        case let NetworkError.apiError(apiResponse):
-            print("Error type: \(apiResponse.data.errorType)")
-            print("Error description: \(apiResponse.data.description)")
-
-        case let NetworkError.networkError(message):
-            print("Network error: \(message)")
-
-        default:
-            print("Unknown error: \(error.localizedDescription)")
-        }
     }
     
     private func handleRegistrationError(_ error: Error) {

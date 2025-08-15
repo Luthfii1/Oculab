@@ -95,18 +95,8 @@ class InputPatientPresenter: ObservableObject {
                 }
             }
         } catch {
-            // Handle error
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-            }
+            errorMessage = ErrorHandler.shared.handleError(error)
+            isError = true
         }
     }
 
@@ -130,18 +120,8 @@ class InputPatientPresenter: ObservableObject {
                 }
             }
         } catch {
-            // Handle error
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-            }
+            errorMessage = ErrorHandler.shared.handleError(error)
+            isError = true
         }
     }
 
@@ -175,18 +155,8 @@ class InputPatientPresenter: ObservableObject {
             }
         } catch {
             clearForm()
-            // Handle error
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-            }
+            errorMessage = ErrorHandler.shared.handleError(error)
+            isError = true
         }
     }
 
@@ -204,18 +174,8 @@ class InputPatientPresenter: ObservableObject {
                 pic = user
             }
         } catch {
-            // Handle error
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-            }
+            errorMessage = ErrorHandler.shared.handleError(error)
+            isError = true
         }
     }
 
@@ -253,18 +213,8 @@ class InputPatientPresenter: ObservableObject {
                 return true
             }
         } catch {
-            // Handle error
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-            }
+            errorMessage = ErrorHandler.shared.handleError(error)
+            isError = true
         }
         return false
     }
@@ -374,21 +324,7 @@ class InputPatientPresenter: ObservableObject {
             Router.shared.popToRoot()
         } catch {
             isError = true
-            // Handle error
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-                errorMessage = apiResponse.data.description
-
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-                errorMessage = message
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-                errorMessage = error.localizedDescription
-            }
+            errorMessage = ErrorHandler.shared.handleError(error, context: .examination)
         }
     }
 }

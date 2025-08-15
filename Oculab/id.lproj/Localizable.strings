@@ -678,6 +678,25 @@
 "validation.date_range_invalid" = "Tanggal harus antara %@ dan %@";
 
 // MARK: - Error Messages
+"error.general" = "Terjadi kesalahan";
+"error.generic" = "Terjadi kesalahan. Silakan coba lagi.";
+"error.network" = "Kesalahan koneksi jaringan";
+"error.network_connection" = "Koneksi jaringan gagal. Silakan periksa koneksi internet Anda.";
+"error.authentication" = "Autentikasi gagal";
+"error.validation" = "Kesalahan validasi";
+"error.not_found" = "Data tidak ditemukan";
+"error.permission_denied" = "Izin ditolak";
+"error.camera_access" = "Akses kamera ditolak. Silakan aktifkan akses kamera di Pengaturan.";
+"error.unknown" = "Kesalahan tak dikenal terjadi";
+
+// Context-specific error messages
+"error.context.login" = "Login gagal. Silakan coba lagi.";
+"error.context.registration" = "Registrasi gagal. Silakan coba lagi.";
+"error.context.profile" = "Gagal memperbarui profil. Silakan coba lagi.";
+"error.context.patient_management" = "Operasi pasien gagal. Silakan coba lagi.";
+"error.context.examination" = "Operasi pemeriksaan gagal. Silakan coba lagi.";
+"error.context.network_connection" = "Koneksi jaringan gagal. Silakan periksa koneksi internet Anda.";
+
 "error.network_error" = "Kesalahan jaringan: %@";
 "error.authentication_required" = "Silakan masuk kembali untuk melanjutkan";
 "error.no_internet_connection" = "Silakan periksa koneksi internet Anda";

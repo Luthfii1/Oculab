@@ -179,20 +179,7 @@ extension ProfilePresenter {
             resetEditPassword()
         } catch {
             isOldPasswordError = true
-            switch error {
-            case let NetworkError.apiError(apiResponse):
-                print("Error type: \(apiResponse.data.errorType)")
-                print("Error description: \(apiResponse.data.description)")
-                descriptionOldPassword = apiResponse.data.description
-
-            case let NetworkError.networkError(message):
-                print("Network error: \(message)")
-                descriptionOldPassword = message
-
-            default:
-                print("Unknown error: \(error.localizedDescription)")
-                descriptionOldPassword = error.localizedDescription
-            }
+            descriptionOldPassword = ErrorHandler.shared.handleError(error, context: .profile)
         }
     }
     

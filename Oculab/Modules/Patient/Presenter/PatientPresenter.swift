@@ -160,7 +160,7 @@ extension PatientPresenter {
                 filterPatients()
             }
         } catch {
-            handleError(error)
+            errorMessage = ErrorHandler.shared.handleError(error)
         }
     }
     
@@ -189,7 +189,7 @@ extension PatientPresenter {
                 }
             }
         } catch {
-            handleError(error)
+            errorMessage = ErrorHandler.shared.handleError(error)
         }
     }
 
@@ -209,7 +209,7 @@ extension PatientPresenter {
                 Router.shared.navigateBack()
             }
         } catch {
-            handleErrorWithMessage(error)
+            errorMessage = ErrorHandler.shared.handleError(error)
         }
     }
     
@@ -240,7 +240,7 @@ extension PatientPresenter {
                 Router.shared.navigateBack()
             }
         } catch {
-            handleErrorWithMessage(error)
+            errorMessage = ErrorHandler.shared.handleError(error)
         }
     }
 }
@@ -285,7 +285,8 @@ extension PatientPresenter {
             }
 
         } catch {
-            handleError(error)
+            errorMessage = ErrorHandler.shared.handleError(error)
+            isLoadingExaminations = false
         }
     }
 }
@@ -316,36 +317,5 @@ extension PatientPresenter {
         formatter.locale = Locale.current // Use current locale for localization
         formatter.dateFormat = "dd MMMM yyyy HH:mm"
         return formatter.string(from: date)
-    }
-    
-    private func handleError(_ error: Error) {
-        switch error {
-        case let NetworkError.apiError(apiResponse):
-            print("Error type: \(apiResponse.data.errorType)")
-            print("Error description: \(apiResponse.data.description)")
-
-        case let NetworkError.networkError(message):
-            print("Network error: \(message)")
-
-        default:
-            print("Unknown error: \(error.localizedDescription)")
-        }
-    }
-    
-    private func handleErrorWithMessage(_ error: Error) {
-        switch error {
-        case let NetworkError.apiError(apiResponse):
-            print("Error type: \(apiResponse.data.errorType)")
-            print("Error description: \(apiResponse.data.description)")
-            errorMessage = apiResponse.data.description
-
-        case let NetworkError.networkError(message):
-            print("Network error: \(message)")
-            errorMessage = message
-
-        default:
-            print("Unknown error: \(error.localizedDescription)")
-            errorMessage = error.localizedDescription
-        }
     }
 }

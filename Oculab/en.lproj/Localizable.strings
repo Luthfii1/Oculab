@@ -247,13 +247,23 @@
 
 // MARK: - Error Messages
 "error.general" = "An error occurred";
+"error.generic" = "An error occurred. Please try again.";
 "error.network" = "Network connection error";
+"error.network_connection" = "Network connection failed. Please check your internet connection.";
 "error.authentication" = "Authentication failed";
 "error.validation" = "Validation error";
 "error.not_found" = "Data not found";
 "error.permission_denied" = "Permission denied";
 "error.camera_access" = "Camera access denied. Please enable camera access in Settings.";
 "error.unknown" = "Unknown error occurred";
+
+// Context-specific error messages
+"error.context.login" = "Login failed. Please try again.";
+"error.context.registration" = "Registration failed. Please try again.";
+"error.context.profile" = "Failed to update profile. Please try again.";
+"error.context.patient_management" = "Patient operation failed. Please try again.";
+"error.context.examination" = "Examination operation failed. Please try again.";
+"error.context.network_connection" = "Network connection failed. Please check your internet connection.";
 
 // MARK: - Success Messages
 "success.saved" = "Successfully saved";
