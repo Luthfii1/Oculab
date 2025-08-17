@@ -7,15 +7,8 @@
 
 import SwiftUI
 
-enum FormField {
-    case search
-    case nik
-    case bpjs
-}
-
 struct PatientDisplayField: View {
     @EnvironmentObject var presenter: InputPatientPresenter
-    @FocusState var focusedField: FormField?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
@@ -30,7 +23,6 @@ struct PatientDisplayField: View {
                 fieldName: .patientNIK,
                 validationType: .nik
             )
-            .focused($focusedField, equals: .nik)
 
             DateField(
                 title: AppPatient.dateOfBirth,
@@ -63,17 +55,8 @@ struct PatientDisplayField: View {
                 fieldName: .patientBPJS,
                 validationType: .bpjs
             )
-            .focused($focusedField, equals: .bpjs)
             .onChange(of: presenter.BPJSnumber) {
                 presenter.handleBPJSNumberChange()
-            }
-        }
-        .toolbar {
-            ToolbarItemGroup(placement: .keyboard) {
-                Spacer()
-                Button(AppAction.done) {
-                    focusedField = nil
-                }
             }
         }
     }
