@@ -221,7 +221,7 @@ extension AccountPresenter {
             }
 
         } catch {
-            handleFetchError(error)
+            _ = ErrorHandler.shared.handleError(error)
         }
     }
     
@@ -250,7 +250,7 @@ extension AccountPresenter {
             clearForm()
             
         } catch {
-            handleRegistrationError(error)
+            registrationError = ErrorHandler.shared.handleError(error)
         }
     }
     
@@ -275,32 +275,7 @@ extension AccountPresenter {
             }
             
         } catch {
-            handleEditError(error)
-        }
-    }
-    
-    @MainActor
-    func deleteSelectedUser() async {
-        guard let userId = selectedUser?.id else { return }
-        
-        isDeleting = true
-        defer { isDeleting = false }
-        
-        do {
-            let result = try await interactor.deleteAccount(userId: userId)
-
-            deletionSuccess = (userName: result.name, message: AppTextUserMgmtView.successDeleteAccount(result.name))
-            clearSelection()
-            
-            await fetchAllAccount()
-            
-            let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
-            impactFeedback.impactOccurred()
-            
-            showDeleteSuccessAlert = true
-            
-        } catch {
-            handleDeleteError(error)
+            editError = ErrorHandler.shared.handleError(error)
         }
     }
     
@@ -327,7 +302,7 @@ extension AccountPresenter {
             showDeleteSuccessAlert = true
             
         } catch {
-            handleDeleteError(error)
+            deletionError = ErrorHandler.shared.handleError(error)
         }
         
         self.userToDelete = nil
@@ -498,54 +473,6 @@ extension AccountPresenter {
 extension AccountPresenter {
     func getRoleType(from roleString: String) -> RolesType {
         return RolesType(rawValue: roleString) ?? .LAB
-    }
-    
-    private func handleFetchError(_ error: Error) {
-        Logger.error("Failed to fetch accounts: \(error.localizedDescription)", category: .user)
-        // Could show a toast or alert to user about fetch failure
-        // For now, we'll just log it as the UI will show empty state
-    }
-    
-    private func handleRegistrationError(_ error: Error) {
-        switch error {
-        case let NetworkError.apiError(apiResponse):
-            registrationError = apiResponse.data.description
-            
-        case let NetworkError.networkError(message):
-            registrationError = message
-            
-        default:
-            registrationError = error.localizedDescription
-        }
-    }
-    
-    private func handleEditError(_ error: Error) {
-        switch error {
-        case let NetworkError.apiError(apiResponse):
-            editError = apiResponse.data.description
-            
-        case let NetworkError.networkError(message):
-            editError = message
-            
-        default:
-            editError = error.localizedDescription
-        }
-    }
-    
-    private func handleDeleteError(_ error: Error) {
-        let errorFeedback = UINotificationFeedbackGenerator()
-        errorFeedback.notificationOccurred(.error)
-        
-        switch error {
-        case let NetworkError.apiError(apiResponse):
-            deletionError = apiResponse.data.description
-            
-        case let NetworkError.networkError(message):
-            deletionError = message
-            
-        default:
-            deletionError = error.localizedDescription
-        }
     }
 }
 

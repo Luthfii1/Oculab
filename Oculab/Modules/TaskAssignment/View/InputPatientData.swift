@@ -11,7 +11,6 @@ struct InputPatientData: View {
     let patientId: String?
     @ObservedObject var presenter = InputPatientPresenter()
     @EnvironmentObject private var authentication: AuthenticationPresenter
-    @FocusState private var focusedField: FormField?
     
     init(patientId: String? = nil) {
         self.patientId = patientId
@@ -36,6 +35,9 @@ struct InputPatientData: View {
                             isSearchEnabled: false,
                             selectedChoice: $presenter.selectedPIC
                         )
+                        .onChange(of: presenter.selectedPIC) { _, _ in
+                            // Validation is automatically triggered in the presenter's didSet
+                        }
                         
                         // Patient Search Dropdown
                         AppDropdown(
@@ -48,11 +50,13 @@ struct InputPatientData: View {
                             selectedChoice: $presenter.selectedPatient,
                             isEnablingAdding: patientId == nil
                         )
-                        .focused($focusedField, equals: .search)
                         .disabled(patientId != nil)
+                        .onChange(of: presenter.selectedPatient) { _, _ in
+                            // Validation is automatically triggered in the presenter's didSet
+                        }
                         
                         if presenter.selectedPatient != AppValue.empty {
-                            PatientDisplayField(focusedField: _focusedField)
+                            PatientDisplayField()
                                 .environmentObject(presenter)
                             
                             AppButton(
@@ -101,6 +105,7 @@ struct InputPatientData: View {
                     }
                 }
             }
+            .dismissKeyboardOnTap()
             .onChange(of: presenter.selectedPatient) { _, newValue in
                 Task {
                     Logger.info("Selected patient changed: \(presenter.selectedPatient)", category: .taskAssignment)
@@ -119,6 +124,26 @@ struct InputPatientData: View {
             }
         }
         .navigationBarBackButtonHidden()
+        // Error alert for patient operations
+        .alert(
+            AppState.error,
+            isPresented: Binding(
+                get: { presenter.isError && !presenter.errorMessage.isEmpty },
+                set: { if !$0 { 
+                    presenter.isError = false
+                    presenter.errorMessage = AppValue.empty
+                } }
+            ),
+            actions: {
+                Button(AppAction.ok) {
+                    presenter.isError = false
+                    presenter.errorMessage = AppValue.empty
+                }
+            },
+            message: {
+                Text(presenter.errorMessage)
+            }
+        )
     }
 }
 

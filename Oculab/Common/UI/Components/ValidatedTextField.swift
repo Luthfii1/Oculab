@@ -298,7 +298,7 @@ struct ValidatedTextField: View {
             if !text.isEmpty {
                 validationManager.validateWithRules(text, fieldName: fieldName, rules: [
                     .numbersOnly(),
-                    .minLength(13),
+                    .minLength(11),
                     .maxLength(13)
                 ])
             }

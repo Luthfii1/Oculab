@@ -44,7 +44,7 @@ class FOVDetailPresenter: ObservableObject {
             
             // Check if this is a "no bounding box data" error (404)
             if let networkError = error as? NetworkError,
-               case .apiError(let apiErrorResponse) = networkError,
+               case .apiError(let apiErrorResponse, _) = networkError,
                apiErrorResponse.data.errorType == "RESOURCE_NOT_FOUND" {
                 
                 // This is expected - FOV exists but no bounding box data yet

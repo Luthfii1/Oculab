@@ -245,6 +245,7 @@ enum AppText {
     // MARK: - Common Values
     enum Value {
         static let empty = ""
+        static let space = " "
         static let defaultStrike = "-"
         static let bullet = "•"
         static let percentage = "%"

@@ -122,13 +122,44 @@ struct DateField: View {
             Spacer().frame(height: 8)
 
             if isDatePickerVisible {
-                DatePicker(AppValue.empty, selection: $date, in: ...Date(), displayedComponents: .date)
-                    .datePickerStyle(.graphical)
-                    .padding()
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(borderColor, lineWidth: 1)
-                    )
+                VStack(spacing: 0) {
+                    // Header with Done button
+                    HStack {
+                        Text(AppPatient.Placeholder.selectDate)
+                            .font(AppTypography.s4_1)
+                            .foregroundColor(AppColors.slate900)
+                        
+                        Spacer()
+                        
+                        Button(AppAction.done) {
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                isDatePickerVisible = false
+                            }
+                        }
+                        .font(AppTypography.s4_1)
+                        .foregroundColor(AppColors.purple500)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(AppColors.slate50)
+                    
+                    DatePicker(AppValue.empty, selection: $date, in: ...Date(), displayedComponents: .date)
+                        .datePickerStyle(.graphical)
+                        .padding()
+                        .background(AppColors.slate0)
+                        .onChange(of: date) { _, _ in
+                            // Hide date picker after date selection (when date actually changes)
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                isDatePickerVisible = false
+                            }
+                        }
+                }
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(borderColor, lineWidth: 1)
+                )
+                .background(AppColors.slate0)
+                .cornerRadius(8)
             }
 
             // Description or error message
