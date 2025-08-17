@@ -24,6 +24,9 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
         super.init()
     }
 
+    // MARK: - Enable/disable features
+    private var isEnableSaveVideoToPhotos: Bool = false
+
     // MARK: - Published Properties
     @Published var session = AVCaptureSession()
     @Published var videoRecordingTitle: String = AppTextVideoRecordView.specimenTitleDefault
@@ -456,6 +459,7 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     
     @MainActor
     func saveVideoWithoutNavigation() async {
+        guard isEnableSaveVideoToPhotos else { return }
         guard let videoURL = previewURL else {
             errorMessage = "No video available to save"
             return
