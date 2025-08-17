@@ -364,9 +364,9 @@ extension AuthenticationPresenter {
         } catch {
             isError = true
             switch error {
-            case let NetworkError.apiError(apiResponse):
+            case let NetworkError.apiError(apiResponse, _):
                 description = apiResponse.data.description
-            case let NetworkError.networkError(message):
+            case let NetworkError.networkError(message, _):
                 description = message
             default:
                 description = error.localizedDescription

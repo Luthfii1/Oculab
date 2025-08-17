@@ -34,11 +34,17 @@ class ErrorHandler: ErrorHandlerProtocol {
         
         // Log additional details for specific error types
         switch error {
-        case let NetworkError.apiError(apiResponse):
+        case let NetworkError.apiError(apiResponse, endpoint):
+            if let endpoint = endpoint {
+                print("   🌐 API Endpoint: \(endpoint)")
+            }
             print("   📡 API Error Type: \(apiResponse.data.errorType)")
             print("   📝 Description: \(apiResponse.data.description)")
             
-        case let NetworkError.networkError(message):
+        case let NetworkError.networkError(message, endpoint):
+            if let endpoint = endpoint {
+                print("   🌐 API Endpoint: \(endpoint)")
+            }
             print("   🌐 Network Message: \(message)")
             if message.contains("retry attempts failed") {
                 print("   🔄 All retry attempts exhausted")
@@ -55,7 +61,7 @@ class ErrorHandler: ErrorHandlerProtocol {
     
     func shouldShowRetryOption(for error: Error) -> Bool {
         switch error {
-        case let NetworkError.networkError(message):
+        case let NetworkError.networkError(message, _):
             // Show retry for network issues but not for retry exhaustion
             return !message.contains("retry attempts failed") && 
                    !message.contains("Operation already in progress") &&
@@ -77,7 +83,7 @@ class ErrorHandler: ErrorHandlerProtocol {
     
     func getRetryDelay(for error: Error) -> TimeInterval? {
         switch error {
-        case let NetworkError.networkError(message):
+        case let NetworkError.networkError(message, _):
             if message.contains("Server error") {
                 return 5.0 // Server errors need more time
             }
@@ -96,11 +102,11 @@ class ErrorHandler: ErrorHandlerProtocol {
     
     private func mapErrorToUserMessage(_ error: Error) -> String {
         switch error {
-        case let NetworkError.apiError(apiResponse):
+        case let NetworkError.apiError(apiResponse, _):
             return apiResponse.data.description.isEmpty ? 
                 AppError.generic : apiResponse.data.description
             
-        case let NetworkError.networkError(message):
+        case let NetworkError.networkError(message, _):
             // Handle retry-specific messages
             if message.contains("retry attempts failed") {
                 return "error.network_retry_failed".localized

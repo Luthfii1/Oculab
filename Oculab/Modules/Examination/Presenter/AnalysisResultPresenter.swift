@@ -191,7 +191,7 @@ extension AnalysisResultPresenter {
     func submitExpertResult(examinationId: String) async {
         do {
             guard let validGrading = GradingType(rawValue: selectedTBGrade) else {
-                throw NetworkError.networkError("Error: Invalid TB Grade")
+                throw NetworkError.networkError("Error: Invalid TB Grade", endpoint: "submitExpertResult")
             }
 
             _ = try await interactor?.submitExpertResult(

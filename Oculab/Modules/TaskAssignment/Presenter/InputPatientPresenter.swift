@@ -134,11 +134,6 @@ class InputPatientPresenter: ObservableObject {
         isError = false
         errorMessage = AppValue.empty
     }
-    
-    private func handleError(_ error: Error, context: ErrorHandler.ErrorContext = .generic) {
-        errorMessage = ErrorHandler.shared.handleError(error, context: context)
-        isError = true
-    }
 }
 
 // MARK: - Network Operations
@@ -152,7 +147,8 @@ extension InputPatientPresenter {
             let users = try await interactor.getAllUser()
             picName = users.map { ($0.name, $0._id) }
         } catch {
-            handleError(error)
+            errorMessage = ErrorHandler.shared.handleError(error, context: .generic)
+            isError = true
         }
     }
 
@@ -171,7 +167,8 @@ extension InputPatientPresenter {
                 return (patient.name + AppValue.space + formattedDoB, patient._id)
             }
         } catch {
-            handleError(error)
+            errorMessage = ErrorHandler.shared.handleError(error, context: .generic)
+            isError = true
         }
     }
 
@@ -186,7 +183,8 @@ extension InputPatientPresenter {
             self.patientFound = true
         } catch {
             clearForm()
-            handleError(error)
+            _ = ErrorHandler.shared.handleError(error, context: .generic)
+            isError = true
         }
     }
 
@@ -199,7 +197,8 @@ extension InputPatientPresenter {
             let user = try await interactor.getUserById(userId: userId)
             self.pic = user
         } catch {
-            handleError(error)
+            _ = ErrorHandler.shared.handleError(error, context: .generic)
+            isError = true
         }
     }
     
@@ -214,7 +213,8 @@ extension InputPatientPresenter {
             patient = response
             return true
         } catch {
-            handleError(error, context: .patientManagement)
+            errorMessage = ErrorHandler.shared.handleError(error, context: .patientManagement)
+            isError = true
         }
         return false
     }
@@ -266,7 +266,7 @@ extension InputPatientPresenter {
     @MainActor
     func submitExamination() async {
         guard let DPJPId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
-            handleError(NSError(domain: "UserAuth", code: -1, userInfo: [NSLocalizedDescriptionKey: "User authentication required"]))
+            isError = true
             return
         }
         
@@ -279,7 +279,8 @@ extension InputPatientPresenter {
         } catch let error as ExaminationError {
             showError(error.message)
         } catch {
-            handleError(error, context: .examination)
+            errorMessage = ErrorHandler.shared.handleError(error, context: .examination)
+            isError = true
         }
     }
     

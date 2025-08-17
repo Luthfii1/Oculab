@@ -14,25 +14,25 @@ class AlamofireNetworkService: NetworkServiceProtocol {
     func get<T: Decodable>(urlString: String, headers: [String: String]?) async throws -> APIResponse<T> {
         let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
         let request = AF.request(urlString, method: .get, headers: afHeaders)
-        return try await handleRequest(request)
+        return try await handleRequest(request, endpoint: urlString)
     }
 
     func post<T: Decodable, B: Encodable>(urlString: String, headers: [String: String]?, body: B) async throws -> APIResponse<T> {
         let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
         let request = AF.request(urlString, method: .post, parameters: body, encoder: JSONParameterEncoder.default, headers: afHeaders)
-        return try await handleRequest(request)
+        return try await handleRequest(request, endpoint: urlString)
     }
 
     func update<T: Decodable, B: Encodable>(urlString: String, headers: [String: String]?, body: B) async throws -> APIResponse<T> {
         let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
         let request = AF.request(urlString, method: .put, parameters: body, encoder: JSONParameterEncoder.default, headers: afHeaders)
-        return try await handleRequest(request)
+        return try await handleRequest(request, endpoint: urlString)
     }
 
     func delete<T: Decodable, B: Encodable>(urlString: String, headers: [String: String]?, body: B?) async throws -> APIResponse<T> {
         let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
         let request = AF.request(urlString, method: .delete, parameters: body, encoder: JSONParameterEncoder.default, headers: afHeaders)
-        return try await handleRequest(request)
+        return try await handleRequest(request, endpoint: urlString)
     }
 
     func multipart<T: Decodable>(urlString: String, headers: [String: String]?, parameters: [String: Data], boundary: String?) async throws -> APIResponse<T> {
@@ -43,19 +43,20 @@ class AlamofireNetworkService: NetworkServiceProtocol {
             }
         }, to: urlString, headers: afHeaders)
         
-        return try await handleRequest(request)
+        return try await handleRequest(request, endpoint: urlString)
     }
 
-    private func handleRequest<T: Decodable>(_ request: DataRequest) async throws -> APIResponse<T> {
+    private func handleRequest<T: Decodable>(_ request: DataRequest, endpoint: String) async throws -> APIResponse<T> {
         let dataResponse = await request.serializingData().response
         
         // Get the data regardless of success or failure
         guard let data = dataResponse.data else {
-            throw NetworkError.networkError("No data received from server")
+            throw NetworkError.networkError("No data received from server", endpoint: endpoint)
         }
         
-        // Debug: Print raw response for troubleshooting
+        // Debug: Print API endpoint and response details
         if let statusCode = dataResponse.response?.statusCode {
+            print("DEBUG: API Endpoint: \(endpoint)")
             print("DEBUG: HTTP Status Code: \(statusCode)")
         }
         
@@ -66,7 +67,7 @@ class AlamofireNetworkService: NetworkServiceProtocol {
         // Always try to decode the response as our standard API format first
         if let errorResponse = try? Self.decoder.decode(APIResponse<ApiErrorData>.self, from: data) {
             print("DEBUG: Successfully decoded as APIResponse<ApiErrorData>")
-            throw NetworkError.apiError(errorResponse)
+            throw NetworkError.apiError(errorResponse, endpoint: endpoint)
         }
         
         // If it's not an error response, try to decode as success
@@ -74,7 +75,7 @@ class AlamofireNetworkService: NetworkServiceProtocol {
             let decodedResponse = try Self.decoder.decode(APIResponse<T>.self, from: data)
             if decodedResponse.status == StatusResponseType.ERROR.rawValue {
                 if let errorResponse = try? Self.decoder.decode(APIResponse<ApiErrorData>.self, from: data) {
-                    throw NetworkError.apiError(errorResponse)
+                    throw NetworkError.apiError(errorResponse, endpoint: endpoint)
                 }
             }
             return decodedResponse
@@ -82,9 +83,9 @@ class AlamofireNetworkService: NetworkServiceProtocol {
             print("DEBUG: Failed to decode as success response: \(error)")
             // If we can't decode the response, fall back to the original error
             if let originalError = dataResponse.error {
-                throw NetworkError.networkError(originalError.localizedDescription)
+                throw NetworkError.networkError(originalError.localizedDescription, endpoint: endpoint)
             }
-            throw NetworkError.networkError("Decoding error: \(error.localizedDescription)")
+            throw NetworkError.networkError("Decoding error: \(error.localizedDescription)", endpoint: endpoint)
         }
     }
 }

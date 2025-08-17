@@ -124,6 +124,26 @@ struct InputPatientData: View {
             }
         }
         .navigationBarBackButtonHidden()
+        // Error alert for patient operations
+        .alert(
+            AppState.error,
+            isPresented: Binding(
+                get: { presenter.isError && !presenter.errorMessage.isEmpty },
+                set: { if !$0 { 
+                    presenter.isError = false
+                    presenter.errorMessage = AppValue.empty
+                } }
+            ),
+            actions: {
+                Button(AppAction.ok) {
+                    presenter.isError = false
+                    presenter.errorMessage = AppValue.empty
+                }
+            },
+            message: {
+                Text(presenter.errorMessage)
+            }
+        )
     }
 }
 

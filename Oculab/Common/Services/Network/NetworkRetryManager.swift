@@ -164,7 +164,7 @@ class NetworkRetryManager: ObservableObject {
         // Check error types that should be retried
         if let networkError = error as? NetworkError {
             switch networkError {
-            case .networkError(let message):
+            case .networkError(let message, _):
                 // Retry for network-related errors but not authentication
                 return !message.lowercased().contains("authentication")
             case .apiError:
@@ -225,11 +225,11 @@ class NetworkRetryManager: ObservableObject {
 // MARK: - Enhanced Network Errors
 
 extension NetworkError {
-    static let timeout = NetworkError.networkError("Request timed out")
-    static let operationInProgress = NetworkError.networkError("Operation already in progress")
-    static let unknownError = NetworkError.networkError("Unknown network error")
+    static let timeout = NetworkError.networkError("Request timed out", endpoint: nil)
+    static let operationInProgress = NetworkError.networkError("Operation already in progress", endpoint: nil)
+    static let unknownError = NetworkError.networkError("Unknown network error", endpoint: nil)
     
-    static func allRetriesFailed(attempts: Int, lastError: Error) -> NetworkError {
-        return .networkError("All \(attempts) retry attempts failed. Last error: \(lastError.localizedDescription)")
+    static func allRetriesFailed(attempts: Int, lastError: Error, endpoint: String? = nil) -> NetworkError {
+        return .networkError("All \(attempts) retry attempts failed. Last error: \(lastError.localizedDescription)", endpoint: endpoint)
     }
 }
