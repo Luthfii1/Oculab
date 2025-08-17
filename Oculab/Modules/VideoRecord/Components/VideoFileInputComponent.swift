@@ -113,14 +113,10 @@ struct VideoInput: View {
     
     private func videoPreviewSection(url: URL) -> some View {
         VStack(spacing: 16) {
-            // Disabled video preview with tap to play full screen
+            // Video thumbnail preview with tap to play full screen
             ZStack {
-                // Disabled video player (black background)
-                Rectangle()
-                    .fill(Color.black)
-                    .aspectRatio(16/9, contentMode: .fit)
+                VideoThumbnailView(url: url, aspectRatio: 16/9, contentMode: .fill)
                     .cornerRadius(8)
-                
                 // Play button overlay
                 Button(action: {
                     showFullScreenPlayer = true
@@ -130,7 +126,6 @@ struct VideoInput: View {
                             .font(.system(size: 50))
                             .foregroundColor(.white)
                             .shadow(radius: 4)
-                        
                         Text("Tap to play video")
                             .font(.caption)
                             .foregroundColor(.white)
@@ -138,6 +133,7 @@ struct VideoInput: View {
                     }
                 }
             }
+            .aspectRatio(16/9, contentMode: .fit)
             .onTapGesture {
                 showFullScreenPlayer = true
             }
