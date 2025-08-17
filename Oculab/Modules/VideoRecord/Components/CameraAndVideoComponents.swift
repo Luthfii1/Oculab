@@ -1,14 +1,18 @@
 //
-//  CameraPreviewComponent.swift
+//  CameraAndVideoComponents.swift
 //  Oculab
 //
 //  Created by Luthfi Misbachul Munir on 14/10/24.
+//  Refactored and Enhanced by GitHub Copilot on 17/08/25.
 //
 
 import AVFoundation
 import AVKit
 import SwiftUI
+import Combine
 
+// MARK: - Camera Preview Component
+// MARK: - Camera Preview Component
 struct CameraPreviewComponent: UIViewRepresentable {
     @EnvironmentObject var videoRecordPresenter: VideoRecordPresenter
     var size: CGSize
@@ -40,29 +44,29 @@ struct CameraPreviewComponent: UIViewRepresentable {
         }
     }
 
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
+    func makeCoordinator() -> CameraPreviewCoordinator {
+        CameraPreviewCoordinator(self)
     }
     
     private func addGestureRecognizers(to view: UIView, context: Context) {
         // Pinch gesture for zoom
         let pinchGesture = UIPinchGestureRecognizer(
             target: context.coordinator,
-            action: #selector(Coordinator.handlePinch(_:))
+            action: #selector(CameraPreviewCoordinator.handlePinch(_:))
         )
         view.addGestureRecognizer(pinchGesture)
         
         // Tap gesture for focus
         let tapGesture = UITapGestureRecognizer(
             target: context.coordinator,
-            action: #selector(Coordinator.handleTap(_:))
+            action: #selector(CameraPreviewCoordinator.handleTap(_:))
         )
         view.addGestureRecognizer(tapGesture)
         
         // Double tap for auto zoom
         let doubleTapGesture = UITapGestureRecognizer(
             target: context.coordinator,
-            action: #selector(Coordinator.handleDoubleTap(_:))
+            action: #selector(CameraPreviewCoordinator.handleDoubleTap(_:))
         )
         doubleTapGesture.numberOfTapsRequired = 2
         view.addGestureRecognizer(doubleTapGesture)
@@ -70,93 +74,95 @@ struct CameraPreviewComponent: UIViewRepresentable {
         // Ensure single tap doesn't interfere with double tap
         tapGesture.require(toFail: doubleTapGesture)
     }
+}
 
-    class Coordinator: NSObject {
-        let parent: CameraPreviewComponent
-        var startZoom: CGFloat = 1.0
+// MARK: - Camera Preview Coordinator
+class CameraPreviewCoordinator: NSObject {
+    let parent: CameraPreviewComponent
+    var startZoom: CGFloat = 1.0
 
-        init(_ parent: CameraPreviewComponent) {
-            self.parent = parent
-        }
+    init(_ parent: CameraPreviewComponent) {
+        self.parent = parent
+    }
 
-        @MainActor
-        @objc func handlePinch(_ gesture: UIPinchGestureRecognizer) {
-            switch gesture.state {
-            case .began:
-                startZoom = parent.videoRecordPresenter.zoomFactor
-            case .changed:
-                let newScaleFactor = startZoom * gesture.scale
-                Task { @MainActor in
-                    parent.videoRecordPresenter.updateZoom(factor: newScaleFactor)
-                }
-            default:
-                break
-            }
-        }
-        
-        @MainActor
-        @objc func handleTap(_ gesture: UITapGestureRecognizer) {
-            let tapPoint = gesture.location(in: gesture.view)
-            guard let view = gesture.view else { return }
-            
-            // Convert tap point to camera coordinate system
-            let devicePoint = CGPoint(
-                x: tapPoint.y / view.bounds.height,
-                y: 1.0 - (tapPoint.x / view.bounds.width)
-            )
-            
-            focusCamera(at: devicePoint)
-        }
-        
-        @objc func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
+    @MainActor
+    @objc func handlePinch(_ gesture: UIPinchGestureRecognizer) {
+        switch gesture.state {
+        case .began:
+            startZoom = parent.videoRecordPresenter.zoomFactor
+        case .changed:
+            let newScaleFactor = startZoom * gesture.scale
             Task { @MainActor in
-                let currentZoom = parent.videoRecordPresenter.zoomFactor
-                let targetZoom: CGFloat = currentZoom > 1.5 ? 1.0 : 3.0
-                
-                parent.videoRecordPresenter.updateZoom(factor: targetZoom)
+                parent.videoRecordPresenter.updateZoom(factor: newScaleFactor)
             }
+        default:
+            break
+        }
+    }
+    
+    @MainActor
+    @objc func handleTap(_ gesture: UITapGestureRecognizer) {
+        let tapPoint = gesture.location(in: gesture.view)
+        guard let view = gesture.view else { return }
+        
+        // Convert tap point to camera coordinate system
+        let devicePoint = CGPoint(
+            x: tapPoint.y / view.bounds.height,
+            y: 1.0 - (tapPoint.x / view.bounds.width)
+        )
+        
+        focusCamera(at: devicePoint)
+    }
+    
+    @objc func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
+        Task { @MainActor in
+            let currentZoom = parent.videoRecordPresenter.zoomFactor
+            let targetZoom: CGFloat = currentZoom > 1.5 ? 1.0 : 3.0
+            
+            parent.videoRecordPresenter.updateZoom(factor: targetZoom)
+        }
+    }
+    
+    @MainActor
+    private func focusCamera(at point: CGPoint) {
+        guard let device = parent.videoRecordPresenter.session.inputs.first as? AVCaptureDeviceInput else {
+            return
         }
         
-        @MainActor
-        private func focusCamera(at point: CGPoint) {
-            guard let device = parent.videoRecordPresenter.session.inputs.first as? AVCaptureDeviceInput else {
-                return
+        let cameraDevice = device.device
+        
+        do {
+            try cameraDevice.lockForConfiguration()
+            
+            // Set focus point
+            if cameraDevice.isFocusPointOfInterestSupported &&
+               cameraDevice.isFocusModeSupported(.autoFocus) {
+                cameraDevice.focusPointOfInterest = point
+                cameraDevice.focusMode = .autoFocus
             }
             
-            let cameraDevice = device.device
-            
-            do {
-                try cameraDevice.lockForConfiguration()
-                
-                // Set focus point
-                if cameraDevice.isFocusPointOfInterestSupported &&
-                   cameraDevice.isFocusModeSupported(.autoFocus) {
-                    cameraDevice.focusPointOfInterest = point
-                    cameraDevice.focusMode = .autoFocus
-                }
-                
-                // Set exposure point
-                if cameraDevice.isExposurePointOfInterestSupported &&
-                   cameraDevice.isExposureModeSupported(.autoExpose) {
-                    cameraDevice.exposurePointOfInterest = point
-                    cameraDevice.exposureMode = .autoExpose
-                }
-                
-                cameraDevice.unlockForConfiguration()
-                
-                Logger.info("Camera focused at point: \(point)", category: .videoRecord)
-                
-            } catch {
-                Logger.error("Failed to focus camera: \(error.localizedDescription)", category: .videoRecord)
+            // Set exposure point
+            if cameraDevice.isExposurePointOfInterestSupported &&
+               cameraDevice.isExposureModeSupported(.autoExpose) {
+                cameraDevice.exposurePointOfInterest = point
+                cameraDevice.exposureMode = .autoExpose
             }
+            
+            cameraDevice.unlockForConfiguration()
+            
+            Logger.info("Camera focused at point: \(point)", category: .videoRecord)
+            
+        } catch {
+            Logger.error("Failed to focus camera: \(error.localizedDescription)", category: .videoRecord)
         }
     }
 }
 
-// MARK: - Video Player Components
-struct VideoPlayerView: View {
+// MARK: - Simple Video Player Component
+struct SimpleVideoPlayerComponent: View {
     @State private var player = AVPlayer()
     @State private var isLoading = true
+    @State private var cancellables = Set<AnyCancellable>()
 
     var body: some View {
         ZStack {
@@ -203,11 +209,10 @@ struct VideoPlayerView: View {
             }
             .store(in: &cancellables)
     }
-    
-    @State private var cancellables = Set<AnyCancellable>()
 }
 
-struct CustomVideoPlayerView: UIViewControllerRepresentable {
+// MARK: - Custom Video Player Component
+struct CustomVideoPlayerComponent: UIViewControllerRepresentable {
     let player: AVPlayer
     let showsPlaybackControls: Bool
 
@@ -229,5 +234,7 @@ struct CustomVideoPlayerView: UIViewControllerRepresentable {
     }
 }
 
-// MARK: - Import Combine for publishers
-import Combine
+// MARK: - Backward Compatibility Aliases
+// These maintain compatibility with existing code
+typealias VideoPlayerView = SimpleVideoPlayerComponent
+typealias CustomVideoPlayerView = CustomVideoPlayerComponent
