@@ -23,12 +23,14 @@ struct AppDropdown: View {
     @State private var searchText: String = AppValue.empty // New state for search text
     @State var isEnablingAdding: Bool = false
 
-    // Computed property to filter choices based on search text
+    // Computed property to filter choices based on search text and sort alphabetically
     private var filteredChoices: [(display: String, value: String)] {
+        let sorted = choices.sorted { $0.display.localizedCaseInsensitiveCompare($1.display) == .orderedAscending }
+        
         if isSearchEnabled {
-            return choices.filter { $0.display.localizedCaseInsensitiveContains(searchText) || searchText.isEmpty }
+            return sorted.filter { $0.display.localizedCaseInsensitiveContains(searchText) || searchText.isEmpty }
         }
-        return choices
+        return sorted
     }
 
     // Colors based on the state (disabled or normal)

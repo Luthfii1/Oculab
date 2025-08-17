@@ -28,12 +28,13 @@ struct InputPatientData: View {
                     VStack(alignment: .leading, spacing: AppConstants.TaskAssignmentUI.verticalSpacing) {
                         // PIC Dropdown
                         AppDropdown(
-                                title: AppTextTaskAssignInputPatient.picTitle,
-                                placeholder: AppTextTaskAssignInputPatient.selectPIC,
-                                leftIcon: AppIcon.personFill,
-                                choices: presenter.picName,
-                                selectedChoice: $presenter.selectedPIC
-                            )
+                            title: AppTextTaskAssignInputPatient.picTitle,
+                            placeholder: AppTextTaskAssignInputPatient.selectPIC,
+                            leftIcon: AppIcon.personFill,
+                            choices: presenter.picName,
+                            isSearchEnabled: false,
+                            selectedChoice: $presenter.selectedPIC
+                        )
                         
                         // Patient Search Dropdown
                         AppDropdown(
@@ -56,11 +57,7 @@ struct InputPatientData: View {
                             AppButton(
                                 title: AppTextTaskAssignInputPatient.fillSpecimenDetailsButton,
                                 rightIcon: AppIcon.arrowForward,
-                                isEnabled: {
-                                    let hasPatientData = !(presenter.patient.NIK == AppValue.empty || presenter.patient.DoB == nil)
-                                    let hasPIC = (authentication.user.role == .LAB && authentication.user.businessModel == .B2C) || presenter.selectedPIC != AppValue.empty
-                                    return hasPatientData && hasPIC
-                                }()
+                                isEnabled: presenter.canProceedToSpecimen(userRole: authentication.user.role, businessModel: authentication.user.businessModel ?? .B2C)
                             ) {
                                 presenter.newExam()
                             }
