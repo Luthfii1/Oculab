@@ -12,26 +12,20 @@ struct VideoPreview: View {
     @EnvironmentObject private var videoRecordPresenter: VideoRecordPresenter
     @Environment(\.dismiss) private var dismiss
     @State private var player: AVPlayer?
-    @State private var isPlaying = false
     @State private var showingFullScreen = false
-    @State private var currentTime: Double = 0
     @State private var duration: Double = 0
     @State private var isSaving = false
 
     var body: some View {
         ZStack {
-            // Video player
+            Color.black
+                .ignoresSafeArea()
+            
+            // Video thumbnail preview
             if let url = videoRecordPresenter.previewURL {
-                VideoPlayer(player: player ?? AVPlayer())
-                    .ignoresSafeArea()
+                VideoThumbnailView(url: url)
                     .onAppear {
                         setupPlayer(with: url)
-                    }
-                    .onDisappear {
-                        player?.pause()
-                    }
-                    .onTapGesture {
-                        showingFullScreen = true
                     }
             } else {
                 // Fallback content
@@ -57,15 +51,17 @@ struct VideoPreview: View {
                 // Video information
                 if duration > 0 {
                     videoInfoOverlay
+                        .padding(.horizontal, 20)
                 }
                 
-                // Control buttons
+                // Control buttons - always show since video is static
                 controlButtonsOverlay
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 32)
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 52)
         }
-        .ignoresSafeArea()
+        .background(Color.black)
+        .ignoresSafeArea(.container, edges: .top)
         .sheet(isPresented: $showingFullScreen) {
             if let url = videoRecordPresenter.previewURL {
                 FullScreenVideoPlayerView(videoURL: url) {
@@ -96,11 +92,11 @@ struct VideoPreview: View {
             
             Spacer()
             
-            // Playback control
+            // Playback control - opens full screen player
             Button(action: {
-                togglePlayback()
+                showingFullScreen = true
             }) {
-                Image(systemName: isPlaying ? "pause.circle.fill" : "play.circle.fill")
+                Image(systemName: "play.circle.fill")
                     .font(.title)
                     .foregroundColor(.white)
                     .shadow(radius: 2)
@@ -151,40 +147,20 @@ struct VideoPreview: View {
     
     // MARK: - Methods
     private func setupPlayer(with url: URL) {
+        // Only used for getting duration and metadata
         player = AVPlayer(url: url)
         
-        // Monitor player status
-        if let player = player {
-            // Get duration
-            let asset = AVAsset(url: url)
-            Task {
-                do {
-                    let duration = try await asset.load(.duration)
-                    await MainActor.run {
-                        self.duration = CMTimeGetSeconds(duration)
-                    }
-                } catch {
-                    Logger.error("Failed to load video duration: \(error)", category: .videoRecord)
+        // Get duration
+        let asset = AVAsset(url: url)
+        Task {
+            do {
+                let duration = try await asset.load(.duration)
+                await MainActor.run {
+                    self.duration = CMTimeGetSeconds(duration)
                 }
+            } catch {
+                Logger.error("Failed to load video duration: \(error)", category: .videoRecord)
             }
-            
-            // Monitor playback state
-            player.publisher(for: \.timeControlStatus)
-                .receive(on: DispatchQueue.main)
-                .sink { status in
-                    isPlaying = (status == .playing)
-                }
-                .store(in: &cancellables)
-        }
-    }
-    
-    private func togglePlayback() {
-        guard let player = player else { return }
-        
-        if isPlaying {
-            player.pause()
-        } else {
-            player.play()
         }
     }
     
@@ -256,8 +232,6 @@ struct VideoPreview: View {
         }
         return "Unknown"
     }
-    
-    @State private var cancellables = Set<AnyCancellable>()
 }
 
 #Preview {
@@ -266,5 +240,59 @@ struct VideoPreview: View {
         .environmentObject(videoRecordPresenter)
 }
 
-// MARK: - Import Combine
-import Combine
+// MARK: - Video Thumbnail View
+struct VideoThumbnailView: View {
+    let url: URL
+    @State private var thumbnailImage: UIImage?
+    
+    var body: some View {
+        ZStack {
+            if let image = thumbnailImage {
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .clipped()
+            } else {
+                // Loading placeholder
+                VStack(spacing: 16) {
+                    ProgressView()
+                        .scaleEffect(1.5)
+                        .tint(.white)
+                    Text("Loading preview...")
+                        .foregroundColor(.white)
+                        .font(.caption)
+                }
+            }
+        }
+        .onAppear {
+            generateThumbnail()
+        }
+    }
+    
+    private func generateThumbnail() {
+        Task {
+            let thumbnail = await createVideoThumbnail(from: url)
+            await MainActor.run {
+                self.thumbnailImage = thumbnail
+            }
+        }
+    }
+    
+    private func createVideoThumbnail(from url: URL) async -> UIImage? {
+        let asset = AVAsset(url: url)
+        let imageGenerator = AVAssetImageGenerator(asset: asset)
+        imageGenerator.appliesPreferredTrackTransform = true
+        imageGenerator.requestedTimeToleranceAfter = .zero
+        imageGenerator.requestedTimeToleranceBefore = .zero
+        
+        do {
+            let time = CMTime(seconds: 0, preferredTimescale: 600)
+            let cgImage = try await imageGenerator.image(at: time).image
+            return UIImage(cgImage: cgImage)
+        } catch {
+            Logger.error("Failed to generate video thumbnail: \(error)", category: .videoRecord)
+            return nil
+        }
+    }
+}

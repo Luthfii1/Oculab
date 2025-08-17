@@ -166,8 +166,8 @@ struct ProfileView: View {
     }
 }
 
-#Preview {
-    ProfileView()
-        .environmentObject(DependencyInjection.shared.createProfilePresenter())
-        .environmentObject(DependencyInjection.shared.createAuthPresenter())
-}
+//#Preview {
+//    ProfileView()
+//        .environmentObject(DependencyInjection.shared.createProfilePresenter())
+//        .environmentObject(DependencyInjection.shared.createAuthPresenter())
+//}
