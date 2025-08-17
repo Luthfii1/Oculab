@@ -87,6 +87,10 @@ class AuthenticationPresenter: ObservableObject {
     var loginButtonText: String {
         isLoading ? AppState.loading : AppTextAuthLogin.buttonText
     }
+    
+    var isDropdownOfficerDisabled: Bool {
+        return user.role == .LAB && user.businessModel == .B2C
+    }
 
     // MARK: - Initialization
     init(interactor: AuthenticationInteractor) {

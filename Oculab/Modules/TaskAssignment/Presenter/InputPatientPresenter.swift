@@ -68,6 +68,21 @@ class InputPatientPresenter: ObservableObject {
                typeString2 != AppValue.empty &&
                examination2.slideId != AppValue.empty
     }
+
+    private var hasValidPatientData: Bool {
+        !(patient.NIK == AppValue.empty || patient.DoB == nil)
+    }
+    
+    private func hasValidPIC(userRole: RolesType, businessModel: BusinessModelType) -> Bool {
+        if userRole == .LAB && businessModel == .B2C {
+            return selectedPIC != AppValue.empty
+        }
+        return selectedPIC != AppValue.empty
+    }
+    
+    func canProceedToSpecimen(userRole: RolesType, businessModel: BusinessModelType) -> Bool {
+        hasValidPatientData && hasValidPIC(userRole: userRole, businessModel: businessModel)
+    }
     
     // MARK: - Helper Methods
     private func updatePatientForm() {
