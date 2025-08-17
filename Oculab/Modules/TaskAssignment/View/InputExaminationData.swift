@@ -66,6 +66,7 @@ struct InputExaminationData: View {
 
                                 ValidatedTextField(
                                     title: AppTextTaskAssignInputExam.slideId1Title,
+                                    isRequired: true,
                                     placeholder: AppTextTaskAssignInputExam.slideId1Placeholder,
                                     text: $presenter.examination.slideId,
                                     fieldName: .slideId1,
@@ -84,6 +85,7 @@ struct InputExaminationData: View {
 
                                 ValidatedTextField(
                                     title: AppTextTaskAssignInputExam.slideId2Title,
+                                    isRequired: false,
                                     placeholder: AppTextTaskAssignInputExam.slideId2Placeholder,
                                     text: $presenter.examination2.slideId,
                                     fieldName: .slideId2,
@@ -92,7 +94,7 @@ struct InputExaminationData: View {
 
                                 AppRadioButton(
                                     title: AppTextTaskAssignInputExam.slideType2Title,
-                                    isRequired: true,
+                                    isRequired: false,
                                     choices: [AppTextTaskAssignInputExam.morningChoice, AppTextTaskAssignInputExam.anytimeChoice],
                                     isDisabled: false,
                                     selectedChoice: $presenter.typeString2
