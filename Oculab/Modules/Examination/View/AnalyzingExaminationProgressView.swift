@@ -18,7 +18,8 @@ struct AnalyzingExaminationProgressView: View {
                     .frame(height: UIScreen.main.bounds.height * 0.2)
 
                 LottieHelper(animationName: AppTextExamProgress.loadingAnimationName)
-                    .frame(width: 84, height: 84)
+                    .aspectRatio(contentMode: .fit)
+                    .frame(maxWidth: .infinity, maxHeight: 120)
                     .padding(.bottom, 72)
 
                 Text(AppTextExamProgress.analyzingTitle)
