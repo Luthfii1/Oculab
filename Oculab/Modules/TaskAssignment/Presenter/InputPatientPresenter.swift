@@ -32,6 +32,28 @@ class InputPatientPresenter: ObservableObject {
     @Published var isUserLoading = false
     @Published var isPatientLoading = false
     @Published var isSubmitPopUpVisible: Bool = false
+    @Published var isSlide2Visible: Bool = false
+    // MARK: - Slide 2 UI Logic
+    /// Toggle Slide 2 visibility and clear data if hiding
+    func toggleSlide2() {
+        if isSlide2Visible {
+            isSlide2Visible = false
+            examination2 = Examination.empty
+            typeString2 = AppValue.empty
+        } else {
+            isSlide2Visible = true
+        }
+    }
+
+    /// Button title for toggling slide 2
+    var slide2ButtonTitle: String {
+        isSlide2Visible ? AppTextTaskAssignInputExam.removeSlide2Button : AppTextTaskAssignInputExam.addSlide2Button
+    }
+
+    /// Button color for toggling slide 2
+    var slide2ButtonColor: AppButton.ButtonColorType {
+        isSlide2Visible ? .destructive(.secondary) : .secondary
+    }
     
     // MARK: - Form State
     @Published var goalString: String = AppValue.empty
@@ -67,11 +89,18 @@ class InputPatientPresenter: ObservableObject {
     
     // MARK: - Computed Properties
     var isFormValid: Bool {
-        return goalString != AppValue.empty &&
-               typeString != AppValue.empty &&
-               examination.slideId != AppValue.empty &&
-               typeString2 != AppValue.empty &&
-               examination2.slideId != AppValue.empty
+        // Use ValidationManager for all relevant fields
+        let validGoal = validationManager.validateRequired(goalString, fieldName: ValidationFieldName.examinationGoal.fieldName)
+        let validType1 = validationManager.validateRequired(typeString, fieldName: ValidationFieldName.slideType1.fieldName)
+        let validSlideId1 = validationManager.validateRequired(examination.slideId, fieldName: ValidationFieldName.slideId1.fieldName)
+
+        if isSlide2Visible {
+            let validType2 = validationManager.validateRequired(typeString2, fieldName: ValidationFieldName.slideType2.fieldName)
+            let validSlideId2 = validationManager.validateRequired(examination2.slideId, fieldName: ValidationFieldName.slideId2.fieldName)
+            return validGoal && validType1 && validSlideId1 && validType2 && validSlideId2
+        } else {
+            return validGoal && validType1 && validSlideId1
+        }
     }
     
     func canProceedToSpecimen(userRole: RolesType, businessModel: BusinessModelType) -> Bool {

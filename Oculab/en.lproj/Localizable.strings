@@ -521,7 +521,9 @@
 "task_assignment.input_exam.error_message_failed_to_get_response" = "Failed to get response from server.";
 "task_assignment.input_exam.error_message_not_all_exams_created" = "Not all examinations were created successfully.";
 "task_assignment.input_exam.error_message_exams_contain_invalid_data" = "Examinations were created but contain invalid data.";
-"task_assignment.input_exam.examination_description" = "Patient %@ specimen will be examined by %@";
+"task_assignment.input_exam.examination_description" = "Specimen for patient %@ will be examined by %@.";
+"task_assignment.input_exam.add_slide2_button" = "Add Slide 2";
+"task_assignment.input_exam.remove_slide2_button" = "Remove Slide 2";
 
 // MARK: - UserManagement Module
 // Main UserManagement

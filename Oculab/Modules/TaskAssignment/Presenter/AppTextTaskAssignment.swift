@@ -58,8 +58,16 @@ extension AppText {
             static let errorMessageNotAllExamsCreated = "task_assignment.input_exam.error_message_not_all_exams_created".localized
             static let errorMessageExamsContainInvalidData = "task_assignment.input_exam.error_message_exams_contain_invalid_data".localized
 
-            static func examinationDescription(patientName: String, picName: String) -> String {
-                return "task_assignment.input_exam.examination_description".localized(with: [patientName, picName])
+            static let addSlide2Button = "task_assignment.input_exam.add_slide2_button".localized
+            static let removeSlide2Button = "task_assignment.input_exam.remove_slide2_button".localized
+
+            static func examinationDescription(patientName: String?, picName: String?) -> String {
+                // Fallback to '-' if nil or empty, and trim whitespace/newlines
+                let safePatient = (patientName?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false ? patientName!.trimmingCharacters(in: .whitespacesAndNewlines) : AppValue.defaultStrike)
+                let safePIC = (picName?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false ? picName!.trimmingCharacters(in: .whitespacesAndNewlines) : AppValue.defaultStrike)
+                let format = NSLocalizedString("task_assignment.input_exam.examination_description", comment: AppValue.empty)
+                let result = String(format: format, safePatient, safePIC)
+                return result
             }
         }
         

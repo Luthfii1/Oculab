@@ -536,6 +536,8 @@
 "task_assignment.input_exam.error_message_not_all_exams_created" = "Tidak semua pemeriksaan berhasil dibuat.";
 "task_assignment.input_exam.error_message_exams_contain_invalid_data" = "Pemeriksaan telah dibuat tetapi mengandung data yang tidak valid.";
 "task_assignment.input_exam.examination_description" = "Sediaan Pasien %@ akan diperiksa oleh %@";
+"task_assignment.input_exam.add_slide2_button" = "Tambah Sediaan 2";
+"task_assignment.input_exam.remove_slide2_button" = "Hapus Sediaan 2";
 
 // MARK: - UserManagement Module
 // Main UserManagement

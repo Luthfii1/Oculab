@@ -66,6 +66,7 @@ struct InputExaminationData: View {
 
                                 ValidatedTextField(
                                     title: AppTextTaskAssignInputExam.slideId1Title,
+                                    isRequired: true,
                                     placeholder: AppTextTaskAssignInputExam.slideId1Placeholder,
                                     text: $presenter.examination.slideId,
                                     fieldName: .slideId1,
@@ -82,26 +83,36 @@ struct InputExaminationData: View {
                                     presenter.handleFirstSlideTypeChange()
                                 }
 
-                                ValidatedTextField(
-                                    title: AppTextTaskAssignInputExam.slideId2Title,
-                                    placeholder: AppTextTaskAssignInputExam.slideId2Placeholder,
-                                    text: $presenter.examination2.slideId,
-                                    fieldName: .slideId2,
-                                    validationType: .none
-                                )
+                                if presenter.isSlide2Visible {
+                                    ValidatedTextField(
+                                        title: AppTextTaskAssignInputExam.slideId2Title,
+                                        isRequired: false,
+                                        placeholder: AppTextTaskAssignInputExam.slideId2Placeholder,
+                                        text: $presenter.examination2.slideId,
+                                        fieldName: .slideId2,
+                                        validationType: .none
+                                    )
 
-                                AppRadioButton(
-                                    title: AppTextTaskAssignInputExam.slideType2Title,
-                                    isRequired: true,
-                                    choices: [AppTextTaskAssignInputExam.morningChoice, AppTextTaskAssignInputExam.anytimeChoice],
-                                    isDisabled: false,
-                                    selectedChoice: $presenter.typeString2
-                                ).onChange(of: presenter.typeString2) {
-                                    presenter.handleSecondSlideTypeChange()
+                                    AppRadioButton(
+                                        title: AppTextTaskAssignInputExam.slideType2Title,
+                                        isRequired: false,
+                                        choices: [AppTextTaskAssignInputExam.morningChoice, AppTextTaskAssignInputExam.anytimeChoice],
+                                        isDisabled: false,
+                                        selectedChoice: $presenter.typeString2
+                                    ).onChange(of: presenter.typeString2) {
+                                        presenter.handleSecondSlideTypeChange()
+                                    }
+                                }
+
+                                AppButton(
+                                    title: presenter.slide2ButtonTitle,
+                                    colorType: presenter.slide2ButtonColor,
+                                    isEnabled: true
+                                ) {
+                                    presenter.toggleSlide2()
                                 }
                                 
                                 Spacer()
-                                
                                 
                                 HStack {
                                     AppButton(
@@ -116,6 +127,7 @@ struct InputExaminationData: View {
                                     .frame(width: UIScreen.main.bounds.width / 3.5)
 
                                     Spacer()
+                                    
                                     AppButton(
                                         title: AppTextTaskAssignInputExam.createTaskFinalButton,
                                         rightIcon: AppIcon.arrowRight,
@@ -130,7 +142,6 @@ struct InputExaminationData: View {
 
                             .padding(.horizontal, AppConstants.TaskAssignmentUI.horizontalPadding)
                         }
-
                         .navigationTitle(AppTextTaskAssignInputExam.navigationTitle)
                         .navigationBarTitleDisplayMode(.inline)
                         .toolbar {
