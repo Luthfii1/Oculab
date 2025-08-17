@@ -58,6 +58,9 @@ extension AppText {
             static let errorMessageNotAllExamsCreated = "task_assignment.input_exam.error_message_not_all_exams_created".localized
             static let errorMessageExamsContainInvalidData = "task_assignment.input_exam.error_message_exams_contain_invalid_data".localized
 
+            static let addSlide2Button = "task_assignment.input_exam.add_slide2_button".localized
+            static let removeSlide2Button = "task_assignment.input_exam.remove_slide2_button".localized
+
             static func examinationDescription(patientName: String, picName: String) -> String {
                 return "task_assignment.input_exam.examination_description".localized(with: [patientName, picName])
             }

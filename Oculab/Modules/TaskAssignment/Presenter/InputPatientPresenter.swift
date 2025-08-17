@@ -32,6 +32,28 @@ class InputPatientPresenter: ObservableObject {
     @Published var isUserLoading = false
     @Published var isPatientLoading = false
     @Published var isSubmitPopUpVisible: Bool = false
+    @Published var isSlide2Visible: Bool = false
+    // MARK: - Slide 2 UI Logic
+    /// Toggle Slide 2 visibility and clear data if hiding
+    func toggleSlide2() {
+        if isSlide2Visible {
+            isSlide2Visible = false
+            examination2 = Examination.empty
+            typeString2 = AppValue.empty
+        } else {
+            isSlide2Visible = true
+        }
+    }
+
+    /// Button title for toggling slide 2
+    var slide2ButtonTitle: String {
+        isSlide2Visible ? AppTextTaskAssignInputExam.removeSlide2Button : AppTextTaskAssignInputExam.addSlide2Button
+    }
+
+    /// Button color for toggling slide 2
+    var slide2ButtonColor: AppButton.ButtonColorType {
+        isSlide2Visible ? .destructive(.secondary) : .secondary
+    }
     
     // MARK: - Form State
     @Published var goalString: String = AppValue.empty
