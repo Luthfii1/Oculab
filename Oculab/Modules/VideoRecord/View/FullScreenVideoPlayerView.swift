@@ -2,8 +2,7 @@
 //  FullScreenVideoPlayerView.swift
 //  Oculab
 //
-//  Created by Rangga Yudhistira Brata on 24/05/25.
-//  Refactored by GitHub Copilot on 17/08/25.
+//  Created by Luthfi Misbachul Munir on 17/08/25.
 //
 
 import SwiftUI
