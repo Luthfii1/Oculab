@@ -68,23 +68,21 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     @MainActor
     private func requestCameraPermission() async {
         let cameraStatus = AVCaptureDevice.authorizationStatus(for: .video)
-        let microphoneStatus = AVCaptureDevice.authorizationStatus(for: .audio)
         
-        switch (cameraStatus, microphoneStatus) {
-        case (.authorized, .authorized):
+        switch cameraStatus {
+        case .authorized:
             await setUp()
-        case (.notDetermined, _), (_, .notDetermined):
+        case .notDetermined:
             let cameraGranted = await AVCaptureDevice.requestAccess(for: .video)
-            let microphoneGranted = await AVCaptureDevice.requestAccess(for: .audio)
             
-            if cameraGranted && microphoneGranted {
+            if cameraGranted {
                 await setUp()
             } else {
                 alert = true
             }
-        case (.denied, _), (.restricted, _), (_, .denied), (_, .restricted):
+        case .denied, .restricted:
             alert = true
-        default:
+        @unknown default:
             alert = true
         }
     }
@@ -101,7 +99,7 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
             // Remove existing inputs and outputs
             removeExistingInputsAndOutputs()
             
-            // Setup camera and audio inputs
+            // Setup camera inputs (audio disabled to reduce file size)
             try await setupInputs()
             
             // Setup outputs
@@ -124,23 +122,14 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     
     private func setupInputs() throws {
         guard let cameraDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
-              let videoInput = try? AVCaptureDeviceInput(device: cameraDevice),
-              let audioDevice = AVCaptureDevice.default(for: .audio),
-              let audioInput = try? AVCaptureDeviceInput(device: audioDevice)
+              let videoInput = try? AVCaptureDeviceInput(device: cameraDevice)
         else {
             throw VideoRecordError.deviceNotFound
         }
         
-        // Add video input
+        // Add video input only (audio disabled to reduce file size)
         if session.canAddInput(videoInput) {
             session.addInput(videoInput)
-        } else {
-            throw VideoRecordError.cannotAddInput
-        }
-        
-        // Add audio input
-        if session.canAddInput(audioInput) {
-            session.addInput(audioInput)
         } else {
             throw VideoRecordError.cannotAddInput
         }
@@ -573,9 +562,9 @@ enum VideoRecordError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .deviceNotFound:
-            return "Camera or microphone not available"
+            return "Camera not available"
         case .cannotAddInput:
-            return "Cannot add camera or microphone input"
+            return "Cannot add camera input"
         case .cannotAddOutput:
             return "Cannot add recording output"
         case .recordingFailed(let message):
