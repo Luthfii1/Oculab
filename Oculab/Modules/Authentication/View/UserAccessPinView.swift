@@ -94,7 +94,14 @@ struct UserAccessPinView: View {
                     securityPresenter.state = state
                     securityPresenter.inputPin.removeAll()
                     securityPresenter.isError = false
-                    securityPresenter.checkFaceIDAvailability()
+                    Task {
+                        await securityPresenter.checkFaceIDAvailability()
+                        
+                        // Automatically trigger Face ID if enabled and this is authentication mode
+                        if state == .authenticate && securityPresenter.isFaceIdEnabled(state: state) {
+                            await securityPresenter.authenticateWithFaceID()
+                        }
+                    }
                 }
             }
         }
