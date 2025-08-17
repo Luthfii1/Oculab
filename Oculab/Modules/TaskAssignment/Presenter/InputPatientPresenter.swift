@@ -11,7 +11,7 @@ import SwiftUI
 class InputPatientPresenter: ObservableObject {
     // MARK: - Dependencies
     private let interactor: InputPatientInteractor
-    @StateObject private var validationManager = ValidationManager.shared
+    @ObservedObject private var validationManager = ValidationManager.shared
     
     // MARK: - Published Properties
     @Published var selectedPIC: String = AppValue.empty {
@@ -422,7 +422,7 @@ extension InputPatientPresenter {
     func handleDateOfBirthChange() {
         patient.DoB = selectedDoB
         // Validate Date of Birth in real-time
-        validationManager.validateDate(
+        _ = validationManager.validateDate(
             patient.DoB, 
             fieldName: ValidationFieldName.patientDateOfBirth.fieldName,
             allowFuture: false,
@@ -441,7 +441,7 @@ extension InputPatientPresenter {
             patient.sex = .MALE // Default fallback
         }
         // Validate Gender in real-time
-        validationManager.validateRequired(selectedSex, fieldName: ValidationFieldName.patientGender.fieldName)
+        _ = validationManager.validateRequired(selectedSex, fieldName: ValidationFieldName.patientGender.fieldName)
         Logger.debug("Patient gender updated to: \(patient.sex)", category: .taskAssignment)
     }
     
@@ -449,7 +449,7 @@ extension InputPatientPresenter {
         patient.BPJS = BPJSnumber
         // Validate BPJS in real-time (only if not empty)
         if !BPJSnumber.isEmpty {
-            validationManager.validateWithRules(
+            _ = validationManager.validateWithRules(
                 BPJSnumber, 
                 fieldName: ValidationFieldName.patientBPJS.fieldName, 
                 rules: [
@@ -471,12 +471,12 @@ extension InputPatientPresenter {
     }
     
     func handlePICChange() {
-        validationManager.validateRequired(selectedPIC, fieldName: ValidationFieldName.userRole.fieldName)
+        _ = validationManager.validateRequired(selectedPIC, fieldName: ValidationFieldName.userRole.fieldName)
         Logger.debug("PIC updated to: \(selectedPIC)", category: .taskAssignment)
     }
     
     func handlePatientSelectionChange() {
-        validationManager.validateRequired(selectedPatient, fieldName: ValidationFieldName.patientName.fieldName)
+        _ = validationManager.validateRequired(selectedPatient, fieldName: ValidationFieldName.patientName.fieldName)
         Logger.debug("Patient selection updated to: \(selectedPatient)", category: .taskAssignment)
     }
 }

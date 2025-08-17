@@ -313,17 +313,23 @@ class ValidationManager: ObservableObject {
     
     /// Sets an error for a field
     func setError(_ message: String, for fieldName: String) {
-        errors[fieldName] = message
+        DispatchQueue.main.async {
+            self.errors[fieldName] = message
+        }
     }
     
     /// Clears the error for a field
     func clearError(for fieldName: String) {
-        errors.removeValue(forKey: fieldName)
+        DispatchQueue.main.async {
+            self.errors.removeValue(forKey: fieldName)
+        }
     }
     
     /// Clears all errors
     func clearAllErrors() {
-        errors.removeAll()
+        DispatchQueue.main.async {
+            self.errors.removeAll()
+        }
     }
     
     /// Checks if the form has any errors
