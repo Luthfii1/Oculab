@@ -23,6 +23,9 @@ struct PatientDisplayField: View {
                 fieldName: .patientNIK,
                 validationType: .nik
             )
+            .onChange(of: presenter.patient.NIK) { _, _ in
+                presenter.handleNIKChange()
+            }
 
             DateField(
                 title: AppPatient.dateOfBirth,

@@ -35,6 +35,9 @@ struct InputPatientData: View {
                             isSearchEnabled: false,
                             selectedChoice: $presenter.selectedPIC
                         )
+                        .onChange(of: presenter.selectedPIC) { _, _ in
+                            // Validation is automatically triggered in the presenter's didSet
+                        }
                         
                         // Patient Search Dropdown
                         AppDropdown(
@@ -48,6 +51,9 @@ struct InputPatientData: View {
                             isEnablingAdding: patientId == nil
                         )
                         .disabled(patientId != nil)
+                        .onChange(of: presenter.selectedPatient) { _, _ in
+                            // Validation is automatically triggered in the presenter's didSet
+                        }
                         
                         if presenter.selectedPatient != AppValue.empty {
                             PatientDisplayField()

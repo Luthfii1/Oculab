@@ -11,12 +11,17 @@ import SwiftUI
 class InputPatientPresenter: ObservableObject {
     // MARK: - Dependencies
     private let interactor: InputPatientInteractor
+    @StateObject private var validationManager = ValidationManager.shared
     
     // MARK: - Published Properties
-    @Published var selectedPIC: String = AppValue.empty
+    @Published var selectedPIC: String = AppValue.empty {
+        didSet {
+            handlePICChange()
+        }
+    }
     @Published var selectedPatient: String = AppValue.empty {
         didSet {
-            Logger.debug("Patient selected: \(selectedPatient)", category: .taskAssignment)
+            handlePatientSelectionChange()
         }
     }
     
@@ -68,20 +73,46 @@ class InputPatientPresenter: ObservableObject {
                typeString2 != AppValue.empty &&
                examination2.slideId != AppValue.empty
     }
-
-    private var hasValidPatientData: Bool {
-        !(patient.NIK == AppValue.empty || patient.DoB == nil)
-    }
-    
-    private func hasValidPIC(userRole: RolesType, businessModel: BusinessModelType) -> Bool {
-        if userRole == .LAB && businessModel == .B2C {
-            return selectedPIC != AppValue.empty
-        }
-        return selectedPIC != AppValue.empty
-    }
     
     func canProceedToSpecimen(userRole: RolesType, businessModel: BusinessModelType) -> Bool {
-        hasValidPatientData && hasValidPIC(userRole: userRole, businessModel: businessModel)
+        // Clear all errors before validation
+        validationManager.clearAllErrors()
+        
+        // Validate required dropdowns
+        let validPIC = validationManager.validateRequired(selectedPIC, fieldName: ValidationFieldName.userRole.fieldName)
+        let validPatientSelection = validationManager.validateRequired(selectedPatient, fieldName: ValidationFieldName.patientName.fieldName)
+        
+        // Validate patient data using ValidationManager
+        let validNIK = validationManager.validateNIK(patient.NIK, fieldName: ValidationFieldName.patientNIK.fieldName)
+        let validGender = validationManager.validateRequired(selectedSex, fieldName: ValidationFieldName.patientGender.fieldName)
+        
+        // Validate Date of Birth
+        let validDoB = validationManager.validateDate(
+            patient.DoB, 
+            fieldName: ValidationFieldName.patientDateOfBirth.fieldName,
+            allowFuture: false,
+            allowPast: true
+        )
+        
+        // Validate BPJS (optional but if provided should be valid)
+        var validBPJS = true
+        if !BPJSnumber.isEmpty {
+            validBPJS = validationManager.validateWithRules(
+                BPJSnumber, 
+                fieldName: ValidationFieldName.patientBPJS.fieldName, 
+                rules: [
+                    .numbersOnly(),
+                    .minLength(11),
+                    .maxLength(13)
+                ]
+            )
+        }
+        
+        let allValid = validPIC && validPatientSelection && validNIK && validGender && validDoB && validBPJS
+        
+        Logger.debug("Form validation - PIC: \(validPIC), Patient: \(validPatientSelection), NIK: \(validNIK), Gender: \(validGender), DoB: \(validDoB), BPJS: \(validBPJS), Overall: \(allValid)", category: .taskAssignment)
+        
+        return allValid
     }
     
     // MARK: - Helper Methods
@@ -91,6 +122,12 @@ class InputPatientPresenter: ObservableObject {
         selectedSex = patient.sex == .MALE ? AppPatient.Gender.male : 
                      patient.sex == .FEMALE ? AppPatient.Gender.female : AppValue.empty
         BPJSnumber = patient.BPJS ?? AppValue.empty
+        
+        // Trigger validation for all loaded fields
+        handleDateOfBirthChange()
+        handleGenderChange()
+        handleBPJSNumberChange()
+        handleNIKChange()
     }
     
     private func resetErrorState() {
@@ -191,6 +228,7 @@ extension InputPatientPresenter {
         selectedDoB = Date()
         selectedSex = AppValue.empty
         BPJSnumber = AppValue.empty
+        validationManager.clearAllErrors()
     }
     
     @MainActor
@@ -383,6 +421,13 @@ extension InputPatientPresenter {
     // MARK: - Patient Form Handlers
     func handleDateOfBirthChange() {
         patient.DoB = selectedDoB
+        // Validate Date of Birth in real-time
+        validationManager.validateDate(
+            patient.DoB, 
+            fieldName: ValidationFieldName.patientDateOfBirth.fieldName,
+            allowFuture: false,
+            allowPast: true
+        )
         Logger.debug("Patient DoB updated to: \(selectedDoB)", category: .taskAssignment)
     }
     
@@ -393,14 +438,46 @@ extension InputPatientPresenter {
         case AppPatient.Gender.male:
             patient.sex = .MALE
         default:
-            patient.sex = .UNKNOWN
+            patient.sex = .MALE // Default fallback
         }
+        // Validate Gender in real-time
+        validationManager.validateRequired(selectedSex, fieldName: ValidationFieldName.patientGender.fieldName)
         Logger.debug("Patient gender updated to: \(patient.sex)", category: .taskAssignment)
     }
     
     func handleBPJSNumberChange() {
         patient.BPJS = BPJSnumber
+        // Validate BPJS in real-time (only if not empty)
+        if !BPJSnumber.isEmpty {
+            validationManager.validateWithRules(
+                BPJSnumber, 
+                fieldName: ValidationFieldName.patientBPJS.fieldName, 
+                rules: [
+                    .numbersOnly(),
+                    .minLength(11),
+                    .maxLength(13)
+                ]
+            )
+        } else {
+            validationManager.clearError(for: ValidationFieldName.patientBPJS.fieldName)
+        }
         Logger.debug("Patient BPJS updated to: \(BPJSnumber)", category: .taskAssignment)
+    }
+    
+    func handleNIKChange() {
+        // NIK validation is already handled by ValidatedTextField
+        // Just trigger validation update for button state
+        Logger.debug("Patient NIK updated to: \(patient.NIK)", category: .taskAssignment)
+    }
+    
+    func handlePICChange() {
+        validationManager.validateRequired(selectedPIC, fieldName: ValidationFieldName.userRole.fieldName)
+        Logger.debug("PIC updated to: \(selectedPIC)", category: .taskAssignment)
+    }
+    
+    func handlePatientSelectionChange() {
+        validationManager.validateRequired(selectedPatient, fieldName: ValidationFieldName.patientName.fieldName)
+        Logger.debug("Patient selection updated to: \(selectedPatient)", category: .taskAssignment)
     }
 }
 
