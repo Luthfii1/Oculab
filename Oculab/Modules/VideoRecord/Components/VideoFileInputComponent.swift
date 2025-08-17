@@ -193,16 +193,6 @@ struct VideoInput: View {
     
     private var videoActionButtons: some View {
         HStack(spacing: 12) {
-            // Save video button
-            AppButton(
-                title: "Save Video",
-                leftIcon: AppText.SystemIcon.success,
-                colorType: .primary,
-                size: .small
-            ) {
-                saveVideo()
-            }
-            
             // Retake video button
             AppButton(
                 title: "Retake",
