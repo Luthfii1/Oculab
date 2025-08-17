@@ -51,6 +51,7 @@ struct PatientDisplayField: View {
                 title: AppPatient.bpjsNumber,
                 placeholder: AppPatient.Placeholder.bpjs,
                 isDisabled: presenter.patientFound,
+                length: 13,
                 text: $presenter.BPJSnumber,
                 fieldName: .patientBPJS,
                 validationType: .bpjs

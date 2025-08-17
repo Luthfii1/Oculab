@@ -100,7 +100,7 @@ class FormValidationViewModel: ObservableObject {
                 if !value.isEmpty {
                     fieldValid = validationManager.validateWithRules(value, fieldName: field.fieldName, rules: [
                         .numbersOnly(),
-                        .minLength(13),
+                        .minLength(11),
                         .maxLength(13)
                     ])
                 } else {
@@ -129,7 +129,7 @@ class FormValidationViewModel: ObservableObject {
                 if let bpjs = bpjs, !bpjs.isEmpty {
                     return self.validationManager.validateWithRules(bpjs, fieldName: ValidationFieldName.patientBPJS.fieldName, rules: [
                         .numbersOnly(),
-                        .minLength(13),
+                        .minLength(11),
                         .maxLength(13)
                     ])
                 }
