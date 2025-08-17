@@ -98,7 +98,7 @@ struct AppDropdown: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                    if let rightIcon = rightIcon {
+                    if let rightIcon = rightIcon, !isDisabled {
                         Image(systemName: rightIcon)
                             .foregroundColor(textColor)
                     }

@@ -31,6 +31,7 @@ struct InputPatientData: View {
                             title: AppTextTaskAssignInputPatient.picTitle,
                             placeholder: AppTextTaskAssignInputPatient.selectPIC,
                             leftIcon: AppIcon.personFill,
+                            isDisabled: authentication.isDropdownOfficerDisabled,
                             choices: presenter.picName,
                             isSearchEnabled: false,
                             selectedChoice: $presenter.selectedPIC
