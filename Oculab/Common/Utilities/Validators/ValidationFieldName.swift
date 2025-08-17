@@ -47,6 +47,7 @@ enum ValidationFieldName: String, CaseIterable {
     case oldPassword = "old_password"
     
     // MARK: - Examination Fields
+    case examinationGoal = "examination_goal"
     case examinationDate = "examination_date"
     case examinationType = "examination_type"
     case examinationNotes = "examination_notes"
@@ -54,6 +55,8 @@ enum ValidationFieldName: String, CaseIterable {
     case bacteriaCount = "bacteria_count"
     case slideId1 = "slide_id_1"
     case slideId2 = "slide_id_2"
+    case slideType1 = "slide_type_1"
+    case slideType2 = "slide_type_2"
     
     // MARK: - Task Assignment Fields
     case taskTitle = "task_title"
@@ -149,6 +152,7 @@ enum ValidationFieldName: String, CaseIterable {
         case .oldPassword: return "Old Password"
             
         // Examination
+        case .examinationGoal: return "Examination Goal"
         case .examinationDate: return "Examination Date"
         case .examinationType: return "Examination Type"
         case .examinationNotes: return "Examination Notes"
@@ -156,6 +160,8 @@ enum ValidationFieldName: String, CaseIterable {
         case .bacteriaCount: return "Bacteria Count"
         case .slideId1: return "Slide ID 1"
         case .slideId2: return "Slide ID 2"
+        case .slideType1: return "Slide Type 1"
+        case .slideType2: return "Slide Type 2"
             
         // Task Assignment
         case .taskTitle: return "Task Title"
@@ -221,7 +227,7 @@ enum ValidationFieldName: String, CaseIterable {
             return .medical
         case .currentPassword, .newPassword, .confirmPassword, .oldPassword:
             return .password
-        case .examinationDate, .examinationType, .examinationNotes, .examinationResult, .bacteriaCount, .slideId1, .slideId2:
+        case .examinationGoal, .examinationDate, .examinationType, .examinationNotes, .examinationResult, .bacteriaCount, .slideId1, .slideId2, .slideType1, .slideType2:
             return .examination
         case .taskTitle, .taskDescription, .taskAssignee, .taskDueDate, .taskPriority:
             return .taskAssignment

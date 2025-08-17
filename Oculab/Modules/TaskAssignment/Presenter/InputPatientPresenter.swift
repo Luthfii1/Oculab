@@ -89,11 +89,18 @@ class InputPatientPresenter: ObservableObject {
     
     // MARK: - Computed Properties
     var isFormValid: Bool {
-        return goalString != AppValue.empty &&
-               typeString != AppValue.empty &&
-               examination.slideId != AppValue.empty &&
-               typeString2 != AppValue.empty &&
-               examination2.slideId != AppValue.empty
+        // Use ValidationManager for all relevant fields
+        let validGoal = validationManager.validateRequired(goalString, fieldName: ValidationFieldName.examinationGoal.fieldName)
+        let validType1 = validationManager.validateRequired(typeString, fieldName: ValidationFieldName.slideType1.fieldName)
+        let validSlideId1 = validationManager.validateRequired(examination.slideId, fieldName: ValidationFieldName.slideId1.fieldName)
+
+        if isSlide2Visible {
+            let validType2 = validationManager.validateRequired(typeString2, fieldName: ValidationFieldName.slideType2.fieldName)
+            let validSlideId2 = validationManager.validateRequired(examination2.slideId, fieldName: ValidationFieldName.slideId2.fieldName)
+            return validGoal && validType1 && validSlideId1 && validType2 && validSlideId2
+        } else {
+            return validGoal && validType1 && validSlideId1
+        }
     }
     
     func canProceedToSpecimen(userRole: RolesType, businessModel: BusinessModelType) -> Bool {

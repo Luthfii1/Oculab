@@ -103,7 +103,7 @@ struct InputExaminationData: View {
                                         presenter.handleSecondSlideTypeChange()
                                     }
                                 }
-                                
+
                                 AppButton(
                                     title: presenter.slide2ButtonTitle,
                                     colorType: presenter.slide2ButtonColor,
@@ -127,6 +127,7 @@ struct InputExaminationData: View {
                                     .frame(width: UIScreen.main.bounds.width / 3.5)
 
                                     Spacer()
+                                    
                                     AppButton(
                                         title: AppTextTaskAssignInputExam.createTaskFinalButton,
                                         rightIcon: AppIcon.arrowRight,
