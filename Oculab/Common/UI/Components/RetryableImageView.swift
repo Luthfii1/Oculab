@@ -2,7 +2,7 @@
 //  RetryableImageView.swift
 //  Oculab
 //
-//  Created by GitHub Copilot on 19/12/24.
+//  Created by Luthfi Misbachul Munir on 19/12/24.
 //
 
 import SwiftUI

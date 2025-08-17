@@ -3,7 +3,6 @@
 //  Oculab
 //
 //  Created by Luthfi Misbachul Munir on 14/10/24.
-//  Refactored and Enhanced by GitHub Copilot on 17/08/25.
 //
 
 import AVFoundation

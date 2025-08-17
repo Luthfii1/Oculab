@@ -2,8 +2,7 @@
 //  VideoPlayerUIStates.swift
 //  Oculab
 //
-//  Created by GitHub Copilot on 17/08/25.
-//  Enhanced for Better Readability and Organization
+//  Created by Luthfi Misbachul Munir on 17/08/25.
 //
 
 import SwiftUI

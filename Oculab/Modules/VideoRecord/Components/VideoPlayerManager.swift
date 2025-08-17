@@ -2,7 +2,7 @@
 //  VideoPlayerManager.swift
 //  Oculab
 //
-//  Created by GitHub Copilot on 17/08/25.
+//  Created by Luthfi Misbachul Munir on 17/08/25.
 //
 
 import SwiftUI

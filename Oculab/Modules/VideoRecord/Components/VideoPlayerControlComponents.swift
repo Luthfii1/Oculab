@@ -2,8 +2,7 @@
 //  VideoPlayerControls.swift
 //  Oculab
 //
-//  Created by GitHub Copilot on 17/08/25.
-//  Enhanced and Restructured for Better Organization
+//  Created by Luthfi Misbachul Munir on 17/08/25.
 //
 
 import SwiftUI
