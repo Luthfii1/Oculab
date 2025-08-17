@@ -131,7 +131,7 @@ extension InputPatientPresenter {
             
             patientNameDoB = patients.map { patient in
                 let formattedDoB = patient.DoB.map { dateFormatter.string(from: $0) } ?? AppValue.empty
-                return (patient.name + formattedDoB, patient._id)
+                return (patient.name + AppValue.space + formattedDoB, patient._id)
             }
         } catch {
             handleError(error)
