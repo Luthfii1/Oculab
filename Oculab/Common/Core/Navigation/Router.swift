@@ -14,7 +14,7 @@ class Router: ObservableObject {
 
     enum Route: Equatable, Hashable {
         case home
-        case videoRecord
+        case videoRecord(slideId: String)
         case pdf(examinationId: String)
         case analysisResult(examinationId: String)
         case examDetail(examId: String, patientId: String)
@@ -46,8 +46,8 @@ class Router: ObservableObject {
         switch route {
         case .home:
             HomeView()
-        case .videoRecord:
-            VideoRecordView()
+        case let .videoRecord(slideId):
+            VideoRecordView(slideId: slideId)
         case let .pdf(examinationId):
             PDFPageView(examinationId: examinationId)
         case let .analysisResult(examinationId):
