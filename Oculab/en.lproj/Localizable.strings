@@ -572,8 +572,8 @@
 "video_record.video_record_view.camera_access_denied_title" = "Camera Access Denied";
 "video_record.video_record_view.camera_access_denied_message" = "Please enable camera access for Oculab in Settings to record videos";
 "video_record.video_record_view.go_to_settings_button" = "Open Settings";
-"video_record.video_record_view.specimen_title" = "Specimen: %@";
-"video_record.video_record_view.specimen_title_default" = "Specimen: -";
+"video_record.video_record_view.specimen_title" = "Slide ID: %@";
+"video_record.video_record_view.specimen_title_default" = "Slide ID:";
 
 // Instruction Record View
 "video_record.instruction_record_view.navigation_title" = "Examination Instructions";

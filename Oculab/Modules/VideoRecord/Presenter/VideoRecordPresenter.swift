@@ -39,7 +39,7 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     @Published var recordedURLs: [URL] = []
     @Published var previewURL: URL?
     @Published var showPreview: Bool = false
-    @Published var showRecordingTitle: Bool = false
+    @Published var showRecordingTitle: Bool = true // currently disable the feature and make it true for always showing the title
     @Published var stitchedImage: UIImage?
     @Published var progressImage: UIImage?
     @Published var progressImageChecker: String = AppValue.empty
@@ -252,7 +252,7 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
         output.startRecording(to: tempURL, recordingDelegate: self)
         isRecording = true
         recordingStartTime = Date()
-        showRecordingTitle = true
+//        showRecordingTitle = true
         
         startRecordingTimer()
         
@@ -265,7 +265,7 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
         
         output.stopRecording()
         isRecording = false
-        showRecordingTitle = false
+//        showRecordingTitle = false
         
         stopRecordingTimer()
         
@@ -417,9 +417,9 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     }
 
     // MARK: - Navigation
-    func navigateToVideo() {
-        Router.shared.navigateTo(.videoRecord)
-    }
+//    func navigateToVideo() {
+//        Router.shared.navigateTo(.videoRecord(slideId: ))
+//    }
 
     func navigateBack() {
         Router.shared.navigateBack()
@@ -526,7 +526,7 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
         // Reset all state
         isRecording = false
         showPlayerView = false
-        showRecordingTitle = false
+//        showRecordingTitle = false
         stitchedImage = nil
         progressImage = nil
         errorMessage = nil
@@ -535,6 +535,7 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
         
         // Clear URLs but don't reset previewURL if it exists
         recordedURLs.removeAll()
+        resetSpecimenTitle()
         
         Logger.info("VideoRecordPresenter cleaned up successfully", category: .videoRecord)
     }

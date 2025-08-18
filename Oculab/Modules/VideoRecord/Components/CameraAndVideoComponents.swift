@@ -11,7 +11,6 @@ import SwiftUI
 import Combine
 
 // MARK: - Camera Preview Component
-// MARK: - Camera Preview Component
 struct CameraPreviewComponent: UIViewRepresentable {
     @EnvironmentObject var videoRecordPresenter: VideoRecordPresenter
     var size: CGSize

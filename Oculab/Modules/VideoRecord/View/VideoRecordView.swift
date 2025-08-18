@@ -12,7 +12,8 @@ struct VideoRecordView: View {
     @StateObject private var videoRecordPresenter = VideoRecordPresenter.shared
     @Environment(\.dismiss) private var dismiss
     @State private var showGuidelines = false
-    @State private var didFinishOnboarding = false 
+    @State private var didFinishOnboarding = false
+    let slideId: String
 
     var body: some View {
         NavigationView {
@@ -93,6 +94,7 @@ struct VideoRecordView: View {
         }
         .navigationBarBackButtonHidden(true)
         .onAppear {
+            videoRecordPresenter.setSpecimenTitle(specimenId: slideId)
             Task {
                 // If we have a preview URL, we're returning from preview mode
                 // Need to reinitialize camera for new recording
@@ -181,7 +183,7 @@ struct VideoRecordView: View {
         )
     }
 }
-
-#Preview {
-    VideoRecordView()
-}
+//
+//#Preview {
+//    VideoRecordView()
+//}

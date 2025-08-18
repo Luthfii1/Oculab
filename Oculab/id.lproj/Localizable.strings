@@ -587,7 +587,7 @@
 "video_record.video_record_view.camera_access_denied_message" = "Silakan aktifkan akses kamera untuk Oculab di Pengaturan untuk merekam video";
 "video_record.video_record_view.go_to_settings_button" = "Buka Pengaturan";
 "video_record.video_record_view.specimen_title" = "Sediaan: %@";
-"video_record.video_record_view.specimen_title_default" = "Sediaan: -";
+"video_record.video_record_view.specimen_title_default" = "Sediaan:";
 
 // Instruction Record View
 "video_record.instruction_record_view.navigation_title" = "Instruksi Pemeriksaan";

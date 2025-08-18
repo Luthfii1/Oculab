@@ -93,7 +93,7 @@ extension ExamDataPresenter {
 // MARK: - Navigation Methods
 extension ExamDataPresenter {
     func newVideoRecord() {
-        Router.shared.navigateTo(.videoRecord)
+        Router.shared.navigateTo(.videoRecord(slideId: examDetailData.slideId))
     }
 
     func navigateToAnalysisResult(examinationId: String) {

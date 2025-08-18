@@ -30,7 +30,8 @@ extension AppText {
             }
 
             static func specimenTitle(_ specimenId: String) -> String {
-                return "video_record.video_record_view.specimen_title".localized(with: [specimenId])
+                let format = NSLocalizedString("video_record.video_record_view.specimen_title", comment: AppValue.empty)
+                return String(format: format, specimenId)
             }
             
             static let specimenTitleDefault = "video_record.video_record_view.specimen_title_default".localized
