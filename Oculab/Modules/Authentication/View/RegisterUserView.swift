@@ -60,8 +60,9 @@ struct RegisterUserView: View {
                         title: AppTextAuthRegister.submitButton,
                         isEnabled: presenter.isRegisterFormValidAndFilled(),
                         action: {
-                            // TODO: Implement registration logic with interactor
-                            Logger.debug("Attempting registration for user: \(presenter.registerFullName)")
+                            Task {
+                                await presenter.handleRegister()
+                            }
                         }
                     )
                     HStack {
@@ -90,6 +91,15 @@ struct RegisterUserView: View {
             .navigationTitle(AppTextAuthRegister.navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .dismissKeyboardOnTap()
+            .alert(isPresented: $presenter.showRegisterSuccessAlert) {
+                Alert(
+                    title: Text(AppState.success),
+                    message: Text(presenter.registerSuccessMessage),
+                    dismissButton: .default(Text(AppAction.ok)) {
+                        Router.shared.popToRoot()
+                    }
+                )
+            }
         }
         .hideBackButton()
         .onDisappear {

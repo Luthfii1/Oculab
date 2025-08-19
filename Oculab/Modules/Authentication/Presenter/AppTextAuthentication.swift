@@ -32,6 +32,8 @@ extension AppText {
             static let submitButton = "register.submit_button".localized
             static let alreadyHaveAccount = "register.already_have_account".localized
             static let loginHere = "register.login_here".localized
+            static let successRegisterMessage = "register.success_message".localized
+            static let validationErrorFillAllFields = "register.validation_error_fill_all_fields".localized
         }
 
         enum Biometric {

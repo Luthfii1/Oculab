@@ -42,6 +42,8 @@ class AuthenticationPresenter: ObservableObject {
     @Published var registerEmail: String = AppValue.empty
     @Published var registerHealthFacilityName: String = AppValue.empty
     @Published var registerHealthFacilityType: HealthFacilityType? = nil
+    @Published var showRegisterSuccessAlert: Bool = false
+    @Published var registerSuccessMessage: String = AppValue.empty
     
     // PIN Management State
     @Published var firstPin = AppValue.empty
@@ -119,6 +121,33 @@ class AuthenticationPresenter: ObservableObject {
 
 // MARK: - Authentication Methods
 extension AuthenticationPresenter {
+
+    @MainActor
+    func handleRegister() async {
+        isLoading = true
+        defer { isLoading = false }
+        // Validate form before sending
+        guard isRegisterFormValidAndFilled() else {
+            isError = true
+            errorMessage = AppTextAuthRegister.validationErrorFillAllFields
+            return
+        }
+        do {
+            let _ = try await interactor.registerUser(
+                name: registerFullName,
+                email: registerEmail,
+                healthFacilityName: registerHealthFacilityName,
+                healthFacilityType: registerHealthFacilityType?.rawValue ?? AppValue.empty
+            )
+
+            showRegisterSuccessAlert = true
+            registerSuccessMessage = AppTextAuthRegister.successRegisterMessage
+        } catch {
+            isError = true
+            errorMessage = ErrorHandler.shared.handleError(error, context: .login)
+        }
+    }
+    
     @MainActor
     func updateLoadingState(_ loading: Bool) {
         isLoading = loading

@@ -767,6 +767,8 @@
 "register.health_facility_type.title" = "Jenis Fasilitas Kesehatan";
 "register.health_facility_type.placeholder" = "Pilih jenis fasilitas";
 "register.submit_button" = "Daftar";
+"register.success_message" = "Berhasil mendaftar akun. Silakan cek email Anda untuk mendapatkan password login.";
+"register.validation_error_fill_all_fields" = "Silakan lengkapi semua field yang wajib diisi dengan benar.";
 
 // Facility type options
 "register.facility_type.independent_practice" = "Praktik Mandiri";

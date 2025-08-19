@@ -750,6 +750,8 @@
 "register.health_facility_type.title" = "Health Facility Type";
 "register.health_facility_type.placeholder" = "Select facility type";
 "register.submit_button" = "Register";
+"register.success_message" = "Successfully registered account. Please check your email to get the password for login.";
+"register.validation_error_fill_all_fields" = "Please fill all required fields correctly.";
 
 // Facility type options
 "register.facility_type.independent_practice" = "Independent Practice";
