@@ -88,6 +88,8 @@ enum AppText {
         static let largecircleFillCircle = "largecircle.fill.circle"
         static let buttonProgrammable = "button.programmable"
         static let envelope = "envelope"
+        static let buildingFill = "building.2.fill"
+        static let buildingCropCircle = "building.2.crop.circle"
         
         // Network related icons
         static let network = "network"

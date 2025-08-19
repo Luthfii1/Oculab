@@ -63,6 +63,7 @@ struct LoginView: View {
                         }
                         .padding(.horizontal, AppConstants.defaultPadding)
                         .padding(.top, AppConstants.loginFieldsTopPadding)
+                        
                         VStack(alignment: .center, spacing: 16) {
                             AppButton(
                                 title: presenter.loginButtonText, 
@@ -76,17 +77,18 @@ struct LoginView: View {
                             }
                             HStack {
                                 Spacer()
-                                Text(AppTextAuthLogin.faskesNotRegisteredYet)
+                                Text(AppTextAuthLogin.dontHaveAccount)
                                     .font(AppTypography.p3)
                                     .foregroundStyle(AppColors.slate900)
                                 AppButton(
-                                    title: AppTextAuthLogin.registerFaskesButtonText,
+                                    title: AppTextAuthLogin.registerAccountButtonText,
                                     colorType: .tertiary,
                                     size: .large,
                                     isEnabled: true
                                 ) {
                                     Task {
-                                        await contactPresenter.directToWhatsapp()
+                                        // await contactPresenter.directToWhatsapp()
+                                        Router.shared.navigateTo(.register)
                                     }
                                 }
                                 .multilineTextAlignment(.leading)

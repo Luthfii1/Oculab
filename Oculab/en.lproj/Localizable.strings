@@ -734,3 +734,31 @@
 "loading.authentication" = "Authenticating...";
 "loading.saving" = "Saving...";
 "loading.processing" = "Processing...";
+
+// MARK: - Registration
+"register.navigation_title" = "Register User";
+"register.already_have_account" = "Already have an account?";
+"register.login_here" = "Login here";
+"auth.login.dont_have_account" = "Don't have an account?";
+"auth.login.register_account_button" = "Register here";
+"register.full_name.title" = "Full Name";
+"register.full_name.placeholder" = "Enter your full name";
+"register.email.title" = "Email";
+"register.email.placeholder" = "Enter your email address";
+"register.health_facility_name.title" = "Health Facility Name";
+"register.health_facility_name.placeholder" = "Enter health facility name";
+"register.health_facility_type.title" = "Health Facility Type";
+"register.health_facility_type.placeholder" = "Select facility type";
+"register.submit_button" = "Register";
+
+// Facility type options
+"register.facility_type.independent_practice" = "Independent Practice";
+"register.facility_type.community_health_center" = "Community Health Center";
+"register.facility_type.clinic" = "Clinic";
+"register.facility_type.hospital" = "Hospital";
+"register.facility_type.pharmacy" = "Pharmacy";
+"register.facility_type.blood_transfusion_unit" = "Blood Transfusion Unit";
+"register.facility_type.health_laboratory" = "Health Laboratory";
+"register.facility_type.optical" = "Optical";
+"register.facility_type.medical_law_facility" = "Medical Law Facility";
+"register.facility_type.traditional_health_facility" = "Traditional Health Facility";
