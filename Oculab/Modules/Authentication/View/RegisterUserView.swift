@@ -20,6 +20,7 @@ struct RegisterUserView: View {
                         isRequired: true,
                         placeholder: AppTextAuthRegister.fullNamePlaceholder,
                         leftIcon: AppIcon.personFill,
+                        isDisabled: presenter.isLoading,
                         text: $presenter.registerFullName,
                         fieldName: .registerFullName,
                         validationType: .name
@@ -29,6 +30,7 @@ struct RegisterUserView: View {
                         isRequired: true,
                         placeholder: AppTextAuthRegister.emailPlaceholder,
                         leftIcon: AppIcon.envelope,
+                        isDisabled: presenter.isLoading,
                         text: $presenter.registerEmail,
                         fieldName: .registerEmail,
                         validationType: .email
@@ -38,6 +40,7 @@ struct RegisterUserView: View {
                         isRequired: true,
                         placeholder: AppTextAuthRegister.healthFacilityNamePlaceholder,
                         leftIcon: AppIcon.buildingFill,
+                        isDisabled: presenter.isLoading,
                         text: $presenter.registerHealthFacilityName,
                         fieldName: .registerHealthFacilityName,
                         validationType: .required
@@ -47,6 +50,7 @@ struct RegisterUserView: View {
                         placeholder: AppTextAuthRegister.healthFacilityTypePlaceholder,
                         isRequired: true,
                         leftIcon: AppIcon.buildingCropCircle,
+                        isDisabled: presenter.isLoading,
                         choices: HealthFacilityType.allCases.map { ($0.localized, $0.rawValue) },
                         isSearchEnabled: false,
                         selectedChoice: Binding<String>(
@@ -58,7 +62,7 @@ struct RegisterUserView: View {
                     )
                     AppButton(
                         title: AppTextAuthRegister.submitButton,
-                        isEnabled: presenter.isRegisterFormValidAndFilled(),
+                        isEnabled: presenter.isRegisterFormValidAndFilled() && !presenter.isLoading,
                         action: {
                             Task {
                                 await presenter.handleRegister()
@@ -100,6 +104,25 @@ struct RegisterUserView: View {
                     }
                 )
             }
+            .alert(
+                AppTextAuthRegister.registerFailedText,
+                isPresented: Binding(
+                    get: { presenter.isError && !presenter.errorMessage.isEmpty },
+                    set: { if !$0 {
+                        presenter.isError = false
+                        presenter.errorMessage = AppValue.empty
+                    } }
+                ),
+                actions: {
+                    Button(AppAction.ok) {
+                        presenter.isError = false
+                        presenter.errorMessage = AppValue.empty
+                    }
+                },
+                message: {
+                    Text(presenter.errorMessage)
+                }
+            )
         }
         .hideBackButton()
         .onDisappear {

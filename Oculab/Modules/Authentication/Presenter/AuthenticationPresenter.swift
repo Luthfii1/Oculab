@@ -106,6 +106,10 @@ class AuthenticationPresenter: ObservableObject {
         isLoading ? AppState.loading : AppTextAuthLogin.buttonText
     }
     
+    var registerButtonText: String {
+        isLoading ? AppState.loading : AppTextAuthRegister.submitButton
+    }
+    
     var isDropdownOfficerDisabled: Bool {
         return user.role == .LAB && user.businessModel == .B2C
     }

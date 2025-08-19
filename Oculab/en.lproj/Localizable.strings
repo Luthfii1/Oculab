@@ -304,6 +304,7 @@
 "auth.login.not_registered" = "Health facility not registered?";
 "auth.login.register_facility" = "Register Health Facility";
 "auth.login.failed" = "Login Failed";
+"auth.register.failed" = "Register Failed";
 
 // Edit Password View
 "auth.edit_password.success_title" = "Password Changed Successfully";
