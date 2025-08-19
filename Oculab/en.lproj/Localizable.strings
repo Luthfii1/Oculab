@@ -367,6 +367,20 @@
 "auth.privacy.definition_title" = "Definitions";
 "auth.privacy.definition_intro" = "Each of the following words or terms used in this Privacy Policy has the meaning as follows below, unless the word or term in question in its use expressly determines otherwise:";
 
+// MARK: - Privacy Policy Definitions
+"privacy.definition.a" = "“OCULAB” is a platform used in the Republic of Indonesia for the purpose of:";
+"privacy.definition.a.i" = "Includes Human Health Resources Data, both medical personnel, medical technical personnel, and other health workers verified by the District/City Health Office and validated by the Provincial Health Office.";
+"privacy.definition.a.ii" = "Provision of Human Health Resources information;";
+"privacy.definition.a.iii" = "Health information system for Human Health Resources; and";
+"privacy.definition.a.iv" = "other health efforts that are promotive, preventive, curative, and rehabilitative as well as other purposes as long as permitted under the applicable laws and regulations.";
+"privacy.definition.b" = "“Platform” is the SATUSEHAT SDMK platform, system, and/or application for integration and interoperability of Human Health Resources data managed and organized by the Ministry of Health. Including curriculum vitae, education history, work history, and other related data needs.";
+"privacy.definition.c" = "“Platform” is the SATUSEHAT SDMK platform, system, and/or application for integration and interoperability of Human Health Resources data managed and organized by the Ministry of Health. Including curriculum vitae, education history, work history, and other related data needs.";
+"privacy.definition.d" = "“User” means any Human Health Resource who uses SATUSEHAT SDMK.";
+"privacy.definition.e" = "“Health Worker” means any person who dedicates themselves in the health sector and has knowledge and/or skills through education in the health sector, which for certain types requires authority to carry out Health Efforts.";
+"privacy.definition.f" = "“Health Service Facility” is any tool and/or place used to provide health services, both promotive, preventive, curative, and rehabilitative, carried out by the government, local government, and/or the community.";
+"privacy.definition.g" = "“Personal Data” or “Health Data” means any and all personal data and health condition data of the User, including but not limited to name, identification number, user location, user contact, as well as documents and other data as requested on the account registration form or health information including any and all user health data such as medical records, gender, health conditions, treatment, allergies, vaccinations, immunizations, actions, medical history, prescriptions, reports, advice, and other medical information or health condition notes.";
+"privacy.definition.h" = "“Data Controller” is any person, public body, and/or international organization acting alone or together in determining the purpose and controlling the processing of Personal Data or Health Data or other information. “Data Processor” is any person, public body, and/or international organization acting alone or together in processing Personal Data or Health Data or other information appointed by the Data Controller.";
+
 // MARK: - Examination Module
 // Main Examination
 "examination.title_result_images" = "Image Results";
