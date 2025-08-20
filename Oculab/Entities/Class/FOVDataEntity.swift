@@ -17,7 +17,8 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
     }
 
     var _id: UUID
-    var image: String
+    var imageMLAnalyzed: String
+    var imageOriginal: String
     var type: FOVType
     var order: Int
     var comment: [String]?
@@ -27,7 +28,8 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
 
     init(
         _id: UUID = UUID(),
-        image: String,
+        imageMLAnalyzed: String,
+        imageOriginal: String,
         type: FOVType,
         order: Int,
         comment: [String]? = nil,
@@ -36,7 +38,8 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
         verified: Bool = false
     ) {
         self._id = _id
-        self.image = image
+        self.imageMLAnalyzed = imageMLAnalyzed
+        self.imageOriginal = imageOriginal
         self.type = type
         self.order = order
         self.comment = comment
@@ -47,7 +50,8 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
 
     enum CodingKeys: CodingKey {
         case _id
-        case image
+        case imageMLAnalyzed
+        case imageOriginal
         case type
         case order
         case comment
@@ -59,7 +63,8 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
     required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self._id = try container.decode(UUID.self, forKey: ._id)
-        self.image = try container.decode(String.self, forKey: .image)
+        self.imageOriginal = try container.decode(String.self, forKey: .imageOriginal)
+        self.imageMLAnalyzed = try container.decode(String.self, forKey: .imageMLAnalyzed)
         self.type = try container.decode(FOVType.self, forKey: .type)
         self.order = try container.decode(Int.self, forKey: .order)
         self.comment = try container.decodeIfPresent([String].self, forKey: .comment)
@@ -71,7 +76,8 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(_id.uuidString, forKey: ._id) // Store UUID as String for encoding
-        try container.encode(image, forKey: .image)
+        try container.encode(imageOriginal, forKey: .imageOriginal)
+        try container.encode(imageMLAnalyzed, forKey: .imageMLAnalyzed)
         try container.encode(type, forKey: .type)
         try container.encode(order, forKey: .order)
         try container.encodeIfPresent(comment, forKey: .comment)

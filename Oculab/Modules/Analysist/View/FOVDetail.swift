@@ -41,7 +41,7 @@ struct FOVDetail: View {
                             .padding(.horizontal, 32)
                         
                         // Show the image even if bounding box data is not available
-                        if let imageURL = URL(string: fovData.image) {
+                        if let imageURL = URL(string: fovData.imageOriginal) {
                             AsyncImage(url: imageURL) { image in
                                 image
                                     .resizable()
@@ -71,7 +71,7 @@ struct FOVDetail: View {
                     .padding()
                 } else if presenter.fovDetail != nil {
                     ZoomableImageComponent(
-                        imageURL: URL(string: fovData.image),
+                        imageURL: URL(string: fovData.imageOriginal),
                         zoomScale: $presenter.zoomScale,
                         offset: $presenter.offset
                     )
@@ -129,9 +129,15 @@ struct FOVDetail: View {
                     // Bottom controls
                     VStack {
                         VStack(spacing: Decimal.d4) {
-                            Text(AppData.makeSentence([AppMedical.Examination.bacteriaCount, fovData.systemCount, AppMedical.Examination.bacteriaCountSuffix, AppMedical.Examination.bacteriaCountSuffix]))
-                                .font(AppTypography.h3)
-                                .foregroundColor(.white)
+                            Text(
+                                AppData.makeSentence(
+                                    [AppMedical.Examination.bacteriaCount,
+                                     fovData.systemCount,
+                                     AppMedical.Examination.bacteriaCountSuffix]
+                                )
+                            )
+                            .font(AppTypography.h3)
+                            .foregroundColor(.white)
                         }
                         .padding(.horizontal, Decimal.d16)
                         .padding(.vertical, Decimal.d12)
@@ -226,7 +232,8 @@ struct FOVDetail: View {
     FOVDetail(
         slideId: "A#EKNIR",
         fovData: FOVData(
-            image: "https://is3.cloudhost.id/oculab-fov/oculab-fov/c5b14ad1-c15b-4d1c-bf2f-1dcf7fbf8d8d.png",
+            imageMLAnalyzed: "https://is3.cloudhost.id/oculab-fov/oculab-fov/248d6e1e-eab3-4981-8445-2174e16b7fdb.jpeg",
+            imageOriginal: "https://is3.cloudhost.id/oculab-fov/oculab-fov/c5b14ad1-c15b-4d1c-bf2f-1dcf7fbf8d8d.png",
             type: .BTA1TO9,
             order: 1,
             systemCount: 12,
