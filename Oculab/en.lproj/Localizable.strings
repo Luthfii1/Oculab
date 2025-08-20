@@ -21,6 +21,7 @@
 "common.skip" = "Skip";
 "common.confirm" = "Confirm";
 "common.search" = "Search";
+"common.or" = "or";
 
 // Common button patterns
 "common.save_changes" = "Save Changes";
@@ -753,6 +754,14 @@
 "register.submit_button" = "Register";
 "register.success_message" = "Successfully registered account. Please check your email to get the password for login.";
 "register.validation_error_fill_all_fields" = "Please fill all required fields correctly.";
+
+// MARK: - Registration Entry (B2B/B2C)
+"register.entry.navigation_title" = "Register Account";
+"register.entry.title" = "Choose your registration type";
+"register.entry.health_facility_button" = "Register Health Facility";
+"register.entry.individual_button" = "Register as Individual Lab";
+"register.entry.health_facility_description" = "For hospitals, clinics, or lab who want to register their facility and team.";
+"register.entry.individual_description" = "For individual lab professionals who want to use Oculab personally.";
 
 // Facility type options
 "register.facility_type.independent_practice" = "Independent Practice";

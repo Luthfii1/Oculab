@@ -44,7 +44,8 @@ class AuthenticationPresenter: ObservableObject {
     @Published var registerHealthFacilityType: HealthFacilityType? = nil
     @Published var showRegisterSuccessAlert: Bool = false
     @Published var registerSuccessMessage: String = AppValue.empty
-    
+    @Published var isChoosingRegistrationType: Bool = true
+
     // PIN Management State
     @Published var firstPin = AppValue.empty
     @Published var secondPin = AppValue.empty
@@ -768,5 +769,6 @@ extension AuthenticationPresenter {
         registerFullName = AppValue.empty
         registerHealthFacilityName = AppValue.empty
         registerHealthFacilityType = nil
+        isChoosingRegistrationType = true
     }
 }

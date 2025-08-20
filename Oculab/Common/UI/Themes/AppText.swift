@@ -140,6 +140,7 @@ enum AppText {
         static let skip = "common.skip".localized
         static let confirm = "common.confirm".localized
         static let search = "common.search".localized
+        static let or = "common.or".localized
         
         // Common button patterns
         static let saveChanges = "common.save_changes".localized

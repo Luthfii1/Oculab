@@ -35,6 +35,14 @@ extension AppText {
             static let registerFailedText = "auth.register.failed".localized
             static let successRegisterMessage = "register.success_message".localized
             static let validationErrorFillAllFields = "register.validation_error_fill_all_fields".localized
+
+            // Registration Entry (B2B/B2C)
+            static let entryNavigationTitle = "register.entry.navigation_title".localized
+            static let entryTitle = "register.entry.title".localized
+            static let entryHealthFacilityButton = "register.entry.health_facility_button".localized
+            static let entryHealthFacilityDescription = "register.entry.health_facility_description".localized
+            static let entryIndividualButton = "register.entry.individual_button".localized
+            static let entryIndividualDescription = "register.entry.individual_description".localized
         }
 
         enum Biometric {

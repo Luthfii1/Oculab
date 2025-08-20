@@ -63,7 +63,7 @@ struct LoginView: View {
                         }
                         .padding(.horizontal, AppConstants.defaultPadding)
                         .padding(.top, AppConstants.loginFieldsTopPadding)
-                        
+
                         VStack(alignment: .center, spacing: 16) {
                             AppButton(
                                 title: presenter.loginButtonText, 
@@ -87,7 +87,6 @@ struct LoginView: View {
                                     isEnabled: true
                                 ) {
                                     Task {
-                                        // await contactPresenter.directToWhatsapp()
                                         Router.shared.navigateTo(.register)
                                     }
                                 }

@@ -35,6 +35,7 @@
 "common.skip" = "Lewati";
 "common.confirm" = "Konfirmasi";
 "common.search" = "Cari";
+"common.or" = "or";
 
 // Common button patterns
 "common.save_changes" = "Simpan Perubahan";
@@ -770,6 +771,14 @@
 "register.submit_button" = "Daftar";
 "register.success_message" = "Berhasil mendaftar akun. Silakan cek email Anda untuk mendapatkan password login.";
 "register.validation_error_fill_all_fields" = "Silakan lengkapi semua field yang wajib diisi dengan benar.";
+
+// MARK: - Registration Entry (B2B/B2C)
+"register.entry.navigation_title" = "Daftar Akun";
+"register.entry.title" = "Pilih jenis akun yang akan didaftarkan";
+"register.entry.health_facility_button" = "Daftarkan Fasilitas Kesehatan";
+"register.entry.individual_button" = "Daftar sebagai Individu Lab Teknisi";
+"register.entry.health_facility_description" = "Untuk rumah sakit, klinik, atau laboratorium yang ingin mendaftarkan fasilitas dan timnya";
+"register.entry.individual_description" = "Untuk profesional laboratorium individu yang ingin menggunakan Oculab secara pribadi.";
 
 // Facility type options
 "register.facility_type.independent_practice" = "Praktik Mandiri";
