@@ -10,9 +10,9 @@ import Foundation
 enum GradingType: String, Codable, CaseIterable {
     case NEGATIVE
     case SCANTY
-    case Plus1 = "Positive 1+"
-    case Plus2 = "Positive 2+"
-    case Plus3 = "Positive 3+"
+    case Plus1 = "POSITIVE 1+"
+    case Plus2 = "POSITIVE 2+"
+    case Plus3 = "POSITIVE 3+"
     case unknown = "Unknown"
 
     init(from decoder: Decoder) throws {
