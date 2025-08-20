@@ -19,7 +19,13 @@ struct AppDropdown: View {
     var isSearchEnabled: Bool = true // New parameter to control search functionality
     @Binding var selectedChoice: String
 
-    @State private var isDropdownOpen: Bool = false
+    @State private var isDropdownOpen: Bool = false {
+        didSet {
+            if isDropdownOpen {
+                selectedChoice = AppValue.empty // Reset selectedChoice when dropdown is opened
+            }
+        }
+    }
     @State private var searchText: String = AppValue.empty // New state for search text
     @State var isEnablingAdding: Bool = false
 
