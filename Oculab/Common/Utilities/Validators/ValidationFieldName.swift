@@ -14,7 +14,11 @@ enum ValidationFieldName: String, CaseIterable {
     // MARK: - Authentication Fields
     case loginEmail = "login_email"
     case loginPassword = "login_password"
-    
+    case registerFullName = "register_full_name"
+    case registerEmail = "register_email"
+    case registerHealthFacilityName = "register_health_facility_name"
+    case registerHealthFacilityType = "register_health_facility_type"
+
     // MARK: - User Management Fields
     case userName = "user_name"
     case userEmail = "user_email"
@@ -120,7 +124,11 @@ enum ValidationFieldName: String, CaseIterable {
         // Authentication
         case .loginEmail: return "Email"
         case .loginPassword: return "Password"
-            
+        case .registerFullName: return "Name"
+        case .registerEmail: return "Email"
+        case .registerHealthFacilityName: return "Health Facility Name"
+        case .registerHealthFacilityType: return "Health Facility Type"
+
         // User Management
         case .userName: return "User Name"
         case .userEmail: return "User Email"
@@ -217,7 +225,7 @@ enum ValidationFieldName: String, CaseIterable {
     /// Category grouping for the field
     var category: ValidationFieldCategory {
         switch self {
-        case .loginEmail, .loginPassword:
+        case .loginEmail, .loginPassword, .registerEmail, .registerFullName, .registerHealthFacilityName, .registerHealthFacilityType:
             return .authentication
         case .userName, .userEmail, .userRole, .userPhone:
             return .userManagement

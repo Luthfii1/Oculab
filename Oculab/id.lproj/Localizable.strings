@@ -35,6 +35,7 @@
 "common.skip" = "Lewati";
 "common.confirm" = "Konfirmasi";
 "common.search" = "Cari";
+"common.or" = "or";
 
 // Common button patterns
 "common.save_changes" = "Simpan Perubahan";
@@ -316,6 +317,7 @@
 "auth.login.not_registered" = "Faskes belum terdaftar?";
 "auth.login.register_facility" = "Daftarkan Faskes";
 "auth.login.failed" = "Login Gagal";
+"auth.register.failed" = "Register Gagal";
 
 // Edit Password View
 "auth.edit_password.success_title" = "Berhasil mengubah kata sandi";
@@ -751,3 +753,41 @@
 "loading.authentication" = "Mengotentikasi...";
 "loading.saving" = "Menyimpan...";
 "loading.processing" = "Memproses...";
+
+// MARK: - Registration
+"register.navigation_title" = "Daftar Pengguna";
+"register.already_have_account" = "Sudah punya akun?";
+"register.login_here" = "Masuk di sini";
+"auth.login.dont_have_account" = "Belum punya akun?";
+"auth.login.register_account_button" = "Daftar di sini";
+"register.full_name.title" = "Nama Lengkap";
+"register.full_name.placeholder" = "Masukkan nama lengkap Anda";
+"register.email.title" = "Email";
+"register.email.placeholder" = "Masukkan alamat email Anda";
+"register.health_facility_name.title" = "Nama Fasilitas Kesehatan";
+"register.health_facility_name.placeholder" = "Masukkan nama fasilitas kesehatan";
+"register.health_facility_type.title" = "Jenis Fasilitas Kesehatan";
+"register.health_facility_type.placeholder" = "Pilih jenis fasilitas";
+"register.submit_button" = "Daftar";
+"register.success_message" = "Berhasil mendaftar akun. Silakan cek email Anda untuk mendapatkan password login.";
+"register.validation_error_fill_all_fields" = "Silakan lengkapi semua field yang wajib diisi dengan benar.";
+
+// MARK: - Registration Entry (B2B/B2C)
+"register.entry.navigation_title" = "Daftar Akun";
+"register.entry.title" = "Pilih jenis akun yang akan didaftarkan";
+"register.entry.health_facility_button" = "Daftarkan Fasilitas Kesehatan";
+"register.entry.individual_button" = "Daftar sebagai Individu Lab Teknisi";
+"register.entry.health_facility_description" = "Untuk rumah sakit, klinik, atau laboratorium yang ingin mendaftarkan fasilitas dan timnya";
+"register.entry.individual_description" = "Untuk profesional laboratorium individu yang ingin menggunakan Oculab secara pribadi.";
+
+// Facility type options
+"register.facility_type.independent_practice" = "Praktik Mandiri";
+"register.facility_type.community_health_center" = "Puskesmas";
+"register.facility_type.clinic" = "Klinik";
+"register.facility_type.hospital" = "Rumah Sakit";
+"register.facility_type.pharmacy" = "Apotek";
+"register.facility_type.blood_transfusion_unit" = "Unit Transfusi Darah";
+"register.facility_type.health_laboratory" = "Laboratorium Kesehatan";
+"register.facility_type.optical" = "Optik";
+"register.facility_type.medical_law_facility" = "Fasilitas Hukum Medis";
+"register.facility_type.traditional_health_facility" = "Fasilitas Kesehatan Tradisional";

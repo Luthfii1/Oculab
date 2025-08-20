@@ -15,9 +15,36 @@ typealias AppTextAuthProfile = AppText.Authentication.ProfileView
 typealias AppTextAuthPrivacyPolicy = AppText.Authentication.PrivacyPolicyView
 typealias AppTextAuthCompPin = AppText.Authentication.PinComponent
 typealias AppTextAuthBiometric = AppText.Authentication.Biometric
+typealias AppTextAuthRegister = AppText.Authentication.RegisterView
 
 extension AppText {
     enum Authentication {
+        enum RegisterView {
+            static let navigationTitle = "register.navigation_title".localized
+            static let fullNameTitle = "register.full_name.title".localized
+            static let fullNamePlaceholder = "register.full_name.placeholder".localized
+            static let emailTitle = "register.email.title".localized
+            static let emailPlaceholder = "register.email.placeholder".localized
+            static let healthFacilityNameTitle = "register.health_facility_name.title".localized
+            static let healthFacilityNamePlaceholder = "register.health_facility_name.placeholder".localized
+            static let healthFacilityTypeTitle = "register.health_facility_type.title".localized
+            static let healthFacilityTypePlaceholder = "register.health_facility_type.placeholder".localized
+            static let submitButton = "register.submit_button".localized
+            static let alreadyHaveAccount = "register.already_have_account".localized
+            static let loginHere = "register.login_here".localized
+            static let registerFailedText = "auth.register.failed".localized
+            static let successRegisterMessage = "register.success_message".localized
+            static let validationErrorFillAllFields = "register.validation_error_fill_all_fields".localized
+
+            // Registration Entry (B2B/B2C)
+            static let entryNavigationTitle = "register.entry.navigation_title".localized
+            static let entryTitle = "register.entry.title".localized
+            static let entryHealthFacilityButton = "register.entry.health_facility_button".localized
+            static let entryHealthFacilityDescription = "register.entry.health_facility_description".localized
+            static let entryIndividualButton = "register.entry.individual_button".localized
+            static let entryIndividualDescription = "register.entry.individual_description".localized
+        }
+
         enum Biometric {
             static let prompt = "auth.biometric.prompt".localized
             static let activationPrompt = "auth.biometric.activation_prompt".localized
@@ -31,6 +58,8 @@ extension AppText {
             static let faskesNotRegisteredYet = "auth.login.not_registered".localized
             static let registerFaskesButtonText = "auth.login.register_facility".localized
             static let loginFailedText = "auth.login.failed".localized
+            static let dontHaveAccount = "auth.login.dont_have_account".localized
+            static let registerAccountButtonText = "auth.login.register_account_button".localized
         }
         
         enum EditPasswordView {

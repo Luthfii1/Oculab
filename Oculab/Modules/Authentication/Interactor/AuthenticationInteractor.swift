@@ -34,6 +34,20 @@ struct CreateAccessPinResponse: Codable {
     var accessPin: String
 }
 
+struct RegisterUserBody: Codable {
+    let _id: String?
+    let name: String
+    let email: String
+    let healthFacilityName: String
+    let healthFacilityType: String
+}
+
+struct RegisterUserData: Codable {
+    let userId: String
+    let email: String
+    let currentPassword: String
+}
+
 
 class AuthenticationInteractor: ObservableObject {
     private var modelContext: ModelContext
@@ -45,6 +59,17 @@ class AuthenticationInteractor: ObservableObject {
     }
 
     private let apiAuthenticationService = API.BE + "/user"
+
+
+    func registerUser(name: String, email: String, healthFacilityName: String, healthFacilityType: String) async throws -> RegisterUserData {
+        let body = RegisterUserBody(_id: nil, name: name, email: email, healthFacilityName: healthFacilityName, healthFacilityType: healthFacilityType)
+        let response: APIResponse<RegisterUserData> = try await networkService.post(
+            urlString: apiAuthenticationService + "/register",
+            headers: nil,
+            body: body
+        )
+        return response.data
+    }
 
     func login(email: String, password: String) async throws -> LoginResponse {
         let response: APIResponse<LoginResponse> = try await networkService.post(

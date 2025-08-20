@@ -36,7 +36,16 @@ class AuthenticationPresenter: ObservableObject {
     @Published var isLogin: Bool = false
     @Published var email = AppValue.empty
     @Published var password = AppValue.empty
-    
+
+    // Registration State
+    @Published var registerFullName: String = AppValue.empty
+    @Published var registerEmail: String = AppValue.empty
+    @Published var registerHealthFacilityName: String = AppValue.empty
+    @Published var registerHealthFacilityType: HealthFacilityType? = nil
+    @Published var showRegisterSuccessAlert: Bool = false
+    @Published var registerSuccessMessage: String = AppValue.empty
+    @Published var isChoosingRegistrationType: Bool = true
+
     // PIN Management State
     @Published var firstPin = AppValue.empty
     @Published var secondPin = AppValue.empty
@@ -79,6 +88,16 @@ class AuthenticationPresenter: ObservableObject {
     var isFilled: Bool {
         return isLoginFormValidAndFilled() && !isLoading
     }
+
+    var isRegisterFormValid: Bool {
+        !registerFullName.isEmpty &&
+        !registerEmail.isEmpty &&
+        !registerHealthFacilityName.isEmpty &&
+        registerHealthFacilityType != nil &&
+        !formValidation.hasError(for: .registerFullName) &&
+        !formValidation.hasError(for: .registerEmail) &&
+        !formValidation.hasError(for: .registerHealthFacilityName)
+    }
     
     var isFormValid: () -> Bool = {
         return false // Will be updated in init
@@ -86,6 +105,10 @@ class AuthenticationPresenter: ObservableObject {
     
     var loginButtonText: String {
         isLoading ? AppState.loading : AppTextAuthLogin.buttonText
+    }
+    
+    var registerButtonText: String {
+        isLoading ? AppState.loading : AppTextAuthRegister.submitButton
     }
     
     var isDropdownOfficerDisabled: Bool {
@@ -103,6 +126,33 @@ class AuthenticationPresenter: ObservableObject {
 
 // MARK: - Authentication Methods
 extension AuthenticationPresenter {
+
+    @MainActor
+    func handleRegister() async {
+        isLoading = true
+        defer { isLoading = false }
+        // Validate form before sending
+        guard isRegisterFormValidAndFilled() else {
+            isError = true
+            errorMessage = AppTextAuthRegister.validationErrorFillAllFields
+            return
+        }
+        do {
+            let _ = try await interactor.registerUser(
+                name: registerFullName,
+                email: registerEmail,
+                healthFacilityName: registerHealthFacilityName,
+                healthFacilityType: registerHealthFacilityType?.rawValue ?? AppValue.empty
+            )
+
+            showRegisterSuccessAlert = true
+            registerSuccessMessage = AppTextAuthRegister.successRegisterMessage
+        } catch {
+            isError = true
+            errorMessage = ErrorHandler.shared.handleError(error, context: .login)
+        }
+    }
+    
     @MainActor
     func updateLoadingState(_ loading: Bool) {
         isLoading = loading
@@ -667,6 +717,7 @@ extension AuthenticationPresenter {
             // Simple validation without using main actor isolated methods
             return !self.email.isEmpty && !self.password.isEmpty
         }
+    // Optionally, you can add more validation setup for registration fields here if needed
     }
     
     /// Validate all login form fields at once
@@ -678,6 +729,9 @@ extension AuthenticationPresenter {
     func clearValidationErrors() {
         let loginFields = ValidationFieldName.FormFields.login
         formValidation.clearErrors(for: loginFields)
+        // Also clear registration field errors
+        let registerFields: [ValidationFieldName] = [.registerFullName, .registerEmail, .registerHealthFacilityName]
+        formValidation.clearErrors(for: registerFields)
     }
     
     /// Check if login form is both filled and has no validation errors
@@ -685,12 +739,22 @@ extension AuthenticationPresenter {
         // Check if fields are filled
         guard !email.isEmpty && !password.isEmpty else { return false }
         guard password.count >= 8 else { return false }
-        
         // Check if there are no validation errors for login fields
         let hasEmailError = formValidation.hasError(for: .loginEmail)
         let hasPasswordError = formValidation.hasError(for: .loginPassword)
-        
         return !hasEmailError && !hasPasswordError
+    }
+
+    /// Check if registration form is both filled and has no validation errors
+    func isRegisterFormValidAndFilled() -> Bool {
+        // Check if fields are filled
+        guard !registerFullName.isEmpty && !registerEmail.isEmpty && !registerHealthFacilityName.isEmpty else { return false }
+        guard registerHealthFacilityType != nil else { return false }
+        // Check if there are no validation errors for registration fields
+        let hasFullNameError = formValidation.hasError(for: .registerFullName)
+        let hasEmailError = formValidation.hasError(for: .registerEmail)
+        let hasFacilityNameError = formValidation.hasError(for: .registerHealthFacilityName)
+        return !hasFullNameError && !hasEmailError && !hasFacilityNameError
     }
     
     /// Clear all input fields and reset validation state
@@ -701,25 +765,10 @@ extension AuthenticationPresenter {
         isError = false
         description = AppValue.empty
         errorMessage = AppValue.empty
+        registerEmail = AppValue.empty
+        registerFullName = AppValue.empty
+        registerHealthFacilityName = AppValue.empty
+        registerHealthFacilityType = nil
+        isChoosingRegistrationType = true
     }
 }
-
-//// MARK: - Helper Methods
-//private extension AuthenticationPresenter {
-//    func withTimeout<T>(seconds: TimeInterval, operation: @escaping () async throws -> T) async throws -> T {
-//        return try await withThrowingTaskGroup(of: T.self) { group in
-//            group.addTask {
-//                try await operation()
-//            }
-//            
-//            group.addTask {
-//                try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
-//                throw NSError(domain: "TimeoutError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Operation timed out"])
-//            }
-//            
-//            let result = try await group.next()!
-//            group.cancelAll()
-//            return result
-//        }
-//    }
-//}
