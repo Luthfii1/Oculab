@@ -80,7 +80,6 @@ struct SavedResultView: View {
                                 .foregroundColor(AppColors.slate300)
                             GradingCardComponent(
                                 type: resultPresenter.examinationResult?.expertGrading ?? .unknown,
-                                confidenceLevel: .lowConfidence,
                                 isExpert: true,
                                 expertNote: resultPresenter.examinationResult?.expertNote
                             )
@@ -101,7 +100,6 @@ struct SavedResultView: View {
                             // System grading component with conditional count
                             GradingCardComponent(
                                 type: resultPresenter.systemGrading,
-                                confidenceLevel: resultPresenter.systemConfidenceLevel,
                                 n: resultPresenter.systemGradingCount
                             )
                         }

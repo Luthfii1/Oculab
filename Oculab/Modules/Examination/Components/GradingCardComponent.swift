@@ -9,7 +9,7 @@ import SwiftUI
 
 struct GradingCardComponent: View {
     var type: GradingType = .unknown
-    var confidenceLevel: ConfidenceLevel = .unpredicted
+    var confidenceLevel: ConfidenceLevel?
     var n: Int = 0
     var isExpert: Bool = false
     var expertNote: String?
@@ -22,11 +22,13 @@ struct GradingCardComponent: View {
 
                 if !isExpert {
                     HStack {
-                        Image(AppImage.robot)
-                        Spacer().frame(width: 4)
-                        Text(AppData.makeSentence([confidenceLevel.rawValue, AppMedical.Examination.confidenceLevel]))
-                            .font(AppTypography.p4)
-                            .foregroundColor(AppColors.slate300)
+                        if let confidenceLevel = confidenceLevel {
+                            Image(AppImage.robot)
+                            Spacer().frame(width: 4)
+                            Text(AppData.makeSentence([confidenceLevel.rawValue, AppMedical.Examination.confidenceLevel]))
+                                .font(AppTypography.p4)
+                                .foregroundColor(AppColors.slate300)
+                        }
 
                         Spacer()
                         Button(action: {
