@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct AppDropdown: View {
     var title: String
@@ -23,6 +24,9 @@ struct AppDropdown: View {
         didSet {
             if isDropdownOpen {
                 selectedChoice = AppValue.empty // Reset selectedChoice when dropdown is opened
+            } else {
+                // close keyboard
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
             }
         }
     }
