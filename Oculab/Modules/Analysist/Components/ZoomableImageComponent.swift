@@ -108,36 +108,41 @@ struct ZoomableImageComponent: UIViewRepresentable {
             }.resume()
         }
 
-         // TODO: ZOOM TO SELECTED BOX LOGIC
-//         if let selectedBox = presenter.selectedBox, let _ = presenter.fovDetail {
-//             let newZoom: CGFloat = 2.0
-//             let boxCenterX = selectedBox.x + selectedBox.width / 2
-//             let boxCenterY = selectedBox.y + selectedBox.height / 2
-//             let screenWidth = scrollView.bounds.width
-//             let screenHeight = scrollView.bounds.height
-//             let offsetX = screenWidth / 2 - boxCenterX * newZoom
-//             let offsetY = screenHeight / 2 - boxCenterY * newZoom
-//
-//             // Only animate if not already zoomed to this box
-//             if abs(scrollView.zoomScale - newZoom) > 0.01 || abs(scrollView.contentOffset.x - offsetX) > 0.5 || abs(scrollView.contentOffset.y - offsetY) > 0.5 {
-//                 UIView.animate(withDuration: 0.35) {
-//                     scrollView.zoomScale = newZoom
-//                     scrollView.contentOffset = CGPoint(x: offsetX, y: offsetY)
-//                 }
-//             }
-//         }
+        // ZOOM TO SELECTED BOX LOGIC
+        if let selectedBox = presenter.selectedBox, let fovDetail = presenter.fovDetail {
+            // Calculate the zoom and offset to center the selected box, but bias upward so the box is not hidden by the sheet
+            let newZoom: CGFloat = 2.8
+            let imageWidth = imageView.frame.width
+            let imageHeight = imageView.frame.height
+            let frameWidth = CGFloat(fovDetail.frameWidth)
+            let frameHeight = CGFloat(fovDetail.frameHeight)
+            // Convert box center from box coordinates to image coordinates
+            let boxCenterX = (selectedBox.x + selectedBox.width / 2) / frameWidth * imageWidth
+            let boxCenterY = (selectedBox.y + selectedBox.height / 2) / frameHeight * imageHeight
+            let screenWidth = scrollView.bounds.width
+            let screenHeight = scrollView.bounds.height
+            let verticalBias: CGFloat = screenHeight * 0.3 // move box up by 30% of screen height
+            let offsetX = max(0, boxCenterX * newZoom - screenWidth / 2)
+            let offsetY = max(0, boxCenterY * newZoom - screenHeight / 2 + verticalBias)
 
-         // TODO: RESET ZOOM/OFFSET WHEN NO BOX IS SELECTED 
-        // if presenter.selectedBox == nil {
-        //     let defaultZoom: CGFloat = 1.0
-        //     let defaultOffset = CGPoint(x: 0, y: 0)
-        //     if abs(scrollView.zoomScale - defaultZoom) > 0.01 || abs(scrollView.contentOffset.x - defaultOffset.x) > 0.5 || abs(scrollView.contentOffset.y - defaultOffset.y) > 0.5 {
-        //         UIView.animate(withDuration: 0.35) {
-        //             scrollView.zoomScale = defaultZoom
-        //             scrollView.contentOffset = defaultOffset
-        //         }
-        //     }
-        // }
+            // Only animate if not already zoomed to this box
+            if abs(scrollView.zoomScale - newZoom) > 0.01 || abs(scrollView.contentOffset.x - offsetX) > 0.5 || abs(scrollView.contentOffset.y - offsetY) > 0.5 {
+                UIView.animate(withDuration: 0.35) {
+                    scrollView.zoomScale = newZoom
+                    scrollView.contentOffset = CGPoint(x: offsetX, y: offsetY)
+                }
+            }
+        } else {
+            // RESET ZOOM/OFFSET WHEN NO BOX IS SELECTED
+            let defaultZoom: CGFloat = 1.0
+            let defaultOffset = CGPoint(x: 0, y: 0)
+            if abs(scrollView.zoomScale - defaultZoom) > 0.01 || abs(scrollView.contentOffset.x - defaultOffset.x) > 0.5 || abs(scrollView.contentOffset.y - defaultOffset.y) > 0.5 {
+                UIView.animate(withDuration: 0.2) {
+                    scrollView.zoomScale = defaultZoom
+                    scrollView.contentOffset = defaultOffset
+                }
+            }
+        }
     }
 
     func makeCoordinator() -> Coordinator {
