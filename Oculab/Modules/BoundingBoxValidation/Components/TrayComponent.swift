@@ -30,7 +30,7 @@ struct TrayView: View {
                         
                         VStack(alignment: .leading) {
                             HStack {
-                                Text("Anotasi \(selectedBox.id)")
+                                Text("Bakteri ke - \(currentIndex + 1)")
                                     .font(AppTypography.p3)
                                     .foregroundColor(.black)
                                 Spacer()
