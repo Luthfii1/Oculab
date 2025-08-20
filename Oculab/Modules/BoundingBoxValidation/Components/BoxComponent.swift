@@ -34,8 +34,8 @@ struct BoxComponentView: View {
             .cornerRadius(4)
             .overlay(
                 RoundedRectangle(cornerRadius: 4)
-                    .inset(by: 3 / zoomScale)
-                    .stroke(borderColor, lineWidth: 3 / zoomScale)
+                    .inset(by: max(2.0, 3 / zoomScale))
+                    .stroke(borderColor, lineWidth: max(2.0, 3 / zoomScale))
             )
     }
 }
