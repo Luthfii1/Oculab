@@ -53,7 +53,6 @@ struct ExamDetailAdminView: View {
                             if presenter.staffInterpretation != AppState.notAvailable {
                                 GradingCardComponent(
                                     type: GradingType(rawValue: presenter.staffInterpretation) ?? .unknown,
-                                    confidenceLevel: .lowConfidence,
                                     isExpert: true
                                 )
                             } else {
@@ -86,7 +85,6 @@ struct ExamDetailAdminView: View {
                             if interpretasiPetugas != AppState.notAvailable {
                                 GradingCardComponent(
                                     type: GradingType(rawValue: interpretasiPetugas) ?? .unknown,
-                                    confidenceLevel: .lowConfidence,
                                     isExpert: true
                                 )
                             } else {

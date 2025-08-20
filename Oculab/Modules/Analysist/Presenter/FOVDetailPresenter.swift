@@ -15,11 +15,30 @@ class FOVDetailPresenter: ObservableObject {
     @Published var offset: CGSize = .zero
     @Published var description: String?
     @Published var isError: Bool = false
-    @Published var boxes: [BoxModel] = []
+    @Published var boxes: [BoxModel] = [] {
+        didSet {
+            numberOfBacilli = boxes.count
+        }
+    }
     @Published var selectedBox: BoxModel?
     @Published var fovDetail: FOVDetailData?
     @Published var errorMessage: String?
     @Published var isBoundingBoxAvailable: Bool = true
+    @Published var isBoundingBoxVisible: Bool = true
+    @Published var numberOfBacilli: Int = 0
+    @Published var currentFOVId: UUID?
+    
+    var boundingBoxIcon: String {
+        isBoundingBoxVisible ? AppIcon.eye : AppIcon.eyeSlash
+    }
+
+    var backgroundColorBoxIcon: Color {
+        isBoundingBoxVisible ? AppColors.purple500 : Color.clear
+    }
+
+    var lineWidthBoxIcon: CGFloat {
+        isBoundingBoxVisible ? 0 : 1
+    }
 
     func resetView() {
         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
@@ -33,8 +52,9 @@ class FOVDetailPresenter: ObservableObject {
         do {
             let result = try await interactor?.fetchData(fovId: fovId)
             if let result {
+                currentFOVId = fovId
                 fovDetail = result
-                boxes = result.boxes
+                boxes = result.boxes.filter { $0.status != .trashed }
                 isBoundingBoxAvailable = true
                 isError = false
                 errorMessage = nil
@@ -87,7 +107,27 @@ class FOVDetailPresenter: ObservableObject {
             guard let index = boxes.firstIndex(where: { $0.id == boxId }) else { return }
             boxes[index].status = newStatus
 
-            _ = try await interactor?.updateBoxStatus(boxId: boxId, newStatus: newStatus.rawValue)
+            let result = try await interactor?.updateBoxStatus(boxId: boxId, newStatus: newStatus.rawValue)
+
+            // If boxes deleted, move selection to next box if possible, else previous, else nil
+            if (result != nil) && (newStatus == .trashed) {
+                if let currentIndex = boxes.firstIndex(where: { $0.id == boxId }) {
+                    var nextBox: BoxModel? = nil
+                    if currentIndex < boxes.count - 1 {
+                        nextBox = boxes[currentIndex + 1]
+                    } else if currentIndex > 0 {
+                        nextBox = boxes[currentIndex - 1]
+                    }
+                    selectedBox = nextBox
+                } else {
+                    selectedBox = nil
+                }
+            }
+
+            // refetch all boxes
+            guard let fovId = currentFOVId else { Logger.error("No fovId set"); return }
+            await fetchData(fovId: fovId)
+            
         } catch {
             errorMessage = ErrorHandler.shared.handleError(error)
             isError = true

@@ -23,7 +23,7 @@ struct FOVAlbum: View {
                             presenter.navigateToDetailed(fovData: fov, order: index, total: presenter.selectedFOVs(for: fovGroup).count, examId: examId)
                         } label: {
                             RetryableImageView(
-                                imageURL: fov.image,
+                                imageURL: fov.imageOriginal,
                                 size: AppConstants.fovThumbnailSize,
                                 cornerRadius: AppConstants.fovCornerRadius,
                                 borderColor: fov.verified ? Color.green : Color.clear,

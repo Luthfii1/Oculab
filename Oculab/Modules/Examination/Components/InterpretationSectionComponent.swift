@@ -32,16 +32,16 @@ struct InterpretationSectionComponent: View {
 
             GradingCardComponent(
                 type: examination.systemGrading,
-                confidenceLevel: presenter.confidenceLevel,
                 n: presenter.resultQuantity
             )
 
             AppDropdown(
                 title: AppMedical.Examination.staffInterpretation,
                 placeholder: AppForm.selectOption,
-                isRequired: false,
+                isRequired: true,
                 rightIcon: AppIcon.down,
-                choices: GradingType.allCases.dropLast().map { ($0.rawValue, $0.rawValue) },
+                choices: GradingType.allCases.dropLast().map { ($0.displayValue, $0.rawValue) },
+                isSearchEnabled: false,
                 selectedChoice: $presenter.selectedTBGrade
             )
             .focused($focusedField, equals: .grading)
@@ -49,6 +49,7 @@ struct InterpretationSectionComponent: View {
             if presenter.selectedTBGrade == GradingType.SCANTY.rawValue {
                 ValidatedTextField(
                     title: AppMedical.Examination.bacteriaCount,
+                    isRequired: true,
                     placeholder: AppTextExamCompInterpretationSection.btaCountPlaceholder,
                     isNumberOnly: true,
                     text: $presenter.numOfBTA,
