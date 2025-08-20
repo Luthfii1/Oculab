@@ -128,41 +128,46 @@ struct FOVDetail: View {
 
                     // Bottom controls
                     VStack {
-                        VStack(spacing: Decimal.d4) {
-                            Text(
-                                AppData.makeSentence(
-                                    [AppMedical.Examination.bacteriaCount,
-                                     fovData.systemCount,
-                                     AppMedical.Examination.bacteriaCountSuffix]
-                                )
+                        Text(
+                            AppData.makeSentence(
+                                [AppMedical.Examination.bacteriaCount,
+                                    fovData.systemCount,
+                                    AppMedical.Examination.bacteriaCountSuffix]
                             )
-                            .font(AppTypography.h3)
-                            .foregroundColor(.white)
-                        }
-                        .padding(.horizontal, Decimal.d16)
-                        .padding(.vertical, Decimal.d12)
+                        )
+                        .font(AppTypography.h3)
+                        .foregroundColor(.white)
+                        .padding(.vertical, Decimal.d8)
 
                         HStack(spacing: Decimal.d16) {
                             Button(action: {
-                                // Add contrast adjustment
+                                presenter.isBoundingBoxVisible.toggle()
                             }) {
-                                Image(AppImage.contrast)
+                                Image(systemName: presenter.boundingBoxIcon)
                                     .foregroundColor(.white)
+                                    .padding(10)
+                                    .background(
+                                        presenter.backgroundColorBoxIcon
+                                    )
+                                    .clipShape(Circle())
+                                    .overlay(
+                                        Circle().stroke(AppColors.purple500, lineWidth: presenter.lineWidthBoxIcon)
+                                    )
                             }
 
-                            Button(action: {
-                                // Add brightness adjustment
-                            }) {
-                                Image(AppImage.brightness)
-                                    .foregroundColor(.white)
-                            }
-
-                            Button(action: {
-                                // Add comment functionality
-                            }) {
-                                Image(AppImage.comment)
-                                    .foregroundColor(.white)
-                            }
+//                            Button(action: {
+//                                // Add brightness adjustment
+//                            }) {
+//                                Image(AppImage.brightness)
+//                                    .foregroundColor(.white)
+//                            }
+//
+//                            Button(action: {
+//                                // Add comment functionality
+//                            }) {
+//                                Image(AppImage.comment)
+//                                    .foregroundColor(.white)
+//                            }
                             
                             // Add refresh button when bounding box data is not available
                             if !presenter.isBoundingBoxAvailable {
@@ -180,6 +185,7 @@ struct FOVDetail: View {
                             }
                         }
                         .padding(.horizontal, Decimal.d16)
+                        .padding(.vertical, Decimal.d8)
                     }
                     .frame(maxWidth: .infinity)
                     .background(Color.black.opacity(0.4))

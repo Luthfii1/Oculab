@@ -18,7 +18,7 @@ struct BoxesGroupComponentView: View {
             let scaleY = imageSize.height / Double(presenter.fovDetail?.frameHeight ?? 1)
 
             ZStack(alignment: .topLeading) {
-                if presenter.fovDetail != nil {
+                if presenter.fovDetail != nil, presenter.isBoundingBoxVisible {
                     ForEach(presenter.boxes) { box in
                         BoxComponentView(
                             box: box,

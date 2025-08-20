@@ -20,6 +20,19 @@ class FOVDetailPresenter: ObservableObject {
     @Published var fovDetail: FOVDetailData?
     @Published var errorMessage: String?
     @Published var isBoundingBoxAvailable: Bool = true
+    @Published var isBoundingBoxVisible: Bool = true
+    
+    var boundingBoxIcon: String {
+        isBoundingBoxVisible ? AppIcon.eye : AppIcon.eyeSlash
+    }
+
+    var backgroundColorBoxIcon: Color {
+        isBoundingBoxVisible ? AppColors.purple500 : Color.clear
+    }
+
+    var lineWidthBoxIcon: CGFloat {
+        isBoundingBoxVisible ? 0 : 1
+    }
 
     func resetView() {
         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
