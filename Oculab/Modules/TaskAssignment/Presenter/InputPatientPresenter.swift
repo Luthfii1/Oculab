@@ -196,7 +196,9 @@ extension InputPatientPresenter {
                 return (patient.name + AppValue.space + formattedDoB, patient._id)
             }
         } catch {
-            errorMessage = ErrorHandler.shared.handleError(error, context: .generic)
+            let message = ErrorHandler.shared.handleError(error, context: .generic)
+            guard message == "No patients found" else {return}
+            errorMessage = message
             isError = true
         }
     }

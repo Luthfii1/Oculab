@@ -399,10 +399,7 @@ extension AuthenticationPresenter {
                 return
             }
             
-            _ = try await interactor.editNewPIN(
-                newAccessPin: firstPin,
-                previousAccessPin: AppValue.empty
-            )
+            _ = try await interactor.createAccessPin(accessPin: firstPin)
             
             // Update local user data
             user.accessPin = firstPin
