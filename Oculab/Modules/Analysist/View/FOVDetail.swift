@@ -131,8 +131,8 @@ struct FOVDetail: View {
                         Text(
                             AppData.makeSentence(
                                 [AppMedical.Examination.bacteriaCount,
-                                    fovData.systemCount,
-                                    AppMedical.Examination.bacteriaCountSuffix]
+                                 presenter.numberOfBacilli,
+                                 AppMedical.Examination.bacteriaCountSuffix]
                             )
                         )
                         .font(AppTypography.h3)
