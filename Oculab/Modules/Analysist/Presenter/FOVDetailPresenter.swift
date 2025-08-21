@@ -26,7 +26,7 @@ class FOVDetailPresenter: ObservableObject {
     @Published var isBoundingBoxAvailable: Bool = true
     @Published var isBoundingBoxVisible: Bool = true
     @Published var isAddBacilliActive: Bool = false
-    @Published var enableAddBacilliFeature: Bool = false
+    @Published var enableAddBacilliFeature: Bool = true
     @Published var numberOfBacilli: Int = 0
     @Published var currentFOVId: UUID?
 
@@ -72,38 +72,45 @@ class FOVDetailPresenter: ObservableObject {
         newBoxLocation = nil
     }
 
-    func confirmBoxCreation(frame: CGRect, frameWidth: Int, frameHeight: Int, scaleX: Double, scaleY: Double) {
-        // Convert from view coordinates back to database coordinates
-        let databaseX = frame.minX / scaleX
-        let databaseY = frame.minY / scaleY
-        let databaseWidth = frame.width / scaleX
-        let databaseHeight = frame.height / scaleY
+    @MainActor
+    func confirmBoxCreation(frame: CGRect, frameWidth: Int, frameHeight: Int, scaleX: Double, scaleY: Double) async {
+        // The existing boxes use center positioning, so we need to convert the frame
+        // from top-left positioning to center positioning for consistency
+        
+        // Calculate the center point of the editable box in view coordinates
+        let centerX = frame.midX
+        let centerY = frame.midY
+        
+        // Convert the center point back to database coordinates
+        let databaseCenterX = centerX / scaleX
+        let databaseCenterY = centerY / scaleY
+        
+        // Convert size to database coordinates
+        let databaseWidth = (frame.width / scaleX) + 10 // fixed variable, this number already looks good
+        let databaseHeight = (frame.height / scaleY) + 10 // fixed variable, this number already looks good
+        
+        // Calculate the top-left position in database coordinates (what the API expects)
+        let databaseX = databaseCenterX - databaseWidth / 2
+        let databaseY = (databaseCenterY - databaseHeight / 2) + 25 // fixed variable, this number already looks good
         
         // Create new box model
-        let newBox = BoxModel(
-            id: UUID().uuidString, // Generate temporary ID
-            width: databaseWidth,
-            height: databaseHeight,
+        let newBox = AddBoxRequest(
             x: databaseX,
             y: databaseY,
-            status: .verified
+            width: databaseWidth,
+            height: databaseHeight
         )
         
-        // Add to local boxes array
-        boxes.append(newBox)
+        guard let currentFOVId = currentFOVId else { return }
         
-        // Print the final result
-        print("=== NEW BOUNDING BOX CREATED ===")
-        print("Database coordinates:")
-        print("x: \(databaseX)")
-        print("y: \(databaseY)")
-        print("width: \(databaseWidth)")
-        print("height: \(databaseHeight)")
-        print("status: \(newBox.status)")
-        print("===============================")
-        
-        // TODO: Send to API/database here
-        // await interactor?.createNewBox(...)
+        do {
+            let result = try await interactor?.addBox(fovId: currentFOVId, newBox: newBox)
+            if result != nil {
+                await fetchData(fovId: currentFOVId)
+            }
+        } catch {
+            _ = ErrorHandler.shared.handleError(error, context: .examination)
+        }
         
         // Reset creation state
         isCreatingNewBox = false

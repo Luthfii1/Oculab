@@ -46,13 +46,15 @@ struct BoxesGroupComponentView: View {
                             presenter.cancelBoxCreation()
                         },
                         onConfirm: { frame in
-                            presenter.confirmBoxCreation(
-                                frame: frame,
-                                frameWidth: presenter.fovDetail?.frameWidth ?? 1,
-                                frameHeight: presenter.fovDetail?.frameHeight ?? 1,
-                                scaleX: scaleX,
-                                scaleY: scaleY
-                            )
+                            Task {
+                                await presenter.confirmBoxCreation(
+                                    frame: frame,
+                                    frameWidth: presenter.fovDetail?.frameWidth ?? 1,
+                                    frameHeight: presenter.fovDetail?.frameHeight ?? 1,
+                                    scaleX: scaleX,
+                                    scaleY: scaleY
+                                )
+                            }
                         }
                     )
                 }
@@ -108,7 +110,7 @@ struct BoxesGroupComponentView: View {
     }
 }
 
-enum BoxStatus: String, Decodable {
+enum BoxStatus: String, Decodable, Encodable {
     case none = "UNVERIFIED"
     case verified = "VERIFIED"
     case trashed = "DELETED"
@@ -133,7 +135,7 @@ enum BoxStatus: String, Decodable {
     }
 }
 
-struct BoxModel: Identifiable, Equatable, Decodable {
+struct BoxModel: Identifiable, Equatable, Decodable, Encodable {
     let id: String
     var width: Double
     var height: Double
