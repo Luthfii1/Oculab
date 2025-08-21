@@ -81,14 +81,15 @@ struct TrayView: View {
                         }
                         .buttonStyle(.plain)
 
-                        Button(action: { onFlag?() }) {
-                            HStack {
-                                Image(systemName: "flag.fill")
-                                Text("Flag Anotasi Bakteri").font(AppTypography.p3)
-                            }
-                            .foregroundColor(.black)
-                        }
-                        .buttonStyle(.plain)
+                        /// Disable this feature for B2C Approach
+                        // Button(action: { onFlag?() }) {
+                        //     HStack {
+                        //         Image(systemName: "flag.fill")
+                        //         Text("Flag Anotasi Bakteri").font(AppTypography.p3)
+                        //     }
+                        //     .foregroundColor(.black)
+                        // }
+                        // .buttonStyle(.plain)
 
                         Button(action: { onReject?() }) {
                             HStack {
