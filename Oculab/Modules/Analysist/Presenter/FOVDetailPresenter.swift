@@ -25,6 +25,7 @@ class FOVDetailPresenter: ObservableObject {
     @Published var errorMessage: String?
     @Published var isBoundingBoxAvailable: Bool = true
     @Published var isBoundingBoxVisible: Bool = true
+    @Published var isAddBacilliActive: Bool = false
     @Published var numberOfBacilli: Int = 0
     @Published var currentFOVId: UUID?
     
@@ -38,6 +39,14 @@ class FOVDetailPresenter: ObservableObject {
 
     var lineWidthBoxIcon: CGFloat {
         isBoundingBoxVisible ? 0 : 1
+    }
+    
+    var backgroundColorAddBacilliIcon: Color {
+        isAddBacilliActive ? AppColors.purple500 : Color.clear
+    }
+    
+    var lineWidthAddBacilliIcon: CGFloat {
+        isAddBacilliActive ? 0 : 1
     }
 
     func resetView() {

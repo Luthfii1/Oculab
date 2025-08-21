@@ -140,6 +140,7 @@ struct FOVDetail: View {
                         .padding(.vertical, Decimal.d8)
 
                         HStack(spacing: Decimal.d16) {
+                            // Button for enable/disable new bounding box
                             Button(action: {
                                 presenter.isBoundingBoxVisible.toggle()
                             }) {
@@ -154,20 +155,22 @@ struct FOVDetail: View {
                                         Circle().stroke(AppColors.purple500, lineWidth: presenter.lineWidthBoxIcon)
                                     )
                             }
-
-//                            Button(action: {
-//                                // Add brightness adjustment
-//                            }) {
-//                                Image(AppImage.brightness)
-//                                    .foregroundColor(.white)
-//                            }
-//
-//                            Button(action: {
-//                                // Add comment functionality
-//                            }) {
-//                                Image(AppImage.comment)
-//                                    .foregroundColor(.white)
-//                            }
+                            
+                            // Button for enable/disable visibility bounding box
+                            Button(action: {
+                                presenter.isAddBacilliActive.toggle()
+                            }) {
+                                Image(systemName: AppIcon.add)
+                                    .foregroundColor(.white)
+                                    .padding(10)
+                                    .background(
+                                        presenter.backgroundColorAddBacilliIcon
+                                    )
+                                    .clipShape(Circle())
+                                    .overlay(
+                                        Circle().stroke(AppColors.purple500, lineWidth: presenter.lineWidthAddBacilliIcon)
+                                    )
+                            }
                             
                             // Add refresh button when bounding box data is not available
                             if !presenter.isBoundingBoxAvailable {
