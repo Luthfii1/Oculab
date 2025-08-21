@@ -18,6 +18,20 @@ struct BoxesGroupComponentView: View {
             let scaleY = imageSize.height / Double(presenter.fovDetail?.frameHeight ?? 1)
 
             ZStack(alignment: .topLeading) {
+                // Tap gesture for adding new bounding boxes
+                if presenter.isAddBacilliActive {
+                    Color.clear
+                        .contentShape(Rectangle())
+                        .gesture(
+                            DragGesture(minimumDistance: 0)
+                                .onEnded { value in
+                                    let tapPoint = value.location
+                                    print("User tapped at: \(tapPoint)")
+                                    // TODO: Create new bounding box at this location
+                                }
+                        )
+                }
+                
                 if presenter.fovDetail != nil, presenter.isBoundingBoxVisible {
                     ForEach(presenter.boxes) { box in
                         BoxComponentView(
@@ -30,34 +44,52 @@ struct BoxesGroupComponentView: View {
                             x: (box.x + box.width / 2) * scaleX,
                             y: (box.y + box.height / 2) * scaleY
                         )
+                        .opacity(presenter.isAddBacilliActive ? 0.3 : 1.0) // Reduce opacity when in add mode
                         .onTapGesture {
-                            presenter.selectedBox = box
+                            // Only allow selection when not in add mode
+                            if !presenter.isAddBacilliActive {
+                                presenter.selectedBox = box
+                            }
                         }
+                        // .gesture(
+                        //     DragGesture(minimumDistance: 0)
+                        //         .onEnded { value in
+                        //             if !presenter.isAddBacilliActive {
+                        //                 let tapPoint = value.location
+                        //                 print("Tapped at location: \(tapPoint) in GeometryReader")
+                        //                 print("Tapped box at: x=\(box.x), y=\(box.y), width=\(box.width), height=\(box.height), id=\(box.id), status=\(box.status)")
+                        //                 presenter.selectedBox = box
+                        //             }
+                        //         }
+                        // )
                         .offset(y: -10)
                     }
                 }
             }
         }
         .sheet(item: $presenter.selectedBox) { selected in
-            TrayView(
-                selectedBox: $presenter.selectedBox,
-                boxes: presenter.boxes,
-                onVerify: {
-                    Task {
-                        await presenter.updateBoxStatus(boxId: selected.id, newStatus: .verified)
+            // Only show sheet when not in add mode
+            if !presenter.isAddBacilliActive {
+                TrayView(
+                    selectedBox: $presenter.selectedBox,
+                    boxes: presenter.boxes,
+                    onVerify: {
+                        Task {
+                            await presenter.updateBoxStatus(boxId: selected.id, newStatus: .verified)
+                        }
+                    },
+                    onFlag: {
+                        Task {
+                            await presenter.updateBoxStatus(boxId: selected.id, newStatus: .flagged)
+                        }
+                    },
+                    onReject: {
+                        Task {
+                            await presenter.updateBoxStatus(boxId: selected.id, newStatus: .trashed)
+                        }
                     }
-                },
-                onFlag: {
-                    Task {
-                        await presenter.updateBoxStatus(boxId: selected.id, newStatus: .flagged)
-                    }
-                },
-                onReject: {
-                    Task {
-                        await presenter.updateBoxStatus(boxId: selected.id, newStatus: .trashed)
-                    }
-                }
-            )
+                )
+            }
         }
     }
 }
