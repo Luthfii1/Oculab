@@ -295,6 +295,11 @@
 "analysist.pdf.bacteriological_examination_title" = "BACTERIOLOGICAL EXAMINATION RESULTS";
 "analysist.pdf.lab_officer_signature" = "Lab Officer";
 "analysist.pdf.supervising_doctor_signature" = "Supervising Doctor for Lab Examination";
+"analysist.verification.sheet.title" = "Bacterial Verification";
+"analysist.verification.sheet.verif_button" = "Verification";
+"analysist.verification.sheet.flag_button" = "Flag";
+"analysist.verification.sheet.delete_button" = "Delete Annotation";
+"analysist.verification.sheet.index_bacilli" = "Bacteria number %@";
 
 // MARK: - Authentication Module
 // Login View

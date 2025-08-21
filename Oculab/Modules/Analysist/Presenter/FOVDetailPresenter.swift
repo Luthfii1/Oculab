@@ -109,16 +109,17 @@ class FOVDetailPresenter: ObservableObject {
 
             let result = try await interactor?.updateBoxStatus(boxId: boxId, newStatus: newStatus.rawValue)
 
-            // If boxes deleted, move selection to next box if possible, else previous, else nil
-            if (result != nil) && (newStatus == .trashed) {
+            // If boxes updated, move selection to the next box with status .none or .flagged, else nil
+            if (result != nil) {
+                // Find the next box with status .none or .flagged, skipping the current box
                 if let currentIndex = boxes.firstIndex(where: { $0.id == boxId }) {
-                    var nextBox: BoxModel? = nil
-                    if currentIndex < boxes.count - 1 {
-                        nextBox = boxes[currentIndex + 1]
-                    } else if currentIndex > 0 {
-                        nextBox = boxes[currentIndex - 1]
+                    // Search forward first
+                    let nextCandidates = boxes[(currentIndex+1)...] + boxes[..<currentIndex]
+                    if let nextBox = nextCandidates.first(where: { $0.status == .none || $0.status == .flagged }) {
+                        selectedBox = nextBox
+                    } else {
+                        selectedBox = nil
                     }
-                    selectedBox = nextBox
                 } else {
                     selectedBox = nil
                 }

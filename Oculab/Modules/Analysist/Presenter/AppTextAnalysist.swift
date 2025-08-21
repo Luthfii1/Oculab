@@ -14,6 +14,7 @@ typealias AppTextAnalysisFOVDetail = AppText.Analysist.FOVDetailView
 typealias AppTextAnalysisPDF = AppText.Analysist.PDFView
 typealias AppTextAnalysisFOVAlbum = AppText.Analysist.FOVAlbumView
 typealias AppTextAnalysisCompZoomable = AppText.Analysist.ZoomableImageComponent
+typealias AppTextAnalysisVerifSheet = AppText.Analysist.VerificationSheet
 
 extension AppText {
     enum Analysist {
@@ -81,6 +82,17 @@ extension AppText {
         
         enum ZoomableImageComponent {
             // This component is mostly UI interaction based, no specific text constants needed
+        }
+        
+        enum VerificationSheet {
+            static let title = "analysist.verification.sheet.title".localized
+            static let verifyingButton = "analysist.verification.sheet.verif_button".localized
+            static let flaggingButton = "analysist.verification.sheet.flag_button".localized
+            static let deletingButton = "analysist.verification.sheet.delete_button".localized
+            
+            static func indexBacilliFormat(_ index: String) -> String {
+                return "analysist.verification.sheet.index_bacilli".localized(with: index)
+            }
         }
     }
 }

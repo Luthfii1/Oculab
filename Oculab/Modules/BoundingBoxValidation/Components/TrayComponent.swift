@@ -23,14 +23,14 @@ struct TrayView: View {
                 VStack(alignment: .leading, spacing: Decimal.d32) {
                     VStack(alignment: .leading, spacing: Decimal.d12) {
                         VStack(alignment: .leading) {
-                            Text("Verifikasi Bakteri")
+                            Text(AppTextAnalysisVerifSheet.title)
                                 .font(AppTypography.s4)
                                 .foregroundColor(.black)
                         }
                         
                         VStack(alignment: .leading) {
                             HStack(alignment: .center, spacing: Decimal.d16) {
-                                Text("Bakteri ke - \(currentIndex + 1)")
+                                Text(AppTextAnalysisVerifSheet.indexBacilliFormat(String(currentIndex+1)))
                                     .font(AppTypography.p3)
                                     .foregroundColor(.black)
                                 Spacer()
@@ -79,19 +79,32 @@ struct TrayView: View {
 
                     HStack(spacing: Decimal.d16) {
                         AppButton(
-                            title: "Hapus Anotasi",
+                            title: AppTextAnalysisVerifSheet.deletingButton,
                             leftIcon: AppIcon.delete,
                             colorType: .destructive(.primary),
                             size: .large,
                             isEnabled: true
                         ) {
-                            onVerify?()
+                            onReject?()
                         }
+                        
+                        /// Disable flagging feature since we focus on B2C approach
+//                        Spacer(minLength: Decimal.d4)
+//                        
+//                        AppButton(
+//                            title: AppTextAnalysisVerifSheet.flaggingButton,
+//                            leftIcon: AppIcon.alert,
+//                            colorType: .tertiary,
+//                            size: .large,
+//                            isEnabled: true
+//                        ) {
+//                            onFlag?()
+//                        }
                         
                         Spacer(minLength: Decimal.d4)
                         
                         AppButton(
-                            title: "Verifikasi",
+                            title: AppTextAnalysisVerifSheet.verifyingButton,
                             leftIcon: AppIcon.success,
                             colorType: .primary,
                             size: .large,
