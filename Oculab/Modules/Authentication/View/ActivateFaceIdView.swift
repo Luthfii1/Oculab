@@ -15,7 +15,6 @@ struct ActivateFaceIdView: View {
             VStack(spacing: 18) {
                 Text(AppTextAuthBiometric.activateBiometricDescription)
                     .font(AppTypography.p2)
-                    .foregroundStyle(securityPresenter.textColor)
                     .multilineTextAlignment(.center)
                     .padding(.top, 24)
                     .padding(.horizontal, 20)
@@ -33,7 +32,9 @@ struct ActivateFaceIdView: View {
                         size: .large,
                         isEnabled: true
                     ) {
-                        Logger.debug("print activate face id")
+                        Task {
+                            await securityPresenter.activateFaceIdFirstTime()
+                        }
                     }
                     
                     AppButton(
@@ -42,7 +43,7 @@ struct ActivateFaceIdView: View {
                         size: .large,
                         isEnabled: true
                     ) {
-                        Logger.debug("print atur nanti")
+                        securityPresenter.skipFaceIdActivation()
                     }
                 }
             }

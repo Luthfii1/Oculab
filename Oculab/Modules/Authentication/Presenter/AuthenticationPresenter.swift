@@ -314,8 +314,9 @@ extension AuthenticationPresenter {
                     user.accessPin = secondPin
                     await createAccessPin()
                     await interactor.updateUserLocalData(user: user)
-                    isPinAuthorized = true
                     // State transition handled by AccountCheckerView onChange
+                    appStateManager?.initializationState = .createFaceId
+                    Router.shared.popToRoot()
                 }
             } else {
                 isError = true
@@ -404,10 +405,6 @@ extension AuthenticationPresenter {
             // Update local user data
             user.accessPin = firstPin
             await interactor.updateUserLocalData(user: user)
-            
-            // Success - navigate or show confirmation
-            showAccessPinSuccessPopup = true
-            
         } catch {
             isError = true
             switch error {
@@ -578,6 +575,16 @@ extension AuthenticationPresenter {
     func updateFaceIdPreference(_ isEnabled: Bool) {
         isFaceIdEnabledFromUserDefaults = isEnabled
         UserDefaults.standard.set(isEnabled, forKey: "isFaceIdEnabled")
+    }
+    
+    @MainActor
+    func activateFaceIdFirstTime() async {
+        await requestFaceIDActivation()
+        isPinAuthorized = true
+    }
+    
+    func skipFaceIdActivation() {
+        isPinAuthorized = true
     }
     
     @MainActor
