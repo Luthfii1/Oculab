@@ -82,6 +82,7 @@ class AuthenticationInteractor: ObservableObject {
         UserDefaults.standard.set(response.data.accessToken, forKey: UserDefaultType.accessToken.rawValue)
         UserDefaults.standard.set(response.data.refreshToken, forKey: UserDefaultType.refreshToken.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultType.isUserLoggedIn.rawValue)
+        UserDefaults.standard.set(true, forKey: UserDefaultType.firstTimeLogin.rawValue)
         UserDefaults.standard.set(response.data.userId, forKey: UserDefaultType.userId.rawValue)
 
         return response.data

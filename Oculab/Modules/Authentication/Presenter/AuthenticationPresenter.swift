@@ -326,7 +326,14 @@ extension AuthenticationPresenter {
 
         case .authenticate:
             if await self.isValidPin() {
-                isPinAuthorized = true
+                if isFirstTimeLoggedIn() {
+                    appStateManager?.initializationState = .createFaceId
+                    Router.shared.popToRoot()
+                } else {
+                    isPinAuthorized = true
+                }
+                // set false for first time login
+                UserDefaults.standard.set(false, forKey: UserDefaultType.firstTimeLogin.rawValue)
                 // State transition handled by AccountCheckerView onChange
             } else {
                 inputPin = AppValue.empty
@@ -649,6 +656,7 @@ extension AuthenticationPresenter {
     
     private func clearLoginState() {
         UserDefaults.standard.removeObject(forKey: UserDefaultType.isUserLoggedIn.rawValue)
+        UserDefaults.standard.removeObject(forKey: UserDefaultType.firstTimeLogin.rawValue)
         UserDefaults.standard.removeObject(forKey: UserDefaultType.userId.rawValue)
         UserDefaults.standard.removeObject(forKey: UserDefaultType.accessToken.rawValue)
         UserDefaults.standard.removeObject(forKey: UserDefaultType.refreshToken.rawValue)
@@ -656,6 +664,10 @@ extension AuthenticationPresenter {
     
     func isUserLoggedIn() -> Bool {
         return UserDefaults.standard.bool(forKey: UserDefaultType.isUserLoggedIn.rawValue)
+    }
+    
+    func isFirstTimeLoggedIn() -> Bool {
+        return UserDefaults.standard.bool(forKey: UserDefaultType.firstTimeLogin.rawValue)
     }
 }
 
