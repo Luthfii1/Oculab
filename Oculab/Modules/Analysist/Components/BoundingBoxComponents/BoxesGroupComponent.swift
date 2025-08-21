@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct BoxesGroupComponentView: View {
     @EnvironmentObject var presenter: FOVDetailPresenter
@@ -18,18 +19,19 @@ struct BoxesGroupComponentView: View {
             let scaleY = imageSize.height / Double(presenter.fovDetail?.frameHeight ?? 1)
 
             ZStack(alignment: .topLeading) {
-                // Tap gesture for adding new bounding boxes
+                // Simple tap for adding new bounding boxes (we'll improve this later)
                 if presenter.isAddBacilliActive {
                     Color.clear
                         .contentShape(Rectangle())
-                        .gesture(
-                            DragGesture(minimumDistance: 0)
-                                .onEnded { value in
-                                    let tapPoint = value.location
-                                    print("User tapped at: \(tapPoint)")
-                                    // TODO: Create new bounding box at this location
-                                }
-                        )
+                        .onTapGesture(coordinateSpace: .local) { location in
+                            print("User tapped at: \(location)")
+                            
+                            // Provide haptic feedback
+                            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                            impactFeedback.impactOccurred()
+                            
+                            // TODO: Create new bounding box at this location
+                        }
                 }
                 
                 if presenter.fovDetail != nil, presenter.isBoundingBoxVisible {
@@ -51,17 +53,6 @@ struct BoxesGroupComponentView: View {
                                 presenter.selectedBox = box
                             }
                         }
-                        // .gesture(
-                        //     DragGesture(minimumDistance: 0)
-                        //         .onEnded { value in
-                        //             if !presenter.isAddBacilliActive {
-                        //                 let tapPoint = value.location
-                        //                 print("Tapped at location: \(tapPoint) in GeometryReader")
-                        //                 print("Tapped box at: x=\(box.x), y=\(box.y), width=\(box.width), height=\(box.height), id=\(box.id), status=\(box.status)")
-                        //                 presenter.selectedBox = box
-                        //             }
-                        //         }
-                        // )
                         .offset(y: -10)
                     }
                 }
