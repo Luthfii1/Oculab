@@ -238,6 +238,10 @@
 // Biometric Authentication
 "auth.biometric.prompt" = "Authenticate to access the application";
 "auth.biometric.activation_prompt" = "Enable Face ID for application security";
+"auth.biometric.activate_title" = "Enable Face ID";
+"auth.biometric.activate_description" = "Enable Face ID to make login easier and more efficient";
+"auth.biometric.activate_enable_button" = "Enable Now";
+"auth.biometric.activate_cancel_button" = "Set Up Later";
 
 // MARK: - Examination
 "exam.progress.analyzing" = "Analyzing data";

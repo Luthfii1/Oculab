@@ -119,6 +119,7 @@ enum AppText {
         static let instruction = "Instruction"
         static let logoSplashScreen = "LogoSplashScreen"
         static let login = "LoginImage"
+        static let activateFaceId = "activateFaceId"
     }
     
     // MARK: - Universal Actions (Used across all modules)

@@ -377,6 +377,10 @@
 // Biometric Authentication
 "auth.biometric.prompt" = "Autentikasi untuk mengakses aplikasi";
 "auth.biometric.activation_prompt" = "Aktifkan Face ID untuk keamanan aplikasi";
+"auth.biometric.activate_title" = "Aktifkan Face ID";
+"auth.biometric.activate_description" = "Aktifkan Face ID supaya login lebih mudah dan efisien";
+"auth.biometric.activate_enable_button" = "Aktifkan Sekarang";
+"auth.biometric.activate_cancel_button" = "Atur Nanti";
 
 // Privacy Policy View
 "auth.privacy.navigation_title" = "Kebijakan Privasi Oculab";
