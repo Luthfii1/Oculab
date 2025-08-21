@@ -14,6 +14,7 @@ enum AppInitializationState: Equatable {
     case loading
     case authenticated
     case requiresPinCreation
+    case createFaceId
     case requiresPinAuthentication
     case unauthenticated
     case error(String)

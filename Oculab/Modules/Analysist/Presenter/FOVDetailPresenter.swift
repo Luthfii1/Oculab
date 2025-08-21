@@ -25,8 +25,14 @@ class FOVDetailPresenter: ObservableObject {
     @Published var errorMessage: String?
     @Published var isBoundingBoxAvailable: Bool = true
     @Published var isBoundingBoxVisible: Bool = true
+    @Published var isAddBacilliActive: Bool = false
+    @Published var enableAddBacilliFeature: Bool = false
     @Published var numberOfBacilli: Int = 0
     @Published var currentFOVId: UUID?
+
+    // For create new box
+    @Published var isCreatingNewBox: Bool = false
+    @Published var newBoxLocation: CGPoint? = nil
     
     var boundingBoxIcon: String {
         isBoundingBoxVisible ? AppIcon.eye : AppIcon.eyeSlash
@@ -39,6 +45,14 @@ class FOVDetailPresenter: ObservableObject {
     var lineWidthBoxIcon: CGFloat {
         isBoundingBoxVisible ? 0 : 1
     }
+    
+    var backgroundColorAddBacilliIcon: Color {
+        isAddBacilliActive ? AppColors.purple500 : Color.clear
+    }
+    
+    var lineWidthAddBacilliIcon: CGFloat {
+        isAddBacilliActive ? 0 : 1
+    }
 
     func resetView() {
         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
@@ -47,6 +61,56 @@ class FOVDetailPresenter: ObservableObject {
         }
     }
 
+    // functions for create new button
+    func startCreatingBox(at location: CGPoint) {
+        newBoxLocation = location
+        isCreatingNewBox = true
+    }
+
+    func cancelBoxCreation() {
+        isCreatingNewBox = false
+        newBoxLocation = nil
+    }
+
+    func confirmBoxCreation(frame: CGRect, frameWidth: Int, frameHeight: Int, scaleX: Double, scaleY: Double) {
+        // Convert from view coordinates back to database coordinates
+        let databaseX = frame.minX / scaleX
+        let databaseY = frame.minY / scaleY
+        let databaseWidth = frame.width / scaleX
+        let databaseHeight = frame.height / scaleY
+        
+        // Create new box model
+        let newBox = BoxModel(
+            id: UUID().uuidString, // Generate temporary ID
+            width: databaseWidth,
+            height: databaseHeight,
+            x: databaseX,
+            y: databaseY,
+            status: .verified
+        )
+        
+        // Add to local boxes array
+        boxes.append(newBox)
+        
+        // Print the final result
+        print("=== NEW BOUNDING BOX CREATED ===")
+        print("Database coordinates:")
+        print("x: \(databaseX)")
+        print("y: \(databaseY)")
+        print("width: \(databaseWidth)")
+        print("height: \(databaseHeight)")
+        print("status: \(newBox.status)")
+        print("===============================")
+        
+        // TODO: Send to API/database here
+        // await interactor?.createNewBox(...)
+        
+        // Reset creation state
+        isCreatingNewBox = false
+        newBoxLocation = nil
+    }
+
+    // network things
     @MainActor
     func fetchData(fovId: UUID) async {
         do {
@@ -109,16 +173,17 @@ class FOVDetailPresenter: ObservableObject {
 
             let result = try await interactor?.updateBoxStatus(boxId: boxId, newStatus: newStatus.rawValue)
 
-            // If boxes deleted, move selection to next box if possible, else previous, else nil
-            if (result != nil) && (newStatus == .trashed) {
+            // If boxes updated, move selection to the next box with status .none or .flagged, else nil
+            if (result != nil) {
+                // Find the next box with status .none or .flagged, skipping the current box
                 if let currentIndex = boxes.firstIndex(where: { $0.id == boxId }) {
-                    var nextBox: BoxModel? = nil
-                    if currentIndex < boxes.count - 1 {
-                        nextBox = boxes[currentIndex + 1]
-                    } else if currentIndex > 0 {
-                        nextBox = boxes[currentIndex - 1]
+                    // Search forward first
+                    let nextCandidates = boxes[(currentIndex+1)...] + boxes[..<currentIndex]
+                    if let nextBox = nextCandidates.first(where: { $0.status == .none || $0.status == .flagged }) {
+                        selectedBox = nextBox
+                    } else {
+                        selectedBox = nil
                     }
-                    selectedBox = nextBox
                 } else {
                     selectedBox = nil
                 }

@@ -57,6 +57,10 @@ private extension AccountCheckerView {
         case .requiresPinCreation:
             UserAccessPinView(state: .create)
                 .environmentObject(authPresenter)
+        
+        case .createFaceId:
+            ActivateFaceIdView()
+                .environmentObject(authPresenter)
             
         case .requiresPinAuthentication:
             UserAccessPinView(state: .authenticate)

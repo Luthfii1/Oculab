@@ -307,6 +307,11 @@
 "analysist.pdf.bacteriological_examination_title" = "HASIL PEMERIKSAAN BAKTERIOLOGIS";
 "analysist.pdf.lab_officer_signature" = "Petugas Lab";
 "analysist.pdf.supervising_doctor_signature" = "Dokter PJ Pemeriksaan Lab";
+"analysist.verification.sheet.title" = "Verifikasi Bakteri";
+"analysist.verification.sheet.verif_button" = "Verifikasi";
+"analysist.verification.sheet.flag_button" = "Cek Kembali";
+"analysist.verification.sheet.delete_button" = "Hapus Anotasi";
+"analysist.verification.sheet.index_bacilli" = "Bakteri ke %@";
 
 // MARK: - Authentication Module
 // Login View
@@ -372,6 +377,10 @@
 // Biometric Authentication
 "auth.biometric.prompt" = "Autentikasi untuk mengakses aplikasi";
 "auth.biometric.activation_prompt" = "Aktifkan Face ID untuk keamanan aplikasi";
+"auth.biometric.activate_title" = "Aktifkan Face ID";
+"auth.biometric.activate_description" = "Aktifkan Face ID supaya login lebih mudah dan efisien";
+"auth.biometric.activate_enable_button" = "Aktifkan Sekarang";
+"auth.biometric.activate_cancel_button" = "Atur Nanti";
 
 // Privacy Policy View
 "auth.privacy.navigation_title" = "Kebijakan Privasi Oculab";

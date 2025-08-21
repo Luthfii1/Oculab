@@ -48,6 +48,10 @@ extension AppText {
         enum Biometric {
             static let prompt = "auth.biometric.prompt".localized
             static let activationPrompt = "auth.biometric.activation_prompt".localized
+            static let activateBiometricTitle = "auth.biometric.activate_title".localized
+            static let activateBiometricDescription = "auth.biometric.activate_description".localized
+            static let activateBiometricEnableButtonText = "auth.biometric.activate_enable_button".localized
+            static let activateBiometricCancelButtonText = "auth.biometric.activate_cancel_button".localized
         }
         
         enum LoginView {

@@ -23,26 +23,29 @@ struct TrayView: View {
                 VStack(alignment: .leading, spacing: Decimal.d32) {
                     VStack(alignment: .leading, spacing: Decimal.d12) {
                         VStack(alignment: .leading) {
-                            Text("Verifikasi Bakteri")
+                            Text(AppTextAnalysisVerifSheet.title)
                                 .font(AppTypography.s4)
                                 .foregroundColor(.black)
                         }
                         
                         VStack(alignment: .leading) {
-                            HStack {
-                                Text("Bakteri ke - \(currentIndex + 1)")
+                            HStack(alignment: .center, spacing: Decimal.d16) {
+                                Text(AppTextAnalysisVerifSheet.indexBacilliFormat(String(currentIndex+1)))
                                     .font(AppTypography.p3)
                                     .foregroundColor(.black)
                                 Spacer()
-                                HStack(spacing: Decimal.d8) {
+                                HStack(spacing: Decimal.d20) {
                                     Button(action: {
                                         if currentIndex > 0 {
                                             self.selectedBox = boxes[currentIndex - 1]
                                         }
                                     }) {
-                                        Image(systemName: "chevron.left")
+                                        Image(systemName: AppIcon.back)
+                                            .frame(width: 30, height: 30)
+                                            .background(currentIndex > 0 ? AppColors.slate100 : AppColors.slate50)
+                                            .foregroundColor(currentIndex > 0 ? .black : AppColors.slate300)
+                                            .clipShape(Circle())
                                     }
-                                    .foregroundColor(currentIndex > 0 ? .black : AppColors.slate100)
                                     .disabled(currentIndex == 0)
 
                                     Button(action: {
@@ -50,9 +53,12 @@ struct TrayView: View {
                                             self.selectedBox = boxes[currentIndex + 1]
                                         }
                                     }) {
-                                        Image(systemName: "chevron.right")
+                                        Image(systemName: AppIcon.forward)
+                                            .frame(width: 30, height: 30)
+                                            .background(currentIndex < boxes.count - 1 ? AppColors.slate100 : AppColors.slate50)
+                                            .foregroundColor(currentIndex < boxes.count - 1 ? .black : AppColors.slate300)
+                                            .clipShape(Circle())
                                     }
-                                    .foregroundColor(currentIndex < boxes.count - 1 ? .black : AppColors.slate100)
                                     .disabled(currentIndex == boxes.count - 1)
                                 }
                             }
@@ -71,39 +77,46 @@ struct TrayView: View {
                     }
                     .padding(.top, Decimal.m12)
 
-                    VStack(alignment: .leading, spacing: Decimal.d12) {
-                        Button(action: { onVerify?() }) {
-                            HStack {
-                                Image(systemName: "checkmark.circle")
-                                Text("Verifikasi Anotasi Bakteri").font(AppTypography.p3)
-                            }
-                            .foregroundColor(.black)
+                    HStack(spacing: Decimal.d16) {
+                        AppButton(
+                            title: AppTextAnalysisVerifSheet.deletingButton,
+                            leftIcon: AppIcon.delete,
+                            colorType: .destructive(.primary),
+                            size: .large,
+                            isEnabled: true
+                        ) {
+                            onReject?()
                         }
-                        .buttonStyle(.plain)
-
-                        Button(action: { onFlag?() }) {
-                            HStack {
-                                Image(systemName: "flag.fill")
-                                Text("Flag Anotasi Bakteri").font(AppTypography.p3)
-                            }
-                            .foregroundColor(.black)
+                        
+                        /// Disable flagging feature since we focus on B2C approach
+//                        Spacer(minLength: Decimal.d4)
+//                        
+//                        AppButton(
+//                            title: AppTextAnalysisVerifSheet.flaggingButton,
+//                            leftIcon: AppIcon.alert,
+//                            colorType: .tertiary,
+//                            size: .large,
+//                            isEnabled: true
+//                        ) {
+//                            onFlag?()
+//                        }
+                        
+                        Spacer(minLength: Decimal.d4)
+                        
+                        AppButton(
+                            title: AppTextAnalysisVerifSheet.verifyingButton,
+                            leftIcon: AppIcon.success,
+                            colorType: .primary,
+                            size: .large,
+                            isEnabled: true
+                        ) {
+                            onVerify?()
                         }
-                        .buttonStyle(.plain)
-
-                        Button(action: { onReject?() }) {
-                            HStack {
-                                Image(systemName: "trash")
-                                Text("Konfirmasi Bukan Bakteri").font(AppTypography.p3)
-                            }
-                            .foregroundColor(AppColors.red700)
-                        }
-                        .buttonStyle(.plain)
                     }
-                    .padding(.bottom, Decimal.d16)
                 }
                 .padding(.horizontal, Decimal.d16)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .presentationDetents([.height(280)])
+                .presentationDetents([.height(230)])
                 .presentationDragIndicator(.visible)
             }
         }
