@@ -156,20 +156,22 @@ struct FOVDetail: View {
                                     )
                             }
                             
-                            // Button for enable/disable visibility bounding box
-                            Button(action: {
-                                presenter.isAddBacilliActive.toggle()
-                            }) {
-                                Image(systemName: AppIcon.add)
-                                    .foregroundColor(.white)
-                                    .padding(10)
-                                    .background(
-                                        presenter.backgroundColorAddBacilliIcon
-                                    )
-                                    .clipShape(Circle())
-                                    .overlay(
-                                        Circle().stroke(AppColors.purple500, lineWidth: presenter.lineWidthAddBacilliIcon)
-                                    )
+                            if presenter.enableAddBacilliFeature {
+                                // Button for enable/disable visibility bounding box
+                                Button(action: {
+                                    presenter.isAddBacilliActive.toggle()
+                                }) {
+                                    Image(systemName: AppIcon.add)
+                                        .foregroundColor(.white)
+                                        .padding(10)
+                                        .background(
+                                            presenter.backgroundColorAddBacilliIcon
+                                        )
+                                        .clipShape(Circle())
+                                        .overlay(
+                                            Circle().stroke(AppColors.purple500, lineWidth: presenter.lineWidthAddBacilliIcon)
+                                        )
+                                }
                             }
                             
                             // Add refresh button when bounding box data is not available

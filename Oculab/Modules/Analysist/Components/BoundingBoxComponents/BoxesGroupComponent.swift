@@ -20,7 +20,7 @@ struct BoxesGroupComponentView: View {
 
             ZStack(alignment: .topLeading) {
                 // Simple tap for adding new bounding boxes (we'll improve this later)
-                if presenter.isAddBacilliActive {
+                if presenter.isAddBacilliActive && !presenter.isCreatingNewBox {
                     Color.clear
                         .contentShape(Rectangle())
                         .onTapGesture(coordinateSpace: .local) { location in
@@ -30,8 +30,31 @@ struct BoxesGroupComponentView: View {
                             let impactFeedback = UIImpactFeedbackGenerator(style: .light)
                             impactFeedback.impactOccurred()
                             
-                            // TODO: Create new bounding box at this location
+                            // Start creating new box
+                            presenter.startCreatingBox(at: location)
                         }
+                }
+                
+                // Show editable box when creating new box
+                if presenter.isCreatingNewBox, let location = presenter.newBoxLocation {
+                    EditableBoxComponentView(
+                        at: location,
+                        scaleX: scaleX,
+                        scaleY: scaleY,
+                        zoomScale: zoomScale,
+                        onCancel: {
+                            presenter.cancelBoxCreation()
+                        },
+                        onConfirm: { frame in
+                            presenter.confirmBoxCreation(
+                                frame: frame,
+                                frameWidth: presenter.fovDetail?.frameWidth ?? 1,
+                                frameHeight: presenter.fovDetail?.frameHeight ?? 1,
+                                scaleX: scaleX,
+                                scaleY: scaleY
+                            )
+                        }
+                    )
                 }
                 
                 if presenter.fovDetail != nil, presenter.isBoundingBoxVisible {

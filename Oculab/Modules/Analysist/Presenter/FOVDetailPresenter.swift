@@ -26,8 +26,13 @@ class FOVDetailPresenter: ObservableObject {
     @Published var isBoundingBoxAvailable: Bool = true
     @Published var isBoundingBoxVisible: Bool = true
     @Published var isAddBacilliActive: Bool = false
+    @Published var enableAddBacilliFeature: Bool = false
     @Published var numberOfBacilli: Int = 0
     @Published var currentFOVId: UUID?
+
+    // For create new box
+    @Published var isCreatingNewBox: Bool = false
+    @Published var newBoxLocation: CGPoint? = nil
     
     var boundingBoxIcon: String {
         isBoundingBoxVisible ? AppIcon.eye : AppIcon.eyeSlash
@@ -56,6 +61,56 @@ class FOVDetailPresenter: ObservableObject {
         }
     }
 
+    // functions for create new button
+    func startCreatingBox(at location: CGPoint) {
+        newBoxLocation = location
+        isCreatingNewBox = true
+    }
+
+    func cancelBoxCreation() {
+        isCreatingNewBox = false
+        newBoxLocation = nil
+    }
+
+    func confirmBoxCreation(frame: CGRect, frameWidth: Int, frameHeight: Int, scaleX: Double, scaleY: Double) {
+        // Convert from view coordinates back to database coordinates
+        let databaseX = frame.minX / scaleX
+        let databaseY = frame.minY / scaleY
+        let databaseWidth = frame.width / scaleX
+        let databaseHeight = frame.height / scaleY
+        
+        // Create new box model
+        let newBox = BoxModel(
+            id: UUID().uuidString, // Generate temporary ID
+            width: databaseWidth,
+            height: databaseHeight,
+            x: databaseX,
+            y: databaseY,
+            status: .verified
+        )
+        
+        // Add to local boxes array
+        boxes.append(newBox)
+        
+        // Print the final result
+        print("=== NEW BOUNDING BOX CREATED ===")
+        print("Database coordinates:")
+        print("x: \(databaseX)")
+        print("y: \(databaseY)")
+        print("width: \(databaseWidth)")
+        print("height: \(databaseHeight)")
+        print("status: \(newBox.status)")
+        print("===============================")
+        
+        // TODO: Send to API/database here
+        // await interactor?.createNewBox(...)
+        
+        // Reset creation state
+        isCreatingNewBox = false
+        newBoxLocation = nil
+    }
+
+    // network things
     @MainActor
     func fetchData(fovId: UUID) async {
         do {
