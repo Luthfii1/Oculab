@@ -49,6 +49,20 @@ class FOVDetailInteractor {
 
         return response.data
     }
+    
+    func addBox(fovId: UUID, newBox: AddBoxRequest) async throws -> APIResponse<BoxModel> {
+        let fovURL = API.BE + "/boundingBox/add-bounding-box/"
+        let url = fovURL + fovId.uuidString.toLowercase()
+        let body = newBox
+
+        let response: APIResponse<BoxModel> = try await networkService.update(
+            urlString: url,
+            headers: nil,
+            body: body
+        )
+
+        return response
+    }
 }
 
 struct StatusBody: Codable {
@@ -59,4 +73,11 @@ struct FOVDetailData: Decodable {
     var frameWidth: Int
     var frameHeight: Int
     var boxes: [BoxModel]
+}
+
+struct AddBoxRequest: Codable {
+    let x: Double
+    let y: Double
+    let width: Double
+    let height: Double
 }
