@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct ForgetPinComponent: View {
+    @EnvironmentObject var authPresenter: AuthenticationPresenter
     var state: PinMode
+    
     var body: some View {
         if state == .authenticate {
             HStack(alignment: .center, spacing: 8) {
@@ -21,6 +23,7 @@ struct ForgetPinComponent: View {
                     colorType: .tertiary
                 ) {
                     Logger.debug("Use password button tapped", category: .authentication)
+                    authPresenter.showForgetPinPopup = true
                 }
             }
         }
@@ -29,4 +32,5 @@ struct ForgetPinComponent: View {
 
 #Preview {
     ForgetPinComponent(state: .authenticate)
+        .environmentObject(DependencyInjection.shared.createAuthPresenter())
 }

@@ -168,6 +168,12 @@ extension AppText {
             static let titleChangePin = "auth.pin.title_change".localized
 
             static let invalidPinMatchText = "auth.pin.invalid_match".localized
+            
+            // Forget PIN popup
+            static let forgetPinTitle = "auth.pin.forget_title".localized
+            static let forgetPinDescription = "auth.pin.forget_description".localized
+            static let forgetPinConfirmButton = "auth.pin.forget_confirm".localized
+            static let forgetPinCancelButton = "auth.pin.forget_cancel".localized
         }
     }
 }

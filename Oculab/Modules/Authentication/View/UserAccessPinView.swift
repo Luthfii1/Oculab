@@ -42,6 +42,42 @@ struct UserAccessPinView: View {
                     )
                 }
                 
+                if securityPresenter.showForgetPinPopup {
+                    AppPopup(
+                        image: AppImage.confirmLeave,
+                        title: AppTextAuthCompPin.forgetPinTitle,
+                        description: AppTextAuthCompPin.forgetPinDescription,
+                        buttons: [
+                            AppButton(
+                                title: AppTextAuthCompPin.forgetPinCancelButton,
+                                colorType: .tertiary,
+                                size: .large,
+                                isEnabled: true
+                            ) {
+                                securityPresenter.cancelForgetPin()
+                            },
+                            AppButton(
+                                title: AppTextAuthCompPin.forgetPinConfirmButton,
+                                colorType: .destructive(.primary),
+                                size: .large,
+                                isEnabled: true
+                            ) {
+                                Task {
+                                    await securityPresenter.handleForgetPin()
+                                }
+                            },
+                        ],
+                        isVisible: Binding(
+                            get: { securityPresenter.showForgetPinPopup },
+                            set: { newValue in
+                                if !newValue {
+                                    securityPresenter.cancelForgetPin()
+                                }
+                            }
+                        )
+                    )
+                }
+                
                 VStack(spacing: 0) {
                     VStack(spacing: 0) {
                         Text(securityPresenter.descriptionPIN)
@@ -67,6 +103,7 @@ struct UserAccessPinView: View {
                         
                         // Forgot PIN section
                         ForgetPinComponent(state: state)
+                            .environmentObject(securityPresenter)
                     }
                     .padding(.horizontal, 20)
                 }
