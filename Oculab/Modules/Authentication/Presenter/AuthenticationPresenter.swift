@@ -526,16 +526,22 @@ extension AuthenticationPresenter {
         // Hide the popup first
         showForgetPinPopup = false
         
-        // TODO: Call backend API to delete access PIN - this should be implemented when backend is ready
-        // The backend should remove the user's PIN from the server-side storage
-        // Example implementation:
-        // do {
-        //     try await interactor.deleteAccessPin()
-        //     Logger.info("Access PIN successfully deleted from backend", category: .authentication)
-        // } catch {
-        //     Logger.error("Failed to delete access PIN from backend: \(error)", category: .authentication)
-        //     // Continue with logout even if backend deletion fails
-        // }
+        // Call backend API to delete access PIN
+        do {
+            let response = try await interactor.deleteAccessPin()
+            Logger.info("Access PIN successfully deleted from backend. Deleted PIN: \(response.accessPin ?? "nil")", category: .authentication)
+            
+            // Update local user data to remove PIN
+            if var localUser = await interactor.getUserLocalData() {
+                localUser.accessPin = nil
+                await interactor.updateUserLocalData(user: localUser)
+            }
+            
+        } catch {
+            Logger.error("Failed to delete access PIN from backend: \(error)", category: .authentication)
+            isError = true
+            errorMessage = ErrorHandler.shared.handleError(error, context: .login)
+        }
         
         // Clear all local user session data
         clearLoginState()

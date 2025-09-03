@@ -48,6 +48,9 @@ struct RegisterUserData: Codable {
     let currentPassword: String
 }
 
+struct DeleteAccessPinResponse: Codable {
+    let accessPin: String?
+}
 
 class AuthenticationInteractor: ObservableObject {
     private var modelContext: ModelContext
@@ -232,5 +235,30 @@ class AuthenticationInteractor: ObservableObject {
         )
         
         return CreateAccessPinResponse(accessPin: response.data.accessPin)
+    }
+
+    func deleteAccessPin() async throws -> DeleteAccessPinResponse {
+        guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
+        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
+        let headers = [
+            "Authorization": "Bearer \(token)",
+            "Content-Type": "application/json"
+        ]
+        
+        struct EmptyBody: Codable {}
+        
+        let response: APIResponse<DeleteAccessPinResponse> = try await networkService.delete(
+            urlString: apiAuthenticationService + "/delete-user-accessPin/\(userId)",
+            headers: headers,
+            body: EmptyBody()
+        )
+        
+        return DeleteAccessPinResponse(accessPin: response.data.accessPin)
     }
 }
