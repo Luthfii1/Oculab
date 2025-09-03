@@ -16,6 +16,7 @@ enum LogCategory: String {
     case user = "USER"
     case taskAssignment = "TASK"
     case videoRecord = "VIDEO"
+    case navigation = "NAV"
 }
 
 enum LogLevel: String {
