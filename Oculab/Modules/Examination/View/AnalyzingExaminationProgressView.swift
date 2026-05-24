@@ -19,12 +19,12 @@ struct AnalyzingExaminationProgressView: View {
 
                 LottieHelper(animationName: AppTextExamProgress.loadingAnimationName)
                     .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: .infinity, maxHeight: 120)
-                    .padding(.bottom, 72)
+                    .frame(maxWidth: .infinity, maxHeight: Decimal.d120)
+                    .padding(.bottom, Decimal.d72)
 
                 Text(AppTextExamProgress.analyzingTitle)
                     .font(AppTypography.h2)
-                    .padding(.bottom, 12)
+                    .padding(.bottom, Decimal.d12)
 
                 Text(AppTextExamProgress.refreshInstruction)
                     .font(AppTypography.p3)

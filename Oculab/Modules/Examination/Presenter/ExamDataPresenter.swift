@@ -13,14 +13,12 @@ class ExamDataPresenter: ObservableObject {
     let videoPresenter = VideoRecordPresenter.shared
     
     // MARK: - Published Properties
-    @Published var isLoading: Bool = false {
-        didSet {
-            updateButtonTitle()
-        }
-    }
-
+    @Published var isLoading: Bool = false
     @Published var recordVideo: URL?
-    @Published var buttonTitle: String = AppTextExam.buttonStartAnalysis
+
+    var buttonTitle: String {
+        isLoading ? AppTextExam.buttonSubmitting : AppTextExam.buttonStartAnalysis
+    }
     @Published var examDetailData: ExaminationDetailData = .init(
         examinationId: AppValue.empty,
         pic: AppValue.empty,
@@ -61,10 +59,11 @@ class ExamDataPresenter: ObservableObject {
     var staffInterpretation: String {
         firstExamination?.expertResult ?? AppState.notAvailable
     }
-    
-    // MARK: - Private Methods
-    private func updateButtonTitle() {
-        buttonTitle = isLoading ? AppTextExam.buttonSubmitting : AppTextExam.buttonStartAnalysis
+
+    @MainActor
+    func resetState() {
+        examinations = []
+        recordVideo = nil
     }
 }
 
@@ -119,13 +118,13 @@ extension ExamDataPresenter {
             let videoData = try Data(contentsOf: fileURL)
             Logger.info("Video data loaded successfully with size: \(videoData.count) bytes", category: .examination)
 
-            let response = try await interactor.submitExamination(
+            _ = try await interactor.submitExamination(
                 examVideo: videoData,
                 examinationId: examDetailData.examinationId,
                 patientId: patientDetailData.patientId
             )
 
-            Logger.info("Examination submitted successfully with response: \(response)", category: .examination)
+            Logger.info("Examination submitted successfully", category: .examination)
 
             recordVideo = nil
             videoPresenter.previewURL = nil

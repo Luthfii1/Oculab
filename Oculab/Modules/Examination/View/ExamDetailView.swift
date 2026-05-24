@@ -12,7 +12,7 @@ struct ExamDetailView: View {
     var patientId: String
 
     @StateObject private var videoRecordPresenter = VideoRecordPresenter.shared
-    @StateObject var presenter = ExamDataPresenter(interactor: ExamInteractor())
+    @StateObject private var presenter = ExamDataPresenter(interactor: ExamInteractor())
     @State private var showGuidelines = false
     @State private var didFinishOnboarding = false
 
@@ -117,8 +117,10 @@ struct ExamDetailView: View {
         .onAppear {
             Task {
                 await presenter.fetchData(examId: examId, patientId: patientId, userRole: .LAB)
-                Logger.debug("Loading state: \(presenter.isLoading)", category: .examination)
             }
+        }
+        .onDisappear {
+            presenter.resetState()
         }
         .onChange(of: videoRecordPresenter.previewURL) {
             presenter.recordVideo = videoRecordPresenter.previewURL

@@ -11,8 +11,8 @@ struct ExamDetailAdminView: View {
     var examId: String
     var patientId: String
 
-    @StateObject var presenter = ExamDataPresenter(interactor: ExamInteractor())
-    @StateObject var resultPresenter = AnalysisResultPresenter()
+    @StateObject private var presenter = ExamDataPresenter(interactor: ExamInteractor())
+    @StateObject private var resultPresenter = AnalysisResultPresenter()
 
     var body: some View {
         NavigationView {
@@ -80,7 +80,7 @@ struct ExamDetailAdminView: View {
                                 .font(AppTypography.s5)
                                 .foregroundColor(AppColors.slate300)
                             
-                            let interpretasiPetugas = presenter.examinations.count > 1 ? (presenter.examinations[1].expertResult ?? AppState.notAvailable) : AppState.notAvailable
+                            let interpretasiPetugas = presenter.secondExamination?.expertResult ?? AppState.notAvailable
                             
                             if interpretasiPetugas != AppState.notAvailable {
                                 GradingCardComponent(
@@ -142,6 +142,10 @@ struct ExamDetailAdminView: View {
                     await presenter.fetchData(examId: examId, patientId: patientId, userRole: .ADMIN)
                     await resultPresenter.fetchData(examinationId: examId)
                 }
+            }
+            .onDisappear {
+                presenter.resetState()
+                resultPresenter.resetState()
             }
         }.navigationBarBackButtonHidden(true)
     }
