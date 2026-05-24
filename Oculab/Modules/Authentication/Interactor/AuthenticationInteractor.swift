@@ -145,7 +145,7 @@ class AuthenticationInteractor: ObservableObject {
             do {
                 try modelContext.save()
             } catch {
-                print("Error: \(error.localizedDescription)")
+                Logger.error("Failed to save user to SwiftData: \(error.localizedDescription)", category: .authentication)
             }
         }
     }
@@ -157,7 +157,7 @@ class AuthenticationInteractor: ObservableObject {
                 let localData = try modelContext.fetch(fetchDescriptor)
                 return localData.first
             } catch {
-                print("Error: \(error.localizedDescription)")
+                Logger.error("Failed to fetch user from SwiftData: \(error.localizedDescription)", category: .authentication)
                 return nil
             }
         }
@@ -180,7 +180,7 @@ class AuthenticationInteractor: ObservableObject {
 
             try modelContext.save()
         } catch {
-            print("Error deleting all users: \(error.localizedDescription)")
+            Logger.error("Failed to delete all users: \(error.localizedDescription)", category: .authentication)
         }
     }
     

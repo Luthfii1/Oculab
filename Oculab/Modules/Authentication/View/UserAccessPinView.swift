@@ -10,7 +10,9 @@ import SwiftUI
 struct UserAccessPinView: View {
     @EnvironmentObject var securityPresenter: AuthenticationPresenter
     var state: PinMode
-    
+    @State private var pinInputTask: Task<Void, Never>?
+    @State private var faceIdTask: Task<Void, Never>?
+
     var body: some View {
         NavigationView {
             ZStack {
@@ -123,7 +125,8 @@ struct UserAccessPinView: View {
                     }
                 }
                 .onChange(of: securityPresenter.inputPin) { _, newValue in
-                    Task {
+                    pinInputTask?.cancel()
+                    pinInputTask = Task {
                         await securityPresenter.handlePinInput(newValue)
                     }
                 }
@@ -131,7 +134,8 @@ struct UserAccessPinView: View {
                     securityPresenter.state = state
                     securityPresenter.inputPin.removeAll()
                     securityPresenter.isError = false
-                    Task {
+                    faceIdTask?.cancel()
+                    faceIdTask = Task {
                         securityPresenter.checkFaceIDAvailability()
 
                         // Skip FaceID auto-prompt when there's no stored PIN to fall back to.
@@ -140,6 +144,10 @@ struct UserAccessPinView: View {
                         else { return }
                         await securityPresenter.authenticateWithFaceID()
                     }
+                }
+                .onDisappear {
+                    pinInputTask?.cancel()
+                    faceIdTask?.cancel()
                 }
             }
         }
