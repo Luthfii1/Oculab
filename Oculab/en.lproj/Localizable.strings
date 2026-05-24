@@ -348,6 +348,12 @@
 "auth.pin.title_change" = "Current PIN";
 "auth.pin.invalid_match" = "PIN does not match, please try again";
 
+// Forget PIN
+"auth.pin.forget_title" = "Forgot PIN?";
+"auth.pin.forget_description" = "You will be logged out and need to sign in again with your email and password to access the app.";
+"auth.pin.forget_confirm" = "Continue";
+"auth.pin.forget_cancel" = "Cancel";
+
 // Profile View
 "auth.profile.account_info" = "Account Information";
 "auth.profile.job_title" = "Job Title";

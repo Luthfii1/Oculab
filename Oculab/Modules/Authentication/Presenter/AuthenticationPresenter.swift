@@ -11,7 +11,7 @@ import SwiftUI
 import Combine
 
 enum PinMode {
-    case create, revalidate, authenticate, changePIN
+    case create, revalidate, authenticate, changePIN, forgetPin
 }
 
 // MARK: - Main AuthenticationPresenter Class
@@ -60,6 +60,7 @@ class AuthenticationPresenter: ObservableObject {
     @Published var newAccessPin = AppValue.empty
     @Published var isAccessPinChangeInProgress = false
     @Published var showAccessPinSuccessPopup = false
+    @Published var showForgetPinPopup = false
     @Published var descriptionPIN: String = AppValue.empty
     @Published var state: PinMode = .authenticate {
         didSet {
@@ -354,6 +355,10 @@ extension AuthenticationPresenter {
                 inputPin = AppValue.empty
                 // Error description is already set in isValidPin()
             }
+
+        case .forgetPin:
+            // Show forget PIN confirmation popup
+            showForgetPinPopup = true
         }
     }
     
@@ -448,6 +453,8 @@ extension AuthenticationPresenter {
                 description = AppTextAuthCompPin.titleAuthenticatePin
             case .changePIN:
                 description = AppTextAuthCompPin.changePinTitle
+            case .forgetPin:
+                description = AppValue.empty
             }
         }
         
@@ -464,6 +471,8 @@ extension AuthenticationPresenter {
             return AppTextAuthCompPin.titleAuthenticatePin
         case .changePIN:
             return AppTextAuthCompPin.titleChangePin
+        case .forgetPin:
+            return AppTextAuthCompPin.titleAuthenticatePin
         }
     }
     
@@ -486,6 +495,8 @@ extension AuthenticationPresenter {
                 descriptionPIN = AppTextAuthCompPin.titleAuthenticatePin
             case .changePIN:
                 descriptionPIN = AppTextAuthCompPin.changePinTitle
+            case .forgetPin:
+                descriptionPIN = AppTextAuthCompPin.titleAuthenticatePin
             }
         }
     }
@@ -508,6 +519,47 @@ extension AuthenticationPresenter {
         inputPin = AppValue.empty
         isError = false
         description = AppValue.empty
+    }
+    
+    @MainActor
+    func handleForgetPin() async {
+        // Hide the popup first
+        showForgetPinPopup = false
+        
+        // Call backend API to delete access PIN
+        do {
+            let response = try await interactor.deleteAccessPin()
+            Logger.info("Access PIN successfully deleted from backend. Deleted PIN: \(response.accessPin ?? "nil")", category: .authentication)
+            
+            // Update local user data to remove PIN
+            if var localUser = await interactor.getUserLocalData() {
+                localUser.accessPin = nil
+                await interactor.updateUserLocalData(user: localUser)
+            }
+            
+        } catch {
+            Logger.error("Failed to delete access PIN from backend: \(error)", category: .authentication)
+            isError = true
+            errorMessage = ErrorHandler.shared.handleError(error, context: .login)
+        }
+        
+        // Clear all local user session data
+        clearLoginState()
+        
+        // Reset authentication state
+        resetAuthenticationState()
+        
+        // Set app state to unauthenticated to show login screen
+        appStateManager?.setUnauthenticated()
+        
+        // Navigate to login
+        Router.shared.popToRoot()
+        
+        Logger.info("User successfully logged out via forget PIN", category: .authentication)
+    }
+    
+    func cancelForgetPin() {
+        showForgetPinPopup = false
     }
 }
 
@@ -689,6 +741,7 @@ extension AuthenticationPresenter {
         newAccessPin = AppValue.empty
         isAccessPinChangeInProgress = false
         showAccessPinSuccessPopup = false
+        showForgetPinPopup = false
         
         // Clear login credentials and validation errors
         email = AppValue.empty

@@ -356,6 +356,12 @@
 "auth.pin.title_change" = "PIN saat Ini";
 "auth.pin.invalid_match" = "PIN tidak cocok, silakan coba lagi";
 
+// Forget PIN
+"auth.pin.forget_title" = "Lupa PIN?";
+"auth.pin.forget_description" = "Anda akan keluar dari aplikasi dan perlu masuk kembali dengan email dan password untuk mengakses aplikasi.";
+"auth.pin.forget_confirm" = "Lanjutkan";
+"auth.pin.forget_cancel" = "Batal";
+
 // Profile View
 "auth.profile.account_info" = "Informasi Akun";
 "auth.profile.job_title" = "Jabatan Pekerjaan";
