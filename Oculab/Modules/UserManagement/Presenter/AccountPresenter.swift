@@ -12,6 +12,7 @@ class AccountPresenter: ObservableObject {
     private var interactor: AccountInteractor
     private var searchTimer: Timer?
     private var debounceTime: TimeInterval = 0.3
+    private var refetchTask: Task<Void, Never>?
     
     // MARK: - Form Validation
     var formValidation: FormValidationViewModel
@@ -100,6 +101,7 @@ class AccountPresenter: ObservableObject {
     
     deinit {
         searchTimer?.invalidate()
+        refetchTask?.cancel()
     }
 }
 
@@ -185,21 +187,21 @@ extension AccountPresenter {
     @MainActor
     func registerNewAccountWithValidation(role: String, name: String, email: String) async {
         guard validateUserForm() else {
-            print("🔘 User form validation failed")
+            Logger.warning("User form validation failed", category: .general)
             return
         }
-        
+
         formValidation.clearAllErrors()
         await registerNewAccount(role: role, name: name, email: email)
     }
-    
+
     @MainActor
     func editSelectedUserWithValidation(role: String, name: String, userId: String) async {
         guard validateUserForm() else {
-            print("🔘 User form validation failed")
+            Logger.warning("User form validation failed", category: .general)
             return
         }
-        
+
         formValidation.clearAllErrors()
         await editSelectedUser(role: role, name: name, userId: userId)
     }
@@ -242,13 +244,14 @@ extension AccountPresenter {
             // Registration successful - result is non-nil
             registrationSuccess = (name: name, role: roleType.rawValue)
             showSuccessPopup = true
-            
-            Task {
-                await fetchAllAccount()
+
+            refetchTask?.cancel()
+            refetchTask = Task { [weak self] in
+                await self?.fetchAllAccount()
             }
-            
+
             clearForm()
-            
+
         } catch {
             registrationError = ErrorHandler.shared.handleError(error)
         }
@@ -269,11 +272,12 @@ extension AccountPresenter {
             selectedUser = SelectedUser(id: result.id, name: result.name)
             editSuccess = (name: name, role: role)
             showSuccessPopup = true
-            
-            Task {
-                await fetchAllAccount()
+
+            refetchTask?.cancel()
+            refetchTask = Task { [weak self] in
+                await self?.fetchAllAccount()
             }
-            
+
         } catch {
             editError = ErrorHandler.shared.handleError(error)
         }

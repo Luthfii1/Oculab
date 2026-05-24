@@ -145,6 +145,9 @@ struct NewUserFormView: View {
                 Text(presenter.registrationError ?? AppValue.unknownError)
             }
         )
+        .onDisappear {
+            presenter.resetForm()
+        }
     }
 }
 

@@ -71,8 +71,7 @@ struct EditUserFormView: View {
                                 placeholder: AppTextUserMgmtEditUserForm.emailPlaceholder,
                                 isDisabled: true,
                                 text: .constant(account.email),
-                                fieldName: .userEmail,
-                                validationType: .email
+                                fieldName: .userEmail
                             )
 
                             // Save button
@@ -147,6 +146,9 @@ struct EditUserFormView: View {
         )
         .onAppear {
             presenter.setAccount(account: account)
+        }
+        .onDisappear {
+            presenter.resetForm()
         }
     }
 }
