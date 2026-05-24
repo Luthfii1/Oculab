@@ -234,6 +234,9 @@ extension AuthenticationPresenter {
             inputPin = AppValue.empty
             firstPin = AppValue.empty
             secondPin = AppValue.empty
+            oldAccessPin = AppValue.empty
+            newAccessPin = AppValue.empty
+            isAccessPinChangeInProgress = false
 
             if account.accessPin == nil {
                 // User needs to create PIN
@@ -262,24 +265,37 @@ extension AuthenticationPresenter {
 
 // MARK: - PIN Management
 extension AuthenticationPresenter {
+    /// Constant-time comparison to avoid leaking PIN content via early-exit timing.
+    private static func constantTimeEquals(_ a: String, _ b: String) -> Bool {
+        let aBytes = Array(a.utf8)
+        let bBytes = Array(b.utf8)
+        guard aBytes.count == bBytes.count else { return false }
+        var diff: UInt8 = 0
+        for i in 0..<aBytes.count {
+            diff |= aBytes[i] ^ bBytes[i]
+        }
+        return diff == 0
+    }
+
     @MainActor
     func isValidPin() async -> Bool {
         // For PIN change flow, we should check against oldAccessPin, not the stored PIN
         if isAccessPinChangeInProgress {
-            if oldAccessPin != inputPin {
+            if !Self.constantTimeEquals(oldAccessPin, inputPin) {
                 description = AppTextAuthCompPin.invalidPinText
                 isError = true
                 return false
             }
         } else {
             // Normal authentication - check against stored PIN
-            if await interactor.getUserLocalData()?.accessPin != inputPin {
+            let storedPin = await interactor.getUserLocalData()?.accessPin ?? AppValue.empty
+            if !Self.constantTimeEquals(storedPin, inputPin) {
                 description = AppTextAuthCompPin.invalidPinText
                 isError = true
                 return false
             }
         }
-        
+
         return true
     }
     
@@ -399,7 +415,7 @@ extension AuthenticationPresenter {
             return
         }
         
-        guard firstPin == secondPin else {
+        guard Self.constantTimeEquals(firstPin, secondPin) else {
             description = AppTextAuthCompPin.invalidPinMatchText
             isError = true
             return
@@ -471,7 +487,7 @@ extension AuthenticationPresenter {
     }
     
     private func revalidatePinMatched() -> Bool {
-        let matched = firstPin == secondPin
+        let matched = Self.constantTimeEquals(firstPin, secondPin)
         if !matched {
             // Set error description when PINs don't match
             description = AppTextAuthCompPin.invalidPinMatchText
@@ -497,8 +513,8 @@ extension AuthenticationPresenter {
         
         // Call backend API to delete access PIN
         do {
-            let response = try await interactor.deleteAccessPin()
-            Logger.info("Access PIN successfully deleted from backend. Deleted PIN: \(response.accessPin ?? "nil")", category: .authentication)
+            _ = try await interactor.deleteAccessPin()
+            Logger.info("Access PIN successfully deleted from backend", category: .authentication)
             
             // Update local user data to remove PIN
             if var localUser = await interactor.getUserLocalData() {
@@ -530,6 +546,7 @@ extension AuthenticationPresenter {
 extension AuthenticationPresenter {
     func checkFaceIDAvailability() {
         let context = LAContext()
+        defer { context.invalidate() }
         var error: NSError?
 
         if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
@@ -552,6 +569,7 @@ extension AuthenticationPresenter {
     @MainActor
     func authenticateWithFaceID() async {
         let context = LAContext()
+        defer { context.invalidate() }
         var error: NSError?
 
         // Check if Face ID is available on the device
@@ -612,6 +630,7 @@ extension AuthenticationPresenter {
     @MainActor
     func requestFaceIDActivation() async {
         let context = LAContext()
+        defer { context.invalidate() }
         var error: NSError?
 
         guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
@@ -719,15 +738,6 @@ extension AuthenticationPresenter {
         // Reset colors
         textColor = AppColors.slate900
         pinColor = AppColors.purple500
-    }
-    
-    private func handleErrorState(isError: Bool, errorData: ApiErrorData? = nil) {
-        DispatchQueue.main.async {
-            if isError, let errorData = errorData {
-                self.description = errorData.description
-            }
-            self.isError = isError
-        }
     }
     
     private func updateUIForErrorState() {
