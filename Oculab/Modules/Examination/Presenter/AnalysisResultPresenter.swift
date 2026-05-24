@@ -25,7 +25,15 @@ class AnalysisResultPresenter: ObservableObject {
     @Published var isLoading = false
 
     // MARK: - UI State Properties
-    @Published var selectedTBGrade: String = AppValue.empty
+    @Published var selectedTBGrade: String = AppValue.empty {
+        didSet {
+            // Drop SCANTY-specific count when staff switches to a different grade,
+            // so submitExpertResult doesn't ship a stale value alongside e.g. PLUS3.
+            if selectedTBGrade != GradingType.SCANTY.rawValue {
+                numOfBTA = AppValue.empty
+            }
+        }
+    }
     @Published var numOfBTA: String = AppValue.empty
     @Published var inspectorNotes: String = AppValue.empty
     @Published private var currentStep: Int = 3

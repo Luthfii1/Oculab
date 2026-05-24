@@ -26,6 +26,7 @@ extension AppText {
         static let titleResultInterpretation = "examination.title_result_interpretation".localized
         static let buttonStartAnalysis = "examination.button_start_analysis".localized
         static let buttonSubmitting = "examination.button_submitting".localized
+        static let tempFileCleanupWarning = "examination.temp_file_cleanup_warning".localized
 
         enum ProgressView {
             static let loadingAnimationName = "loadingPaperplane"

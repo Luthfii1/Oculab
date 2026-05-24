@@ -404,6 +404,7 @@
 "examination.title_result_interpretation" = "Interpretation Results";
 "examination.button_start_analysis" = "Start Analysis";
 "examination.button_submitting" = "Submitting...";
+"examination.temp_file_cleanup_warning" = "Examination submitted, but the temporary recording could not be removed from the device.";
 
 // Progress View
 "examination.progress.analyzing_title" = "Interpreting data";
