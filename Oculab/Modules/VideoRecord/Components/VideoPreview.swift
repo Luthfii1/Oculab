@@ -168,17 +168,23 @@ struct VideoPreview: View {
         // Clean up current video
         player?.pause()
         player = nil
-        
-        // Delete temporary file
-        if let url = videoRecordPresenter.previewURL {
-            deleteTemporaryFile(at: url)
+
+        let urlToRemove = videoRecordPresenter.previewURL
+
+        Task { @MainActor in
+            // Stop the capture session before deleting the file to release the writer handle
+            await videoRecordPresenter.stopCameraSession()
+
+            if let url = urlToRemove {
+                videoRecordPresenter.deleteTemporaryFile(at: url)
+            }
+
+            // Reset presenter state
+            videoRecordPresenter.previewURL = nil
+            videoRecordPresenter.stitchedImage = nil
+
+            Logger.info("Video retake initiated", category: .videoRecord)
         }
-        
-        // Reset presenter state
-        videoRecordPresenter.previewURL = nil
-        videoRecordPresenter.stitchedImage = nil
-        
-        Logger.info("Video retake initiated", category: .videoRecord)
     }
     
     private func shareVideo() {
@@ -197,21 +203,13 @@ struct VideoPreview: View {
     
     private func deleteVideo() {
         guard let url = videoRecordPresenter.previewURL else { return }
-        
-        deleteTemporaryFile(at: url)
+
+        videoRecordPresenter.deleteTemporaryFile(at: url)
         videoRecordPresenter.previewURL = nil
         videoRecordPresenter.navigateBack()
     }
-    
-    private func deleteTemporaryFile(at url: URL) {
-        do {
-            try FileManager.default.removeItem(at: url)
-            Logger.info("Temporary video file deleted: \(url.lastPathComponent)", category: .videoRecord)
-        } catch {
-            Logger.error("Failed to delete temporary file: \(error.localizedDescription)", category: .videoRecord)
-        }
-    }
-    
+
+
     private func formatTime(_ time: Double) -> String {
         let minutes = Int(time) / 60
         let seconds = Int(time) % 60

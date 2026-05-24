@@ -25,6 +25,7 @@ class VideoPlayerManager: ObservableObject {
     // MARK: - Private Properties
     private var cancellables = Set<AnyCancellable>()
     private let videoURL: URL
+    private var timeObserverToken: Any?
     
     // MARK: - Initialization
     init(videoURL: URL) {
@@ -35,14 +36,13 @@ class VideoPlayerManager: ObservableObject {
     func setupPlayer() {
         // Validate video file exists
         guard FileManager.default.fileExists(atPath: videoURL.path) else {
-            Logger.error("Video file does not exist at path: \(videoURL.path)", category: .videoRecord)
+            Logger.error("Video file does not exist", category: .videoRecord)
             hasError = true
             isLoading = false
             return
         }
-        
-        Logger.info("Setting up video player for URL: \(videoURL.path)", category: .videoRecord)
-        Logger.info("File size: \(getFileSize(videoURL))", category: .videoRecord)
+
+        Logger.info("Setting up video player (size: \(getFileSize(videoURL)))", category: .videoRecord)
         
         player = AVPlayer(url: videoURL)
         
@@ -97,6 +97,10 @@ class VideoPlayerManager: ObservableObject {
     }
     
     func cleanup() {
+        if let token = timeObserverToken {
+            player?.removeTimeObserver(token)
+            timeObserverToken = nil
+        }
         player?.pause()
         player = nil
         cancellables.removeAll()
@@ -106,11 +110,21 @@ class VideoPlayerManager: ObservableObject {
     private func loadVideoAsset() {
         let asset = AVAsset(url: videoURL)
         Task {
+            // Verify the file is still readable before loading metadata
+            guard FileManager.default.isReadableFile(atPath: videoURL.path) else {
+                await MainActor.run {
+                    self.hasError = true
+                    self.isLoading = false
+                }
+                Logger.error("Video file is not readable", category: .videoRecord)
+                return
+            }
+
             do {
                 let duration = try await asset.load(.duration)
                 let isPlayable = try await asset.load(.isPlayable)
                 let hasVideoTracks = try await asset.loadTracks(withMediaType: .video).count > 0
-                
+
                 await MainActor.run {
                     self.duration = CMTimeGetSeconds(duration)
                     if isPlayable && hasVideoTracks {
@@ -165,14 +179,14 @@ class VideoPlayerManager: ObservableObject {
             .store(in: &cancellables)
         
         // Monitor current time
-        player.addPeriodicTimeObserver(
+        timeObserverToken = player.addPeriodicTimeObserver(
             forInterval: CMTime(seconds: 0.1, preferredTimescale: 600),
             queue: .main
         ) { [weak self] time in
             guard let self = self, !self.isDragging else { return }
             let newTime = CMTimeGetSeconds(time)
             self.currentTime = newTime
-            
+
             // Check if video has reached the end
             if self.duration > 0 && abs(newTime - self.duration) < 0.1 {
                 self.hasReachedEnd = true
@@ -194,12 +208,13 @@ class VideoPlayerManager: ObservableObject {
     
     private func replayVideo() {
         guard let player = player else { return }
-        
+
         let startTime = CMTime.zero
         player.seek(to: startTime) { [weak self] _ in
             DispatchQueue.main.async {
-                self?.hasReachedEnd = false
-                self?.currentTime = 0
+                guard let self = self, let player = self.player else { return }
+                self.hasReachedEnd = false
+                self.currentTime = 0
                 player.play()
                 Logger.info("Video replaying from start", category: .videoRecord)
             }
