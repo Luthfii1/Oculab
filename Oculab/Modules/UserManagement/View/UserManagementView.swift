@@ -9,7 +9,8 @@ import SwiftUI
 
 struct UserManagementView: View {
     @EnvironmentObject var presenter: AccountPresenter
-    
+    @State private var fetchTask: Task<Void, Never>?
+
     var body: some View {
         NavigationView {
             ZStack {
@@ -148,9 +149,13 @@ struct UserManagementView: View {
                     }
                 )
                 .onAppear {
-                    Task {
+                    fetchTask?.cancel()
+                    fetchTask = Task {
                         await presenter.fetchAllAccount()
                     }
+                }
+                .onDisappear {
+                    fetchTask?.cancel()
                 }
             }
         }
