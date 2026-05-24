@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct HomeView: View {
-    @ObservedObject private var presenter = HomeHistoryPresenter()
+    @StateObject private var presenter = HomeHistoryPresenter()
     @EnvironmentObject private var authentication: AuthenticationPresenter
+    @State private var loadTask: Task<Void, Never>?
+    @State private var refreshTask: Task<Void, Never>?
 
     var body: some View {
         NavigationView {
@@ -117,10 +119,12 @@ struct HomeView: View {
                 .padding(.bottom, 20)
             }
             .refreshable {
-                Task {
+                refreshTask?.cancel()
+                refreshTask = Task {
                     await presenter.getStatisticData()
                     await presenter.fetchData(userRole: authentication.user.role)
                 }
+                await refreshTask?.value
             }
             .navigationTitle(AppTextHomeHistory.navigationTitleHome)
             .toolbar {
@@ -131,10 +135,15 @@ struct HomeView: View {
         }
         .ignoresSafeArea()
         .onAppear {
-            Task {
+            loadTask?.cancel()
+            loadTask = Task {
                 await presenter.getStatisticData()
                 await presenter.fetchData(userRole: authentication.user.role)
             }
+        }
+        .onDisappear {
+            loadTask?.cancel()
+            refreshTask?.cancel()
         }
         .navigationBarBackButtonHidden(true)
     }

@@ -164,7 +164,11 @@ struct WeeklyCalendar: View {
         let calendar = Calendar.current
         var weekDates: [Date] = []
 
-        let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: date))!
+        guard let startOfWeek = calendar.date(
+            from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: date)
+        ) else {
+            return [date]
+        }
 
         for i in 0..<Constants.daysInWeek {
             if let weekDate = calendar.date(byAdding: .day, value: i, to: startOfWeek) {
