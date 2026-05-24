@@ -56,12 +56,12 @@ struct GuidelinesOnboardingView: View {
                     .padding(.bottom, 24)
 
                 AppButton(
-                    title: AppAction.next,
+                    title: currentPage == pages.count - 1 ? AppAction.done : AppAction.next,
                     rightIcon: AppIcon.arrowRight,
-                    isEnabled: currentPage == pages.count - 1,
+                    isEnabled: true,
                     action: {
                         if currentPage < pages.count - 1 {
-                            currentPage += 1
+                            withAnimation { currentPage += 1 }
                         } else {
                             dismiss()
                         }

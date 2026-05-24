@@ -73,8 +73,6 @@ struct ExamDetailView: View {
                                 didFinishOnboarding: $didFinishOnboarding,
                                 selectedURL: $presenter.recordVideo
                             ).environmentObject(presenter)
-
-                            VStack(alignment: .leading, spacing: Decimal.d24) {}
                         }
                     }
 
@@ -85,7 +83,8 @@ struct ExamDetailView: View {
                         isEnabled: presenter.isButtonEnabled
                     ) {
                         Task {
-                            await presenter.handleSubmit()
+                            let didSucceed = await presenter.handleSubmit()
+                            guard didSucceed else { return }
                             presenter.navigateToAnalysisResult(examinationId: presenter.examDetailData.examinationId)
                         }
                     }

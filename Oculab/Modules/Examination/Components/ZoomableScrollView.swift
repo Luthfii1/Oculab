@@ -31,7 +31,10 @@ struct ZoomableScrollView<Content: View>: UIViewRepresentable {
         scrollView.backgroundColor = .black
         scrollView.contentInsetAdjustmentBehavior = .never
 
-        let hostedView = context.coordinator.hostingController.view!
+        guard let hostedView = context.coordinator.hostingController.view else {
+            Logger.error("ZoomableScrollView: hosting controller view is nil", category: .examination)
+            return scrollView
+        }
         hostedView.translatesAutoresizingMaskIntoConstraints = true
         hostedView.frame = scrollView.bounds
         scrollView.addSubview(hostedView)

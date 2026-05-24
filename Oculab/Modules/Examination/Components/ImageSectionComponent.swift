@@ -25,11 +25,10 @@ struct ImageSectionComponent: View {
                 .font(AppTypography.p3)
                 .foregroundStyle(AppColors.slate300)
 
-            if presenter.isWSIImageVisible {
-                AsyncImage(url: URL(
-                    string: examination
-                        .imagePreview
-                )) { phase in
+            if presenter.isWSIImageVisible,
+               !examination.imagePreview.isEmpty,
+               let imageURL = URL(string: examination.imagePreview) {
+                AsyncImage(url: imageURL) { phase in
                     switch phase {
                     case .empty:
                         ProgressView().frame(height: 114)

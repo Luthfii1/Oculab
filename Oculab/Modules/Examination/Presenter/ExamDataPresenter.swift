@@ -38,6 +38,7 @@ class ExamDataPresenter: ObservableObject {
         bpjs: AppValue.empty
     )
     @Published var examinations: [AdminExaminationData] = []
+    @Published var submissionError: String?
 
     // MARK: - Initialization
     init(interactor: ExamInteractor) {
@@ -104,13 +105,14 @@ extension ExamDataPresenter {
 // MARK: - Submission Methods
 extension ExamDataPresenter {
     @MainActor
-    func handleSubmit() async {
+    func handleSubmit() async -> Bool {
         isLoading = true
         defer { isLoading = false }
+        submissionError = nil
 
         guard let fileURL = recordVideo else {
             Logger.warning("Submit button pressed but recordVideo URL is nil", category: .examination)
-            return
+            return false
         }
 
         do {
@@ -125,14 +127,15 @@ extension ExamDataPresenter {
 
             Logger.info("Examination submitted successfully with response: \(response)", category: .examination)
 
-            // Clear video data and cleanup
             recordVideo = nil
             videoPresenter.previewURL = nil
             deleteTemporaryFile(at: fileURL)
 
+            return true
         } catch {
             Logger.error("Error submitting or loading video data: \(error)", category: .examination)
-            _ = ErrorHandler.shared.handleError(error, context: .examination)
+            submissionError = ErrorHandler.shared.handleError(error, context: .examination)
+            return false
         }
     }
 }
