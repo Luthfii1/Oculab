@@ -49,5 +49,8 @@ import SwiftUI
 }
 
 #Preview {
-    PatientCard(name: "Risa", birthDate: "2003")
+    PatientCard(
+        name: AppTextPatientCompCard.previewName,
+        birthDate: AppTextPatientCompCard.previewBirthDate
+    )
 }

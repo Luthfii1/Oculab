@@ -20,7 +20,10 @@ struct PatientFormField: View {
                 text: $presenter.patient.name,
                 fieldName: .patientName
             )
-            
+            .onChange(of: presenter.patient.name) {
+                presenter.handleNameChange()
+            }
+
             ValidatedTextField(
                 title: AppPatient.nik,
                 isRequired: true,
@@ -30,6 +33,9 @@ struct PatientFormField: View {
                 text: $presenter.patient.NIK,
                 fieldName: .patientNIK
             )
+            .onChange(of: presenter.patient.NIK) {
+                presenter.handleNIKChange()
+            }
 
             DateField(
                 title: AppPatient.dateOfBirth,

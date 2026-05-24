@@ -92,6 +92,9 @@ struct PatientListView: View {
                     await presenter.getAllPatient()
                 }
             }
+            .onDisappear {
+                presenter.resetState()
+            }
             .onChange(of: presenter.searchText) { _, _ in
                 presenter.searchPatients()
             }

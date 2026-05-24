@@ -530,6 +530,8 @@
 "patient.card.birth_date_prefix" = "Tanggal Lahir: ";
 "patient.card.button_create_patient" = "Pasien Baru";
 "patient.card.button_save_patient" = "Data Pasien";
+"patient.card.preview_name" = "Nama Pasien";
+"patient.card.preview_birth_date" = "01/01/2000";
 
 // Patient Form Field Component
 "patient.form_field.name_placeholder" = "John Doe";
