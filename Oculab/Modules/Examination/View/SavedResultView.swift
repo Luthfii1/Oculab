@@ -11,8 +11,8 @@ struct SavedResultView: View {
     var examId: String
     var patientId: String
 
-    @StateObject var presenter = ExamDataPresenter(interactor: ExamInteractor())
-    @StateObject var resultPresenter = AnalysisResultPresenter()
+    @StateObject private var presenter = ExamDataPresenter(interactor: ExamInteractor())
+    @StateObject private var resultPresenter = AnalysisResultPresenter()
 
     var body: some View {
         NavigationView {
@@ -146,6 +146,10 @@ struct SavedResultView: View {
                     await presenter.fetchData(examId: examId, patientId: patientId, userRole: .LAB)
                     await resultPresenter.fetchData(examinationId: examId)
                 }
+            }
+            .onDisappear {
+                presenter.resetState()
+                resultPresenter.resetState()
             }
         }.navigationBarBackButtonHidden(true)
     }

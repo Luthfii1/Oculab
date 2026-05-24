@@ -12,6 +12,10 @@ class AnalysisResultPresenter: ObservableObject {
     // MARK: - Dependencies
     private let interactor: AnalysisResultInteractor
 
+    // MARK: - Task Handles
+    private var fetchTask: Task<Void, Never>?
+    private var trackingTask: Task<Void, Never>?
+
     init(interactor: AnalysisResultInteractor = AnalysisResultInteractor()) {
         self.interactor = interactor
     }
@@ -35,12 +39,12 @@ class AnalysisResultPresenter: ObservableObject {
     @Published var buttonTitle: String = AppTextExamProgress.buttonSaveResult
     @Published var isAllFOVsVerified: Bool = false
     @Published var startTime: Date?
-    
+
     // MARK: - Computed Properties
     var systemGrading: GradingType {
         examinationResult?.systemGrading ?? .unknown
     }
-    
+
     var systemConfidenceLevel: ConfidenceLevel {
         ConfidenceLevel.classify(
             aggregatedConfidence: examinationResult?.confidenceLevelAggregated ?? 0.0
@@ -50,7 +54,7 @@ class AnalysisResultPresenter: ObservableObject {
     let columnsFOVAlbum = [
         GridItem(.adaptive(minimum: AppConstants.fovGridMinItemSize))
     ]
-    
+
     var systemGradingCount: Int {
         switch systemGrading {
         case .NEGATIVE:
@@ -63,10 +67,10 @@ class AnalysisResultPresenter: ObservableObject {
             return examinationResult?.bacteriaTotalCount ?? 0
         }
     }
-    
+
     func selectedFOVs(for fovGroup: FOVType) -> [FOVData] {
         guard let groupedFOVs = groupedFOVs else { return [] }
-        
+
         switch fovGroup {
         case .BTA0:
             return groupedFOVs.bta0
@@ -76,15 +80,15 @@ class AnalysisResultPresenter: ObservableObject {
             return groupedFOVs.btaabove9
         }
     }
-    
+
     var availableFOVTypes: [FOVType] {
         return [.BTA0, .BTA1TO9, .BTAABOVE9]
     }
-    
+
     // MARK: - Helper Methods
     func fovCount(for fovType: FOVType) -> Int? {
         guard let groupedFOVs = groupedFOVs else { return nil }
-        
+
         switch fovType {
         case .BTA0:
             return groupedFOVs.bta0.isEmpty ? nil : groupedFOVs.bta0.count
@@ -128,7 +132,7 @@ extension AnalysisResultPresenter {
 extension AnalysisResultPresenter {
     func setStartTime() {
         startTime = Date()
-        Logger.info("Start time set: \(String(describing: startTime))", category: .examination)
+        Logger.info("Start time set", category: .examination)
     }
 
     @MainActor
@@ -163,7 +167,7 @@ extension AnalysisResultPresenter {
     func fetchData(examinationId: String) async {
         defer { isLoading = false }
         isLoading = true
-        
+
         do {
             examinationResult = try await interactor.fetchData(examId: examinationId)
 
@@ -192,11 +196,13 @@ extension AnalysisResultPresenter {
                 throw NetworkError.networkError("Error: Invalid TB Grade", endpoint: "submitExpertResult")
             }
 
+            let bacteriaCount = Int(numOfBTA) ?? 0
+
             _ = try await interactor.submitExpertResult(
                 examId: examinationId,
                 expertResult: ExpertExamResult(
                     finalGrading: validGrading,
-                    bacteriaTotalCount: Int(numOfBTA),
+                    bacteriaTotalCount: bacteriaCount,
                     notes: inspectorNotes
                 )
             )
@@ -211,15 +217,15 @@ extension AnalysisResultPresenter {
     func isEnableToSubmit() -> Bool {
         return isValidGradingSelection()
     }
-    
+
     private func isValidGradingSelection() -> Bool {
         guard selectedTBGrade != AppValue.empty else { return false }
-        
+
         // For SCANTY grade, require bacteria count
         if selectedTBGrade == GradingType.SCANTY.rawValue {
             return !numOfBTA.isEmpty && Int(numOfBTA) != nil
         }
-        
+
         return true
     }
 }
@@ -243,6 +249,10 @@ extension AnalysisResultPresenter {
 extension AnalysisResultPresenter {
     @MainActor
     func resetState() {
+        fetchTask?.cancel()
+        fetchTask = nil
+        trackingTask?.cancel()
+        trackingTask = nil
         examinationResult = nil
         errorMessage = nil
         confidenceLevel = .unpredicted

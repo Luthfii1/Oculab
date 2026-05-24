@@ -75,7 +75,7 @@ struct GuidelinesOnboardingView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
-                        Router.shared.navigateBack()
+                        dismiss()
                     }) {
                         Image(AppImage.back)
                     }
