@@ -59,6 +59,9 @@ struct PatientFormView: View {
             .onAppear {
                 presenter.setupForm(patientId: patientId)
             }
+            .onDisappear {
+                presenter.resetState()
+            }
             .alert(AppValue.unknownError, isPresented: Binding(
                 get: { presenter.errorMessage != nil },
                 set: { _ in presenter.errorMessage = nil }

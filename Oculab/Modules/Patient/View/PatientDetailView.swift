@@ -14,7 +14,7 @@ struct PatientDetailView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                if !presenter.isLoadingPatient && !presenter.patient.name.isEmpty {
+                if !presenter.isPatientLoading && !presenter.patient.name.isEmpty {
                     Spacer().frame(height: Decimal.d24)
                     
                     AppCard(icon: AppIcon.personFill, title: AppTextPatientDetail.patientDataTitle, spacing: Decimal.d16, isEnablingEdit: true) {
@@ -71,7 +71,7 @@ struct PatientDetailView: View {
                             }
                         }
                     }
-                } else if presenter.isLoadingPatient {
+                } else if presenter.isPatientLoading {
                     ProgressView(AppTextPatientDetail.loadingPatientMessage)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
@@ -95,6 +95,9 @@ struct PatientDetailView: View {
                     await presenter.getPatientById(patientId: patientId)
                     await presenter.getExaminationsByPatientId(patientId: patientId)
                 }
+            }
+            .onDisappear {
+                presenter.resetState()
             }
         }
         .navigationBarBackButtonHidden(true)

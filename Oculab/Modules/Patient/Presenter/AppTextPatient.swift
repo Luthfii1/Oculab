@@ -41,6 +41,8 @@ extension AppText {
             static let birthDatePrefix = "patient.card.birth_date_prefix".localized
             static let buttonCreatePatient = AppAction.add("patient.card.button_create_patient".localized)
             static let buttonSavePatient = AppAction.save("patient.card.button_save_patient".localized)
+            static let previewName = "patient.card.preview_name".localized
+            static let previewBirthDate = "patient.card.preview_birth_date".localized
         }
         
         enum PatientFormFieldComponent {
