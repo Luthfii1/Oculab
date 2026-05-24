@@ -16,12 +16,14 @@ struct OculabApp: App {
     @StateObject private var authPresenter = DependencyInjection.shared.createAuthPresenter()
 
     init() {
+        KeychainHelper.bootstrap()
+
         do {
             self.container = try ModelContainer(for: User.self)
         } catch {
             fatalError("Failed to initialize SwiftData ModelContainer: \(error.localizedDescription)")
         }
-        
+
         DependencyInjection.shared.initializer(modelContext: container.mainContext)
     }
 

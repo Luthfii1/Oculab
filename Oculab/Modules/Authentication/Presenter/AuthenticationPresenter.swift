@@ -710,8 +710,7 @@ extension AuthenticationPresenter {
         UserDefaults.standard.removeObject(forKey: UserDefaultType.isUserLoggedIn.rawValue)
         UserDefaults.standard.removeObject(forKey: UserDefaultType.firstTimeLogin.rawValue)
         UserDefaults.standard.removeObject(forKey: UserDefaultType.userId.rawValue)
-        UserDefaults.standard.removeObject(forKey: UserDefaultType.accessToken.rawValue)
-        UserDefaults.standard.removeObject(forKey: UserDefaultType.refreshToken.rawValue)
+        KeychainHelper.removeAll()
     }
     
     func isUserLoggedIn() -> Bool {

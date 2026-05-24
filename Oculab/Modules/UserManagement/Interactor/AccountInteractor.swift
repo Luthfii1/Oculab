@@ -35,7 +35,7 @@ class AccountInteractor: ObservableObject {
             )
         }
 
-        guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
+        guard let token = KeychainHelper.string(for: .accessToken) else {
             throw URLError(.userAuthenticationRequired)
         }
 
@@ -71,7 +71,7 @@ class AccountInteractor: ObservableObject {
             )
         }
         
-        guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
+        guard let token = KeychainHelper.string(for: .accessToken) else {
             throw URLError(.userAuthenticationRequired)
         }
 
@@ -93,7 +93,7 @@ class AccountInteractor: ObservableObject {
     }
     
     func editAccount(userId: String, name: String? = nil, role: RolesType? = nil) async throws -> EditAccountResponse {
-        guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
+        guard let token = KeychainHelper.string(for: .accessToken) else {
             throw URLError(.userAuthenticationRequired)
         }
         
@@ -137,7 +137,7 @@ class AccountInteractor: ObservableObject {
     }
     
     func deleteAccount(userId: String) async throws -> DeleteAccountResponse {
-        guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
+        guard let token = KeychainHelper.string(for: .accessToken) else {
             throw URLError(.userAuthenticationRequired)
         }
 
