@@ -9,9 +9,12 @@ import SwiftUI
 
 struct InputPatientData: View {
     let patientId: String?
-    @ObservedObject var presenter = InputPatientPresenter()
+    @StateObject var presenter = InputPatientPresenter()
     @EnvironmentObject private var authentication: AuthenticationPresenter
-    
+    @State private var loadTask: Task<Void, Never>?
+    @State private var patientChangeTask: Task<Void, Never>?
+    @State private var picChangeTask: Task<Void, Never>?
+
     init(patientId: String? = nil) {
         self.patientId = patientId
     }
@@ -88,15 +91,16 @@ struct InputPatientData: View {
                 }
             }
             .onAppear {
-                Task {
+                loadTask?.cancel()
+                loadTask = Task {
                     await presenter.getAllUser()
                     await presenter.getAllPatient()
-                    
+
                     // Auto-fill PIC for B2C LAB users
                     if authentication.user.role == .LAB && authentication.user.businessModel == .B2C {
                         presenter.selectedPIC = authentication.user._id
                     }
-                    
+
                     // Auto-fill patient if patientId is provided
                     if let patientId = patientId, !patientId.isEmpty {
                         await presenter.getPatientById(patientId: patientId)
@@ -105,10 +109,16 @@ struct InputPatientData: View {
                     }
                 }
             }
+            .onDisappear {
+                loadTask?.cancel()
+                patientChangeTask?.cancel()
+                picChangeTask?.cancel()
+            }
             .dismissKeyboardOnTap()
             .onChange(of: presenter.selectedPatient) { _, newValue in
-                Task {
-                    Logger.info("Selected patient changed: \(presenter.selectedPatient)", category: .taskAssignment)
+                patientChangeTask?.cancel()
+                patientChangeTask = Task {
+                    Logger.info("Selected patient changed", category: .taskAssignment)
                     // Only fetch if it's not already auto-filled
                     if patientId == nil || newValue != patientId {
                         await presenter.getPatientById(patientId: newValue)
@@ -117,7 +127,8 @@ struct InputPatientData: View {
             }
             .onChange(of: presenter.selectedPIC) { _, newValue in
                 if !newValue.isEmpty {
-                    Task {
+                    picChangeTask?.cancel()
+                    picChangeTask = Task {
                         await presenter.getUserById(userId: newValue)
                     }
                 }

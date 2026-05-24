@@ -8,9 +8,10 @@
 import SwiftUI
 
 struct InputExaminationData: View {
-    @ObservedObject var presenter: InputPatientPresenter = .init()
+    @StateObject var presenter: InputPatientPresenter = .init()
     @State var selectedPIC: String
-    @State var selectedPatient: String 
+    @State var selectedPatient: String
+    @State private var submitTask: Task<Void, Never>?
 
     var body: some View {
         NavigationView {
@@ -26,9 +27,10 @@ struct InputExaminationData: View {
                             title: AppTextTaskAssignInputExam.createTaskButton,
                             colorType: .primary,
                             size: .large,
-                            isEnabled: true
+                            isEnabled: !presenter.isSubmittingExamination
                         ) {
-                            Task {
+                            submitTask?.cancel()
+                            submitTask = Task {
                                 await presenter.submitExamination()
                             }
                         },
@@ -160,6 +162,9 @@ struct InputExaminationData: View {
             }
             .onAppear {
                 presenter.setupExaminationData(selectedPIC: selectedPIC, selectedPatient: selectedPatient)
+            }
+            .onDisappear {
+                submitTask?.cancel()
             }
         }
         .navigationBarBackButtonHidden(true)

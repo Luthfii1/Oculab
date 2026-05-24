@@ -31,6 +31,7 @@ class InputPatientPresenter: ObservableObject {
     @Published var errorMessage: String = AppValue.empty
     @Published var isUserLoading = false
     @Published var isPatientLoading = false
+    @Published var isSubmittingExamination = false
     @Published var isSubmitPopUpVisible: Bool = false
     @Published var isSlide2Visible: Bool = false
     // MARK: - Slide 2 UI Logic
@@ -146,7 +147,7 @@ class InputPatientPresenter: ObservableObject {
     
     // MARK: - Helper Methods
     private func updatePatientForm() {
-        Logger.info("Patient found - DoB: \(String(describing: patient.DoB)), Sex: \(patient.sex), BPJS: \(String(describing: patient.BPJS))", category: .taskAssignment)
+        Logger.info("Patient record loaded", category: .taskAssignment)
         selectedDoB = patient.DoB ?? Date()
         selectedSex = patient.sex == .MALE ? AppPatient.Gender.male : 
                      patient.sex == .FEMALE ? AppPatient.Gender.female : AppValue.empty
@@ -235,8 +236,7 @@ extension InputPatientPresenter {
     
     @MainActor
     func addNewPatient() async -> Bool {
-        Logger.debug("Adding new patient - ID: \(patient._id)", category: .taskAssignment)
-        Logger.debug("Patient details: \(patient.name), NIK: \(patient.NIK), BPJS: \(patient.BPJS ?? "None")", category: .taskAssignment)
+        Logger.debug("Adding new patient", category: .taskAssignment)
 
         do {
             patient.name = selectedPatient
@@ -287,7 +287,7 @@ extension InputPatientPresenter {
         Task {
             await getPatientById(patientId: selectedPatient)
             await getUserById(userId: selectedPIC)
-            Logger.info("Examination data loaded for patient: \(patient.name)", category: .taskAssignment)
+            Logger.info("Examination data loaded", category: .taskAssignment)
         }
     }
 }
@@ -296,8 +296,14 @@ extension InputPatientPresenter {
 extension InputPatientPresenter {
     @MainActor
     func submitExamination() async {
+        guard !isSubmittingExamination else { return }
+        isSubmittingExamination = true
+        defer { isSubmittingExamination = false }
+
         guard let DPJPId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
+            errorMessage = AppTextTaskAssignInputExam.errorMessageFailedToGetResponse
             isError = true
+            Logger.error("Submit failed: missing DPJP user id in UserDefaults", category: .taskAssignment)
             return
         }
         
@@ -460,7 +466,7 @@ extension InputPatientPresenter {
             allowFuture: false,
             allowPast: true
         )
-        Logger.debug("Patient DoB updated to: \(selectedDoB)", category: .taskAssignment)
+        Logger.debug("Patient DoB updated", category: .taskAssignment)
     }
     
     func handleGenderChange() {
@@ -474,7 +480,7 @@ extension InputPatientPresenter {
         }
         // Validate Gender in real-time
         _ = validationManager.validateRequired(selectedSex, fieldName: ValidationFieldName.patientGender.fieldName)
-        Logger.debug("Patient gender updated to: \(patient.sex)", category: .taskAssignment)
+        Logger.debug("Patient gender updated", category: .taskAssignment)
     }
     
     func handleBPJSNumberChange() {
@@ -493,23 +499,23 @@ extension InputPatientPresenter {
         } else {
             validationManager.clearError(for: ValidationFieldName.patientBPJS.fieldName)
         }
-        Logger.debug("Patient BPJS updated to: \(BPJSnumber)", category: .taskAssignment)
+        Logger.debug("Patient BPJS updated", category: .taskAssignment)
     }
     
     func handleNIKChange() {
         // NIK validation is already handled by ValidatedTextField
         // Just trigger validation update for button state
-        Logger.debug("Patient NIK updated to: \(patient.NIK)", category: .taskAssignment)
+        Logger.debug("Patient NIK updated", category: .taskAssignment)
     }
     
     func handlePICChange() {
         _ = validationManager.validateRequired(selectedPIC, fieldName: ValidationFieldName.userRole.fieldName)
-        Logger.debug("PIC updated to: \(selectedPIC)", category: .taskAssignment)
+        Logger.debug("PIC selection updated", category: .taskAssignment)
     }
     
     func handlePatientSelectionChange() {
         _ = validationManager.validateRequired(selectedPatient, fieldName: ValidationFieldName.patientName.fieldName)
-        Logger.debug("Patient selection updated to: \(selectedPatient)", category: .taskAssignment)
+        Logger.debug("Patient selection updated", category: .taskAssignment)
     }
 }
 
