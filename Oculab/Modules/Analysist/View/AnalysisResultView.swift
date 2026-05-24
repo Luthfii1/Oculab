@@ -56,6 +56,9 @@ struct AnalysisResultView: View {
                         await presenter.fetchData(examinationId: examinationId)
                     }
                 }
+                .onDisappear {
+                    presenter.resetState()
+                }
 
                 Spacer()
 

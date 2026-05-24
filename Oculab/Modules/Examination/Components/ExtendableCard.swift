@@ -25,14 +25,8 @@ struct ExtendableCard: View {
                     .padding(.leading, Decimal.d8)
                 Spacer()
 
-                // Show chevron only if isExtendable is true
                 if isExtendable {
                     Image(systemName: isExtended ? AppIcon.up : AppIcon.down)
-                        .onTapGesture {
-                            withAnimation {
-                                isExtended.toggle()
-                            }
-                        }
                 }
             }
 

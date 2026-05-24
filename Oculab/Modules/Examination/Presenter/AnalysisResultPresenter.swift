@@ -10,8 +10,11 @@ import SwiftUI
 
 class AnalysisResultPresenter: ObservableObject {
     // MARK: - Dependencies
-    var view: AnalysisResultView?
-    private var interactor: AnalysisResultInteractor? = AnalysisResultInteractor()
+    private let interactor: AnalysisResultInteractor
+
+    init(interactor: AnalysisResultInteractor = AnalysisResultInteractor()) {
+        self.interactor = interactor
+    }
 
     // MARK: - Published Properties
     @Published var examinationResult: ExaminationResultData?
@@ -128,6 +131,7 @@ extension AnalysisResultPresenter {
         Logger.info("Start time set: \(String(describing: startTime))", category: .examination)
     }
 
+    @MainActor
     func submitTrackingDuration(examinationId: String) async {
         guard let validStartTime = startTime else {
             Logger.warning("startTime is nil, cannot submit tracking duration", category: .examination)
@@ -136,8 +140,8 @@ extension AnalysisResultPresenter {
 
         do {
             Logger.info("Submitting tracking duration from \(validStartTime) to \(Date())", category: .examination)
-            
-            _ = try await interactor?.submitTrackingDuration(
+
+            _ = try await interactor.submitTrackingDuration(
                 examId: examinationId,
                 body: TrackingDurationRequest(
                     startTimestamp: DateFormatterHelper.shared.formatToISO8601(validStartTime),
@@ -161,16 +165,10 @@ extension AnalysisResultPresenter {
         isLoading = true
         
         do {
-            let result = try await interactor?.fetchData(examId: examinationId)
-            if let result {
-                examinationResult = result
-            }
+            examinationResult = try await interactor.fetchData(examId: examinationId)
 
-            let groupedFOVs = try await interactor?.fetchFOVData(examId: examinationId)
-            if let groupedFOVs {
-                self.groupedFOVs = groupedFOVs
-                checkIsAllFOVsVerified()
-            }
+            groupedFOVs = try await interactor.fetchFOVData(examId: examinationId)
+            checkIsAllFOVsVerified()
         } catch {
             errorMessage = ErrorHandler.shared.handleError(error, context: .examination)
         }
@@ -194,7 +192,7 @@ extension AnalysisResultPresenter {
                 throw NetworkError.networkError("Error: Invalid TB Grade", endpoint: "submitExpertResult")
             }
 
-            _ = try await interactor?.submitExpertResult(
+            _ = try await interactor.submitExpertResult(
                 examId: examinationId,
                 expertResult: ExpertExamResult(
                     finalGrading: validGrading,
@@ -211,11 +209,6 @@ extension AnalysisResultPresenter {
     }
 
     func isEnableToSubmit() -> Bool {
-        // TODO: Need to discuss is it should check all FOVs Verified or not
-//        if !isAllFOVsVerified {
-//            return false
-//        }
-
         return isValidGradingSelection()
     }
     
@@ -234,18 +227,36 @@ extension AnalysisResultPresenter {
 // MARK: - FOV Verification Methods
 extension AnalysisResultPresenter {
     func checkIsAllFOVsVerified() {
-        guard let groupedFOVs = groupedFOVs else {
-            isAllFOVsVerified = false
-            buttonTitle = AppTextExamProgress.buttonVerifyAllFOVs
-            return
-        }
+        let allVerified: Bool = {
+            guard groupedFOVs != nil else { return false }
+            return availableFOVTypes.allSatisfy { fovType in
+                selectedFOVs(for: fovType).allSatisfy { $0.verified }
+            }
+        }()
 
-        // Check all FOV types using availableFOVTypes for consistency
-        let allVerified = availableFOVTypes.allSatisfy { fovType in
-            selectedFOVs(for: fovType).allSatisfy { $0.verified }
-        }
-        
         isAllFOVsVerified = allVerified
         buttonTitle = allVerified ? AppTextExamProgress.buttonSaveResult : AppTextExamProgress.buttonVerifyAllFOVs
+    }
+}
+
+// MARK: - State Reset
+extension AnalysisResultPresenter {
+    @MainActor
+    func resetState() {
+        examinationResult = nil
+        errorMessage = nil
+        confidenceLevel = .unpredicted
+        resultQuantity = 0
+        groupedFOVs = nil
+        isLoading = false
+        selectedTBGrade = AppValue.empty
+        numOfBTA = AppValue.empty
+        inspectorNotes = AppValue.empty
+        isVerifPopUpVisible = false
+        isLeavePopUpVisible = false
+        isWSIImageVisible = false
+        buttonTitle = AppTextExamProgress.buttonSaveResult
+        isAllFOVsVerified = false
+        startTime = nil
     }
 }
