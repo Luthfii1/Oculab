@@ -29,4 +29,12 @@ class PDFPresenter: ObservableObject {
     func navigateToPreviousScreen() {
         Router.shared.navigateBack()
     }
+
+    @MainActor
+    func resetState() {
+        description = nil
+        isError = false
+        errorMessage = nil
+        data = nil
+    }
 }

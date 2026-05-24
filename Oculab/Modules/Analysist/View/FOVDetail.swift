@@ -234,6 +234,9 @@ struct FOVDetail: View {
                     await presenter.verifyingFOV(fovId: fovData._id)
                 }
             }
+            .onDisappear {
+                presenter.resetState()
+            }
         }
         .navigationBarBackButtonHidden()
     }

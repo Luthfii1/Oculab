@@ -52,7 +52,7 @@ class FOVDetailInteractor {
     
     func addBox(fovId: UUID, newBox: AddBoxRequest) async throws -> APIResponse<BoxModel> {
         let fovURL = API.BE + "/boundingBox/add-bounding-box/"
-        let url = fovURL + fovId.uuidString.toLowercase()
+        let url = fovURL + fovId.uuidString.lowercased()
         let body = newBox
 
         let response: APIResponse<BoxModel> = try await networkService.update(
