@@ -133,11 +133,12 @@ struct UserAccessPinView: View {
                     securityPresenter.isError = false
                     Task {
                         securityPresenter.checkFaceIDAvailability()
-                        
-                        // Automatically trigger Face ID if enabled and this is authentication mode
-                        if securityPresenter.isFaceIdEnabled(state: state) {
-                            await securityPresenter.authenticateWithFaceID()
-                        }
+
+                        // Skip FaceID auto-prompt when there's no stored PIN to fall back to.
+                        guard securityPresenter.isFaceIdEnabled(state: state),
+                              await securityPresenter.hasStoredAccessPin()
+                        else { return }
+                        await securityPresenter.authenticateWithFaceID()
                     }
                 }
             }
