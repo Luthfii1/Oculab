@@ -38,9 +38,50 @@ class Router: ObservableObject {
         case patientList
         case patientForm(patientId: String? = nil)
         case patientDetail(patientId: String)
+        
+        // MARK: - Route Properties
+        var requiresAuthentication: Bool {
+            switch self {
+            case .login, .register:
+                return false
+            default:
+                return true
+            }
+        }
+        
+        var routeIdentifier: String {
+            switch self {
+            case .home: return "home"
+            case .videoRecord: return "video-record"
+            case .pdf: return "pdf"
+            case .analysisResult: return "analysis-result"
+            case .examDetail: return "exam-detail"
+            case .examDetailAdmin: return "exam-detail-admin"
+            case .savedResult: return "saved-result"
+            case .newExam: return "new-exam"
+            case .userAccessPin: return "user-access-pin"
+            case .login: return "login"
+            case .register: return "register"
+            case .photoAlbum: return "photo-album"
+            case .detailedPhoto: return "detailed-photo"
+            case .profile: return "profile"
+            case .editPassword: return "edit-password"
+            case .inputPatientData: return "input-patient-data"
+            case .informationInterpretation: return "information-interpretation"
+            case .privacyPolicy: return "privacy-policy"
+            case .analyzingStatusProgress: return "analyzing-status-progress"
+            case .accountManagement: return "account-management"
+            case .newAccount: return "new-account"
+            case .editAccount: return "edit-account"
+            case .patientList: return "patient-list"
+            case .patientForm: return "patient-form"
+            case .patientDetail: return "patient-detail"
+            }
+        }
     }
 
     @Published var path: NavigationPath = .init()
+    @Published var currentRoute: Route?
 
     @ViewBuilder
     func view(for route: Route) -> some View {
@@ -107,16 +148,94 @@ class Router: ObservableObject {
     }
 
     func navigateTo(_ appRoute: Route) {
-        path.append(appRoute)
+        DispatchQueue.main.async {
+            self.currentRoute = appRoute
+            self.path.append(appRoute)
+            Logger.info("Navigated to: \(appRoute.routeIdentifier)", category: .navigation)
+        }
     }
 
     func navigateBack() {
-        path.removeLast()
+        DispatchQueue.main.async {
+            if !self.path.isEmpty {
+                self.path.removeLast()
+                Logger.info("Navigated back", category: .navigation)
+            }
+        }
     }
 
     func popToRoot() {
         DispatchQueue.main.async {
-            self.path.removeLast(self.path.count)
+            let countToRemove = self.path.count
+            if countToRemove > 0 {
+                self.path.removeLast(countToRemove)
+                self.currentRoute = nil
+                Logger.info("Popped to root, removed \(countToRemove) routes", category: .navigation)
+            }
         }
+    }
+    
+    // MARK: - Deeplink Support
+    func generateDeeplinkURL(for route: Route) -> URL? {
+        var components = URLComponents()
+        components.scheme = "oculab"
+        
+        switch route {
+        case .home:
+            components.path = "/home"
+            
+        case .login:
+            components.path = "/login"
+            
+        case .register:
+            components.path = "/register"
+            
+        case .profile:
+            components.path = "/profile"
+            
+        case .examDetail(let examId, let patientId):
+            components.path = "/exam-detail"
+            components.queryItems = [
+                URLQueryItem(name: "examId", value: examId),
+                URLQueryItem(name: "patientId", value: patientId)
+            ]
+            
+        case .newExam(let patientId, let picId):
+            components.path = "/new-exam"
+            components.queryItems = [
+                URLQueryItem(name: "patientId", value: patientId),
+                URLQueryItem(name: "picId", value: picId)
+            ]
+            
+        case .patientDetail(let patientId):
+            components.path = "/patient-detail"
+            components.queryItems = [
+                URLQueryItem(name: "patientId", value: patientId)
+            ]
+            
+        case .analysisResult(let examinationId):
+            components.path = "/analysis-result"
+            components.queryItems = [
+                URLQueryItem(name: "examinationId", value: examinationId)
+            ]
+            
+        case .videoRecord(let slideId):
+            components.path = "/video-record"
+            components.queryItems = [
+                URLQueryItem(name: "slideId", value: slideId)
+            ]
+            
+        default:
+            return nil
+        }
+        
+        return components.url
+    }
+    
+    func canNavigateToRoute(_ route: Route) -> Bool {
+        if route.requiresAuthentication {
+            return UserDefaults.standard.bool(forKey: UserDefaultType.isUserLoggedIn.rawValue)
+        }
+        return true
     }
 }

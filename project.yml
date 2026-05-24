@@ -40,6 +40,9 @@ targets:
           NSMicrophoneUsageDescription: We would like to access your microphone to record video
           NSPhotoLibraryUsageDescription: We need access to save videos to your photo library.
           NSFaceIDUsageDescription: We use Face ID to secure and unlock the app.
+          CFBundleURLTypes:
+            - CFBundleURLName: com.Oculab.Oculab.deeplink
+              CFBundleURLSchemes: [oculab]
           NSAppTransportSecurity:
             NSExceptionDomains:
               "b4wgswckgks8488og484s8co.34.50.75.183.sslip.io":

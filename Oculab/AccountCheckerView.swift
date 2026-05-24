@@ -10,6 +10,7 @@ import SwiftUI
 struct AccountCheckerView: View {
     @AppStorage(UserDefaultType.isUserLoggedIn.rawValue) var isUserLoggedIn: Bool = false
     @EnvironmentObject var authPresenter: AuthenticationPresenter
+    @EnvironmentObject var routeFinder: RouteFinder
     @StateObject private var appStateManager = AppStateManager()
 
     var body: some View {
@@ -28,6 +29,11 @@ struct AccountCheckerView: View {
                 // Only set authenticated if we're not already in authenticated state
                 if appStateManager.initializationState != .authenticated {
                     appStateManager.setAuthenticated()
+                }
+                
+                // Process any pending deeplink after successful authentication
+                Task {
+                    await routeFinder.processPendingDeeplink()
                 }
             }
         }
