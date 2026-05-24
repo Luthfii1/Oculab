@@ -267,15 +267,15 @@ extension AuthenticationPresenter {
         // For PIN change flow, we should check against oldAccessPin, not the stored PIN
         if isAccessPinChangeInProgress {
             if oldAccessPin != inputPin {
-                isError = true
                 description = AppTextAuthCompPin.invalidPinText
+                isError = true
                 return false
             }
         } else {
             // Normal authentication - check against stored PIN
             if await interactor.getUserLocalData()?.accessPin != inputPin {
-                isError = true
                 description = AppTextAuthCompPin.invalidPinText
+                isError = true
                 return false
             }
         }
@@ -320,8 +320,8 @@ extension AuthenticationPresenter {
                     Router.shared.popToRoot()
                 }
             } else {
-                isError = true
                 inputPin = AppValue.empty
+                isError = true
                 // Error description is already set in revalidatePinMatched()
             }
 
@@ -731,8 +731,14 @@ extension AuthenticationPresenter {
     }
     
     private func updateUIForErrorState() {
-        if !isError {
+        if isError {
+            // Surface the error message on the PIN screen, which reads `descriptionPIN`.
+            if !description.isEmpty {
+                descriptionPIN = description
+            }
+        } else {
             description = AppValue.empty
+            setDescriptionPIN()
         }
         textColor = isError ? AppColors.red500 : AppColors.slate900
         pinColor = isError ? AppColors.red500 : AppColors.purple500

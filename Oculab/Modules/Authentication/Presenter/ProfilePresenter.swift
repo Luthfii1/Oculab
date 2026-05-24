@@ -73,9 +73,6 @@ class ProfilePresenter: ObservableObject {
         self.formValidation = FormValidationViewModel()
         self.interactor = interactor
         self.authInteractor = authInteractor
-        Task {
-            await self.getUser()
-        }
     }
 }
 
