@@ -100,15 +100,19 @@ class CameraPreviewCoordinator: NSObject {
     
     @MainActor
     @objc func handleTap(_ gesture: UITapGestureRecognizer) {
-        let tapPoint = gesture.location(in: gesture.view)
-        guard let view = gesture.view else { return }
-        
+        guard let view = gesture.view,
+              view.bounds.width > 0,
+              view.bounds.height > 0 else { return }
+
+        let tapPoint = gesture.location(in: view)
+        guard view.bounds.contains(tapPoint) else { return }
+
         // Convert tap point to camera coordinate system
         let devicePoint = CGPoint(
             x: tapPoint.y / view.bounds.height,
             y: 1.0 - (tapPoint.x / view.bounds.width)
         )
-        
+
         focusCamera(at: devicePoint)
     }
     

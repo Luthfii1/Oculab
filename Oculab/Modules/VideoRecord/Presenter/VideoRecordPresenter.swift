@@ -57,7 +57,10 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     private let maxZoomFactor: CGFloat = 4.9
     private var recordingTimer: Timer?
     private var recordingStartTime: Date?
-    private let frameProcessingQueue = DispatchQueue(label: "frameProcessingQueue", qos: .userInteractive)
+    private let frameProcessingQueue = DispatchQueue(
+        label: "com.oculab.videorecord.frameProcessing",
+        qos: .userInteractive
+    )
 
     // MARK: - Constants
     let preRecordingInstructions: [String] = AppTextVideoRecordInstruction.preRecordingInstructions
@@ -95,27 +98,22 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     private func setUp() async {
         isLoading = true
         defer { isLoading = false }
-        
+
+        session.beginConfiguration()
+
         do {
-            session.beginConfiguration()
-            
-            // Remove existing inputs and outputs
             removeExistingInputsAndOutputs()
-            
-            // Setup camera inputs (audio disabled to reduce file size)
-            try await setupInputs()
-            
-            // Setup outputs
+            try setupInputs()
             setupOutputs()
-            
             session.commitConfiguration()
-            
-            await startCameraSession()
-            
         } catch {
-            print("Setup error: \(error.localizedDescription)")
+            session.commitConfiguration()
+            Logger.error("Camera setup failed: \(error.localizedDescription)", category: .videoRecord)
             errorMessage = "Failed to setup camera: \(error.localizedDescription)"
+            return
         }
+
+        await startCameraSession()
     }
     
     private func removeExistingInputsAndOutputs() {
@@ -242,33 +240,32 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     @MainActor
     func startRecording() {
         guard !isRecording else { return }
-        
-        let tempURL = URL(fileURLWithPath: NSTemporaryDirectory())
-            .appendingPathComponent(AppTextVideoRecordView.videoFileDateAndExtension())
-        
-        // Configure recording quality
-        configureRecordingQuality()
-        
-        output.startRecording(to: tempURL, recordingDelegate: self)
+
+        // Mark recording state before issuing I/O to prevent double-tap races
         isRecording = true
         recordingStartTime = Date()
-//        showRecordingTitle = true
-        
+
+        let tempURL = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent(AppTextVideoRecordView.videoFileDateAndExtension())
+
+        configureRecordingQuality()
+
+        output.startRecording(to: tempURL, recordingDelegate: self)
         startRecordingTimer()
-        
-        Logger.info("Recording started at: \(tempURL.lastPathComponent)", category: .videoRecord)
+
+        Logger.info("Recording started", category: .videoRecord)
     }
-    
+
+
     @MainActor
     func stopRecording() {
         guard isRecording else { return }
-        
+
         output.stopRecording()
         isRecording = false
-//        showRecordingTitle = false
-        
+
         stopRecordingTimer()
-        
+
         Logger.info("Recording stopped", category: .videoRecord)
     }
     
@@ -297,7 +294,7 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     }
 
     // MARK: - AVCaptureFileOutputRecordingDelegate
-    func fileOutput(
+    nonisolated func fileOutput(
         _ output: AVCaptureFileOutput,
         didFinishRecordingTo outputFileURL: URL,
         from connections: [AVCaptureConnection],
@@ -306,30 +303,33 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
         Task { @MainActor in
             if let error = error {
                 Logger.error("Recording error: \(error.localizedDescription)", category: .videoRecord)
-                errorMessage = error.localizedDescription
-                previewURL = nil
+                self.errorMessage = error.localizedDescription
+                self.previewURL = nil
+                self.deleteTemporaryFile(at: outputFileURL)
                 return
             }
 
-            Logger.info("Recording finished: \(outputFileURL.lastPathComponent)", category: .videoRecord)
-            previewURL = outputFileURL
-            await stopCameraSession()
+            Logger.info("Recording finished successfully", category: .videoRecord)
+            self.previewURL = outputFileURL
+            await self.stopCameraSession()
         }
     }
-    
+
     // MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
-    func captureOutput(
+    nonisolated func captureOutput(
         _ output: AVCaptureOutput,
         didOutput sampleBuffer: CMSampleBuffer,
         from connection: AVCaptureConnection
     ) {
-        guard isRecording,
-              let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
-        
-        // Process frame for stitching if needed
-        processFrameForStitching(pixelBuffer: pixelBuffer)
+        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
+
+        Task { @MainActor [weak self] in
+            guard let self = self, self.isRecording else { return }
+            self.processFrameForStitching(pixelBuffer: pixelBuffer)
+        }
     }
-    
+
+    @MainActor
     private func processFrameForStitching(pixelBuffer: CVPixelBuffer) {
         // Check if enough time has passed since last stitch
         let currentTime = Date()
@@ -337,20 +337,17 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
            currentTime.timeIntervalSince(lastTime) < stitchInterval {
             return
         }
-        
+
         lastStitchTime = currentTime
-        
+
         // Convert pixel buffer to UIImage
         let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
         let context = CIContext()
-        
+
         guard let cgImage = context.createCGImage(ciImage, from: ciImage.extent) else { return }
         let uiImage = UIImage(cgImage: cgImage)
-        
-        // Perform stitching on main thread
-        Task { @MainActor in
-            stitchNewFrame(uiImage)
-        }
+
+        stitchNewFrame(uiImage)
     }
     
     // MARK: - UI State Management
@@ -417,10 +414,6 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     }
 
     // MARK: - Navigation
-//    func navigateToVideo() {
-//        Router.shared.navigateTo(.videoRecord(slideId: ))
-//    }
-
     func navigateBack() {
         Router.shared.navigateBack()
     }
@@ -492,9 +485,12 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     // MARK: - Camera Controls
     @MainActor
     func updateZoom(factor: CGFloat) {
-        guard let device = session.inputs.first as? AVCaptureDeviceInput else { return }
-        let cameraDevice = device.device
+        guard let videoInput = session.inputs
+            .compactMap({ $0 as? AVCaptureDeviceInput })
+            .first(where: { $0.device.hasMediaType(.video) })
+        else { return }
 
+        let cameraDevice = videoInput.device
         let clampedFactor = min(max(factor, minZoomFactor), maxZoomFactor)
 
         do {
@@ -505,6 +501,21 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
         } catch {
             Logger.error("Error setting zoom: \(error.localizedDescription)", category: .videoRecord)
             errorMessage = "Failed to adjust zoom"
+        }
+    }
+
+    @MainActor
+    @discardableResult
+    func deleteTemporaryFile(at url: URL) -> Bool {
+        let fileManager = FileManager.default
+        guard fileManager.fileExists(atPath: url.path) else { return true }
+        do {
+            try fileManager.removeItem(at: url)
+            Logger.info("Temporary recording removed", category: .videoRecord)
+            return true
+        } catch {
+            Logger.error("Failed to remove temporary recording: \(error.localizedDescription)", category: .videoRecord)
+            return false
         }
     }
     
@@ -520,23 +531,27 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     // MARK: - Cleanup
     @MainActor
     func cleanup() async {
+        // Stop recording cleanly if in progress so the timer is invalidated
+        // and no orphan capture finishes after the view is gone.
+        if isRecording {
+            output.stopRecording()
+        }
         stopRecordingTimer()
         await stopCameraSession()
-        
+
         // Reset all state
         isRecording = false
         showPlayerView = false
-//        showRecordingTitle = false
         stitchedImage = nil
         progressImage = nil
         errorMessage = nil
         recordingDuration = 0.0
         zoomFactor = 1.0
-        
+
         // Clear URLs but don't reset previewURL if it exists
         recordedURLs.removeAll()
         resetSpecimenTitle()
-        
+
         Logger.info("VideoRecordPresenter cleaned up successfully", category: .videoRecord)
     }
     
