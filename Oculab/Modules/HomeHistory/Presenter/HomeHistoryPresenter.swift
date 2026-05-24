@@ -10,7 +10,11 @@ import Foundation
 class HomeHistoryPresenter: ObservableObject {
     // MARK: - Dependencies
     var view: HomeView?
-    private var interactor: HomeInteractor? = HomeInteractor()
+    private let interactor: HomeInteractor
+
+    init(interactor: HomeInteractor = HomeInteractor()) {
+        self.interactor = interactor
+    }
 
     // MARK: - Published Properties
     @Published var selectedLatestActivity: LatestActivityType = .belumDimulai
@@ -46,13 +50,8 @@ extension HomeHistoryPresenter {
         defer { isStatisticLoading = false }
 
         do {
-            let data = try await interactor?.getStatisticExamination()
-
-            if let data {
-                statisticExam = data
-                calculateProgress()
-            }
-            
+            statisticExam = try await interactor.getStatisticExamination()
+            calculateProgress()
         } catch {
             Logger.error("Failed to fetch statistics: \(error.localizedDescription)", category: .general)
             _ = ErrorHandler.shared.handleError(error)
@@ -130,7 +129,7 @@ extension HomeHistoryPresenter {
         defer { isAllExamsLoading = false }
         
         do {
-            let response = try await interactor?.getFinishedDataCard(date: dateString)
+            let response = try await interactor.getFinishedDataCard(date: dateString)
             
             handleFinishedExaminationsResponse(response, for: dateString)
             
@@ -141,14 +140,9 @@ extension HomeHistoryPresenter {
         }
     }
     
-    private func handleFinishedExaminationsResponse(_ response: [FinishedExaminationCardData]?, for dateString: String) {
-        if let response = response, !response.isEmpty {
-            finishedExaminationsByDate = response
-            Logger.info("Successfully loaded \(response.count) examinations for date: \(dateString)", category: .general)
-        } else {
-            finishedExaminationsByDate = []
-            Logger.info("No examinations found for date: \(dateString)", category: .general)
-        }
+    private func handleFinishedExaminationsResponse(_ response: [FinishedExaminationCardData], for dateString: String) {
+        finishedExaminationsByDate = response
+        Logger.info("Loaded \(response.count) examinations", category: .general)
     }
     
     @MainActor
@@ -157,23 +151,36 @@ extension HomeHistoryPresenter {
         defer { isAllExamsLoading = false }
 
         do {
-            let response = try await getExaminationData(for: userRole)
-            
-            if let response {
-                latestExamination = response
-                await filterLatestActivity(typeActivity: selectedLatestActivity)
-            }
+            latestExamination = try await getExaminationData(for: userRole)
+            await filterLatestActivity(typeActivity: selectedLatestActivity)
         } catch {
             Logger.error("Failed to fetch examination data for role \(userRole): \(error.localizedDescription)", category: .general)
             _ = ErrorHandler.shared.handleError(error)
         }
     }
     
-    private func getExaminationData(for userRole: RolesType) async throws -> [ExaminationCardData]? {
+    private func getExaminationData(for userRole: RolesType) async throws -> [ExaminationCardData] {
         if userRole == .ADMIN {
-            return try await interactor?.getAllDataAdmin()
+            return try await interactor.getAllDataAdmin()
         } else {
-            return try await interactor?.getAllData()
+            return try await interactor.getAllData()
         }
+    }
+}
+
+// MARK: - State Management
+extension HomeHistoryPresenter {
+    @MainActor
+    func resetState() {
+        latestExamination = []
+        filteredExamination = []
+        filteredExaminationByDate = []
+        finishedExaminationsByDate = []
+        unfinishedExaminationsByDate = []
+        statisticExam = .init()
+        progress = 0.0
+        isAllExamsLoading = false
+        isStatisticLoading = false
+        selectedLatestActivity = .belumDimulai
     }
 }

@@ -27,7 +27,6 @@ struct StatisticComponent: View {
                 HStack(spacing: Decimal.d32) {
                     HalfCircleProgress(progress: presenter.progress)
                         .offset(y: 35)
-                    // TODO: Create func to create sentence
                     VStack(alignment: .leading, spacing: Decimal.d4) {
                         Text(AppData.makeSentence([presenter.statisticExam.totalFinished ?? 0, AppTextHomeHistCompStatistic.tasksCompletedSuffix])).font(AppTypography.h4_1)
                         Text(

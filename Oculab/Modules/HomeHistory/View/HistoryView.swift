@@ -8,10 +8,11 @@
 import SwiftUI
 
 struct HistoryView: View {
-    @ObservedObject private var presenter = HomeHistoryPresenter()
+    @StateObject private var presenter = HomeHistoryPresenter()
     @State var selectedDate: Date
-    
+
     @State private var currentlyLoadedDate: Date?
+    @State private var loadTask: Task<Void, Never>?
 
     var body: some View {
         NavigationView {
@@ -72,6 +73,9 @@ struct HistoryView: View {
                 loadDataForDate(newValue)
             }
         }
+        .onDisappear {
+            loadTask?.cancel()
+        }
         .navigationBarBackButtonHidden(true)
     }
     
@@ -84,8 +88,9 @@ struct HistoryView: View {
     
     private func loadDataForDate(_ date: Date) {
         currentlyLoadedDate = date
-        
-        Task {
+
+        loadTask?.cancel()
+        loadTask = Task {
             await presenter.fetchFinishedExaminationsByDate(date: date)
         }
     }
