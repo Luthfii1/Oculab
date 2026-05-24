@@ -34,7 +34,7 @@ class ProfileInteractor: ProfileInteractorProtocol {
     private let apiAuthenticationService = API.BE + "/user"
 
     func editNewPassword(newPassword: String, previousPassword: String) async throws -> UserUpdatePasswordResponse {
-        guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
+        guard let token = KeychainHelper.string(for: .accessToken) else {
             throw URLError(.userAuthenticationRequired)
         }
         

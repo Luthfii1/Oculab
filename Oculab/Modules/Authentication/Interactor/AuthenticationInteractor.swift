@@ -81,9 +81,9 @@ class AuthenticationInteractor: ObservableObject {
             body: UserBody(email: email, password: password)
         )
 
-        // Store user data
-        UserDefaults.standard.set(response.data.accessToken, forKey: UserDefaultType.accessToken.rawValue)
-        UserDefaults.standard.set(response.data.refreshToken, forKey: UserDefaultType.refreshToken.rawValue)
+        // Store credentials in Keychain; non-secret state in UserDefaults.
+        KeychainHelper.set(response.data.accessToken, for: .accessToken)
+        KeychainHelper.set(response.data.refreshToken, for: .refreshToken)
         UserDefaults.standard.set(true, forKey: UserDefaultType.isUserLoggedIn.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultType.firstTimeLogin.rawValue)
         UserDefaults.standard.set(response.data.userId, forKey: UserDefaultType.userId.rawValue)
@@ -185,7 +185,7 @@ class AuthenticationInteractor: ObservableObject {
     }
     
     func editNewPIN(newAccessPin: String, previousAccessPin: String) async throws -> UserUpdateAccessPinResponse {
-        guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
+        guard let token = KeychainHelper.string(for: .accessToken) else {
             throw URLError(.userAuthenticationRequired)
         }
         
@@ -215,7 +215,7 @@ class AuthenticationInteractor: ObservableObject {
     }
     
     func createAccessPin(accessPin: String) async throws -> CreateAccessPinResponse {
-        guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
+        guard let token = KeychainHelper.string(for: .accessToken) else {
             throw URLError(.userAuthenticationRequired)
         }
         
@@ -238,7 +238,7 @@ class AuthenticationInteractor: ObservableObject {
     }
 
     func deleteAccessPin() async throws -> DeleteAccessPinResponse {
-        guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
+        guard let token = KeychainHelper.string(for: .accessToken) else {
             throw URLError(.userAuthenticationRequired)
         }
         

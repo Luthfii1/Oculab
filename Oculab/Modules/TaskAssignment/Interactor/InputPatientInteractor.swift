@@ -30,7 +30,7 @@ class InputPatientInteractor {
             )
         }
         
-        guard let token = UserDefaults.standard.string(forKey: UserDefaultType.accessToken.rawValue) else {
+        guard let token = KeychainHelper.string(for: .accessToken) else {
             throw URLError(.userAuthenticationRequired)
         }
 
