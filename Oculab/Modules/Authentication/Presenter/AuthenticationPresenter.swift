@@ -430,37 +430,6 @@ extension AuthenticationPresenter {
         }
     }
     
-    func onPinCreation() {
-        var description: String = AppValue.empty
-        
-        if state == .create {
-            if isAccessPinChangeInProgress {
-                description = AppTextAuthCompPin.titleCreateChangePin
-            } else {
-                description = AppTextAuthCompPin.titleCreatePin
-            }
-        } else {
-            switch state {
-            case .create:
-                description = isAccessPinChangeInProgress ? AppTextAuthCompPin.titleCreateChangePin : AppTextAuthCompPin.titleCreatePin
-            case .revalidate:
-                if isAccessPinChangeInProgress {
-                    description = AppTextAuthCompPin.revalidateChangePinTitle
-                } else {
-                    description = AppTextAuthCompPin.revalidatePinTitle
-                }
-            case .authenticate:
-                description = AppTextAuthCompPin.titleAuthenticatePin
-            case .changePIN:
-                description = AppTextAuthCompPin.changePinTitle
-            case .forgetPin:
-                description = AppValue.empty
-            }
-        }
-        
-        descriptionPIN = description
-    }
-    
     var title: String {
         switch state {
         case .create:
@@ -541,20 +510,14 @@ extension AuthenticationPresenter {
             Logger.error("Failed to delete access PIN from backend: \(error)", category: .authentication)
             isError = true
             errorMessage = ErrorHandler.shared.handleError(error, context: .login)
+            return
         }
-        
-        // Clear all local user session data
+
         clearLoginState()
-        
-        // Reset authentication state
         resetAuthenticationState()
-        
-        // Set app state to unauthenticated to show login screen
         appStateManager?.setUnauthenticated()
-        
-        // Navigate to login
         Router.shared.popToRoot()
-        
+
         Logger.info("User successfully logged out via forget PIN", category: .authentication)
     }
     
@@ -582,6 +545,10 @@ extension AuthenticationPresenter {
         return isFaceIdEnabledFromUserDefaults && state == .authenticate && isFaceIdAvailable
     }
 
+    func hasStoredAccessPin() async -> Bool {
+        return await interactor.getUserLocalData()?.accessPin != nil
+    }
+
     @MainActor
     func authenticateWithFaceID() async {
         let context = LAContext()
@@ -603,18 +570,13 @@ extension AuthenticationPresenter {
         }
 
         do {
-            try await withCheckedThrowingContinuation { continuation in
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
                 context.evaluatePolicy(
                     .deviceOwnerAuthenticationWithBiometrics,
                     localizedReason: AppTextAuthBiometric.activationPrompt
                 ) { success, authenticationError in
                     if success {
                         continuation.resume(returning: ())
-                        DispatchQueue.main.async {
-                            self.isPinAuthorized = true
-                            // State transition handled by AccountCheckerView onChange
-                            Router.shared.popToRoot()
-                        }
                     } else {
                         continuation.resume(throwing: authenticationError ?? NSError(
                             domain: "AuthenticationError",
@@ -623,17 +585,18 @@ extension AuthenticationPresenter {
                     }
                 }
             }
+            isPinAuthorized = true
+            // State transition handled by AccountCheckerView onChange
+            Router.shared.popToRoot()
         } catch {
-            DispatchQueue.main.async {
-                self.isError = true
-                self.description = AppTextAuthProfile.descFailedFaceID(error: error.localizedDescription)
-            }
+            isError = true
+            description = AppTextAuthProfile.descFailedFaceID(error: error.localizedDescription)
         }
     }
 
     func updateFaceIdPreference(_ isEnabled: Bool) {
         isFaceIdEnabledFromUserDefaults = isEnabled
-        UserDefaults.standard.set(isEnabled, forKey: "isFaceIdEnabled")
+        UserDefaults.standard.set(isEnabled, forKey: UserDefaultType.isFaceIdEnabled.rawValue)
     }
     
     @MainActor
