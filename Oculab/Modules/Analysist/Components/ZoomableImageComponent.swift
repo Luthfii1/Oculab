@@ -54,9 +54,16 @@ struct ZoomableImageComponent: UIViewRepresentable {
               let imageView = containerView.viewWithTag(2) as? UIImageView else { return }
 
         // Only load image if it hasn't been loaded yet
-        if imageView.image == nil, let url = imageURL {
+        if imageView.image == nil, let url = imageURL, context.coordinator.imageLoadingTask == nil {
+            // Cancel any prior task before issuing a new one
+            context.coordinator.imageLoadingTask?.cancel()
+
             // Load image asynchronously
-            URLSession.shared.dataTask(with: url) { data, _, _ in
+            let task = URLSession.shared.dataTask(with: url) { [weak coordinator = context.coordinator] data, _, _ in
+                guard let coordinator = coordinator else { return }
+                // Clear the stored task once it has finished
+                defer { coordinator.imageLoadingTask = nil }
+
                 if let data = data, let image = UIImage(data: data) {
                     DispatchQueue.main.async {
                         imageView.image = image
@@ -117,7 +124,9 @@ struct ZoomableImageComponent: UIViewRepresentable {
                         }
                     }
                 }
-            }.resume()
+            }
+            context.coordinator.imageLoadingTask = task
+            task.resume()
         }
         
         // Update the BoxesGroupComponentView's zoom scale if it exists
@@ -192,9 +201,15 @@ struct ZoomableImageComponent: UIViewRepresentable {
         var currentSelectedBoxIdentifier: String?
         var boxesHostingController: UIHostingController<AnyView>?
         private var interactionResetTimer: Timer?
-        
+        var imageLoadingTask: URLSessionDataTask?
+
         init(_ parent: ZoomableImageComponent) {
             self.parent = parent
+        }
+
+        deinit {
+            interactionResetTimer?.invalidate()
+            imageLoadingTask?.cancel()
         }
         
         func updateBoxesView(with zoomScale: CGFloat, presenter: FOVDetailPresenter) {

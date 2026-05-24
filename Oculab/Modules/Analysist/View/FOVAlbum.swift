@@ -9,7 +9,7 @@ import SwiftUI
 
 struct FOVAlbum: View {
     var fovGroup: FOVType
-    @ObservedObject var presenter: AnalysisResultPresenter = .init()
+    @StateObject private var presenter = AnalysisResultPresenter()
     var examId: String
 
     var body: some View {

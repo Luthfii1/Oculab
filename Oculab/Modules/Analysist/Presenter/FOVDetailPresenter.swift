@@ -9,7 +9,11 @@ import Foundation
 import SwiftUI
 
 class FOVDetailPresenter: ObservableObject {
-    var interactor: FOVDetailInteractor? = FOVDetailInteractor()
+    private let interactor: FOVDetailInteractor
+
+    init(interactor: FOVDetailInteractor = FOVDetailInteractor()) {
+        self.interactor = interactor
+    }
 
     @Published var zoomScale: CGFloat = 1.0
     @Published var offset: CGSize = .zero
@@ -61,6 +65,25 @@ class FOVDetailPresenter: ObservableObject {
         }
     }
 
+    @MainActor
+    func resetState() {
+        zoomScale = 1.0
+        offset = .zero
+        description = nil
+        isError = false
+        boxes = []
+        selectedBox = nil
+        fovDetail = nil
+        errorMessage = nil
+        isBoundingBoxAvailable = true
+        isBoundingBoxVisible = true
+        isAddBacilliActive = false
+        numberOfBacilli = 0
+        currentFOVId = nil
+        isCreatingNewBox = false
+        newBoxLocation = nil
+    }
+
     // functions for create new button
     func startCreatingBox(at location: CGPoint) {
         newBoxLocation = location
@@ -104,10 +127,8 @@ class FOVDetailPresenter: ObservableObject {
         guard let currentFOVId = currentFOVId else { return }
         
         do {
-            let result = try await interactor?.addBox(fovId: currentFOVId, newBox: newBox)
-            if result != nil {
-                await fetchData(fovId: currentFOVId)
-            }
+            _ = try await interactor.addBox(fovId: currentFOVId, newBox: newBox)
+            await fetchData(fovId: currentFOVId)
         } catch {
             _ = ErrorHandler.shared.handleError(error, context: .examination)
         }
@@ -121,15 +142,13 @@ class FOVDetailPresenter: ObservableObject {
     @MainActor
     func fetchData(fovId: UUID) async {
         do {
-            let result = try await interactor?.fetchData(fovId: fovId)
-            if let result {
-                currentFOVId = fovId
-                fovDetail = result
-                boxes = result.boxes.filter { $0.status != .trashed }
-                isBoundingBoxAvailable = true
-                isError = false
-                errorMessage = nil
-            }
+            let result = try await interactor.fetchData(fovId: fovId)
+            currentFOVId = fovId
+            fovDetail = result
+            boxes = result.boxes.filter { $0.status != .trashed }
+            isBoundingBoxAvailable = true
+            isError = false
+            errorMessage = nil
         } catch {
             let errorDetails = ErrorHandler.shared.handleError(error, context: .examination)
             
@@ -164,7 +183,7 @@ class FOVDetailPresenter: ObservableObject {
         }
         
         do {
-            _ = try await interactor?.verifyingFOV(fovId: fovId)
+            _ = try await interactor.verifyingFOV(fovId: fovId)
         } catch {
             let errorDetails = ErrorHandler.shared.handleError(error, context: .examination)
             errorMessage = errorDetails
@@ -178,28 +197,28 @@ class FOVDetailPresenter: ObservableObject {
             guard let index = boxes.firstIndex(where: { $0.id == boxId }) else { return }
             boxes[index].status = newStatus
 
-            let result = try await interactor?.updateBoxStatus(boxId: boxId, newStatus: newStatus.rawValue)
+            _ = try await interactor.updateBoxStatus(boxId: boxId, newStatus: newStatus.rawValue)
 
-            // If boxes updated, move selection to the next box with status .none or .flagged, else nil
-            if (result != nil) {
-                // Find the next box with status .none or .flagged, skipping the current box
-                if let currentIndex = boxes.firstIndex(where: { $0.id == boxId }) {
-                    // Search forward first
-                    let nextCandidates = boxes[(currentIndex+1)...] + boxes[..<currentIndex]
-                    if let nextBox = nextCandidates.first(where: { $0.status == .none || $0.status == .flagged }) {
-                        selectedBox = nextBox
-                    } else {
-                        selectedBox = nil
-                    }
-                } else {
-                    selectedBox = nil
-                }
+            // Move selection to the next box with status .none or .flagged, else nil
+            if let currentIndex = boxes.firstIndex(where: { $0.id == boxId }),
+               !boxes.isEmpty {
+                let safeIndex = min(currentIndex, boxes.count - 1)
+                let forwardSlice = (safeIndex + 1) < boxes.count
+                    ? Array(boxes[(safeIndex + 1)...])
+                    : []
+                let backwardSlice = safeIndex > 0
+                    ? Array(boxes[..<safeIndex])
+                    : []
+                let nextCandidates = forwardSlice + backwardSlice
+                selectedBox = nextCandidates.first(where: { $0.status == .none || $0.status == .flagged })
+            } else {
+                selectedBox = nil
             }
 
             // refetch all boxes
             guard let fovId = currentFOVId else { Logger.error("No fovId set"); return }
             await fetchData(fovId: fovId)
-            
+
         } catch {
             errorMessage = ErrorHandler.shared.handleError(error)
             isError = true

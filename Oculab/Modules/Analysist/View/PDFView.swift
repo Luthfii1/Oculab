@@ -14,8 +14,8 @@ struct PDFPageView: View {
     
     var body: some View {
         VStack {
-            if presenter.data != nil {
-                PDFKitView(pdfDocument: PDFDocument(data: generatePDF())!)
+            if presenter.data != nil, let pdfDocument = PDFDocument(data: generatePDF()) {
+                PDFKitView(pdfDocument: pdfDocument)
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarTrailing) {
@@ -48,6 +48,9 @@ struct PDFPageView: View {
             Task {
                 await presenter.getPdfData(examinationId: examinationId)
             }
+        }
+        .onDisappear {
+            presenter.resetState()
         }
     }
 
@@ -385,9 +388,9 @@ struct PDFPageView: View {
             let documentURL = documentDirectory.appendingPathComponent(AppTextAnalysisPDF.generatedPDFFileName)
             do {
                 try pdfData.write(to: documentURL)
-                print("PDF saved at: \(documentURL)")
+                Logger.info("PDF saved successfully", category: .examination)
             } catch {
-                print("Error saving PDF: \(error.localizedDescription)")
+                Logger.error("Error saving PDF: \(error.localizedDescription)", category: .examination)
             }
         }
     }

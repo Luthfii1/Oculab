@@ -24,8 +24,8 @@ struct BoxesGroupComponentView: View {
                     Color.clear
                         .contentShape(Rectangle())
                         .onTapGesture(coordinateSpace: .local) { location in
-                            print("User tapped at: \(location)")
-                            
+                            Logger.debug("User tapped at: \(location)", category: .examination)
+
                             // Provide haptic feedback
                             let impactFeedback = UIImpactFeedbackGenerator(style: .light)
                             impactFeedback.impactOccurred()
