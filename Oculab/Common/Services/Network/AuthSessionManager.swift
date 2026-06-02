@@ -45,6 +45,19 @@ enum AuthSessionManager {
         return merged
     }
 
+    static func requiresAuthentication(for endpoint: String) -> Bool {
+        !unauthenticatedPaths.contains(where: { endpoint.contains($0) })
+    }
+
+    static func shouldAttachAuthorization(to endpoint: String) -> Bool {
+        guard requiresAuthentication(for: endpoint),
+              KeychainHelper.string(for: .accessToken) != nil
+        else {
+            return false
+        }
+        return true
+    }
+
     static func shouldAttemptTokenRefresh(for endpoint: String) -> Bool {
         guard KeychainHelper.string(for: .refreshToken) != nil,
               UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) != nil
@@ -52,7 +65,7 @@ enum AuthSessionManager {
             return false
         }
 
-        return !unauthenticatedPaths.contains(where: { endpoint.contains($0) })
+        return requiresAuthentication(for: endpoint)
     }
 
     static func refreshAccessToken(

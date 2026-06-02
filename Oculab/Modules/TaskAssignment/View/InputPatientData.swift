@@ -9,14 +9,15 @@ import SwiftUI
 
 struct InputPatientData: View {
     let patientId: String?
-    @StateObject var presenter = InputPatientPresenter()
+    @ObservedObject var presenter: TaskAssignmentFlowCoordinator
     @EnvironmentObject private var authentication: AuthenticationPresenter
     @State private var loadTask: Task<Void, Never>?
     @State private var patientChangeTask: Task<Void, Never>?
     @State private var picChangeTask: Task<Void, Never>?
 
-    init(patientId: String? = nil) {
+    init(patientId: String? = nil, flow: TaskAssignmentFlowCoordinator) {
         self.patientId = patientId
+        self.presenter = flow
     }
     
     var body: some View {
@@ -28,44 +29,44 @@ struct InputPatientData: View {
                     Spacer().frame(height: AppConstants.TaskAssignmentUI.verticalSpacing)
                     
                     VStack(alignment: .leading, spacing: AppConstants.TaskAssignmentUI.verticalSpacing) {
-                        // PIC Dropdown
                         AppDropdown(
                             title: AppTextTaskAssignInputPatient.picTitle,
                             placeholder: AppTextTaskAssignInputPatient.selectPIC,
                             leftIcon: AppIcon.personFill,
-                            isDisabled: authentication.isDropdownOfficerDisabled,
+                            isDisabled: authentication.isDropdownOfficerDisabled || presenter.isInitialLoading,
                             choices: presenter.picName,
                             isSearchEnabled: false,
                             selectedChoice: $presenter.selectedPIC
                         )
-                        .onChange(of: presenter.selectedPIC) { _, _ in
-                            // Validation is automatically triggered in the presenter's didSet
+
+                        if presenter.isPatientListEmpty && patientId == nil {
+                            InputPatientEmptyListHint()
                         }
-                        
-                        // Patient Search Dropdown
+
                         AppDropdown(
                             title: AppPatient.name,
-                            placeholder: patientId != nil ? AppTextTaskAssignInputPatient.patientNamePlaceholder : AppSearch.Patient.placeholder,
+                            placeholder: patientSearchPlaceholder,
                             leftIcon: AppIcon.personFill,
                             rightIcon: nil,
+                            isDisabled: patientId != nil || presenter.isInitialLoading,
                             choices: presenter.patientNameDoB,
-                            description: patientId != nil ? AppTextTaskAssignInputPatient.patientNameDescriptionAutoSelected : AppTextTaskAssignInputPatient.patientNameDescription,
-                            selectedChoice: $presenter.selectedPatient,
+                            description: patientDescription,
+                            emptyListMessage: presenter.isPatientListEmpty
+                                ? AppTextTaskAssignInputPatient.emptyPatientListDropdownHint
+                                : nil,
+                            selectedChoice: presenter.patientChoiceBinding,
                             isEnablingAdding: patientId == nil
                         )
                         .disabled(patientId != nil)
-                        .onChange(of: presenter.selectedPatient) { _, _ in
-                            // Validation is automatically triggered in the presenter's didSet
-                        }
                         
-                        if presenter.selectedPatient != AppValue.empty {
+                        if presenter.hasPatientChoice {
                             PatientDisplayField()
                                 .environmentObject(presenter)
                             
                             AppButton(
-                                title: AppTextTaskAssignInputPatient.fillSpecimenDetailsButton,
-                                rightIcon: AppIcon.arrowForward,
-                                isEnabled: presenter.canProceedToSpecimen(userRole: authentication.user.role, businessModel: authentication.user.businessModel ?? .B2C)
+                                title: proceedButtonTitle,
+                                rightIcon: presenter.isSavingPatient ? nil : AppIcon.arrowForward,
+                                isEnabled: canProceed && !presenter.isSavingPatient
                             ) {
                                 presenter.newExam()
                             }
@@ -81,6 +82,7 @@ struct InputPatientData: View {
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: {
+                            Router.shared.endTaskAssignmentFlow()
                             Router.shared.navigateBack()
                         }) {
                             HStack {
@@ -90,22 +92,25 @@ struct InputPatientData: View {
                     }
                 }
             }
+            .loadingOverlay(presenter.isInitialLoading, message: AppTextTaskAssignInputPatient.loadingDataMessage)
             .onAppear {
                 loadTask?.cancel()
                 loadTask = Task {
                     await presenter.getAllUser()
                     await presenter.getAllPatient()
-
-                    // Auto-fill PIC for B2C LAB users
-                    if authentication.user.role == .LAB && authentication.user.businessModel == .B2C {
-                        presenter.selectedPIC = authentication.user._id
+                    await MainActor.run {
+                        presenter.markInitialLoadComplete()
                     }
 
-                    // Auto-fill patient if patientId is provided
+                    if authentication.user.role == .LAB && authentication.user.businessModel == .B2C {
+                        let picId = authentication.user._id
+                        presenter.selectedPIC = picId
+                        await presenter.getUserById(userId: picId)
+                    }
+
                     if let patientId = patientId, !patientId.isEmpty {
+                        presenter.patientSelection = .existing(patientId: patientId)
                         await presenter.getPatientById(patientId: patientId)
-                        // Set the selected patient to trigger the form display
-                        presenter.selectedPatient = patientId
                     }
                 }
             }
@@ -115,13 +120,12 @@ struct InputPatientData: View {
                 picChangeTask?.cancel()
             }
             .dismissKeyboardOnTap()
-            .onChange(of: presenter.selectedPatient) { _, newValue in
+            .onChange(of: presenter.patientSelection) { _, _ in
                 patientChangeTask?.cancel()
                 patientChangeTask = Task {
                     Logger.info("Selected patient changed", category: .taskAssignment)
-                    // Only fetch if it's not already auto-filled
-                    if patientId == nil || newValue != patientId {
-                        await presenter.getPatientById(patientId: newValue)
+                    if patientId == nil || presenter.patientSelection?.existingPatientId != patientId {
+                        await presenter.handlePatientChoiceChange()
                     }
                 }
             }
@@ -135,12 +139,11 @@ struct InputPatientData: View {
             }
         }
         .navigationBarBackButtonHidden()
-        // Error alert for patient operations
         .alert(
             AppState.error,
             isPresented: Binding(
                 get: { presenter.isError && !presenter.errorMessage.isEmpty },
-                set: { if !$0 { 
+                set: { if !$0 {
                     presenter.isError = false
                     presenter.errorMessage = AppValue.empty
                 } }
@@ -156,9 +159,58 @@ struct InputPatientData: View {
             }
         )
     }
+
+    private var patientSearchPlaceholder: String {
+        if patientId != nil {
+            return AppTextTaskAssignInputPatient.patientNamePlaceholder
+        }
+        return AppSearch.Patient.placeholder
+    }
+
+    private var patientDescription: String? {
+        if patientId != nil {
+            return AppTextTaskAssignInputPatient.patientNameDescriptionAutoSelected
+        }
+        if presenter.isPatientListEmpty {
+            return nil
+        }
+        return AppTextTaskAssignInputPatient.patientNameDescription
+    }
+
+    private var proceedButtonTitle: String {
+        presenter.isSavingPatient
+            ? AppTextTaskAssignInputPatient.savingPatientButtonTitle
+            : AppTextTaskAssignInputPatient.fillSpecimenDetailsButton
+    }
+
+    private var canProceed: Bool {
+        presenter.canProceedToSpecimen(
+            userRole: authentication.user.role,
+            businessModel: authentication.user.businessModel ?? .B2C
+        )
+    }
 }
 
-//#Preview("With Patient") {
-//    InputPatientData(patientId: "d0c1a2b3-4f5e-6789-91ab-cdef12345678")
-//}
+// MARK: - Empty list guidance
+private struct InputPatientEmptyListHint: View {
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: AppIcon.personFill)
+                .foregroundColor(AppColors.purple500)
+                .font(.title3)
 
+            Text(AppTextTaskAssignInputPatient.emptyPatientListHint)
+                .font(AppTypography.p3)
+                .foregroundColor(AppColors.slate700)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppColors.purple50)
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(AppColors.purple100, lineWidth: 1)
+        )
+    }
+}

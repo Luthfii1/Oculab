@@ -149,6 +149,7 @@
 "search.clear" = "Clear search";
 "search.searching" = "Searching...";
 "search.patient.placeholder" = "Search patient name";
+"search.patient.type_to_add_hint" = "Type a patient name, then tap Add New";
 "search.account.placeholder" = "Search account";
 "search.no_results_for" = "No results for %@";
 "search.result_for" = "\"%@\"";
@@ -536,6 +537,13 @@
 "task_assignment.input_patient.select_pic_data" = "Officer";
 "task_assignment.input_patient.patient_name_placeholder" = "Patient automatically selected";
 "task_assignment.input_patient.navigation_title" = "Patient Data";
+"task_assignment.input_patient.loading_data" = "patient data";
+"task_assignment.input_patient.empty_patient_list_hint" = "You don't have any patients yet. Type a name in the field below and tap Add New to register your first patient.";
+"task_assignment.input_patient.empty_patient_list_dropdown" = "No patients yet. Type a name above and tap Add New.";
+"task_assignment.input_patient.patient_details_section" = "Patient details";
+"task_assignment.input_patient.new_patient_badge" = "New patient";
+"task_assignment.input_patient.existing_patient_badge" = "Existing patient";
+"task_assignment.input_patient.saving_patient" = "patient";
 
 // Input Examination Data View
 "task_assignment.input_exam.step_title_patient" = "Patient Data";

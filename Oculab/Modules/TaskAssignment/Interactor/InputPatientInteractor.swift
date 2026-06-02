@@ -95,7 +95,7 @@ class InputPatientInteractor {
         examinations: [ExaminationRequest]
     ) async throws -> ExaminationDataResponse {
         let response: APIResponse<ExaminationDataResponse> = try await networkService.post(
-            urlString: urlCreateExam + patientId,
+            urlString: urlCreateExam + patientId.lowercased(),
             headers: nil,
             body: examinations
         )

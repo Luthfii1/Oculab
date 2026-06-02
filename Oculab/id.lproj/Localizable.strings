@@ -156,6 +156,7 @@
 "search.clear" = "Hapus Pencarian";
 "search.searching" = "Mencari...";
 "search.patient.placeholder" = "Cari nama pasien";
+"search.patient.type_to_add_hint" = "Ketik nama pasien, lalu ketuk Tambah Baru";
 "search.account.placeholder" = "Cari akun";
 "search.no_results_for" = "Tidak ada hasil untuk %@";
 "search.result_for" = "\"%@\"";
@@ -552,6 +553,13 @@
 "task_assignment.input_patient.select_pic_data" = "Petugas";
 "task_assignment.input_patient.patient_name_placeholder" = "Pasien dipilih otomatis";
 "task_assignment.input_patient.navigation_title" = "Data Pasien";
+"task_assignment.input_patient.loading_data" = "data pasien";
+"task_assignment.input_patient.empty_patient_list_hint" = "Belum ada pasien terdaftar. Ketik nama pada kolom di bawah lalu ketuk Tambah Baru untuk mendaftarkan pasien pertama.";
+"task_assignment.input_patient.empty_patient_list_dropdown" = "Belum ada pasien. Ketik nama di atas lalu ketuk Tambah Baru.";
+"task_assignment.input_patient.patient_details_section" = "Detail pasien";
+"task_assignment.input_patient.new_patient_badge" = "Pasien baru";
+"task_assignment.input_patient.existing_patient_badge" = "Pasien terdaftar";
+"task_assignment.input_patient.saving_patient" = "pasien";
 
 // Input Examination Data View
 "task_assignment.input_exam.step_title_patient" = "Data Pasien";

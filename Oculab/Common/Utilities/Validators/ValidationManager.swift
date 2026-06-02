@@ -15,10 +15,10 @@ class ValidationManager: ObservableObject {
     @Published var errors: [String: String] = [:]
     @Published var isValidating: Bool = false
     
-    // MARK: - Singleton
+    // MARK: - Shared instance (auth, profile, patient modules)
     static let shared = ValidationManager()
-    
-    private init() {}
+
+    init() {}
     
     // MARK: - Validation Rules
     

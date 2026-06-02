@@ -5,25 +5,24 @@
 //  Created by Alifiyah Ariandri on 07/11/24.
 //
 
+import Combine
 import Foundation
 import SwiftUI
 
-class InputPatientPresenter: ObservableObject {
+/// Shared coordinator for the patient → specimen task-assignment wizard.
+final class TaskAssignmentFlowCoordinator: ObservableObject {
     // MARK: - Dependencies
-    private let interactor: InputPatientInteractor
-    @ObservedObject private var validationManager = ValidationManager.shared
-    
+    private let repository: TaskAssignmentRepository
+    let validationManager: ValidationManager
+    private var validationCancellable: AnyCancellable?
+
     // MARK: - Published Properties
     @Published var selectedPIC: String = AppValue.empty {
         didSet {
             handlePICChange()
         }
     }
-    @Published var selectedPatient: String = AppValue.empty {
-        didSet {
-            handlePatientSelectionChange()
-        }
-    }
+    @Published var patientSelection: PatientSelection?
     
     // MARK: - UI State
     @Published var isAddingNewPatient: Bool = false
@@ -31,6 +30,14 @@ class InputPatientPresenter: ObservableObject {
     @Published var errorMessage: String = AppValue.empty
     @Published var isUserLoading = false
     @Published var isPatientLoading = false
+    @Published var hasCompletedInitialLoad = false
+    @Published var isSavingPatient = false
+    /// Canonical server patient id after `ensurePatientOnServer` (single source of truth).
+    @Published private(set) var savedPatientId: String = AppValue.empty
+    /// Patient id from navigation — preserved even if a later fetch fails.
+    @Published private(set) var examinationPatientId: String = AppValue.empty
+    /// PIC id from navigation — preserved even if a later fetch fails.
+    @Published private(set) var examinationPICId: String = AppValue.empty
     @Published var isSubmittingExamination = false
     @Published var isSubmitPopUpVisible: Bool = false
     @Published var isSlide2Visible: Bool = false
@@ -84,11 +91,51 @@ class InputPatientPresenter: ObservableObject {
     }
     
     // MARK: - Initialization
-    init(interactor: InputPatientInteractor = InputPatientInteractor()) {
-        self.interactor = interactor
+    init(
+        repository: TaskAssignmentRepository = TaskAssignmentRepository(),
+        validationManager: ValidationManager = ValidationManager(),
+        prefillPatientId: String? = nil
+    ) {
+        self.repository = repository
+        self.validationManager = validationManager
+        if let prefill = prefillPatientId?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !prefill.isEmpty {
+            savedPatientId = prefill
+            examinationPatientId = prefill
+            patientSelection = .existing(patientId: prefill)
+        }
+
+        validationCancellable = validationManager.objectWillChange.sink { [weak self] _ in
+            self?.objectWillChange.send()
+        }
+    }
+
+    var knownPatientIds: Set<String> {
+        Set(patientNameDoB.map(\.1))
     }
     
     // MARK: - Computed Properties
+    var isInitialLoading: Bool {
+        !hasCompletedInitialLoad && (isUserLoading || isPatientLoading)
+    }
+
+    var isPatientListEmpty: Bool {
+        hasCompletedInitialLoad && patientNameDoB.isEmpty
+    }
+
+    var selectedPatientDisplayName: String {
+        if !patient.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return patient.name
+        }
+        if let selection = patientSelection {
+            if let match = patientNameDoB.first(where: { $0.1 == selection.valueForBinding }) {
+                return match.0
+            }
+            return selection.newPatientName ?? selection.valueForBinding
+        }
+        return AppValue.empty
+    }
+
     var isFormValid: Bool {
         // Use ValidationManager for all relevant fields
         let validGoal = validationManager.validateRequired(goalString, fieldName: ValidationFieldName.examinationGoal.fieldName)
@@ -110,7 +157,10 @@ class InputPatientPresenter: ObservableObject {
         
         // Validate required dropdowns
         let validPIC = validationManager.validateRequired(selectedPIC, fieldName: ValidationFieldName.userRole.fieldName)
-        let validPatientSelection = validationManager.validateRequired(selectedPatient, fieldName: ValidationFieldName.patientName.fieldName)
+        let validPatientSelection = validationManager.validateRequired(
+            patientSelection?.valueForBinding ?? AppValue.empty,
+            fieldName: ValidationFieldName.patientName.fieldName
+        )
         
         // Validate patient data using ValidationManager
         let validNIK = validationManager.validateNIK(patient.NIK, fieldName: ValidationFieldName.patientNIK.fieldName)
@@ -167,14 +217,14 @@ class InputPatientPresenter: ObservableObject {
 }
 
 // MARK: - Network Operations
-extension InputPatientPresenter {
+extension TaskAssignmentFlowCoordinator {
     @MainActor
     func getAllUser() async {
         isUserLoading = true
         defer { isUserLoading = false }
         
         do {
-            let users = try await interactor.getAllUser()
+            let users = try await repository.fetchPICs()
             picName = users.map { ($0.name, $0._id) }
         } catch {
             errorMessage = ErrorHandler.shared.handleError(error, context: .generic)
@@ -188,7 +238,7 @@ extension InputPatientPresenter {
         defer { isPatientLoading = false }
         
         do {
-            let patients = try await interactor.getAllPatient()
+            let patients = try await repository.fetchPatients()
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = AppConstants.PatientUI.dateFormat
             
@@ -197,7 +247,7 @@ extension InputPatientPresenter {
                 return (patient.name + AppValue.space + formattedDoB, patient._id)
             }
         } catch {
-            if isEmptyPatientListError(error) {
+            if repository.isEmptyPatientListError(error) {
                 patientNameDoB = []
                 return
             }
@@ -207,45 +257,73 @@ extension InputPatientPresenter {
     }
 
     @MainActor
-    func getPatientById(patientId: String) async {
-        guard isExistingPatientSelection(patientId) else {
-            prepareNewPatientSelection(name: patientId)
-            return
-        }
+    func getPatientById(patientId: String, preserveIdentityOnFailure: Bool = false) async {
+        guard let selection = PatientSelection.from(
+            bindingValue: patientId,
+            knownPatientIds: knownPatientIds
+        ) else { return }
 
-        isPatientLoading = true
-        defer { isPatientLoading = false }
-        
-        do {
-            let patient = try await interactor.getPatientById(patientId: patientId)
-            self.patient = patient
-            self.patientFound = true
-        } catch {
-            clearForm()
-            errorMessage = ErrorHandler.shared.handleError(error, context: .generic)
-            isError = true
+        switch selection {
+        case .existing(let id):
+            patientSelection = .existing(patientId: id)
+            await loadExistingPatient(id: id, preserveIdentityOnFailure: preserveIdentityOnFailure)
+        case .new(let name):
+            patientSelection = .new(displayName: name)
+            prepareNewPatientSelection(name: name)
         }
     }
 
-    func isExistingPatientSelection(_ patientId: String) -> Bool {
-        patientNameDoB.contains { $0.1 == patientId }
+    @MainActor
+    func loadExistingPatient(id: String, preserveIdentityOnFailure: Bool) async {
+        let trimmedId = id.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedId.isEmpty else { return }
+
+        isPatientLoading = true
+        defer { isPatientLoading = false }
+
+        do {
+            let loaded = try await repository.fetchPatient(id: trimmedId)
+            patient = loaded
+            patientFound = true
+            isAddingNewPatient = false
+            patientSelection = .existing(patientId: loaded._id)
+            savedPatientId = loaded._id
+            examinationPatientId = loaded._id
+        } catch {
+            if preserveIdentityOnFailure {
+                Logger.warning(
+                    "Could not load patient \(trimmedId); keeping examination context",
+                    category: .taskAssignment
+                )
+            } else {
+                clearForm()
+                errorMessage = ErrorHandler.shared.handleError(error, context: .generic)
+                isError = true
+            }
+        }
     }
 
     @MainActor
     func prepareNewPatientSelection(name: String) {
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty else { return }
+
         patientFound = false
+        isAddingNewPatient = true
+        patientSelection = .new(displayName: trimmedName)
+        savedPatientId = AppValue.empty
+        examinationPatientId = AppValue.empty
         patient = Patient.empty
-        patient.name = name
+        patient.name = trimmedName
         selectedDoB = Date()
         selectedSex = AppValue.empty
         BPJSnumber = AppValue.empty
         validationManager.clearAllErrors()
     }
 
-    private func isEmptyPatientListError(_ error: Error) -> Bool {
-        guard case let NetworkError.apiError(apiResponse, _) = error else { return false }
-        return apiResponse.data.errorType == "RESOURCE_NOT_FOUND"
-            && apiResponse.data.description == "No patients found"
+    @MainActor
+    func markInitialLoadComplete() {
+        hasCompletedInitialLoad = true
     }
 
     @MainActor
@@ -254,7 +332,7 @@ extension InputPatientPresenter {
         defer { isUserLoading = false }
         
         do {
-            let user = try await interactor.getUserById(userId: userId)
+            let user = try await repository.fetchUser(id: userId)
             self.pic = user
         } catch {
             _ = ErrorHandler.shared.handleError(error, context: .generic)
@@ -262,27 +340,23 @@ extension InputPatientPresenter {
         }
     }
     
-    @MainActor
-    func addNewPatient() async -> Bool {
-        Logger.debug("Adding new patient", category: .taskAssignment)
-
-        do {
-            patient.name = selectedPatient
-            let response = try await interactor.addNewPatient(patient: patient)
-            patient = response
-            return true
-        } catch {
-            errorMessage = ErrorHandler.shared.handleError(error, context: .patientManagement)
-            isError = true
-        }
-        return false
+    private func applyPersistedPatient(_ persisted: Patient) {
+        patient = persisted
+        savedPatientId = persisted._id
+        examinationPatientId = persisted._id
+        patientFound = true
+        isAddingNewPatient = false
     }
 }
 
 // MARK: - Patient Management
-extension InputPatientPresenter {
+extension TaskAssignmentFlowCoordinator {
     func clearForm() {
         patientFound = false
+        isAddingNewPatient = false
+        patientSelection = nil
+        savedPatientId = AppValue.empty
+        examinationPatientId = AppValue.empty
         patient = Patient.empty
         selectedDoB = Date()
         selectedSex = AppValue.empty
@@ -293,35 +367,85 @@ extension InputPatientPresenter {
     @MainActor
     func newExam() {
         Task {
-            if !patientFound {
-                let success = await addNewPatient()
-                if success {
-                    navigateToNewExam()
-                } else {
-                    Logger.error("Failed to add new patient", category: .taskAssignment)
-                }
-            } else {
-                Logger.debug("Patient already exists, proceeding to examination", category: .taskAssignment)
-                navigateToNewExam()
-            }
+            await proceedToSpecimenStep()
         }
     }
-    
-    private func navigateToNewExam() {
-        Router.shared.navigateTo(.newExam(patientId: patient._id, picId: pic._id))
+
+    /// Single persistence point before leaving step 1.
+    @MainActor
+    func proceedToSpecimenStep() async {
+        guard !isSavingPatient else { return }
+        isSavingPatient = true
+        defer { isSavingPatient = false }
+
+        do {
+            syncPatientNameFromSelection()
+
+            let picId = pic._id.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                ? selectedPIC.trimmingCharacters(in: .whitespacesAndNewlines)
+                : pic._id.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !picId.isEmpty else { throw TaskAssignmentFlowError.missingPic }
+
+            let preferredId = savedPatientId.isEmpty ? patient._id : savedPatientId
+            let persisted = try await repository.ensurePatientOnServer(
+                draft: patient,
+                preferredId: preferredId
+            )
+            applyPersistedPatient(persisted)
+
+            examinationPICId = picId
+            Router.shared.navigateTo(.newExam(patientId: persisted._id, picId: picId))
+        } catch let flowError as TaskAssignmentFlowError {
+            errorMessage = flowError.localizedDescription
+            isError = true
+        } catch {
+            errorMessage = ErrorHandler.shared.handleError(error, context: .patientManagement)
+            isError = true
+        }
     }
-    
+
+    /// Step 2 entry — refresh display names; patient is already persisted.
+    @MainActor
+    func bootstrapSpecimenStep() async {
+        let picId = examinationPICId.isEmpty ? selectedPIC : examinationPICId
+        if !picId.isEmpty {
+            await getUserById(userId: picId)
+        }
+
+        let patientId = savedPatientId.isEmpty ? examinationPatientId : savedPatientId
+        guard !patientId.isEmpty else { return }
+        await getPatientById(patientId: patientId, preserveIdentityOnFailure: true)
+        Logger.info("Specimen step bootstrapped for patient \(patientId)", category: .taskAssignment)
+    }
+
+    /// Deeplink / legacy route: attach ids when opening specimen step without step 1.
+    func attachSpecimenRouteContext(patientId: String, picId: String) {
+        let trimmedPatient = patientId.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedPic = picId.trimmingCharacters(in: .whitespacesAndNewlines)
+        if savedPatientId.isEmpty, TaskAssignmentIdentifiers.isPatientId(trimmedPatient) {
+            savedPatientId = trimmedPatient
+            examinationPatientId = trimmedPatient
+            patientSelection = .existing(patientId: trimmedPatient)
+        }
+        if examinationPICId.isEmpty, !trimmedPic.isEmpty {
+            examinationPICId = trimmedPic
+            selectedPIC = trimmedPic
+        }
+    }
+
     func setupExaminationData(selectedPIC: String, selectedPatient: String) {
+        attachSpecimenRouteContext(patientId: selectedPatient, picId: selectedPIC)
         Task {
-            await getPatientById(patientId: selectedPatient)
-            await getUserById(userId: selectedPIC)
-            Logger.info("Examination data loaded", category: .taskAssignment)
+            await bootstrapSpecimenStep()
         }
     }
 }
 
+/// Backward-compatible name used by views and components.
+typealias InputPatientPresenter = TaskAssignmentFlowCoordinator
+
 // MARK: - Examination Submission
-extension InputPatientPresenter {
+extension TaskAssignmentFlowCoordinator {
     @MainActor
     func submitExamination() async {
         guard !isSubmittingExamination else { return }
@@ -336,10 +460,15 @@ extension InputPatientPresenter {
         }
         
         do {
+            let patientId = try await resolvedServerPatientIdForSubmit()
             let examinationsToSend = try buildExaminationRequests(DPJPId: DPJPId)
-            let response = try await submitExaminationRequests(examinationsToSend)
+            let response = try await repository.createExaminations(
+                patientId: patientId,
+                examinations: examinationsToSend
+            )
             try validateExaminationResponse(response, expectedCount: examinationsToSend.count)
-            
+
+            Router.shared.endTaskAssignmentFlow()
             Router.shared.popToRoot()
         } catch let error as ExaminationError {
             showError(error.message)
@@ -387,20 +516,33 @@ extension InputPatientPresenter {
     }
     
     private func createExaminationRequest(from exam: Examination, DPJPId: String, useFirstExamGoal: Bool = false) -> ExaminationRequest {
+        let picId = pic._id.isEmpty ? examinationPICId : pic._id
         return ExaminationRequest(
             _id: exam._id,
             goal: useFirstExamGoal ? examination.goal : exam.goal,
             preparationType: exam.preparationType,
             slideId: exam.slideId,
             examinationDate: exam.examinationDate,
-            PIC: pic._id,
+            PIC: picId,
             DPJP: DPJPId,
             examinationPlanDate: exam.examinationPlanDate
         )
     }
     
-    private func submitExaminationRequests(_ requests: [ExaminationRequest]) async throws -> ExaminationDataResponse {
-        return try await interactor.addNewExamination(patientId: patient._id, examinations: requests)
+    @MainActor
+    private func resolvedServerPatientIdForSubmit() async throws -> String {
+        let preferred = savedPatientId.isEmpty ? examinationPatientId : savedPatientId
+        let trimmed = preferred.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            throw ExaminationError.missingPatientId
+        }
+
+        let persisted = try await repository.ensurePatientOnServer(
+            draft: patient,
+            preferredId: trimmed
+        )
+        applyPersistedPatient(persisted)
+        return persisted._id.lowercased()
     }
     
     private func validateExaminationResponse(_ response: ExaminationDataResponse, expectedCount: Int) throws {
@@ -427,11 +569,14 @@ private enum ExaminationError: Error {
     case secondExamIncomplete
     case duplicateSlideIds
     case examinationIncomplete
+    case missingPatientId
     case incompleteCreation
     case invalidData
     
     var message: String {
         switch self {
+        case .missingPatientId:
+            return AppTextTaskAssignInputExam.errorMessageFailedToGetResponse
         case .firstExamIncomplete:
             return AppTextTaskAssignInputExam.warningFirstExamShouldBeFilled
         case .secondExamIncomplete:
@@ -449,7 +594,7 @@ private enum ExaminationError: Error {
 }
 
 // MARK: - Form Handling & UI Actions
-extension InputPatientPresenter {
+extension TaskAssignmentFlowCoordinator {
     // MARK: - Form Handlers
     func handleGoalChange() {
         let goalType: ExamGoalType = goalString == AppMedical.Examination.goalFollowUp ? .TREATMENT : .SCREENING
@@ -542,7 +687,10 @@ extension InputPatientPresenter {
     }
     
     func handlePatientSelectionChange() {
-        _ = validationManager.validateRequired(selectedPatient, fieldName: ValidationFieldName.patientName.fieldName)
+        _ = validationManager.validateRequired(
+            patientSelection?.valueForBinding ?? AppValue.empty,
+            fieldName: ValidationFieldName.patientName.fieldName
+        )
         Logger.debug("Patient selection updated", category: .taskAssignment)
     }
 }
@@ -581,49 +729,3 @@ extension Examination {
     }
 }
 
-struct ExaminationRequest: Encodable {
-    var _id: String?
-    var goal: ExamGoalType?
-    var preparationType: ExamPreparationType?
-    var slideId: String?
-    var examinationDate: Date?
-    var PIC: String?
-    var DPJP: String?
-    var examinationPlanDate: Date?
-
-    enum CodingKeys: CodingKey {
-        case _id
-        case goal
-        case preparationType
-        case slideId
-        case examinationDate
-        case PIC
-        case DPJP
-        case examinationPlanDate
-    }
-
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-
-        try container.encode(_id, forKey: ._id)
-        try container.encode(goal, forKey: .goal)
-        try container.encode(preparationType, forKey: .preparationType)
-        try container.encode(slideId, forKey: .slideId)
-        try container.encode(PIC, forKey: .PIC)
-        try container.encode(DPJP, forKey: .DPJP)
-
-        if let examinationDate = examinationDate {
-            let dateFormatter = ISO8601DateFormatter()
-            dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-            let dateString = dateFormatter.string(from: examinationDate)
-            try container.encode(dateString, forKey: .examinationDate)
-        }
-
-        if let examinationPlanDate = examinationPlanDate {
-            let dateFormatter = ISO8601DateFormatter()
-            dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-            let dateString = dateFormatter.string(from: examinationPlanDate)
-            try container.encode(dateString, forKey: .examinationPlanDate)
-        }
-    }
-}

@@ -8,10 +8,21 @@
 import SwiftUI
 
 struct PatientDisplayField: View {
-    @EnvironmentObject var presenter: InputPatientPresenter
+    @EnvironmentObject var presenter: TaskAssignmentFlowCoordinator
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
+            patientDetailsHeader
+
+            if presenter.isPatientLoading {
+                HStack(spacing: 8) {
+                    ProgressView()
+                    Text(AppTextTaskAssignInputPatient.loadingDataMessage)
+                        .font(AppTypography.p3)
+                        .foregroundColor(AppColors.slate600)
+                }
+            }
+
             ValidatedTextField(
                 title: AppPatient.nik,
                 isRequired: true,
@@ -21,7 +32,8 @@ struct PatientDisplayField: View {
                 length: 16,
                 text: $presenter.patient.NIK,
                 fieldName: .patientNIK,
-                validationType: .nik
+                validationType: .nik,
+                validationManager: presenter.validationManager
             )
             .onChange(of: presenter.patient.NIK) { _, _ in
                 presenter.handleNIKChange()
@@ -57,16 +69,47 @@ struct PatientDisplayField: View {
                 length: 13,
                 text: $presenter.BPJSnumber,
                 fieldName: .patientBPJS,
-                validationType: .bpjs
+                validationType: .bpjs,
+                validationManager: presenter.validationManager
             )
             .onChange(of: presenter.BPJSnumber) {
                 presenter.handleBPJSNumberChange()
             }
+        }
+        .opacity(presenter.isPatientLoading ? 0.6 : 1)
+        .allowsHitTesting(!presenter.isPatientLoading)
+    }
+
+    private var patientDetailsHeader: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(AppTextTaskAssignInputPatient.patientDetailsSectionTitle)
+                .font(AppTypography.s4_1)
+                .foregroundColor(AppColors.slate900)
+
+            Text(presenter.selectedPatientDisplayName)
+                .font(AppTypography.h3)
+                .foregroundColor(AppColors.slate900)
+
+            HStack(spacing: 6) {
+                Image(systemName: presenter.patientFound ? AppIcon.textBadgeCheckmark : AppIcon.personFill)
+                    .font(.caption)
+                Text(
+                    presenter.patientFound
+                        ? AppTextTaskAssignInputPatient.existingPatientBadge
+                        : AppTextTaskAssignInputPatient.newPatientBadge
+                )
+                .font(AppTypography.p3)
+            }
+            .foregroundColor(presenter.patientFound ? AppColors.purple700 : AppColors.slate600)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(presenter.patientFound ? AppColors.purple50 : AppColors.slate50)
+            .cornerRadius(8)
         }
     }
 }
 
 #Preview {
     PatientDisplayField()
-        .environmentObject(InputPatientPresenter())
+        .environmentObject(TaskAssignmentFlowCoordinator())
 }

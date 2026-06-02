@@ -84,8 +84,10 @@ class AlamofireNetworkService: NetworkServiceProtocol {
         headers: [String: String]?,
         perform: ([String: String]?) async throws -> APIResponse<T>
     ) async throws -> APIResponse<T> {
+        let initialHeaders = try resolveHeaders(for: endpoint, headers: headers)
+
         do {
-            return try await perform(headers)
+            return try await perform(initialHeaders)
         } catch NetworkError.unauthorized {
             guard AuthSessionManager.shouldAttemptTokenRefresh(for: endpoint) else {
                 throw NetworkError.unauthorized(endpoint: endpoint)
@@ -95,6 +97,14 @@ class AlamofireNetworkService: NetworkServiceProtocol {
             let refreshedHeaders = try AuthSessionManager.headersByReplacingAuthorization(headers)
             return try await perform(refreshedHeaders)
         }
+    }
+
+    /// Attach bearer token on the first request for protected endpoints (not only after a 401).
+    private func resolveHeaders(for endpoint: String, headers: [String: String]?) throws -> [String: String]? {
+        guard AuthSessionManager.shouldAttachAuthorization(to: endpoint) else {
+            return headers
+        }
+        return try AuthSessionManager.headersByReplacingAuthorization(headers)
     }
 
     private func handleRequest<T: Decodable>(_ request: DataRequest, endpoint: String) async throws -> APIResponse<T> {

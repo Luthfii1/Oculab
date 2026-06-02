@@ -43,18 +43,30 @@ git clone https://github.com/Luthfii1/Oculab.git
 
 ### 4. Generate the Xcode Project
 
-Navigate to the project directory and generate the Xcode project using XcodeGen:
+From the project root, run the setup script (same flow as Obo iOS — generates the project, resolves SPM, and opens Xcode):
 
 ```bash
-cd /navigate/to/our/project
-xcodegen
+cd /path/to/Oculab
+sh ci_scripts/ci_post_clone.sh
 ```
 
-If you have just pulled from another branch, you can simply run:
+Override the team ID if needed:
 
 ```bash
-xcodegen
+export DEVELOPMENT_TEAM="YOUR_APPLE_TEAM_ID"
+sh ci_scripts/ci_post_clone.sh
 ```
+
+Or run the steps manually:
+
+```bash
+export DEVELOPMENT_TEAM="YOUR_APPLE_TEAM_ID"  # optional; script defaults to XSHZNN2ULY
+xcodegen generate
+xcodebuild -resolvePackageDependencies -project Oculab.xcodeproj -scheme Oculab
+open Oculab.xcodeproj
+```
+
+After pulling changes that affect `project.yml`, run `sh ci_scripts/ci_post_clone.sh` again.
 
 ### 5. Setting up SwiftFormat
 

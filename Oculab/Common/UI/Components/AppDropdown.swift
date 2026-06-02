@@ -17,19 +17,11 @@ struct AppDropdown: View {
     var isDisabled: Bool = false
     var choices: [(display: String, value: String)] // List of dropdown choices with display and value
     var description: String? = nil // Description or additional info
+    var emptyListMessage: String? = nil // Shown when there are no choices (e.g. first-time empty list)
     var isSearchEnabled: Bool = true // New parameter to control search functionality
     @Binding var selectedChoice: String
 
-    @State private var isDropdownOpen: Bool = false {
-        didSet {
-            if isDropdownOpen {
-                selectedChoice = AppValue.empty // Reset selectedChoice when dropdown is opened
-            } else {
-                // close keyboard
-                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-            }
-        }
-    }
+    @State private var isDropdownOpen: Bool = false
     @State private var searchText: String = AppValue.empty // New state for search text
     @State var isEnablingAdding: Bool = false
 
@@ -75,9 +67,19 @@ struct AppDropdown: View {
             Button(action: {
                 if !isDisabled {
                     withAnimation {
-                        isDropdownOpen.toggle()
-                        if isSearchEnabled {
-                            searchText = AppValue.empty // Reset search when dropdown is opened
+                        if isDropdownOpen {
+                            isDropdownOpen = false
+                            UIApplication.shared.sendAction(
+                                #selector(UIResponder.resignFirstResponder),
+                                to: nil,
+                                from: nil,
+                                for: nil
+                            )
+                        } else {
+                            if isSearchEnabled {
+                                syncSearchTextWithSelection()
+                            }
+                            isDropdownOpen = true
                         }
                     }
                 }
@@ -92,6 +94,9 @@ struct AppDropdown: View {
                         if isSearchEnabled {
                             TextField(placeholder, text: $searchText, onEditingChanged: { editing in
                                 if editing {
+                                    if !isDropdownOpen {
+                                        syncSearchTextWithSelection()
+                                    }
                                     isDropdownOpen = true
                                 }
                             })
@@ -133,10 +138,11 @@ struct AppDropdown: View {
             // Dropdown choices (visible when the dropdown is open and filtered by search)
             if isDropdownOpen {
                 VStack(alignment: .leading) {
-                    if isSearchEnabled && isEnablingAdding {
+                    if isSearchEnabled && isEnablingAdding && !trimmedSearchText.isEmpty {
                         Button {
                             isDropdownOpen = false
-                            selectedChoice = searchText
+                            selectedChoice = trimmedSearchText
+                            searchText = trimmedSearchText
                         } label: {
                             HStack {
                                 Text(AppAction.addNew).font(AppTypography.p2).foregroundStyle(AppColors.purple500)
@@ -149,10 +155,12 @@ struct AppDropdown: View {
 
                     ScrollView {
                         if filteredChoices.isEmpty {
-                            Text(AppSearch.noResults)
-                                .foregroundColor(AppColors.slate100)
+                            Text(emptyDropdownMessage)
+                                .font(AppTypography.p3)
+                                .foregroundColor(AppColors.slate400)
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 .padding(.top, 8)
+                                .multilineTextAlignment(.center)
 
                         } else {
                             ForEach(filteredChoices, id: \.value) { choice in
@@ -194,6 +202,28 @@ struct AppDropdown: View {
             }
         }
         .padding(.vertical, 4)
+    }
+
+    private var trimmedSearchText: String {
+        searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var emptyDropdownMessage: String {
+        if choices.isEmpty, let emptyListMessage, !emptyListMessage.isEmpty {
+            return emptyListMessage
+        }
+        if isSearchEnabled && isEnablingAdding && trimmedSearchText.isEmpty {
+            return AppSearch.Patient.typeToAddHint
+        }
+        return AppSearch.noResults
+    }
+
+    private func syncSearchTextWithSelection() {
+        guard !selectedChoice.isEmpty else {
+            searchText = AppValue.empty
+            return
+        }
+        searchText = choices.first(where: { $0.value == selectedChoice })?.display ?? selectedChoice
     }
 }
 

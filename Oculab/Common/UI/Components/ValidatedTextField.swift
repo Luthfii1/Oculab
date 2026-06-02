@@ -24,8 +24,8 @@ struct ValidatedTextField: View {
     var validationType: ValidationType = .none
     var customRules: [ValidationManager.ValidationRule] = []
     var validateOnChange: Bool = true
-    @StateObject private var validationManager = ValidationManager.shared
-    
+    @ObservedObject private var validationManager: ValidationManager
+
     @State private var isPasswordVisible: Bool = false
     @FocusState private var isFocused: Bool
 
@@ -45,7 +45,8 @@ struct ValidatedTextField: View {
         fieldName: String,
         validationType: ValidationType = .none,
         customRules: [ValidationManager.ValidationRule] = [],
-        validateOnChange: Bool = true
+        validateOnChange: Bool = true,
+        validationManager: ValidationManager? = nil
     ) {
         self.title = title
         self.isRequired = isRequired
@@ -60,6 +61,7 @@ struct ValidatedTextField: View {
         self.validationType = validationType
         self.customRules = customRules
         self.validateOnChange = validateOnChange
+        _validationManager = ObservedObject(wrappedValue: validationManager ?? ValidationManager.shared)
     }
     
     /// Initialize with ValidationFieldName enum (new recommended approach)
@@ -76,7 +78,8 @@ struct ValidatedTextField: View {
         fieldName: ValidationFieldName,
         validationType: ValidationType = .none,
         customRules: [ValidationManager.ValidationRule] = [],
-        validateOnChange: Bool = true
+        validateOnChange: Bool = true,
+        validationManager: ValidationManager? = nil
     ) {
         self.title = title
         self.isRequired = isRequired
@@ -91,6 +94,7 @@ struct ValidatedTextField: View {
         self.validationType = validationType
         self.customRules = customRules
         self.validateOnChange = validateOnChange
+        _validationManager = ObservedObject(wrappedValue: validationManager ?? ValidationManager.shared)
     }
 
     private var isPasswordInput: Bool {

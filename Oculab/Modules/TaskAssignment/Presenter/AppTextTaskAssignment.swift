@@ -28,6 +28,13 @@ extension AppText {
             static let selectPIC = AppForm.select("task_assignment.input_patient.select_pic_data".localized)
             static let patientNamePlaceholder = "task_assignment.input_patient.patient_name_placeholder".localized
             static let navigationTitle = "task_assignment.input_patient.navigation_title".localized
+            static let loadingDataMessage = AppState.loading("task_assignment.input_patient.loading_data".localized)
+            static let emptyPatientListHint = "task_assignment.input_patient.empty_patient_list_hint".localized
+            static let emptyPatientListDropdownHint = "task_assignment.input_patient.empty_patient_list_dropdown".localized
+            static let patientDetailsSectionTitle = "task_assignment.input_patient.patient_details_section".localized
+            static let newPatientBadge = "task_assignment.input_patient.new_patient_badge".localized
+            static let existingPatientBadge = "task_assignment.input_patient.existing_patient_badge".localized
+            static let savingPatientButtonTitle = AppState.loading("task_assignment.input_patient.saving_patient".localized)
         }
         
         enum InputExaminationDataView {

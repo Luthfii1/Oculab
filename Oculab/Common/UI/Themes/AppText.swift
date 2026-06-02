@@ -358,6 +358,7 @@ enum AppText {
         
         enum Patient {
             static let placeholder = "search.patient.placeholder".localized
+            static let typeToAddHint = "search.patient.type_to_add_hint".localized
         }
         
         enum Account {

@@ -83,6 +83,9 @@ class Router: ObservableObject {
     @Published var path: NavigationPath = .init()
     @Published var currentRoute: Route?
 
+    /// Shared wizard state for patient → specimen task assignment.
+    private(set) var taskAssignmentFlow: TaskAssignmentFlowCoordinator?
+
     @ViewBuilder
     func view(for route: Route) -> some View {
         switch route {
@@ -101,7 +104,7 @@ class Router: ObservableObject {
         case let .savedResult(examId, patientId):
             SavedResultView(examId: examId, patientId: patientId)
         case let .newExam(patientId, picId):
-            InputExaminationData(selectedPIC: picId, selectedPatient: patientId)
+            taskAssignmentExaminationView(patientId: patientId, picId: picId)
         case let .userAccessPin(state):
             UserAccessPinView(state: state)
                 .environmentObject(DependencyInjection.shared.createAuthPresenter())
@@ -122,7 +125,7 @@ class Router: ObservableObject {
             EditPasswordView()
                 .environmentObject(DependencyInjection.shared.createProfilePresenter())
         case .inputPatientData(let patientId):
-            InputPatientData(patientId: patientId)
+            taskAssignmentPatientView(patientId: patientId)
         case .informationInterpretation:
             InformationPage()
         case .privacyPolicy:
@@ -149,9 +152,24 @@ class Router: ObservableObject {
 
     func navigateTo(_ appRoute: Route) {
         DispatchQueue.main.async {
+            self.prepareFlowSession(for: appRoute)
             self.currentRoute = appRoute
             self.path.append(appRoute)
             Logger.info("Navigated to: \(appRoute.routeIdentifier)", category: .navigation)
+        }
+    }
+
+    private func prepareFlowSession(for route: Route) {
+        switch route {
+        case .inputPatientData(let patientId):
+            beginTaskAssignmentFlow(prefillPatientId: patientId)
+        case let .newExam(patientId, picId):
+            if taskAssignmentFlow == nil {
+                let flow = beginTaskAssignmentFlow(prefillPatientId: patientId)
+                flow.attachSpecimenRouteContext(patientId: patientId, picId: picId)
+            }
+        default:
+            break
         }
     }
 
@@ -172,6 +190,49 @@ class Router: ObservableObject {
                 self.currentRoute = nil
                 Logger.info("Popped to root, removed \(countToRemove) routes", category: .navigation)
             }
+            self.endTaskAssignmentFlow()
+        }
+    }
+
+    // MARK: - Task assignment flow session
+
+    @discardableResult
+    func beginTaskAssignmentFlow(prefillPatientId: String? = nil) -> TaskAssignmentFlowCoordinator {
+        let flow = TaskAssignmentFlowCoordinator(prefillPatientId: prefillPatientId)
+        taskAssignmentFlow = flow
+        return flow
+    }
+
+    func obtainTaskAssignmentFlow(prefillPatientId: String? = nil) -> TaskAssignmentFlowCoordinator {
+        if let taskAssignmentFlow {
+            return taskAssignmentFlow
+        }
+        return beginTaskAssignmentFlow(prefillPatientId: prefillPatientId)
+    }
+
+    func endTaskAssignmentFlow() {
+        taskAssignmentFlow = nil
+    }
+
+    @ViewBuilder
+    private func taskAssignmentPatientView(patientId: String?) -> some View {
+        if let flow = taskAssignmentFlow {
+            InputPatientData(patientId: patientId, flow: flow)
+                .environmentObject(flow)
+                .environmentObject(flow.validationManager)
+        } else {
+            ProgressView()
+        }
+    }
+
+    @ViewBuilder
+    private func taskAssignmentExaminationView(patientId: String, picId: String) -> some View {
+        if let flow = taskAssignmentFlow {
+            InputExaminationData(flow: flow)
+                .environmentObject(flow)
+                .environmentObject(flow.validationManager)
+        } else {
+            ProgressView()
         }
     }
     

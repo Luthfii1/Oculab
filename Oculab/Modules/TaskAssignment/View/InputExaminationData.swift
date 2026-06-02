@@ -8,10 +8,13 @@
 import SwiftUI
 
 struct InputExaminationData: View {
-    @StateObject var presenter: InputPatientPresenter = .init()
-    @State var selectedPIC: String
-    @State var selectedPatient: String
+    @ObservedObject var presenter: TaskAssignmentFlowCoordinator
     @State private var submitTask: Task<Void, Never>?
+    @State private var bootstrapTask: Task<Void, Never>?
+
+    init(flow: TaskAssignmentFlowCoordinator) {
+        self.presenter = flow
+    }
 
     var body: some View {
         NavigationView {
@@ -19,7 +22,10 @@ struct InputExaminationData: View {
                 AppPopup(
                     image: AppImage.confirm,
                     title: AppTextTaskAssignInputExam.confirmPopupTitle,
-                    description: AppTextTaskAssignInputExam.examinationDescription(patientName: presenter.patient.name, picName: presenter.pic.name),
+                    description: AppTextTaskAssignInputExam.examinationDescription(
+                        patientName: presenter.patient.name,
+                        picName: presenter.pic.name
+                    ),
                     isError: presenter.isError,
                     errorMessage: presenter.errorMessage,
                     buttons: [
@@ -52,14 +58,20 @@ struct InputExaminationData: View {
                         VStack {
                             Spacer().frame(height: AppConstants.TaskAssignmentUI.verticalSpacing)
 
-                            AppStepper(stepTitles: AppTextTaskAssignInputExam.stepTitles, currentStep: AppTextTaskAssignInputExam.currentStepIndex)
+                            AppStepper(
+                                stepTitles: AppTextTaskAssignInputExam.stepTitles,
+                                currentStep: AppTextTaskAssignInputExam.currentStepIndex
+                            )
                             Spacer().frame(height: AppConstants.TaskAssignmentUI.verticalSpacing)
 
                             VStack(alignment: .leading, spacing: AppConstants.TaskAssignmentUI.verticalSpacing) {
                                 AppRadioButton(
                                     title: AppMedical.Examination.purpose,
                                     isRequired: true,
-                                    choices: [AppTextTaskAssignInputExam.screeningChoice, AppTextTaskAssignInputExam.followUpChoice],
+                                    choices: [
+                                        AppTextTaskAssignInputExam.screeningChoice,
+                                        AppTextTaskAssignInputExam.followUpChoice
+                                    ],
                                     isDisabled: false,
                                     selectedChoice: $presenter.goalString
                                 ).onChange(of: presenter.goalString) {
@@ -72,13 +84,17 @@ struct InputExaminationData: View {
                                     placeholder: AppTextTaskAssignInputExam.slideId1Placeholder,
                                     text: $presenter.examination.slideId,
                                     fieldName: .slideId1,
-                                    validationType: .none
+                                    validationType: .none,
+                                    validationManager: presenter.validationManager
                                 )
 
                                 AppRadioButton(
                                     title: AppTextTaskAssignInputExam.slideType1Title,
                                     isRequired: true,
-                                    choices: [AppTextTaskAssignInputExam.morningChoice, AppTextTaskAssignInputExam.anytimeChoice],
+                                    choices: [
+                                        AppTextTaskAssignInputExam.morningChoice,
+                                        AppTextTaskAssignInputExam.anytimeChoice
+                                    ],
                                     isDisabled: false,
                                     selectedChoice: $presenter.typeString
                                 ).onChange(of: presenter.typeString) {
@@ -92,13 +108,17 @@ struct InputExaminationData: View {
                                         placeholder: AppTextTaskAssignInputExam.slideId2Placeholder,
                                         text: $presenter.examination2.slideId,
                                         fieldName: .slideId2,
-                                        validationType: .none
+                                        validationType: .none,
+                                        validationManager: presenter.validationManager
                                     )
 
                                     AppRadioButton(
                                         title: AppTextTaskAssignInputExam.slideType2Title,
                                         isRequired: false,
-                                        choices: [AppTextTaskAssignInputExam.morningChoice, AppTextTaskAssignInputExam.anytimeChoice],
+                                        choices: [
+                                            AppTextTaskAssignInputExam.morningChoice,
+                                            AppTextTaskAssignInputExam.anytimeChoice
+                                        ],
                                         isDisabled: false,
                                         selectedChoice: $presenter.typeString2
                                     ).onChange(of: presenter.typeString2) {
@@ -149,6 +169,7 @@ struct InputExaminationData: View {
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
                                 Button(action: {
+                                    Router.shared.endTaskAssignmentFlow()
                                     Router.shared.popToRoot()
                                 }) {
                                     HStack {
@@ -161,16 +182,35 @@ struct InputExaminationData: View {
                 }
             }
             .onAppear {
-                presenter.setupExaminationData(selectedPIC: selectedPIC, selectedPatient: selectedPatient)
+                bootstrapTask?.cancel()
+                bootstrapTask = Task {
+                    await presenter.bootstrapSpecimenStep()
+                }
             }
             .onDisappear {
                 submitTask?.cancel()
+                bootstrapTask?.cancel()
             }
         }
         .navigationBarBackButtonHidden(true)
+        .alert(
+            AppState.error,
+            isPresented: Binding(
+                get: { presenter.isError && !presenter.errorMessage.isEmpty },
+                set: { if !$0 {
+                    presenter.isError = false
+                    presenter.errorMessage = AppValue.empty
+                } }
+            ),
+            actions: {
+                Button(AppAction.ok) {
+                    presenter.isError = false
+                    presenter.errorMessage = AppValue.empty
+                }
+            },
+            message: {
+                Text(presenter.errorMessage)
+            }
+        )
     }
 }
-
-//#Preview {
-//    InputExaminationData(selectedPIC: AppValue.empty, selectedPatient: AppValue.empty)
-//}
