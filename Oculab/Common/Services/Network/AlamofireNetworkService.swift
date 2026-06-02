@@ -10,67 +10,122 @@ import Alamofire
 
 class AlamofireNetworkService: NetworkServiceProtocol {
     private static let decoder = JSONDecoder()
-    
+
     func get<T: Decodable>(urlString: String, headers: [String: String]?) async throws -> APIResponse<T> {
-        let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
-        let request = AF.request(urlString, method: .get, headers: afHeaders)
-        return try await handleRequest(request, endpoint: urlString)
+        try await executeWithAuthRetry(endpoint: urlString, headers: headers) { headers in
+            let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
+            let request = AF.request(urlString, method: .get, headers: afHeaders)
+            return try await self.handleRequest(request, endpoint: urlString)
+        }
     }
 
     func post<T: Decodable, B: Encodable>(urlString: String, headers: [String: String]?, body: B) async throws -> APIResponse<T> {
-        let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
-        let request = AF.request(urlString, method: .post, parameters: body, encoder: JSONParameterEncoder.default, headers: afHeaders)
-        return try await handleRequest(request, endpoint: urlString)
+        try await executeWithAuthRetry(endpoint: urlString, headers: headers) { headers in
+            let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
+            let request = AF.request(
+                urlString,
+                method: .post,
+                parameters: body,
+                encoder: JSONParameterEncoder.default,
+                headers: afHeaders
+            )
+            return try await self.handleRequest(request, endpoint: urlString)
+        }
     }
 
     func update<T: Decodable, B: Encodable>(urlString: String, headers: [String: String]?, body: B) async throws -> APIResponse<T> {
-        let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
-        let request = AF.request(urlString, method: .put, parameters: body, encoder: JSONParameterEncoder.default, headers: afHeaders)
-        return try await handleRequest(request, endpoint: urlString)
+        try await executeWithAuthRetry(endpoint: urlString, headers: headers) { headers in
+            let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
+            let request = AF.request(
+                urlString,
+                method: .put,
+                parameters: body,
+                encoder: JSONParameterEncoder.default,
+                headers: afHeaders
+            )
+            return try await self.handleRequest(request, endpoint: urlString)
+        }
     }
 
     func delete<T: Decodable, B: Encodable>(urlString: String, headers: [String: String]?, body: B?) async throws -> APIResponse<T> {
-        let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
-        let request = AF.request(urlString, method: .delete, parameters: body, encoder: JSONParameterEncoder.default, headers: afHeaders)
-        return try await handleRequest(request, endpoint: urlString)
+        try await executeWithAuthRetry(endpoint: urlString, headers: headers) { headers in
+            let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
+            let request = AF.request(
+                urlString,
+                method: .delete,
+                parameters: body,
+                encoder: JSONParameterEncoder.default,
+                headers: afHeaders
+            )
+            return try await self.handleRequest(request, endpoint: urlString)
+        }
     }
 
-    func multipart<T: Decodable>(urlString: String, headers: [String: String]?, parameters: [String: Data], boundary: String?) async throws -> APIResponse<T> {
-        let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
-        let request = AF.upload(multipartFormData: { multipartFormData in
-            for (key, value) in parameters {
-                multipartFormData.append(value, withName: key, fileName: "\(key).mov", mimeType: "video/quicktime")
+    func multipart<T: Decodable>(
+        urlString: String,
+        headers: [String: String]?,
+        parameters: [String: Data],
+        boundary: String?
+    ) async throws -> APIResponse<T> {
+        try await executeWithAuthRetry(endpoint: urlString, headers: headers) { headers in
+            let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
+            let request = AF.upload(multipartFormData: { multipartFormData in
+                for (key, value) in parameters {
+                    multipartFormData.append(value, withName: key, fileName: "\(key).mov", mimeType: "video/quicktime")
+                }
+            }, to: urlString, headers: afHeaders)
+
+            return try await self.handleRequest(request, endpoint: urlString)
+        }
+    }
+
+    private func executeWithAuthRetry<T>(
+        endpoint: String,
+        headers: [String: String]?,
+        perform: ([String: String]?) async throws -> APIResponse<T>
+    ) async throws -> APIResponse<T> {
+        do {
+            return try await perform(headers)
+        } catch NetworkError.unauthorized {
+            guard AuthSessionManager.shouldAttemptTokenRefresh(for: endpoint) else {
+                throw NetworkError.unauthorized(endpoint: endpoint)
             }
-        }, to: urlString, headers: afHeaders)
-        
-        return try await handleRequest(request, endpoint: urlString)
+
+            try await AuthTokenRefresher.shared.refreshAccessToken(using: self)
+            let refreshedHeaders = try AuthSessionManager.headersByReplacingAuthorization(headers)
+            return try await perform(refreshedHeaders)
+        }
     }
 
     private func handleRequest<T: Decodable>(_ request: DataRequest, endpoint: String) async throws -> APIResponse<T> {
         let dataResponse = await request.serializingData().response
-        
-        // Get the data regardless of success or failure
+
         guard let data = dataResponse.data else {
             throw NetworkError.networkError("No data received from server", endpoint: endpoint)
         }
-        
-        // Debug: Print API endpoint and response details
+
+        if dataResponse.response?.statusCode == 401 {
+            throw NetworkError.unauthorized(endpoint: endpoint)
+        }
+
+        #if DEBUG
         if let statusCode = dataResponse.response?.statusCode {
             print("DEBUG: API Endpoint: \(endpoint)")
             print("DEBUG: HTTP Status Code: \(statusCode)")
         }
-        
+
         if let rawString = String(data: data, encoding: .utf8) {
             print("DEBUG: Raw Response: \(rawString)")
         }
-        
-        // Always try to decode the response as our standard API format first
+        #endif
+
         if let errorResponse = try? Self.decoder.decode(APIResponse<ApiErrorData>.self, from: data) {
+            #if DEBUG
             print("DEBUG: Successfully decoded as APIResponse<ApiErrorData>")
+            #endif
             throw NetworkError.apiError(errorResponse, endpoint: endpoint)
         }
-        
-        // If it's not an error response, try to decode as success
+
         do {
             let decodedResponse = try Self.decoder.decode(APIResponse<T>.self, from: data)
             if decodedResponse.status == StatusResponseType.ERROR.rawValue {
@@ -79,9 +134,12 @@ class AlamofireNetworkService: NetworkServiceProtocol {
                 }
             }
             return decodedResponse
+        } catch let decodingError as NetworkError {
+            throw decodingError
         } catch {
+            #if DEBUG
             print("DEBUG: Failed to decode as success response: \(error)")
-            // If we can't decode the response, fall back to the original error
+            #endif
             if let originalError = dataResponse.error {
                 throw NetworkError.networkError(originalError.localizedDescription, endpoint: endpoint)
             }

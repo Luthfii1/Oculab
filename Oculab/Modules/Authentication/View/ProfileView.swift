@@ -61,7 +61,10 @@ struct ProfileView: View {
                                 set: { newValue in
                                     Task {
                                         if newValue {
-                                            await authPresenter.requestFaceIDActivation()
+                                            let enabled = await authPresenter.requestFaceIDActivation()
+                                            if !enabled {
+                                                authPresenter.updateFaceIdPreference(false)
+                                            }
                                         } else {
                                             authPresenter.updateFaceIdPreference(false)
                                         }
@@ -153,7 +156,7 @@ struct ProfileView: View {
 
                     AppButton(title: AppAction.exit, rightIcon: AppIcon.doorRightHandOpen, colorType: .destructive(.secondary)) {
                         Task {
-                            await profilePresenter.logout()
+                            await profilePresenter.logout(authPresenter: authPresenter)
                         }
                     }
 

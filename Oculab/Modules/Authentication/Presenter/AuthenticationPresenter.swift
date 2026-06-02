@@ -31,7 +31,14 @@ class AuthenticationPresenter: ObservableObject {
     
     // Authentication State
     @Published var user: User = .init()
-    @Published var isPinAuthorized: Bool = false
+    @Published var isPinAuthorized: Bool = false {
+        didSet {
+            UserDefaults.standard.set(
+                isPinAuthorized,
+                forKey: UserDefaultType.isPinSessionAuthorized.rawValue
+            )
+        }
+    }
     @Published var isSuccess: Bool = false
     @Published var isLogin: Bool = false
     @Published var email = AppValue.empty
@@ -83,6 +90,7 @@ class AuthenticationPresenter: ObservableObject {
     // MARK: - Constants & Dependencies
     let numbers = AppConstants.pinNumbers
     private var interactor: AuthenticationInteractor
+    private var isPinSubmissionInProgress = false
     weak var appStateManager: AppStateManager?
 
     // MARK: - Computed Properties
@@ -132,26 +140,59 @@ extension AuthenticationPresenter {
     func handleRegister() async {
         isLoading = true
         defer { isLoading = false }
-        // Validate form before sending
-        guard isRegisterFormValidAndFilled() else {
+
+        let isValid = await formValidation.validateBatch(
+            fields: ValidationFieldName.FormFields.b2cRegistration,
+            values: [
+                .registerFullName: registerFullName,
+                .registerEmail: registerEmail,
+                .registerHealthFacilityName: registerHealthFacilityName,
+            ]
+        )
+
+        guard isValid && isRegisterFormValidAndFilled() else {
             isError = true
             errorMessage = AppTextAuthRegister.validationErrorFillAllFields
             return
         }
+
         do {
-            let _ = try await interactor.registerUser(
+            let registration = try await interactor.registerUser(
                 name: registerFullName,
                 email: registerEmail,
                 healthFacilityName: registerHealthFacilityName,
                 healthFacilityType: registerHealthFacilityType?.rawValue ?? AppValue.empty
             )
 
-            showRegisterSuccessAlert = true
-            registerSuccessMessage = AppTextAuthRegister.successRegisterMessage
+            email = registration.email
+            password = registration.currentPassword
+
+            guard await login() else {
+                prepareForLoginAfterRegister()
+                showRegisterSuccessAlert = true
+                registerSuccessMessage = AppTextAuthRegister.successRegisterMessage
+                return
+            }
+
+            await getAccountById()
+            if isError {
+                prepareForLoginAfterRegister()
+                showRegisterSuccessAlert = true
+                registerSuccessMessage = AppTextAuthRegister.successRegisterMessage
+                return
+            }
+
+            clearRegistrationForm()
         } catch {
             isError = true
-            errorMessage = ErrorHandler.shared.handleError(error, context: .login)
+            errorMessage = ErrorHandler.shared.handleError(error, context: .registration)
         }
+    }
+
+    @MainActor
+    func prepareForLoginAfterRegister() {
+        email = registerEmail
+        clearRegistrationForm()
     }
     
     @MainActor
@@ -172,6 +213,8 @@ extension AuthenticationPresenter {
 
         // Check if form is valid
         guard isValid && isFormValid() else {
+            isError = true
+            description = AppTextAuthLogin.loginFailedText
             return false
         }
         
@@ -183,6 +226,12 @@ extension AuthenticationPresenter {
         
         if loginSuccess {
             await getAccountById()
+            if isError {
+                description = errorMessage.isEmpty
+                    ? AppTextAuthLogin.loginFailedText
+                    : errorMessage
+                return false
+            }
         } else {
             isError = true
             // Use the backend error message if available, otherwise use generic message
@@ -193,7 +242,7 @@ extension AuthenticationPresenter {
             }
         }
         
-        return loginSuccess
+        return loginSuccess && !isError
     }
     
     @MainActor
@@ -252,6 +301,7 @@ extension AuthenticationPresenter {
             
         } catch {
             errorMessage = ErrorHandler.shared.handleError(error, context: .login)
+            description = errorMessage
             
             // Handle error and ensure user goes back to login
             isPinAuthorized = false
@@ -327,11 +377,18 @@ extension AuthenticationPresenter {
                     newAccessPin = secondPin
                     await editAccessPin()
                 } else {
-                    // This is initial PIN setup - just update locally and authorize
-                    user.accessPin = secondPin
+                    guard !isPinSubmissionInProgress else { return }
+                    isPinSubmissionInProgress = true
+                    defer { isPinSubmissionInProgress = false }
+
                     await createAccessPin()
-                    await interactor.updateUserLocalData(user: user)
-                    // State transition handled by AccountCheckerView onChange
+                    guard !isError else {
+                        inputPin = AppValue.empty
+                        return
+                    }
+
+                    UserDefaults.standard.set(true, forKey: UserDefaultType.firstTimeLogin.rawValue)
+                    await refreshUserFromSwiftData()
                     appStateManager?.initializationState = .createFaceId
                     Router.shared.popToRoot()
                 }
@@ -422,18 +479,26 @@ extension AuthenticationPresenter {
         }
         
         do {
-            guard let user = await interactor.getUserLocalData() else {
+            guard var localUser = await interactor.getUserLocalData() else {
                 isError = true
                 description = "User not found"
                 return
             }
             
             _ = try await interactor.createAccessPin(accessPin: firstPin)
-            
-            // Update local user data
-            user.accessPin = firstPin
-            await interactor.updateUserLocalData(user: user)
+            localUser.accessPin = firstPin
+            await interactor.updateUserLocalData(user: localUser)
+            await refreshUserFromSwiftData()
         } catch {
+            if case let NetworkError.apiError(apiResponse, _) = error, apiResponse.code == 409 {
+                if var localUser = await interactor.getUserLocalData() {
+                    localUser.accessPin = firstPin
+                    await interactor.updateUserLocalData(user: localUser)
+                    await refreshUserFromSwiftData()
+                }
+                return
+            }
+
             isError = true
             switch error {
             case let NetworkError.apiError(apiResponse, _):
@@ -529,9 +594,7 @@ extension AuthenticationPresenter {
             return
         }
 
-        clearLoginState()
-        resetAuthenticationState()
-        appStateManager?.setUnauthenticated()
+        await performLogout()
         Router.shared.popToRoot()
 
         Logger.info("User successfully logged out via forget PIN", category: .authentication)
@@ -619,16 +682,22 @@ extension AuthenticationPresenter {
     
     @MainActor
     func activateFaceIdFirstTime() async {
-        await requestFaceIDActivation()
-        isPinAuthorized = true
+        if await requestFaceIDActivation() {
+            completeFaceIdSetup()
+        }
     }
     
     func skipFaceIdActivation() {
+        completeFaceIdSetup()
+    }
+
+    private func completeFaceIdSetup() {
+        UserDefaults.standard.set(false, forKey: UserDefaultType.firstTimeLogin.rawValue)
         isPinAuthorized = true
     }
     
     @MainActor
-    func requestFaceIDActivation() async {
+    func requestFaceIDActivation() async -> Bool {
         let context = LAContext()
         defer { context.invalidate() }
         var error: NSError?
@@ -636,7 +705,7 @@ extension AuthenticationPresenter {
         guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
             isError = true
             description = AppTextAuthProfile.descFaceIdNotSupported
-            return
+            return false
         }
 
         do {
@@ -654,11 +723,12 @@ extension AuthenticationPresenter {
             }
 
             updateFaceIdPreference(true)
+            return true
         } catch {
             isError = true
             description = AppTextAuthProfile.descFailedFaceID(error: error.localizedDescription)
-            // Reset toggle ke `false` secara manual
             isFaceIdEnabledFromUserDefaults = false
+            return false
         }
     }
 }
@@ -692,7 +762,21 @@ extension AuthenticationPresenter {
         UserDefaults.standard.removeObject(forKey: UserDefaultType.isUserLoggedIn.rawValue)
         UserDefaults.standard.removeObject(forKey: UserDefaultType.firstTimeLogin.rawValue)
         UserDefaults.standard.removeObject(forKey: UserDefaultType.userId.rawValue)
+        UserDefaults.standard.removeObject(forKey: UserDefaultType.isPinSessionAuthorized.rawValue)
         KeychainHelper.removeAll()
+    }
+
+    @MainActor
+    func performLogout() async {
+        await interactor.clearLocalUserData()
+
+        for item in UserDefaultType.allCases where item != .hasSeenOnboarding {
+            UserDefaults.standard.removeObject(forKey: item.rawValue)
+        }
+
+        KeychainHelper.removeAll()
+        resetAuthenticationState()
+        appStateManager?.setUnauthenticated()
     }
     
     func isUserLoggedIn() -> Bool {
@@ -812,10 +896,18 @@ extension AuthenticationPresenter {
         isError = false
         description = AppValue.empty
         errorMessage = AppValue.empty
+        clearRegistrationForm()
+    }
+
+    func clearRegistrationForm() {
         registerEmail = AppValue.empty
         registerFullName = AppValue.empty
         registerHealthFacilityName = AppValue.empty
         registerHealthFacilityType = nil
         isChoosingRegistrationType = true
+        let registerFields: [ValidationFieldName] = [
+            .registerFullName, .registerEmail, .registerHealthFacilityName,
+        ]
+        formValidation.clearErrors(for: registerFields)
     }
 }

@@ -234,7 +234,11 @@ class Router: ObservableObject {
     
     func canNavigateToRoute(_ route: Route) -> Bool {
         if route.requiresAuthentication {
-            return UserDefaults.standard.bool(forKey: UserDefaultType.isUserLoggedIn.rawValue)
+            let isLoggedIn = UserDefaults.standard.bool(forKey: UserDefaultType.isUserLoggedIn.rawValue)
+            let isPinSessionAuthorized = UserDefaults.standard.bool(
+                forKey: UserDefaultType.isPinSessionAuthorized.rawValue
+            )
+            return isLoggedIn && isPinSessionAuthorized
         }
         return true
     }

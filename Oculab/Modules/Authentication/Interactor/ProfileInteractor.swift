@@ -47,7 +47,7 @@ class ProfileInteractor: ProfileInteractorProtocol {
         ]
         
         let response: APIResponse<UserUpdatePasswordResponse> = try await networkService.update(
-            urlString: apiAuthenticationService + "/update-user-password/\(String(describing: userId))",
+            urlString: apiAuthenticationService + "/update-user-password/\(userId)",
             headers: headers,
             body: UserUpdatePasswordBody(
                 newPassword: newPassword,

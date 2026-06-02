@@ -169,6 +169,8 @@ class NetworkRetryManager: ObservableObject {
                 return !message.lowercased().contains("authentication")
             case .apiError:
                 return false // Don't retry API-level errors
+            case .unauthorized:
+                return false
             }
         }
         

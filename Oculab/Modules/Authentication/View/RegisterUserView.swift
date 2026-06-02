@@ -19,7 +19,7 @@ struct RegisterUserView: View {
                     if presenter.isChoosingRegistrationType {
                         RegisterEntryComponent(
                             onB2C: {
-                                presenter.isChoosingRegistrationType.toggle()
+                                presenter.isChoosingRegistrationType = false
                             },
                             onB2B: {
                                 await contactPresenter.directToWhatsapp()
@@ -74,7 +74,7 @@ struct RegisterUserView: View {
                                 )
                             )
                             AppButton(
-                                title: AppTextAuthRegister.submitButton,
+                                title: presenter.registerButtonText,
                                 isEnabled: presenter.isRegisterFormValidAndFilled() && !presenter.isLoading,
                                 action: {
                                     Task {
@@ -115,6 +115,7 @@ struct RegisterUserView: View {
                     title: Text(AppState.success),
                     message: Text(presenter.registerSuccessMessage),
                     dismissButton: .default(Text(AppAction.ok)) {
+                        presenter.prepareForLoginAfterRegister()
                         Router.shared.popToRoot()
                     }
                 )
@@ -141,8 +142,7 @@ struct RegisterUserView: View {
         }
         .hideBackButton()
         .onDisappear {
-            presenter.clearInput()
-            presenter.clearValidationErrors()
+            presenter.clearRegistrationForm()
         }
     }
 }

@@ -14,4 +14,6 @@ enum UserDefaultType: String, CaseIterable {
     case isFaceIdEnabled
     case hasSeenOnboarding
     case firstTimeLogin
+    /// True after PIN/Face ID succeeds for the current login session; cleared on logout.
+    case isPinSessionAuthorized
 }

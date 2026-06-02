@@ -85,7 +85,7 @@ class AuthenticationInteractor: ObservableObject {
         KeychainHelper.set(response.data.accessToken, for: .accessToken)
         KeychainHelper.set(response.data.refreshToken, for: .refreshToken)
         UserDefaults.standard.set(true, forKey: UserDefaultType.isUserLoggedIn.rawValue)
-        UserDefaults.standard.set(true, forKey: UserDefaultType.firstTimeLogin.rawValue)
+        UserDefaults.standard.set(false, forKey: UserDefaultType.isPinSessionAuthorized.rawValue)
         UserDefaults.standard.set(response.data.userId, forKey: UserDefaultType.userId.rawValue)
 
         return response.data
@@ -102,12 +102,14 @@ class AuthenticationInteractor: ObservableObject {
 
         let response: APIResponse<User> = try await networkService.get(
             urlString: apiAuthenticationService + "/get-user-data-by-id/\(userId)",
-            headers: nil
+            headers: try authorizationHeaders()
         )
 
-        // save to swiftdata
         await updateUserSwiftData(data: response.data)
 
+        if let localUser = await getUserSwiftData() {
+            return localUser
+        }
         return response.data
     }
 
@@ -122,7 +124,7 @@ class AuthenticationInteractor: ObservableObject {
 
         let response: APIResponse<User> = try await networkService.update(
             urlString: apiAuthenticationService + "/update-user/\(userId)",
-            headers: nil,
+            headers: try authorizationHeaders(),
             body: user
         )
 
@@ -139,15 +141,42 @@ class AuthenticationInteractor: ObservableObject {
         await updateUserSwiftData(data: user)
     }
 
-    private func insertUserSwiftData(data: User) async {
-        await MainActor.run {
-            modelContext.insert(data)
-            do {
-                try modelContext.save()
-            } catch {
-                Logger.error("Failed to save user to SwiftData: \(error.localizedDescription)", category: .authentication)
-            }
-        }
+    func clearLocalUserData() async {
+        await removeUserSwiftData()
+    }
+
+    private func authorizationHeaders() throws -> [String: String] {
+        try AuthSessionManager.authorizationHeaders()
+    }
+
+    private func copyUser(from source: User) -> User {
+        User(
+            _id: source._id,
+            name: source.name,
+            role: source.role,
+            token: source.token,
+            healthFacilityName: source.healthFacilityName,
+            email: source.email,
+            password: source.password,
+            previousPassword: source.previousPassword,
+            accessPin: source.accessPin,
+            isFaceIdEnabled: source.isFaceIdEnabled,
+            businessModel: source.businessModel
+        )
+    }
+
+    private func applyUser(_ source: User, to target: User) {
+        target._id = source._id
+        target.name = source.name
+        target.role = source.role
+        target.token = source.token
+        target.healthFacilityName = source.healthFacilityName
+        target.email = source.email
+        target.password = source.password
+        target.previousPassword = source.previousPassword
+        target.accessPin = source.accessPin
+        target.isFaceIdEnabled = source.isFaceIdEnabled
+        target.businessModel = source.businessModel
     }
 
     private func getUserSwiftData() async -> User? {
@@ -164,23 +193,37 @@ class AuthenticationInteractor: ObservableObject {
     }
 
     private func updateUserSwiftData(data: User) async {
-        await removeUserSwiftData()
-        await insertUserSwiftData(data: data)
+        await MainActor.run {
+            let fetchDescriptor = FetchDescriptor<User>()
+            do {
+                let existing = try modelContext.fetch(fetchDescriptor)
+                if let current = existing.first {
+                    applyUser(data, to: current)
+                } else {
+                    modelContext.insert(copyUser(from: data))
+                }
+                try modelContext.save()
+            } catch {
+                Logger.error("Failed to update user in SwiftData: \(error.localizedDescription)", category: .authentication)
+            }
+        }
     }
 
     private func removeUserSwiftData() async {
-        let fetchDescriptor = FetchDescriptor<User>()
+        await MainActor.run {
+            let fetchDescriptor = FetchDescriptor<User>()
 
-        do {
-            let allUsers = try modelContext.fetch(fetchDescriptor)
+            do {
+                let allUsers = try modelContext.fetch(fetchDescriptor)
 
-            for user in allUsers {
-                modelContext.delete(user)
+                for user in allUsers {
+                    modelContext.delete(user)
+                }
+
+                try modelContext.save()
+            } catch {
+                Logger.error("Failed to delete all users: \(error.localizedDescription)", category: .authentication)
             }
-
-            try modelContext.save()
-        } catch {
-            Logger.error("Failed to delete all users: \(error.localizedDescription)", category: .authentication)
         }
     }
     
@@ -199,7 +242,7 @@ class AuthenticationInteractor: ObservableObject {
         ]
         
         let response: APIResponse<UserUpdateAccessPinResponse> = try await networkService.update(
-            urlString: apiAuthenticationService + "/update-user-accessPin/\(String(describing: userId))",
+            urlString: apiAuthenticationService + "/update-user-accessPin/\(userId)",
             headers: headers,
             body: UserUpdateAccessPinBody(
                 newAccessPin: newAccessPin,
@@ -229,7 +272,7 @@ class AuthenticationInteractor: ObservableObject {
         ]
         
         let response: APIResponse<CreateAccessPinResponse> = try await networkService.post(
-            urlString: apiAuthenticationService + "/create-user-accessPin/\(String(describing: userId))",
+            urlString: apiAuthenticationService + "/create-user-accessPin/\(userId)",
             headers: headers,
             body: CreateAccessPinResponse(accessPin: accessPin)
         )

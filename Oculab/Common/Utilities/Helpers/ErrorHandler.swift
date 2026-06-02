@@ -49,6 +49,12 @@ class ErrorHandler: ErrorHandlerProtocol {
             if message.contains("retry attempts failed") {
                 print("   🔄 All retry attempts exhausted")
             }
+
+        case let NetworkError.unauthorized(endpoint):
+            if let endpoint = endpoint {
+                print("   🌐 API Endpoint: \(endpoint)")
+            }
+            print("   🔐 Unauthorized — access token rejected")
             
         case URLError.userAuthenticationRequired:
             print("   🔐 Authentication required")
@@ -74,6 +80,9 @@ class ErrorHandler: ErrorHandlerProtocol {
             return false
             
         case NetworkError.apiError:
+            return false
+
+        case NetworkError.unauthorized:
             return false
             
         default:
@@ -121,6 +130,9 @@ class ErrorHandler: ErrorHandlerProtocol {
             } else {
                 return message
             }
+
+        case NetworkError.unauthorized:
+            return "error.authentication_required".localized
             
         case URLError.userAuthenticationRequired:
             return "error.authentication_required".localized

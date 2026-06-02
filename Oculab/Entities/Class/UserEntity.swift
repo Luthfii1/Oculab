@@ -31,7 +31,7 @@ class User: Codable, Identifiable {
         email: String? = "noName@example.com",
         password: String? = nil,
         previousPassword: String? = nil,
-        accessPin: String? = "8888",
+        accessPin: String? = nil,
         isFaceIdEnabled: Bool = false,
         businessModel: BusinessModelType? = nil
     ) {
@@ -48,8 +48,9 @@ class User: Codable, Identifiable {
         self.businessModel = businessModel
     }
 
-    enum CodingKeys: CodingKey {
-        case _id
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case legacyId = "_id"
         case name
         case role
         case token
@@ -63,7 +64,11 @@ class User: Codable, Identifiable {
 
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self._id = try container.decode(String.self, forKey: ._id)
+        if let id = try container.decodeIfPresent(String.self, forKey: .id) {
+            self._id = id
+        } else {
+            self._id = try container.decode(String.self, forKey: .legacyId)
+        }
         self.name = try container.decode(String.self, forKey: .name)
         self.role = try container.decode(RolesType.self, forKey: .role)
         self.token = try container.decodeIfPresent(String.self, forKey: .token)
@@ -77,7 +82,7 @@ class User: Codable, Identifiable {
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(_id, forKey: ._id)
+        try container.encode(_id, forKey: .id)
         try container.encode(name, forKey: .name)
         try container.encode(role, forKey: .role)
         try container.encodeIfPresent(token, forKey: .token)

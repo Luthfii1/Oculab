@@ -15,7 +15,6 @@ class NetworkService: NetworkServiceProtocol {
     
     private let retryManager: NetworkRetryManager
     private let baseService: AlamofireNetworkService
-    private static let decoder = JSONDecoder()
     
     // MARK: - Configuration
     
@@ -24,7 +23,7 @@ class NetworkService: NetworkServiceProtocol {
         static let maxRetryAttempts = 3
         
         // Different retry strategies for different operations
-        static let criticalOperations = ["login", "logout", "getAccountById"]
+        static let criticalOperations = ["login", "logout", "get-user-data-by-id"]
         static let backgroundOperations = ["analytics", "logging"]
     }
     
@@ -131,176 +130,50 @@ class NetworkService: NetworkServiceProtocol {
     // MARK: - Private Request Methods
     
     private func performGetRequest<T: Decodable>(
-        urlString: String, 
+        urlString: String,
         headers: [String: String]?
     ) async throws -> APIResponse<T> {
-        
-        let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
-        let request = AF.request(urlString, method: .get, headers: afHeaders)
-            .validate()
-            .responseTimeout(NetworkConfig.requestTimeout)
-        
-        return try await handleRequest(request)
+        try await baseService.get(urlString: urlString, headers: headers)
     }
-    
+
     private func performPostRequest<T: Decodable, B: Encodable>(
-        urlString: String, 
-        headers: [String: String]?, 
+        urlString: String,
+        headers: [String: String]?,
         body: B
     ) async throws -> APIResponse<T> {
-        
-        let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
-        let request = AF.request(
-            urlString, 
-            method: .post, 
-            parameters: body, 
-            encoder: JSONParameterEncoder.default, 
-            headers: afHeaders
-        )
-        .validate()
-        .responseTimeout(NetworkConfig.requestTimeout)
-        
-        return try await handleRequest(request)
+        try await baseService.post(urlString: urlString, headers: headers, body: body)
     }
-    
+
     private func performUpdateRequest<T: Decodable, B: Encodable>(
-        urlString: String, 
-        headers: [String: String]?, 
+        urlString: String,
+        headers: [String: String]?,
         body: B
     ) async throws -> APIResponse<T> {
-        
-        let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
-        let request = AF.request(
-            urlString, 
-            method: .put, 
-            parameters: body, 
-            encoder: JSONParameterEncoder.default, 
-            headers: afHeaders
-        )
-        .validate()
-        .responseTimeout(NetworkConfig.requestTimeout)
-        
-        return try await handleRequest(request)
+        try await baseService.update(urlString: urlString, headers: headers, body: body)
     }
-    
+
     private func performDeleteRequest<T: Decodable, B: Encodable>(
-        urlString: String, 
-        headers: [String: String]?, 
+        urlString: String,
+        headers: [String: String]?,
         body: B?
     ) async throws -> APIResponse<T> {
-        
-        let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
-        let request = AF.request(
-            urlString, 
-            method: .delete, 
-            parameters: body, 
-            encoder: JSONParameterEncoder.default, 
-            headers: afHeaders
-        )
-        .validate()
-        .responseTimeout(NetworkConfig.requestTimeout)
-        
-        return try await handleRequest(request)
+        try await baseService.delete(urlString: urlString, headers: headers, body: body)
     }
-    
+
     private func performMultipartRequest<T: Decodable>(
-        urlString: String, 
-        headers: [String: String]?, 
-        parameters: [String: Data], 
+        urlString: String,
+        headers: [String: String]?,
+        parameters: [String: Data],
         boundary: String?
     ) async throws -> APIResponse<T> {
-        
-        let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
-        let request = AF.upload(multipartFormData: { multipartFormData in
-            for (key, value) in parameters {
-                multipartFormData.append(value, withName: key, fileName: "\(key).mov", mimeType: "video/quicktime")
-            }
-        }, to: urlString, headers: afHeaders)
-        .validate()
-        .responseTimeout(NetworkConfig.requestTimeout * 2) // Longer timeout for uploads
-        
-        return try await handleRequest(request)
+        try await baseService.multipart(
+            urlString: urlString,
+            headers: headers,
+            parameters: parameters,
+            boundary: boundary
+        )
     }
-    
-    // MARK: - Enhanced Request Handling
-    
-    private func handleRequest<T: Decodable>(_ request: DataRequest) async throws -> APIResponse<T> {
-        let dataResponse = await request.serializingData().response
-        
-        switch dataResponse.result {
-        case .success(let data):
-            return try await processSuccessfulResponse(data: data)
-            
-        case .failure(let afError):
-            throw try await processFailedResponse(error: afError, data: dataResponse.data)
-        }
-    }
-    
-    private func processSuccessfulResponse<T: Decodable>(data: Data) async throws -> APIResponse<T> {
-        do {
-            let decodedResponse = try Self.decoder.decode(APIResponse<T>.self, from: data)
-            
-            // Check if the API returned an error status
-            if decodedResponse.status == StatusResponseType.ERROR.rawValue {
-                if let errorResponse = try? Self.decoder.decode(APIResponse<ApiErrorData>.self, from: data) {
-                    throw NetworkError.apiError(errorResponse)
-                }
-            }
-            
-            return decodedResponse
-            
-        } catch let decodingError {
-            // Try to decode as error response first
-            if let errorResponse = try? Self.decoder.decode(APIResponse<ApiErrorData>.self, from: data) {
-                throw NetworkError.apiError(errorResponse)
-            }
-            
-            // If that fails, throw a decoding error
-            throw NetworkError.networkError("Response decoding failed: \(decodingError.localizedDescription)")
-        }
-    }
-    
-    private func processFailedResponse(error: AFError, data: Data?) async throws -> NetworkError {
-        // Check if we have response data that might contain error details
-        if let data = data,
-           let errorResponse = try? Self.decoder.decode(APIResponse<ApiErrorData>.self, from: data) {
-            return NetworkError.apiError(errorResponse)
-        }
-        
-        // Map AFError to appropriate NetworkError
-        switch error {
-        case .sessionTaskFailed(let sessionError):
-            if let urlError = sessionError as? URLError {
-                switch urlError.code {
-                case .timedOut:
-                    return NetworkError.networkError("Request timed out")
-                case .notConnectedToInternet:
-                    return NetworkError.networkError("No internet connection")
-                case .cannotConnectToHost:
-                    return NetworkError.networkError("Cannot connect to server")
-                default:
-                    return NetworkError.networkError("Network error: \(urlError.localizedDescription)")
-                }
-            }
-            return NetworkError.networkError("Session task failed: \(sessionError.localizedDescription)")
-            
-            case .responseValidationFailed(let reason):
-            switch reason {
-            case .unacceptableStatusCode(let code):
-                if code >= 500 {
-                    return NetworkError.serverError("Server error (HTTP \(code))")
-                } else if code == 401 {
-                    return NetworkError.networkError("Authentication required")
-                } else {
-                    return NetworkError.networkError("HTTP error \(code)")
-                }
-            default:
-                return NetworkError.networkError("Response validation failed")
-            }        default:
-            return NetworkError.networkError("Network request failed: \(error.localizedDescription)")
-        }
-    }
-    
+
     // MARK: - Retry Strategy
     
     private func getRetryAttempts(for urlString: String) -> Int {
@@ -316,14 +189,6 @@ class NetworkService: NetworkServiceProtocol {
         
         // Default retry attempts
         return NetworkConfig.maxRetryAttempts
-    }
-}
-
-// MARK: - Alamofire Extensions
-
-private extension DataRequest {
-    func responseTimeout(_ timeout: TimeInterval) -> DataRequest {
-        return self.responseTimeout(timeout)
     }
 }
 

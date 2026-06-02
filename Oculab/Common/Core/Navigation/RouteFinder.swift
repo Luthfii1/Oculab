@@ -304,7 +304,11 @@ class RouteFinder: ObservableObject {
     
     // MARK: - Authentication Check
     func isUserAuthenticated() -> Bool {
-        return UserDefaults.standard.bool(forKey: UserDefaultType.isUserLoggedIn.rawValue)
+        let isLoggedIn = UserDefaults.standard.bool(forKey: UserDefaultType.isUserLoggedIn.rawValue)
+        let isPinSessionAuthorized = UserDefaults.standard.bool(
+            forKey: UserDefaultType.isPinSessionAuthorized.rawValue
+        )
+        return isLoggedIn && isPinSessionAuthorized
     }
     
     // MARK: - Navigation Helpers
