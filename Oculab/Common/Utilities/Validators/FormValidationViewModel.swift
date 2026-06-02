@@ -166,7 +166,21 @@ class FormValidationViewModel: ObservableObject {
         let validations: [() -> Bool] = [
             { self.validationManager.validateRequired(currentPassword, fieldName: ValidationFieldName.currentPassword.fieldName) },
             { self.validationManager.validatePassword(newPassword, fieldName: ValidationFieldName.newPassword.fieldName) },
-            { self.validationManager.validateFieldsMatch(newPassword, confirmPassword, fieldName: ValidationFieldName.confirmPassword.fieldName) }
+            {
+                self.validationManager.validateNewPasswordDifferentFromCurrent(
+                    newPassword,
+                    currentPassword: currentPassword,
+                    fieldName: ValidationFieldName.newPassword.fieldName
+                )
+            },
+            { self.validationManager.validateRequired(confirmPassword, fieldName: ValidationFieldName.confirmPassword.fieldName) },
+            {
+                self.validationManager.validateFieldsMatch(
+                    newPassword,
+                    confirmPassword,
+                    fieldName: ValidationFieldName.confirmPassword.fieldName
+                )
+            }
         ]
         
         return validateForm(validations: validations)

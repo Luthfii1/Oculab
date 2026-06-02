@@ -47,7 +47,7 @@ struct InputPatientData: View {
                             title: AppPatient.name,
                             placeholder: patientId != nil ? AppTextTaskAssignInputPatient.patientNamePlaceholder : AppSearch.Patient.placeholder,
                             leftIcon: AppIcon.personFill,
-                            rightIcon: AppValue.empty,
+                            rightIcon: nil,
                             choices: presenter.patientNameDoB,
                             description: patientId != nil ? AppTextTaskAssignInputPatient.patientNameDescriptionAutoSelected : AppTextTaskAssignInputPatient.patientNameDescription,
                             selectedChoice: $presenter.selectedPatient,

@@ -104,12 +104,10 @@ class AlamofireNetworkService: NetworkServiceProtocol {
             throw NetworkError.networkError("No data received from server", endpoint: endpoint)
         }
 
-        if dataResponse.response?.statusCode == 401 {
-            throw NetworkError.unauthorized(endpoint: endpoint)
-        }
+        let statusCode = dataResponse.response?.statusCode
 
         #if DEBUG
-        if let statusCode = dataResponse.response?.statusCode {
+        if let statusCode {
             print("DEBUG: API Endpoint: \(endpoint)")
             print("DEBUG: HTTP Status Code: \(statusCode)")
         }
@@ -118,6 +116,8 @@ class AlamofireNetworkService: NetworkServiceProtocol {
             print("DEBUG: Raw Response: \(rawString)")
         }
         #endif
+
+        try validateHTTPResponse(data: data, statusCode: statusCode, endpoint: endpoint)
 
         if let errorResponse = try? Self.decoder.decode(APIResponse<ApiErrorData>.self, from: data) {
             #if DEBUG
@@ -143,7 +143,32 @@ class AlamofireNetworkService: NetworkServiceProtocol {
             if let originalError = dataResponse.error {
                 throw NetworkError.networkError(originalError.localizedDescription, endpoint: endpoint)
             }
-            throw NetworkError.networkError("Decoding error: \(error.localizedDescription)", endpoint: endpoint)
+            throw NetworkError.networkError("Server error", endpoint: endpoint)
         }
+    }
+
+    private func validateHTTPResponse(data: Data, statusCode: Int?, endpoint: String) throws {
+        if statusCode == 401 {
+            throw NetworkError.unauthorized(endpoint: endpoint)
+        }
+
+        if let statusCode, (500...599).contains(statusCode) {
+            throw NetworkError.networkError("Server error (\(statusCode))", endpoint: endpoint)
+        }
+
+        if isNonJSONResponse(data) {
+            throw NetworkError.networkError("Server error", endpoint: endpoint)
+        }
+    }
+
+    private func isNonJSONResponse(_ data: Data) -> Bool {
+        guard let text = String(data: data, encoding: .utf8)?
+            .trimmingCharacters(in: .whitespacesAndNewlines),
+              !text.isEmpty else {
+            return false
+        }
+
+        guard let first = text.first else { return false }
+        return first != "{" && first != "["
     }
 }

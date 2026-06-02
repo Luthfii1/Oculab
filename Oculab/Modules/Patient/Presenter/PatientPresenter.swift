@@ -233,6 +233,11 @@ extension PatientPresenter {
             filterPatients()
             Logger.info("Successfully fetched \(response.count) patients", category: .patient)
         } catch {
+            if isEmptyPatientListError(error) {
+                patientNameDoB.removeAll()
+                filterPatients()
+                return
+            }
             errorMessage = ErrorHandler.shared.handleError(error)
             Logger.error("Failed to fetch patients: \(error.localizedDescription)", category: .patient)
         }
@@ -397,5 +402,11 @@ extension PatientPresenter {
 
     func formatDateTime(_ date: Date) -> String {
         return Self.dateTimeFormatter.string(from: date)
+    }
+
+    private func isEmptyPatientListError(_ error: Error) -> Bool {
+        guard case let NetworkError.apiError(apiResponse, _) = error else { return false }
+        return apiResponse.data.errorType == "RESOURCE_NOT_FOUND"
+            && apiResponse.data.description == "No patients found"
     }
 }

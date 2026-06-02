@@ -36,6 +36,7 @@ class Patient: Encodable, Decodable, Identifiable {
 
     enum CodingKeys: CodingKey {
         case _id
+        case id
         case name
         case NIK
         case DoB
@@ -48,7 +49,13 @@ class Patient: Encodable, Decodable, Identifiable {
     required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        self._id = try container.decode(String.self, forKey: ._id)
+        if let id = try container.decodeIfPresent(String.self, forKey: .id) {
+            self._id = id
+        } else if let patientId = try container.decodeIfPresent(String.self, forKey: .patientId) {
+            self._id = patientId
+        } else {
+            self._id = try container.decode(String.self, forKey: ._id)
+        }
         self.name = try container.decode(String.self, forKey: .name)
         self.NIK = try container.decode(String.self, forKey: .NIK)
 

@@ -325,9 +325,12 @@
 "auth.edit_password.current_password" = "Password";
 "auth.edit_password.new_password_title" = "New Password";
 "auth.edit_password.new_password" = "New Password";
-"auth.edit_password.new_password_description" = "Password must consist of at least 8 characters";
+"auth.edit_password.new_password_description" = "Password must be at least 8 characters and include uppercase and lowercase letters";
 "auth.edit_password.confirm_password_title" = "Confirm New Password";
 "auth.edit_password.confirm_password" = "Confirm New Password";
+"auth.edit_password.current_password_incorrect" = "Current password is incorrect. Please check and try again.";
+"auth.edit_password.new_password_same_as_current" = "New password must be different from your current password.";
+"auth.edit_password.update_failed" = "Unable to update password. Please try again.";
 
 // PIN View
 "auth.pin.success_title" = "PIN Successfully Changed";

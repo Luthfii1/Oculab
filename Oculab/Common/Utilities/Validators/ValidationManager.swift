@@ -85,6 +85,36 @@ class ValidationManager: ObservableObject {
         return true
     }
     
+    /// Checks password rules without mutating validation error state.
+    func meetsPasswordRequirements(
+        _ password: String,
+        minLength: Int = 8,
+        requireUppercase: Bool = true,
+        requireLowercase: Bool = true,
+        requireNumbers: Bool = false,
+        requireSpecialChars: Bool = false
+    ) -> Bool {
+        guard !password.isEmpty, password.count >= minLength else { return false }
+
+        if requireUppercase && !password.contains(where: { $0.isUppercase }) {
+            return false
+        }
+
+        if requireLowercase && !password.contains(where: { $0.isLowercase }) {
+            return false
+        }
+
+        if requireNumbers && !password.contains(where: { $0.isNumber }) {
+            return false
+        }
+
+        if requireSpecialChars && !password.contains(where: { "!@#$%^&*()_+-=[]{}|;:,.<>?".contains($0) }) {
+            return false
+        }
+
+        return true
+    }
+    
     /// Validates a PIN code
     func validatePIN(_ pin: String, fieldName: String = "pin", expectedLength: Int = 4) -> Bool {
         clearError(for: fieldName)
@@ -153,15 +183,47 @@ class ValidationManager: ObservableObject {
         return true
     }
     
-    /// Validates that two fields match (e.g., password confirmation)
-    func validateFieldsMatch(_ field1: String, _ field2: String, fieldName: String = "confirmation") -> Bool {
+    func validateNewPasswordDifferentFromCurrent(
+        _ newPassword: String,
+        currentPassword: String,
+        fieldName: String = ValidationFieldName.newPassword.fieldName
+    ) -> Bool {
         clearError(for: fieldName)
-        
+
+        guard !newPassword.isEmpty, !currentPassword.isEmpty else {
+            return true
+        }
+
+        guard newPassword != currentPassword else {
+            setError("auth.edit_password.new_password_same_as_current".localized, for: fieldName)
+            return false
+        }
+
+        return true
+    }
+
+    /// Validates that two fields match (e.g., password confirmation)
+    func validateFieldsMatch(
+        _ field1: String,
+        _ field2: String,
+        fieldName: String = "confirmation",
+        requireBothFields: Bool = false
+    ) -> Bool {
+        clearError(for: fieldName)
+
+        if field2.isEmpty {
+            if requireBothFields {
+                setError("password_required".localized, for: fieldName)
+                return false
+            }
+            return true
+        }
+
         guard field1 == field2 else {
             setError("fields_do_not_match".localized, for: fieldName)
             return false
         }
-        
+
         return true
     }
     

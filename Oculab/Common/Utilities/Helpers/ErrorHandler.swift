@@ -123,7 +123,10 @@ class ErrorHandler: ErrorHandlerProtocol {
                 return "error.operation_in_progress".localized
             } else if message.contains("Request timed out") {
                 return AppError.Context.networkConnection
-            } else if message.contains("Server error") {
+            } else if message.contains("Server error")
+                        || message.contains("Decoding error")
+                        || message.contains("isn't in the correct format")
+                        || message.contains("Bad gateway") {
                 return "error.server_temporarily_unavailable".localized
             } else if message.isEmpty {
                 return AppError.networkConnection

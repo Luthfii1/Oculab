@@ -197,15 +197,22 @@ extension InputPatientPresenter {
                 return (patient.name + AppValue.space + formattedDoB, patient._id)
             }
         } catch {
-            let message = ErrorHandler.shared.handleError(error, context: .generic)
-            guard message == "No patients found" else {return}
-            errorMessage = message
+            if isEmptyPatientListError(error) {
+                patientNameDoB = []
+                return
+            }
+            errorMessage = ErrorHandler.shared.handleError(error, context: .generic)
             isError = true
         }
     }
 
     @MainActor
     func getPatientById(patientId: String) async {
+        guard isExistingPatientSelection(patientId) else {
+            prepareNewPatientSelection(name: patientId)
+            return
+        }
+
         isPatientLoading = true
         defer { isPatientLoading = false }
         
@@ -215,9 +222,30 @@ extension InputPatientPresenter {
             self.patientFound = true
         } catch {
             clearForm()
-            _ = ErrorHandler.shared.handleError(error, context: .generic)
+            errorMessage = ErrorHandler.shared.handleError(error, context: .generic)
             isError = true
         }
+    }
+
+    func isExistingPatientSelection(_ patientId: String) -> Bool {
+        patientNameDoB.contains { $0.1 == patientId }
+    }
+
+    @MainActor
+    func prepareNewPatientSelection(name: String) {
+        patientFound = false
+        patient = Patient.empty
+        patient.name = name
+        selectedDoB = Date()
+        selectedSex = AppValue.empty
+        BPJSnumber = AppValue.empty
+        validationManager.clearAllErrors()
+    }
+
+    private func isEmptyPatientListError(_ error: Error) -> Bool {
+        guard case let NetworkError.apiError(apiResponse, _) = error else { return false }
+        return apiResponse.data.errorType == "RESOURCE_NOT_FOUND"
+            && apiResponse.data.description == "No patients found"
     }
 
     @MainActor

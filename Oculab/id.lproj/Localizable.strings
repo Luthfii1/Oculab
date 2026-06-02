@@ -333,9 +333,12 @@
 "auth.edit_password.current_password" = "Kata Sandi";
 "auth.edit_password.new_password_title" = "Kata Sandi Baru";
 "auth.edit_password.new_password" = "Kata Sandi Baru";
-"auth.edit_password.new_password_description" = "Kata sandi harus terdiri dari minimal 8 karakter";
+"auth.edit_password.new_password_description" = "Kata sandi minimal 8 karakter dan harus mengandung huruf besar dan huruf kecil";
 "auth.edit_password.confirm_password_title" = "Konfirmasi Kata Sandi Baru";
 "auth.edit_password.confirm_password" = "Konfirmasi Kata Sandi Baru";
+"auth.edit_password.current_password_incorrect" = "Kata sandi saat ini salah. Periksa kembali dan coba lagi.";
+"auth.edit_password.new_password_same_as_current" = "Kata sandi baru harus berbeda dari kata sandi saat ini.";
+"auth.edit_password.update_failed" = "Gagal memperbarui kata sandi. Silakan coba lagi.";
 
 // PIN View
 "auth.pin.success_title" = "PIN Berhasil Diubah";
@@ -762,6 +765,7 @@
 
 // MARK: - Enhanced Network Error Messages  
 "error.network_retry_failed" = "Koneksi gagal setelah beberapa percobaan. Harap periksa koneksi internet Anda dan coba lagi";
+"error.server_temporarily_unavailable" = "Server sedang tidak tersedia. Silakan coba lagi dalam beberapa saat.";
 "error.operation_in_progress" = "Harap tunggu, operasi lain sedang berjalan";
 
 // MARK: - Loading Messages

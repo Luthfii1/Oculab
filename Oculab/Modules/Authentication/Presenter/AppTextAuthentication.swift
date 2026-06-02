@@ -78,6 +78,9 @@ extension AppText {
             static let newPasswordDescription = "auth.edit_password.new_password_description".localized
             static let confirmPasswordTitle = "auth.edit_password.confirm_password_title".localized
             static let confirmPasswordPlaceholder = AppForm.placeholder("auth.edit_password.confirm_password".localized)
+            static let currentPasswordIncorrect = "auth.edit_password.current_password_incorrect".localized
+            static let newPasswordSameAsCurrent = "auth.edit_password.new_password_same_as_current".localized
+            static let updateFailed = "auth.edit_password.update_failed".localized
         }
 
         enum UserAccessPinView {

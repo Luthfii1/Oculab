@@ -10,9 +10,6 @@ settings:
   DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM_ID}
   
 packages:
-#  SwiftPM:
-#    url: https://github.com/apple/swift-package-manager
-#    branch: swift-5.10.1-RELEASE
   Alamofire:
     url: https://github.com/Alamofire/Alamofire
     from: 5.9.1

@@ -84,7 +84,7 @@ struct AppDropdown: View {
             }) {
                 HStack(spacing: Decimal.d4) {
                     HStack(alignment: .center) { // Set alignment here
-                        if let leftIcon = leftIcon {
+                        if let leftIcon = leftIcon, !leftIcon.isEmpty {
                             Image(systemName: leftIcon)
                                 .foregroundColor(AppColors.purple700)
                         }
@@ -108,7 +108,7 @@ struct AppDropdown: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                    if let rightIcon = rightIcon, !isDisabled {
+                    if let rightIcon = rightIcon, !rightIcon.isEmpty, !isDisabled {
                         Image(systemName: rightIcon)
                             .foregroundColor(textColor)
                     }
