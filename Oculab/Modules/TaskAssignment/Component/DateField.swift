@@ -26,7 +26,7 @@ struct DateField: View {
         if isError {
             return AppColors.red500
         } else if isDisabled {
-            return AppColors.slate200
+            return AppColors.purple100
         } else {
             return AppColors.slate100
         }
@@ -43,11 +43,17 @@ struct DateField: View {
     }
 
     private var textColor: Color {
-        isDisabled ? AppColors.slate400 : AppColors.slate900
+        isDisabled ? AppColors.slate500 : AppColors.slate900
     }
 
     private var backgroundColor: Color {
-        isDisabled ? AppColors.slate50 : AppColors.slate0
+        isDisabled ? AppColors.purple50 : AppColors.slate0
+    }
+
+    private var displayDateText: String {
+        let isPlaceholderDay = Calendar.current.isDate(date, equalTo: Date(), toGranularity: .month)
+            && Calendar.current.isDate(date, equalTo: Date(), toGranularity: .day)
+        return isPlaceholderDay ? placeholder : date.formattedDDMMYYYY()
     }
 
     var body: some View {
@@ -74,41 +80,28 @@ struct DateField: View {
                         .padding(.leading, 16)
                 }
 
-                Button {
-                    if !isDisabled {
-                        isDatePickerVisible.toggle()
-                    }
-                } label: {
-                    VStack(alignment: .leading) {
-                        HStack {
-                            Text(
-                                Calendar.current.isDate(date, equalTo: Date(), toGranularity: .month) &&
-                                    Calendar.current.isDate(date, equalTo: Date(), toGranularity: .day) ?
-                                    placeholder :
-                                    date.formattedDDMMYYYY()
-                            )
-                            .foregroundColor(
-                                Calendar.current.isDate(
-                                    date,
-                                    equalTo: Date(),
-                                    toGranularity: .month
-                                ) &&
-                                    Calendar.current.isDate(date, equalTo: Date(), toGranularity: .day) ? AppColors
-                                    .slate100 : AppColors.slate900
-                            )
-                            .multilineTextAlignment(.leading)
-                            .foregroundStyle(textColor)
-
-                            Spacer()
-                        }
-
-                    }.frame(maxWidth: .infinity)
+                if isDisabled {
+                    Text(displayDateText)
+                        .foregroundStyle(textColor)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 16)
+                } else {
+                    Button {
+                        isDatePickerVisible.toggle()
+                    } label: {
+                        Text(displayDateText)
+                            .foregroundStyle(
+                                displayDateText == placeholder ? AppColors.slate400 : AppColors.slate900
+                            )
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 16)
+                    }
+                    .buttonStyle(.plain)
                 }
 
-                if let rightIcon = rightIcon {
+                if let rightIcon = rightIcon, !isDisabled {
                     Image(systemName: rightIcon)
-                        .foregroundColor(iconColor) // Icon color based on state
+                        .foregroundColor(iconColor)
                         .padding(.trailing, AppConstants.TaskAssignmentUI.elementSpacing)
                 }
             }
@@ -118,6 +111,7 @@ struct DateField: View {
                     .stroke(borderColor, lineWidth: 1)
             )
             .background(backgroundColor)
+            .allowsHitTesting(!isDisabled)
 
             Spacer().frame(height: 8)
 
@@ -141,7 +135,7 @@ struct DateField: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
-                    .background(AppColors.slate50)
+                    .background(AppColors.purple50)
                     
                     DatePicker(AppValue.empty, selection: $date, in: ...Date(), displayedComponents: .date)
                         .datePickerStyle(.graphical)
@@ -166,7 +160,7 @@ struct DateField: View {
             if let description = description {
                 Text(description)
                     .font(AppTypography.p3)
-                    .foregroundColor(isError ? AppColors.red500 : AppColors.slate600)
+                    .foregroundColor(isError ? AppColors.red500 : AppColors.slate400)
             }
         }
     }

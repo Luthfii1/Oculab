@@ -85,6 +85,14 @@ extension HomeHistoryPresenter {
         filteredExamination = getFilteredExaminations(by: typeActivity)
     }
     
+    var hasAnyExaminations: Bool {
+        !latestExamination.isEmpty
+    }
+
+    func examinationCount(for type: LatestActivityType) -> Int {
+        getFilteredExaminations(by: type).count
+    }
+
     private func getFilteredExaminations(by type: LatestActivityType) -> [ExaminationCardData] {
         switch type {
         case .semua:

@@ -66,17 +66,18 @@ struct StatusTagComponent: View {
         case .NOTSTARTED:
             VStack(alignment: .leading) {
                 HStack(spacing: Decimal.d8) {
-                    Image(systemName: AppIcon.alert).resizable()
+                    Image(systemName: AppIcon.circle)
+                        .resizable()
                         .frame(width: Decimal.d12 + Decimal.d6, height: Decimal.d12 + Decimal.d6)
-                        .foregroundStyle(AppColors.red500)
+                        .foregroundStyle(AppColors.purple500)
                     Text(StatusType.NOTSTARTED.description)
-                        .foregroundStyle(AppColors.slate900)
+                        .foregroundStyle(AppColors.purple700)
                 }
             }
             .font(AppTypography.p4)
             .padding(.horizontal, Decimal.d8)
             .padding(.vertical, Decimal.d6)
-            .background(AppColors.red50)
+            .background(AppColors.purple50)
             .cornerRadius(Decimal.d20)
         }
     }

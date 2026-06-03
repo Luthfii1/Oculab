@@ -18,92 +18,83 @@ struct ExamDetailView: View {
 
     var body: some View {
         NavigationView {
-            VStack {
+            VStack(spacing: 0) {
                 AppStepper(
                     stepTitles: [AppTextExamDetail.dataPemeriksaanStep, AppTextExamDetail.hasilPemeriksaanStep],
                     currentStep: 0
-                ).padding(.top, Decimal.d12)
+                )
+                .padding(.top, 12)
+                .padding(.horizontal, 20)
 
-                Spacer().frame(height: Decimal.d24)
+                if presenter.isLoading {
+                    Spacer()
+                    ProgressView()
+                    Text(AppState.loading("examination.detail.loading".localized))
+                        .font(AppTypography.p3)
+                        .foregroundStyle(AppColors.slate400)
+                    Spacer()
+                } else {
+                    ScrollView(showsIndicators: false) {
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text(AppTextExamDetail.reviewSummaryHint)
+                                .font(AppTypography.p3)
+                                .foregroundStyle(AppColors.slate400)
+                                .fixedSize(horizontal: false, vertical: true)
 
-                VStack(spacing: Decimal.d24) {
-                    if presenter.isLoading == true {
-                        ProgressView()
-                        Spacer()
-                    } else {
-                        ScrollView(showsIndicators: false) {
                             LaborantInfoComponent(
                                 pic: presenter.examDetailData.pic,
                                 dpjp: presenter.examDetailData.dpjp
                             )
 
-                            AppCard(
+                            ExamDetailSectionCard(
                                 icon: AppIcon.personFill,
-                                title: AppTextExamDetail.titlePatientDataCard,
-                                spacing: Decimal.d8,
-                                isBorderDisabled: true
+                                title: AppTextExamDetail.titlePatientDataCard
                             ) {
-                                ExtendedCard(data: [
-                                    (key: AppPatient.name, value: presenter.patientDetailData.name),
-                                    (key: AppPatient.nik, value: presenter.patientDetailData.nik),
-                                    (key: AppPatient.dateOfBirth, value: presenter.patientDetailData.dob),
-                                    (key: AppPatient.gender, value: presenter.patientDetailData.sex),
-                                    (key: AppPatient.bpjsNumber, value: presenter.patientDetailData.bpjs)
-                                ], titleSize: AppTypography.s5)
+                                ExamDetailFieldList(rows: presenter.patientDisplayRows)
                             }
 
-                            AppCard(
+                            ExamDetailSectionCard(
                                 icon: AppIcon.docTextMagnifyingglass,
-                                title: AppTextExamDetail.slideDetailTitle,
-                                spacing: Decimal.d8,
-                                isBorderDisabled: true
+                                title: AppTextExamDetail.slideDetailTitle
                             ) {
-                                ExtendedCard(data: [
-                                    (key: AppMedical.Examination.slideId, value: presenter.examDetailData.slideId),
-                                    (key: AppMedical.Examination.purpose, value: presenter.examDetailData.examinationGoal),
-                                    (key: AppMedical.Examination.specimenType, value: presenter.examDetailData.type)
-                                ], titleSize: AppTypography.s5)
+                                ExamDetailFieldList(rows: presenter.specimenDisplayRows)
                             }
 
-                            VideoInput(
-                                title: AppTextExamDetail.slideImageTitle,
-                                isRequired: true,
-                                isEmpty: false,
-                                showOnboardingGuidelines: $showGuidelines,
-                                didFinishOnboarding: $didFinishOnboarding,
-                                selectedURL: $presenter.recordVideo
-                            ).environmentObject(presenter)
+                            ExamDetailSectionCard(
+                                icon: AppIcon.cameraFill,
+                                title: AppTextExamDetail.slideImageTitle
+                            ) {
+                                VideoInput(
+                                    title: AppValue.empty,
+                                    isRequired: false,
+                                    isEmpty: false,
+                                    showOnboardingGuidelines: $showGuidelines,
+                                    didFinishOnboarding: $didFinishOnboarding,
+                                    selectedURL: $presenter.recordVideo
+                                )
+                                .environmentObject(presenter)
+                            }
+
+                            Spacer().frame(height: 100)
                         }
+                        .padding(.horizontal, 20)
+                        .padding(.top, 16)
                     }
 
-                    AppButton(
-                        title: presenter.buttonTitle,
-                        rightIcon: AppIcon.arrowRight,
-                        size: .large,
-                        isEnabled: presenter.isButtonEnabled
-                    ) {
-                        Task {
-                            let didSucceed = await presenter.handleSubmit()
-                            guard didSucceed else { return }
-                            presenter.navigateToAnalysisResult(examinationId: presenter.examDetailData.examinationId)
-                        }
-                    }
+                    detailFooter
                 }
-                .padding(.horizontal, Decimal.d20)
-                .navigationTitle(AppTextExamDetail.newExaminationTitle)
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        Button(action: {
-                            presenter.recordVideo = nil
-                            presenter.videoPresenter.previewURL = nil
-
-                            Router.shared.navigateBack()
-                        }) {
-                            HStack {
-                                Image(AppImage.back)
-                            }
-                        }
+            }
+            .background(AppColors.slate0)
+            .navigationTitle(AppTextExamDetail.newExaminationTitle)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        presenter.recordVideo = nil
+                        presenter.videoPresenter.previewURL = nil
+                        Router.shared.navigateBack()
+                    }) {
+                        Image(AppImage.back)
                     }
                 }
             }
@@ -125,9 +116,67 @@ struct ExamDetailView: View {
         .onChange(of: videoRecordPresenter.previewURL) {
             presenter.recordVideo = videoRecordPresenter.previewURL
         }
+        .alert(
+            AppState.error,
+            isPresented: Binding(
+                get: { presenter.submissionError != nil },
+                set: { if !$0 { presenter.submissionError = nil } }
+            ),
+            actions: {
+                Button(AppAction.ok) {
+                    presenter.submissionError = nil
+                }
+            },
+            message: {
+                Text(presenter.submissionError ?? AppValue.empty)
+            }
+        )
+    }
+
+    private var detailFooter: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if let hint = presenter.startAnalysisHint {
+                HStack(alignment: .top, spacing: 8) {
+                    Image(systemName: AppIcon.info)
+                        .foregroundStyle(AppColors.purple600)
+                    Text(hint)
+                        .font(AppTypography.p3)
+                        .foregroundStyle(AppColors.slate600)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(AppColors.purple50)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+
+            AppButton(
+                title: presenter.buttonTitle,
+                rightIcon: AppIcon.arrowRight,
+                size: .large,
+                isEnabled: presenter.isButtonEnabled
+            ) {
+                Task {
+                    let didSucceed = await presenter.handleSubmit()
+                    guard didSucceed else { return }
+                    presenter.navigateToAnalysisResult(
+                        examinationId: presenter.examDetailData.examinationId
+                    )
+                }
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
+        .background(AppColors.slate0)
+        .overlay(alignment: .top) {
+            Divider()
+        }
     }
 }
 
 #Preview {
-    ExamDetailView(examId: "6f4e5288-3dfd-4be4-8a2e-8c60f09f07e2", patientId: "f3g4h5i6-7891-abcd-ef12-3456789abcdef")
+    ExamDetailView(
+        examId: "6f4e5288-3dfd-4be4-8a2e-8c60f09f07e2",
+        patientId: "f3g4h5i6-7891-abcd-ef12-3456789abcdef"
+    )
 }

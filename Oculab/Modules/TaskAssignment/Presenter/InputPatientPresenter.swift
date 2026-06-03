@@ -41,6 +41,8 @@ final class TaskAssignmentFlowCoordinator: ObservableObject {
     @Published var isSubmittingExamination = false
     @Published var isSubmitPopUpVisible: Bool = false
     @Published var isSlide2Visible: Bool = false
+    /// When false, specimen fields stay neutral until the user taps Create Task.
+    @Published var specimenValidationAttempted: Bool = false
     // MARK: - Slide 2 UI Logic
     /// Toggle Slide 2 visibility and clear data if hiding
     func toggleSlide2() {
@@ -48,6 +50,8 @@ final class TaskAssignmentFlowCoordinator: ObservableObject {
             isSlide2Visible = false
             examination2 = Examination.empty
             typeString2 = AppValue.empty
+            validationManager.clearError(for: ValidationFieldName.slideId2.fieldName)
+            validationManager.clearError(for: ValidationFieldName.slideType2.fieldName)
         } else {
             isSlide2Visible = true
         }
@@ -136,19 +140,59 @@ final class TaskAssignmentFlowCoordinator: ObservableObject {
         return AppValue.empty
     }
 
-    var isFormValid: Bool {
-        // Use ValidationManager for all relevant fields
-        let validGoal = validationManager.validateRequired(goalString, fieldName: ValidationFieldName.examinationGoal.fieldName)
-        let validType1 = validationManager.validateRequired(typeString, fieldName: ValidationFieldName.slideType1.fieldName)
-        let validSlideId1 = validationManager.validateRequired(examination.slideId, fieldName: ValidationFieldName.slideId1.fieldName)
+    /// Read-only check for enabling Create Task (no error mutation, safe in SwiftUI `body`).
+    var isSpecimenStepReady: Bool {
+        let validGoal = validationManager.meetsRequired(goalString)
+        let validType1 = validationManager.meetsRequired(typeString)
+        let validSlideId1 = validationManager.meetsRequired(examination.slideId)
 
         if isSlide2Visible {
-            let validType2 = validationManager.validateRequired(typeString2, fieldName: ValidationFieldName.slideType2.fieldName)
-            let validSlideId2 = validationManager.validateRequired(examination2.slideId, fieldName: ValidationFieldName.slideId2.fieldName)
+            let validType2 = validationManager.meetsRequired(typeString2)
+            let validSlideId2 = validationManager.meetsRequired(examination2.slideId)
             return validGoal && validType1 && validSlideId1 && validType2 && validSlideId2
-        } else {
-            return validGoal && validType1 && validSlideId1
         }
+        return validGoal && validType1 && validSlideId1
+    }
+
+    @discardableResult
+    func validateSpecimenStepBeforeProceed() -> Bool {
+        validationManager.clearAllErrors()
+
+        let validGoal = validationManager.validateRequired(
+            goalString,
+            fieldName: ValidationFieldName.examinationGoal.fieldName
+        )
+        let validType1 = validationManager.validateRequired(
+            typeString,
+            fieldName: ValidationFieldName.slideType1.fieldName
+        )
+        let validSlideId1 = validationManager.validateRequired(
+            examination.slideId,
+            fieldName: ValidationFieldName.slideId1.fieldName
+        )
+
+        if isSlide2Visible {
+            let validType2 = validationManager.validateRequired(
+                typeString2,
+                fieldName: ValidationFieldName.slideType2.fieldName
+            )
+            let validSlideId2 = validationManager.validateRequired(
+                examination2.slideId,
+                fieldName: ValidationFieldName.slideId2.fieldName
+            )
+            return validGoal && validType1 && validSlideId1 && validType2 && validSlideId2
+        }
+        return validGoal && validType1 && validSlideId1
+    }
+
+    func clearSpecimenFieldErrors() {
+        [
+            ValidationFieldName.examinationGoal,
+            .slideId1,
+            .slideId2,
+            .slideType1,
+            .slideType2,
+        ].forEach { validationManager.clearError(for: $0.fieldName) }
     }
     
     /// Read-only check for enabling the proceed button (no error mutation, safe in SwiftUI `body`).
@@ -429,6 +473,9 @@ extension TaskAssignmentFlowCoordinator {
     /// Step 2 entry — refresh display names; patient is already persisted.
     @MainActor
     func bootstrapSpecimenStep() async {
+        specimenValidationAttempted = false
+        clearSpecimenFieldErrors()
+
         let picId = examinationPICId.isEmpty ? selectedPIC : examinationPICId
         if !picId.isEmpty {
             await getUserById(userId: picId)
@@ -641,6 +688,8 @@ extension TaskAssignmentFlowCoordinator {
     // MARK: - UI Actions
     func showSubmitPopup() {
         resetErrorState()
+        specimenValidationAttempted = true
+        guard validateSpecimenStepBeforeProceed() else { return }
         isSubmitPopUpVisible = true
         Logger.info("Submit popup displayed", category: .taskAssignment)
     }

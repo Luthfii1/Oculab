@@ -67,6 +67,12 @@ extension AppText {
 
             static let addSlide2Button = "task_assignment.input_exam.add_slide2_button".localized
             static let removeSlide2Button = "task_assignment.input_exam.remove_slide2_button".localized
+            static let specimenContextTitle = "task_assignment.input_exam.specimen_context_title".localized
+            static let specimenContextPatientLabel = "task_assignment.input_exam.specimen_context_patient".localized
+            static let specimenContextPicLabel = "task_assignment.input_exam.specimen_context_pic".localized
+            static let slide1SectionTitle = "task_assignment.input_exam.slide1_section_title".localized
+            static let slide2SectionTitle = "task_assignment.input_exam.slide2_section_title".localized
+            static let completeRequiredHint = "task_assignment.input_exam.complete_required_hint".localized
 
             static func examinationDescription(patientName: String?, picName: String?) -> String {
                 // Fallback to '-' if nil or empty, and trim whitespace/newlines

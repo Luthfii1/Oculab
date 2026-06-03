@@ -441,6 +441,9 @@
 "examination.detail.slide_detail_title" = "Detail Sediaan";
 "examination.detail.slide_image_title" = "Gambar Sediaan";
 "examination.detail.patient_data_card" = "Data Pasien";
+"examination.detail.review_summary_hint" = "Periksa data pasien dan sediaan, lalu rekam video sediaan untuk melanjutkan.";
+"examination.detail.start_analysis_hint" = "Rekam video sediaan di atas untuk mengaktifkan Mulai Analisis.";
+"examination.detail.loading" = "detail pemeriksaan";
 
 // Guidelines Onboarding
 "examination.guidelines.navigation_title" = "Persiapan Pemeriksaan";
@@ -473,6 +476,7 @@
 "examination.interpretation.no_staff_notes" = "Tidak ada catatan dari teknisi lab";
 
 // Laborant Info Component
+"examination.laborant.card_title" = "Tim pemeriksaan";
 "examination.laborant.officer_title" = "Petugas Pemeriksaan";
 "examination.laborant.assigned_by_title" = "Ditugaskan Oleh";
 
@@ -490,6 +494,8 @@
 "home_history.task_section_title" = "Tugas Pemeriksaan";
 "home_history.new_examination_button" = "Pemeriksaan Baru";
 "home_history.no_task_message" = "Anda belum ditugaskan untuk melakukan pemeriksaan";
+"home_history.no_tasks_in_filter_message" = "Tidak ada tugas pada kategori ini. Coba filter lain.";
+"home_history.task_count_format" = "%d ditampilkan";
 "home_history.examination_data" = "data pemeriksaan anda";
 
 // Finished Examination Card Component
@@ -502,6 +508,10 @@
 "home_history.statistic.tasks_completed_suffix" = "Tugas Selesai";
 "home_history.statistic.from_tasks_prefix" = "dari";
 "home_history.statistic.tasks_total_suffix" = "Tugas";
+"home_history.statistic.completion_summary" = "%d dari %d selesai";
+"home_history.statistic.completion_hint" = "Berdasarkan semua tugas pemeriksaan yang ditugaskan";
+"home_history.statistic.completed_chip" = "selesai";
+"home_history.statistic.pending_chip" = "menunggu";
 "home_history.statistic.positive_label" = "Positif";
 "home_history.statistic.negative_label" = "Negatif";
 
@@ -510,6 +520,9 @@
 
 // Home Activity Component
 "home_history.home_activity.officer_label" = "Petugas Pemeriksaan";
+"home_history.home_activity.patient_label" = "Pasien";
+"home_history.home_activity.dob_label" = "Tanggal lahir";
+"home_history.home_activity.planned_date_label" = "Tanggal rencana";
 
 // MARK: - Patient Module
 // Form View
@@ -584,6 +597,12 @@
 "task_assignment.input_exam.examination_description" = "Sediaan Pasien %@ akan diperiksa oleh %@";
 "task_assignment.input_exam.add_slide2_button" = "Tambah Sediaan 2";
 "task_assignment.input_exam.remove_slide2_button" = "Hapus Sediaan 2";
+"task_assignment.input_exam.specimen_context_title" = "Pemeriksaan untuk";
+"task_assignment.input_exam.specimen_context_patient" = "Pasien";
+"task_assignment.input_exam.specimen_context_pic" = "Petugas (PIC)";
+"task_assignment.input_exam.slide1_section_title" = "Sediaan 1";
+"task_assignment.input_exam.slide2_section_title" = "Sediaan 2";
+"task_assignment.input_exam.complete_required_hint" = "Lengkapi semua kolom wajib untuk mengaktifkan Buat Tugas.";
 
 // MARK: - UserManagement Module
 // Main UserManagement

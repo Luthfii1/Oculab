@@ -19,7 +19,7 @@ struct PatientDisplayField: View {
                     ProgressView()
                     Text(AppTextTaskAssignInputPatient.loadingDataMessage)
                         .font(AppTypography.p3)
-                        .foregroundColor(AppColors.slate600)
+                        .foregroundColor(AppColors.slate400)
                 }
             }
 
@@ -43,11 +43,12 @@ struct PatientDisplayField: View {
                 title: AppPatient.dateOfBirth,
                 isRequired: true,
                 placeholder: AppPatient.Placeholder.selectDate,
-                rightIcon: AppIcon.calendar,
+                rightIcon: presenter.patientFound ? nil : AppIcon.calendar,
                 isDisabled: presenter.patientFound,
                 date: $presenter.selectedDoB
             )
             .onChange(of: presenter.selectedDoB) {
+                guard !presenter.patientFound else { return }
                 presenter.handleDateOfBirthChange()
             }
 
@@ -100,10 +101,10 @@ struct PatientDisplayField: View {
                 )
                 .font(AppTypography.p3)
             }
-            .foregroundColor(presenter.patientFound ? AppColors.purple700 : AppColors.slate600)
+            .foregroundColor(presenter.patientFound ? AppColors.purple700 : AppColors.slate400)
             .padding(.horizontal, 10)
             .padding(.vertical, 4)
-            .background(presenter.patientFound ? AppColors.purple50 : AppColors.slate50)
+            .background(AppColors.purple50)
             .cornerRadius(8)
         }
     }

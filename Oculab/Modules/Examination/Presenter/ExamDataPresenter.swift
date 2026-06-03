@@ -47,6 +47,66 @@ class ExamDataPresenter: ObservableObject {
     var isButtonEnabled: Bool {
         return recordVideo != nil && !isLoading
     }
+
+    var startAnalysisHint: String? {
+        guard recordVideo == nil, !isLoading else { return nil }
+        return AppTextExamDetail.startAnalysisHint
+    }
+
+    var patientDisplayRows: [(label: String, value: String)] {
+        [
+            (AppPatient.name, displayOrDash(patientDetailData.name)),
+            (AppPatient.nik, displayOrDash(patientDetailData.nik)),
+            (AppPatient.dateOfBirth, displayOrDash(patientDetailData.dob)),
+            (AppPatient.gender, formatPatientSex(patientDetailData.sex)),
+            (AppPatient.bpjsNumber, displayOrDash(patientDetailData.bpjs)),
+        ]
+    }
+
+    var specimenDisplayRows: [(label: String, value: String)] {
+        [
+            (AppMedical.Examination.slideId, displayOrDash(examDetailData.slideId)),
+            (AppMedical.Examination.purpose, formatExamGoal(examDetailData.examinationGoal)),
+            (AppMedical.Examination.specimenType, formatPreparationType(examDetailData.type)),
+        ]
+    }
+
+    private func displayOrDash(_ value: String) -> String {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? AppValue.defaultStrike : trimmed
+    }
+
+    private func formatPatientSex(_ raw: String) -> String {
+        switch raw.uppercased() {
+        case "MALE": return AppPatient.Gender.male
+        case "FEMALE": return AppPatient.Gender.female
+        default:
+            let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+            return trimmed.isEmpty ? AppValue.defaultStrike : trimmed.capitalized
+        }
+    }
+
+    private func formatExamGoal(_ raw: String) -> String {
+        switch raw.uppercased() {
+        case ExamGoalType.SCREENING.rawValue:
+            return AppTextTaskAssignInputExam.screeningChoice
+        case ExamGoalType.TREATMENT.rawValue:
+            return AppTextTaskAssignInputExam.followUpChoice
+        default:
+            return displayOrDash(raw)
+        }
+    }
+
+    private func formatPreparationType(_ raw: String) -> String {
+        switch raw.uppercased() {
+        case ExamPreparationType.SP.rawValue:
+            return AppTextTaskAssignInputExam.morningChoice
+        case ExamPreparationType.SPS.rawValue:
+            return AppTextTaskAssignInputExam.anytimeChoice
+        default:
+            return displayOrDash(raw)
+        }
+    }
     
     var firstExamination: AdminExaminationData? {
         examinations.first

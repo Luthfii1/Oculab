@@ -425,6 +425,9 @@
 "examination.detail.slide_detail_title" = "Specimen Details";
 "examination.detail.slide_image_title" = "Specimen Image";
 "examination.detail.patient_data_card" = "Patient Data";
+"examination.detail.review_summary_hint" = "Review patient and specimen details, then record the slide video to continue.";
+"examination.detail.start_analysis_hint" = "Record the specimen video above to enable Start Analysis.";
+"examination.detail.loading" = "examination details";
 
 // Guidelines Onboarding
 "examination.guidelines.navigation_title" = "Examination Preparation";
@@ -457,6 +460,7 @@
 "examination.interpretation.no_staff_notes" = "No notes from lab technician";
 
 // Laborant Info Component
+"examination.laborant.card_title" = "Examination team";
 "examination.laborant.officer_title" = "Examination Officer";
 "examination.laborant.assigned_by_title" = "Assigned By";
 
@@ -474,6 +478,8 @@
 "home_history.task_section_title" = "Examination Tasks";
 "home_history.new_examination_button" = "New Examination";
 "home_history.no_task_message" = "You have not been assigned to perform examinations";
+"home_history.no_tasks_in_filter_message" = "No tasks in this category. Try another filter.";
+"home_history.task_count_format" = "%d shown";
 "home_history.examination_data" = "your examination data";
 
 // Finished Examination Card Component
@@ -486,6 +492,10 @@
 "home_history.statistic.tasks_completed_suffix" = "Tasks Completed";
 "home_history.statistic.from_tasks_prefix" = "of";
 "home_history.statistic.tasks_total_suffix" = "Tasks";
+"home_history.statistic.completion_summary" = "%d of %d completed";
+"home_history.statistic.completion_hint" = "Based on all assigned examination tasks";
+"home_history.statistic.completed_chip" = "done";
+"home_history.statistic.pending_chip" = "pending";
 "home_history.statistic.positive_label" = "Positive";
 "home_history.statistic.negative_label" = "Negative";
 
@@ -494,6 +504,9 @@
 
 // Home Activity Component
 "home_history.home_activity.officer_label" = "Examination Officer";
+"home_history.home_activity.patient_label" = "Patient";
+"home_history.home_activity.dob_label" = "Date of birth";
+"home_history.home_activity.planned_date_label" = "Planned date";
 
 // MARK: - Patient Module
 // Form View
@@ -568,6 +581,12 @@
 "task_assignment.input_exam.examination_description" = "Specimen for patient %@ will be examined by %@.";
 "task_assignment.input_exam.add_slide2_button" = "Add Slide 2";
 "task_assignment.input_exam.remove_slide2_button" = "Remove Slide 2";
+"task_assignment.input_exam.specimen_context_title" = "Examination for";
+"task_assignment.input_exam.specimen_context_patient" = "Patient";
+"task_assignment.input_exam.specimen_context_pic" = "Officer (PIC)";
+"task_assignment.input_exam.slide1_section_title" = "Slide 1";
+"task_assignment.input_exam.slide2_section_title" = "Slide 2";
+"task_assignment.input_exam.complete_required_hint" = "Complete all required fields to enable Create Task.";
 
 // MARK: - UserManagement Module
 // Main UserManagement

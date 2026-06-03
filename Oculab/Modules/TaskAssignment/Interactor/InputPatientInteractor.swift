@@ -135,8 +135,10 @@ struct AddExaminationResponse: Decodable {
         case examinationDate
         case statusExamination
         case PIC
+        case picId
         case examinationPlanDate
         case DPJP
+        case dpjpId
     }
 
     init(from decoder: Decoder) throws {
@@ -151,11 +153,30 @@ struct AddExaminationResponse: Decodable {
         goal = try container.decode(ExamGoalType.self, forKey: .goal)
         preparationType = try container.decode(ExamPreparationType.self, forKey: .preparationType)
         slideId = try container.decode(String.self, forKey: .slideId)
-        examinationDate = try container.decode(String.self, forKey: .examinationDate)
+        examinationDate = try container.decodeIfPresent(String.self, forKey: .examinationDate) ?? AppValue.empty
         statusExamination = try container.decode(StatusType.self, forKey: .statusExamination)
-        PIC = try container.decode(String.self, forKey: .PIC)
-        examinationPlanDate = try container.decode(String.self, forKey: .examinationPlanDate)
-        DPJP = try container.decode(String.self, forKey: .DPJP)
+        PIC = Self.decodeString(
+            from: container,
+            keys: [.PIC, .picId]
+        )
+        examinationPlanDate = try container.decodeIfPresent(String.self, forKey: .examinationPlanDate) ?? AppValue.empty
+        DPJP = Self.decodeString(
+            from: container,
+            keys: [.DPJP, .dpjpId]
+        )
+    }
+
+    private static func decodeString(
+        from container: KeyedDecodingContainer<CodingKeys>,
+        keys: [CodingKeys]
+    ) -> String {
+        for key in keys {
+            if let value = try? container.decode(String.self, forKey: key),
+               !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                return value
+            }
+        }
+        return AppValue.empty
     }
 }
 

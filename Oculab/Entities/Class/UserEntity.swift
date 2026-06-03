@@ -10,7 +10,7 @@ import SwiftData
 
 @Model
 class User: Codable, Identifiable {
-    var id: String
+    var id: String = AppValue.empty
     var name: String
     var role: RolesType
     var token: String?

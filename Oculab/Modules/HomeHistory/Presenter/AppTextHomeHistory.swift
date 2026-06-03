@@ -26,6 +26,8 @@ extension AppText {
         static let taskSectionTitle = "home_history.task_section_title".localized
         static let newExaminationButton = "home_history.new_examination_button".localized
         static let noTaskMessage = "home_history.no_task_message".localized
+        static let noTasksInFilterMessage = "home_history.no_tasks_in_filter_message".localized
+        static let taskCountFormat = "home_history.task_count_format".localized
         static let loadingState = AppState.loading("home_history.examination_data".localized)
 
         enum FinishedExaminationCardComponent {
@@ -39,6 +41,10 @@ extension AppText {
             static let tasksCompletedSuffix = "home_history.statistic.tasks_completed_suffix".localized
             static let fromTasksPrefix = "home_history.statistic.from_tasks_prefix".localized
             static let tasksInTotalSuffix = "home_history.statistic.tasks_total_suffix".localized
+            static let completionSummary = "home_history.statistic.completion_summary".localized
+            static let completionHint = "home_history.statistic.completion_hint".localized
+            static let completedChipLabel = "home_history.statistic.completed_chip".localized
+            static let pendingChipLabel = "home_history.statistic.pending_chip".localized
             static let positiveLabel = "home_history.statistic.positive_label".localized
             static let negativeLabel = "home_history.statistic.negative_label".localized
         }
@@ -49,6 +55,9 @@ extension AppText {
         
         enum HomeActivityComponent {
             static let examinationOfficerLabel = "home_history.home_activity.officer_label".localized
+            static let patientLabel = "home_history.home_activity.patient_label".localized
+            static let dobLabel = "home_history.home_activity.dob_label".localized
+            static let plannedDateLabel = "home_history.home_activity.planned_date_label".localized
         }
         
         enum ButtonActivityComponent {

@@ -19,7 +19,7 @@ struct OculabApp: App {
         KeychainHelper.bootstrap()
 
         do {
-            self.container = try ModelContainer(for: User.self)
+            self.container = try Self.makeModelContainer()
         } catch {
             fatalError("Failed to initialize SwiftData ModelContainer: \(error.localizedDescription)")
         }
@@ -38,6 +38,43 @@ struct OculabApp: App {
                 }
         }
         .modelContainer(container)
+    }
+
+    /// Beta: wipe local SwiftData when schema version changes instead of migrating.
+    private enum SwiftDataBootstrap {
+        /// Bump when `@Model` types change in a breaking way.
+        static let schemaVersion = 2
+    }
+
+    private static func makeModelContainer() throws -> ModelContainer {
+        let schema = Schema([User.self])
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        let versionKey = UserDefaultType.swiftDataSchemaVersion.rawValue
+        let storedVersion = UserDefaults.standard.integer(forKey: versionKey)
+
+        if storedVersion != SwiftDataBootstrap.schemaVersion {
+            Logger.info(
+                "SwiftData schema changed (\(storedVersion) → \(SwiftDataBootstrap.schemaVersion)); wiping local cache",
+                category: .authentication
+            )
+            try deleteStoreFiles(at: configuration.url)
+            UserDefaults.standard.set(SwiftDataBootstrap.schemaVersion, forKey: versionKey)
+        }
+
+        return try ModelContainer(for: schema, configurations: [configuration])
+    }
+
+    private static func deleteStoreFiles(at storeURL: URL) throws {
+        let fileManager = FileManager.default
+        let relatedURLs = [
+            storeURL,
+            storeURL.appendingPathExtension("wal"),
+            storeURL.appendingPathExtension("shm"),
+        ]
+
+        for url in relatedURLs where fileManager.fileExists(atPath: url.path) {
+            try fileManager.removeItem(at: url)
+        }
     }
     
     // MARK: - Deeplink Handling

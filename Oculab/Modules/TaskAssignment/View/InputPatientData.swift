@@ -195,7 +195,7 @@ private struct InputPatientEmptyListHint: View {
 
             Text(AppTextTaskAssignInputPatient.emptyPatientListHint)
                 .font(AppTypography.p3)
-                .foregroundColor(AppColors.slate700)
+                .foregroundColor(AppColors.slate500)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding(12)

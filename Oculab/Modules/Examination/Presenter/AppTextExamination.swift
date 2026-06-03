@@ -48,6 +48,8 @@ extension AppText {
             static let slideImageTitle = "examination.detail.slide_image_title".localized
 
             static let titlePatientDataCard = "examination.detail.patient_data_card".localized
+            static let reviewSummaryHint = "examination.detail.review_summary_hint".localized
+            static let startAnalysisHint = "examination.detail.start_analysis_hint".localized
             static let buttonViewPDF = AppAction.view("PDF")
         }
         
@@ -104,6 +106,7 @@ extension AppText {
         }
         
         enum LaborantInfoComponent {
+            static let cardTitle = "examination.laborant.card_title".localized
             static let examinationOfficerTitle = "examination.laborant.officer_title".localized
             static let assignedByTitle = "examination.laborant.assigned_by_title".localized
         }

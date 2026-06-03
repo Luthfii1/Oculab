@@ -24,6 +24,8 @@ struct ValidatedTextField: View {
     var validationType: ValidationType = .none
     var customRules: [ValidationManager.ValidationRule] = []
     var validateOnChange: Bool = true
+    /// When false, validation still runs but errors are hidden until submit (e.g. specimen step).
+    var showsErrors: Bool = true
     @ObservedObject private var validationManager: ValidationManager
 
     @State private var isPasswordVisible: Bool = false
@@ -46,6 +48,7 @@ struct ValidatedTextField: View {
         validationType: ValidationType = .none,
         customRules: [ValidationManager.ValidationRule] = [],
         validateOnChange: Bool = true,
+        showsErrors: Bool = true,
         validationManager: ValidationManager? = nil
     ) {
         self.title = title
@@ -61,6 +64,7 @@ struct ValidatedTextField: View {
         self.validationType = validationType
         self.customRules = customRules
         self.validateOnChange = validateOnChange
+        self.showsErrors = showsErrors
         _validationManager = ObservedObject(wrappedValue: validationManager ?? ValidationManager.shared)
     }
     
@@ -79,6 +83,7 @@ struct ValidatedTextField: View {
         validationType: ValidationType = .none,
         customRules: [ValidationManager.ValidationRule] = [],
         validateOnChange: Bool = true,
+        showsErrors: Bool = true,
         validationManager: ValidationManager? = nil
     ) {
         self.title = title
@@ -94,6 +99,7 @@ struct ValidatedTextField: View {
         self.validationType = validationType
         self.customRules = customRules
         self.validateOnChange = validateOnChange
+        self.showsErrors = showsErrors
         _validationManager = ObservedObject(wrappedValue: validationManager ?? ValidationManager.shared)
     }
 
@@ -103,11 +109,11 @@ struct ValidatedTextField: View {
 
     // Enhanced error state based on validation
     private var isError: Bool {
-        validationManager.hasError(for: fieldName)
+        showsErrors && validationManager.hasError(for: fieldName)
     }
     
     private var errorMessage: String? {
-        validationManager.getError(for: fieldName)
+        showsErrors ? validationManager.getError(for: fieldName) : nil
     }
 
     // Colors based on the state (error, disabled, normal)
