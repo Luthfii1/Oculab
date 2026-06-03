@@ -67,7 +67,7 @@ class ExamInteractor {
         examVideo: Data,
         examinationId: String,
         patientId: String
-    ) async throws -> APIResponse<Response> {
+    ) async throws -> APIResponse<ForwardVideoToMLData> {
         let urlString = APIEndpoints.forwardVideoToML + "\(examinationId.lowercased())"
         let parameters = ["video": examVideo]
 
@@ -99,6 +99,8 @@ struct PatientDetailData {
     let bpjs: String
 }
 
-struct Response: Decodable {
-    let statusML: String
+struct ForwardVideoToMLData: Decodable {
+    let examinationId: String?
+    let statusExamination: StatusType?
+    let statusML: String?
 }

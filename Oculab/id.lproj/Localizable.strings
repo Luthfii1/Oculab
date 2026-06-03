@@ -427,7 +427,11 @@
 
 // Progress View
 "examination.progress.analyzing_title" = "Menginterpretasikan data";
-"examination.progress.refresh_instruction" = "Tarik ke bawah untuk memuat ulang";
+"examination.progress.refresh_instruction" = "Tarik ke bawah untuk memeriksa status";
+"examination.progress.background_instruction" = "Analisis berjalan di latar belakang. Anda dapat kembali ke tugas dan membuka layar ini lagi dari daftar beranda.";
+"examination.progress.button_back_to_tasks" = "Kembali ke tugas";
+"examination.progress.notification_ready_title" = "Analisis selesai";
+"examination.progress.notification_ready_body" = "Pemeriksaan Anda siap divalidasi. Ketuk untuk melihat hasil.";
 "examination.progress.button_save_result" = "Simpan Hasil Pemeriksaan";
 "examination.progress.button_verify_fovs" = "Verikasi Semua Lapang Pandang";
 
@@ -444,6 +448,11 @@
 "examination.detail.review_summary_hint" = "Periksa data pasien dan sediaan, lalu rekam video sediaan untuk melanjutkan.";
 "examination.detail.start_analysis_hint" = "Rekam video sediaan di atas untuk mengaktifkan Mulai Analisis.";
 "examination.detail.loading" = "detail pemeriksaan";
+"examination.detail.uploading_video" = "video untuk analisis";
+"examination.detail.analysis_queued_title" = "Analisis dimulai";
+"examination.detail.analysis_queued_message" = "Video Anda telah dikirim untuk dianalisis. Anda dapat melanjutkan tugas lain di beranda. Buka pemeriksaan ini lagi ketika status siap untuk validasi.";
+"examination.detail.analysis_queued_go_home" = "Lanjut ke tugas";
+"examination.detail.analysis_queued_view_progress" = "Lihat progres";
 
 // Guidelines Onboarding
 "examination.guidelines.navigation_title" = "Persiapan Pemeriksaan";
@@ -683,12 +692,27 @@
 // Video Preview Component
 "video_record.video_preview_component.save_video_button" = "Simpan Video";
 "video_record.video_preview_component.retake_video_button" = "Ambil Ulang";
+"video_record.video_preview_component.saving" = "video";
+"video_record.video_preview_component.no_video_available" = "Video tidak tersedia";
+"video_record.video_preview_component.duration_format" = "Durasi %@";
+"video_record.video_preview_component.file_size_format" = "Ukuran %@";
 
 // Video Input Component
 "video_record.video_input_component.video_error_alert_message" = "Video tidak dapat diputar. Silakan rekam ulang sampel.";
+"video_record.video_input_component.video_error_alert_title" = "Kesalahan video";
+"video_record.video_input_component.record_video_button" = "Rekam video";
 "video_record.video_input_component.create_video_button" = "Gambar";
 "video_record.video_input_component.view_video_button" = "Video";
 "video_record.video_input_component.video_playback_error_title" = "Memutar Video";
+"video_record.video_input_component.empty_title" = "Belum ada video sediaan";
+"video_record.video_input_component.empty_subtitle" = "Rekam video singkat sediaan melalui mikroskop sebelum memulai analisis.";
+"video_record.video_input_component.loading" = "video";
+"video_record.video_input_component.play_button" = "Putar";
+"video_record.video_input_component.retake_button" = "Rekam ulang";
+"video_record.video_input_component.tap_thumbnail_hint" = "Ketuk pratinjau atau Putar untuk meninjau layar penuh";
+"video_record.video_input_component.duration_label" = "Durasi %@";
+"video_record.video_input_component.file_size_label" = "Ukuran %@";
+"video_record.video_input_component.retake_warning" = "Rekam ulang akan mengganti video saat ini.";
 
 // MARK: - Status Type Enum
 // StatusType Enum

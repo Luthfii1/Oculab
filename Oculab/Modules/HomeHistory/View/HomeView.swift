@@ -56,6 +56,19 @@ struct HomeView: View {
             loadTask?.cancel()
             refreshTask?.cancel()
         }
+        .onReceive(NotificationCenter.default.publisher(for: .examinationAnalysisReady)) { _ in
+            refreshTask?.cancel()
+            refreshTask = Task {
+                await presenter.getStatisticData()
+                await presenter.fetchData(userRole: authentication.user.role)
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .examinationAnalysisProgress)) { _ in
+            refreshTask?.cancel()
+            refreshTask = Task {
+                await presenter.fetchData(userRole: authentication.user.role)
+            }
+        }
         .navigationBarBackButtonHidden(true)
     }
 

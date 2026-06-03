@@ -31,6 +31,10 @@ extension AppText {
             static let loadingAnimationName = "loadingPaperplane"
             static let analyzingTitle = "examination.progress.analyzing_title".localized
             static let refreshInstruction = "examination.progress.refresh_instruction".localized
+            static let backgroundInstruction = "examination.progress.background_instruction".localized
+            static let buttonBackToTasks = "examination.progress.button_back_to_tasks".localized
+            static let notificationReadyTitle = "examination.progress.notification_ready_title".localized
+            static let notificationReadyBody = "examination.progress.notification_ready_body".localized
             static let buttonSaveResult = "examination.progress.button_save_result".localized
             static let buttonVerifyAllFOVs = "examination.progress.button_verify_fovs".localized
         }
@@ -50,6 +54,11 @@ extension AppText {
             static let titlePatientDataCard = "examination.detail.patient_data_card".localized
             static let reviewSummaryHint = "examination.detail.review_summary_hint".localized
             static let startAnalysisHint = "examination.detail.start_analysis_hint".localized
+            static let uploadingVideoMessage = AppState.loading("examination.detail.uploading_video".localized)
+            static let analysisQueuedTitle = "examination.detail.analysis_queued_title".localized
+            static let analysisQueuedMessage = "examination.detail.analysis_queued_message".localized
+            static let analysisQueuedGoHome = "examination.detail.analysis_queued_go_home".localized
+            static let analysisQueuedViewProgress = "examination.detail.analysis_queued_view_progress".localized
             static let buttonViewPDF = AppAction.view("PDF")
         }
         

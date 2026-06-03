@@ -17,54 +17,60 @@ struct AnalyzingExaminationProgressView: View {
                 Spacer()
                     .frame(height: UIScreen.main.bounds.height * 0.2)
 
+                AnalysisProgressRing(
+                    progress: presenter.analysisProgress,
+                    message: presenter.analysisStatusMessage
+                )
+                .padding(.bottom, Decimal.d32)
+
                 LottieHelper(animationName: AppTextExamProgress.loadingAnimationName)
                     .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: .infinity, maxHeight: Decimal.d120)
-                    .padding(.bottom, Decimal.d72)
+                    .frame(maxWidth: .infinity, maxHeight: Decimal.d72)
+                    .padding(.bottom, Decimal.d24)
 
                 Text(AppTextExamProgress.analyzingTitle)
                     .font(AppTypography.h2)
                     .padding(.bottom, Decimal.d12)
 
+                Text(AppTextExamProgress.backgroundInstruction)
+                    .font(AppTypography.p3)
+                    .foregroundStyle(AppColors.slate400)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 24)
+
                 Text(AppTextExamProgress.refreshInstruction)
                     .font(AppTypography.p3)
+                    .foregroundStyle(AppColors.slate400)
+                    .padding(.top, 8)
+
+                AppButton(
+                    title: AppTextExamProgress.buttonBackToTasks,
+                    size: .large,
+                    isEnabled: true
+                ) {
+                    Router.shared.popToRoot()
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 24)
 
                 Spacer()
             }
         }
         .refreshable {
             Task {
-                await presenter.getStatusExamination(examinationId: examinationId)
+                await presenter.refreshExaminationStatus(examinationId: examinationId)
             }
+        }
+        .onAppear {
+            presenter.startExaminationStatusPolling(examinationId: examinationId)
+        }
+        .onDisappear {
+            presenter.stopExaminationStatusPolling()
         }
     }
 }
 
 #Preview {
     AnalyzingExaminationProgressView(examinationId: "6f4e5288-3dfd-4be4-8a2e-8c60f09f07e2")
-        .environmentObject(DependencyInjection.shared)
+        .environmentObject(AnalysisResultPresenter())
 }
-
-// TODO: Change this component if the websocket has ready
-// // Loading percentage component
-// // TODO: Implement with websocket
-// ZStack {
-//     Circle()
-//         .stroke(lineWidth: 12)
-//         .opacity(0.3)
-//         .foregroundColor(AppColors.purple50)
-
-//     Circle()
-//         .trim(from: 0.0, to: 0.8)
-//         .stroke(style: StrokeStyle(lineWidth: 12, lineCap: .round, lineJoin: .round))
-//         .foregroundColor(AppColors.purple500)
-//         .rotationEffect(Angle(degrees: 270.0))
-//         .animation(.linear, value: 0.8)
-
-//     Text("80%")
-//         .font(.system(size: 32, weight: .bold))
-//         .foregroundStyle(AppColors.purple500)
-// }
-// .frame(width: 120, height: 120)
-// .padding(.bottom, 40)
-// Loading animation component

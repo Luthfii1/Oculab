@@ -10,6 +10,8 @@ import SwiftUI
 
 @main
 struct OculabApp: App {
+    @UIApplicationDelegateAdaptor(AppNotificationDelegate.self) private var appNotificationDelegate
+
     let container: ModelContainer
     @AppStorage(UserDefaultType.hasSeenOnboarding.rawValue) var hasSeenOnboarding: Bool = false
     @StateObject private var routeFinder = RouteFinder.shared

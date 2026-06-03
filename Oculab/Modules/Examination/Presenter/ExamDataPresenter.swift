@@ -14,10 +14,11 @@ class ExamDataPresenter: ObservableObject {
     
     // MARK: - Published Properties
     @Published var isLoading: Bool = false
+    @Published var isSubmittingExamination: Bool = false
     @Published var recordVideo: URL?
 
     var buttonTitle: String {
-        isLoading ? AppTextExam.buttonSubmitting : AppTextExam.buttonStartAnalysis
+        isSubmittingExamination ? AppTextExam.buttonSubmitting : AppTextExam.buttonStartAnalysis
     }
     @Published var examDetailData: ExaminationDetailData = .init(
         examinationId: AppValue.empty,
@@ -37,6 +38,8 @@ class ExamDataPresenter: ObservableObject {
     )
     @Published var examinations: [AdminExaminationData] = []
     @Published var submissionError: String?
+    @Published var showAnalysisQueuedConfirmation = false
+    private var queuedExaminationId: String?
 
     // MARK: - Initialization
     init(interactor: ExamInteractor) {
@@ -45,11 +48,11 @@ class ExamDataPresenter: ObservableObject {
     
     // MARK: - Computed Properties
     var isButtonEnabled: Bool {
-        return recordVideo != nil && !isLoading
+        return recordVideo != nil && !isLoading && !isSubmittingExamination
     }
 
     var startAnalysisHint: String? {
-        guard recordVideo == nil, !isLoading else { return nil }
+        guard recordVideo == nil, !isLoading, !isSubmittingExamination else { return nil }
         return AppTextExamDetail.startAnalysisHint
     }
 
@@ -159,14 +162,29 @@ extension ExamDataPresenter {
     func navigateToAnalysisResult(examinationId: String) {
         Router.shared.navigateTo(.analysisResult(examinationId: examinationId))
     }
+
+    @MainActor
+    func confirmAnalysisQueuedAndGoHome() {
+        showAnalysisQueuedConfirmation = false
+        queuedExaminationId = nil
+        Router.shared.popToRoot()
+    }
+
+    @MainActor
+    func viewAnalysisProgressFromQueue() {
+        guard let examinationId = queuedExaminationId else { return }
+        showAnalysisQueuedConfirmation = false
+        queuedExaminationId = nil
+        navigateToAnalysisResult(examinationId: examinationId)
+    }
 }
 
 // MARK: - Submission Methods
 extension ExamDataPresenter {
     @MainActor
     func handleSubmit() async -> Bool {
-        isLoading = true
-        defer { isLoading = false }
+        isSubmittingExamination = true
+        defer { isSubmittingExamination = false }
         submissionError = nil
 
         guard let fileURL = recordVideo else {
@@ -190,6 +208,13 @@ extension ExamDataPresenter {
             videoPresenter.previewURL = nil
             deleteTemporaryFile(at: fileURL)
 
+            queuedExaminationId = examDetailData.examinationId
+            AnalysisTrackingStore.track(examinationId: examDetailData.examinationId)
+            Task { @MainActor in
+                AnalysisRealtimeService.shared.subscribe(to: examDetailData.examinationId)
+                await ExaminationNotificationService.shared.requestAuthorizationIfNeeded()
+            }
+            showAnalysisQueuedConfirmation = true
             return true
         } catch {
             Logger.error("Error submitting or loading video data: \(error)", category: .examination)

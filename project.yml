@@ -15,6 +15,9 @@ packages:
   Lottie:
     url: https://github.com/airbnb/lottie-ios
     from: 4.5.1
+  SocketIO:
+    url: https://github.com/socketio/socket.io-client-swift
+    from: 16.1.1
 
 targets:
   Oculab:
@@ -68,6 +71,7 @@ targets:
     dependencies:
       - package: Alamofire
       - package: Lottie
+      - package: SocketIO
     # postCompileScripts:
     #   - script: |
     #       export PATH="$PATH:/opt/homebrew/bin"

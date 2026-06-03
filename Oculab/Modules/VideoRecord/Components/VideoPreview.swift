@@ -37,9 +37,9 @@ struct VideoPreview: View {
                             Image(systemName: "video.slash")
                                 .font(.system(size: 60))
                                 .foregroundColor(.gray)
-                            Text("No video available")
-                                .foregroundColor(.gray)
-                                .font(.headline)
+                            Text(AppTextVideoRecordCompPreview.noVideoAvailable)
+                                .foregroundStyle(AppColors.slate300)
+                                .font(AppTypography.s4_1)
                         }
                     )
             }
@@ -75,14 +75,14 @@ struct VideoPreview: View {
     private var videoInfoOverlay: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Duration: \(formatTime(duration))")
-                    .font(.caption)
-                    .foregroundColor(.white)
-                
+                Text(String(format: AppTextVideoRecordCompPreview.durationFormat, formatTime(duration)))
+                    .font(AppTypography.p5)
+                    .foregroundStyle(AppColors.slate0)
+
                 if let url = videoRecordPresenter.previewURL {
-                    Text("Size: \(getFileSize(url))")
-                        .font(.caption)
-                        .foregroundColor(.white)
+                    Text(String(format: AppTextVideoRecordCompPreview.fileSizeFormat, getFileSize(url)))
+                        .font(AppTypography.p5)
+                        .foregroundStyle(AppColors.slate0)
                 }
             }
             .padding(.horizontal, 12)
@@ -109,7 +109,7 @@ struct VideoPreview: View {
         VStack(alignment: .center, spacing: 16) {
             // Primary action - Save video
             AppButton(
-                title: isSaving ? "Saving..." : AppTextVideoRecordCompPreview.saveVideoButton,
+                title: isSaving ? AppTextVideoRecordCompPreview.savingMessage : AppTextVideoRecordCompPreview.saveVideoButton,
                 rightIcon: AppText.SystemIcon.success,
                 colorType: .neutral(.primary),
                 size: .large,

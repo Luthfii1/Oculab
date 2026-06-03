@@ -116,6 +116,35 @@ struct ExamDetailView: View {
         .onChange(of: videoRecordPresenter.previewURL) {
             presenter.recordVideo = videoRecordPresenter.previewURL
         }
+        .overlay {
+            if presenter.isSubmittingExamination {
+                ZStack {
+                    Color.black.opacity(0.25)
+                        .ignoresSafeArea()
+                    VStack(spacing: 12) {
+                        ProgressView()
+                        Text(AppTextExamDetail.uploadingVideoMessage)
+                            .font(AppTypography.p3)
+                            .foregroundStyle(AppColors.slate0)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding(24)
+                }
+            }
+        }
+        .alert(
+            AppTextExamDetail.analysisQueuedTitle,
+            isPresented: $presenter.showAnalysisQueuedConfirmation
+        ) {
+            Button(AppTextExamDetail.analysisQueuedGoHome) {
+                presenter.confirmAnalysisQueuedAndGoHome()
+            }
+            Button(AppTextExamDetail.analysisQueuedViewProgress) {
+                presenter.viewAnalysisProgressFromQueue()
+            }
+        } message: {
+            Text(AppTextExamDetail.analysisQueuedMessage)
+        }
         .alert(
             AppState.error,
             isPresented: Binding(
@@ -157,11 +186,7 @@ struct ExamDetailView: View {
                 isEnabled: presenter.isButtonEnabled
             ) {
                 Task {
-                    let didSucceed = await presenter.handleSubmit()
-                    guard didSucceed else { return }
-                    presenter.navigateToAnalysisResult(
-                        examinationId: presenter.examDetailData.examinationId
-                    )
+                    await presenter.handleSubmit()
                 }
             }
         }

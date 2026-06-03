@@ -15,4 +15,13 @@ class API {
     static let BE_STAGING: String = "https://staging.oculab.ai"
 
     static let ML: String = "https://oculab-ml.vercel.app"
+
+    /// Socket.IO base URL (same host as REST API).
+    static var socketURL: URL {
+        URL(string: BE)!
+    }
+
+    static var analysisProgressPath: String {
+        BE + "/aiAnalysisProgress/"
+    }
 }

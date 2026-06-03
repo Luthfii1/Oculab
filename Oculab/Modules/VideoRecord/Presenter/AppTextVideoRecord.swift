@@ -73,16 +73,30 @@ extension AppText {
             static let settingsButton = "video_record.camera_view_component.settings_button".localized
         }
         
+        enum VideoInputComponent {
+            static let videoErrorAlertMessage = "video_record.video_input_component.video_error_alert_message".localized
+            static let videoErrorAlertTitle = "video_record.video_input_component.video_error_alert_title".localized
+            static let createVideoButton = "video_record.video_input_component.record_video_button".localized
+            static let viewVideoButton = "video_record.video_input_component.view_video_button".localized
+            static let videoPlaybackErrorTitle = "video_record.video_input_component.video_playback_error_title".localized
+            static let emptyTitle = "video_record.video_input_component.empty_title".localized
+            static let emptySubtitle = "video_record.video_input_component.empty_subtitle".localized
+            static let loadingMessage = AppState.loading("video_record.video_input_component.loading".localized)
+            static let playButton = "video_record.video_input_component.play_button".localized
+            static let retakeButton = "video_record.video_input_component.retake_button".localized
+            static let tapThumbnailHint = "video_record.video_input_component.tap_thumbnail_hint".localized
+            static let durationLabel = "video_record.video_input_component.duration_label".localized
+            static let fileSizeLabel = "video_record.video_input_component.file_size_label".localized
+            static let retakeWarning = "video_record.video_input_component.retake_warning".localized
+        }
+
         enum VideoPreviewComponent {
             static let saveVideoButton = "video_record.video_preview_component.save_video_button".localized
             static let retakeVideoButton = "video_record.video_preview_component.retake_video_button".localized
-        }
-        
-        enum VideoInputComponent {
-            static let videoErrorAlertMessage = "video_record.video_input_component.video_error_alert_message".localized
-            static let createVideoButton = "video_record.video_input_component.create_video_button".localized
-            static let viewVideoButton = "video_record.video_input_component.view_video_button".localized
-            static let videoPlaybackErrorTitle = "video_record.video_input_component.video_playback_error_title".localized
+            static let savingMessage = AppState.loading("video_record.video_preview_component.saving".localized)
+            static let noVideoAvailable = "video_record.video_preview_component.no_video_available".localized
+            static let durationFormat = "video_record.video_preview_component.duration_format".localized
+            static let fileSizeFormat = "video_record.video_preview_component.file_size_format".localized
         }
     }
 }

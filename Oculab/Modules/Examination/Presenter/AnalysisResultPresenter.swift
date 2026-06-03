@@ -11,10 +11,13 @@ import SwiftUI
 class AnalysisResultPresenter: ObservableObject {
     // MARK: - Dependencies
     private let interactor: AnalysisResultInteractor
+    private let progressInteractor = AnalysisProgressInteractor()
 
     // MARK: - Task Handles
     private var fetchTask: Task<Void, Never>?
     private var trackingTask: Task<Void, Never>?
+    private var progressObserver: NSObjectProtocol?
+    private var trackedExaminationId: String?
 
     init(interactor: AnalysisResultInteractor = AnalysisResultInteractor()) {
         self.interactor = interactor
@@ -27,6 +30,8 @@ class AnalysisResultPresenter: ObservableObject {
     @Published var resultQuantity: Int = 0
     @Published var groupedFOVs: FOVGrouping?
     @Published var isLoading = false
+    @Published var analysisProgress: Int = 0
+    @Published var analysisStatusMessage: String = AppTextExamProgress.analyzingTitle
 
     // MARK: - UI State Properties
     @Published var selectedTBGrade: String = AppValue.empty
@@ -164,26 +169,120 @@ extension AnalysisResultPresenter {
 // MARK: - Data Management Methods
 extension AnalysisResultPresenter {
     @MainActor
-    func fetchData(examinationId: String) async {
-        defer { isLoading = false }
-        isLoading = true
+    func fetchData(examinationId: String, silent: Bool = false) async {
+        if !silent {
+            defer { isLoading = false }
+            isLoading = true
+        }
 
         do {
             examinationResult = try await interactor.fetchData(examId: examinationId)
 
-            groupedFOVs = try await interactor.fetchFOVData(examId: examinationId)
-            checkIsAllFOVsVerified()
+            if examinationResult?.statusExamination != .INPROGRESS {
+                groupedFOVs = try await interactor.fetchFOVData(examId: examinationId)
+                checkIsAllFOVsVerified()
+            }
         } catch {
-            errorMessage = ErrorHandler.shared.handleError(error, context: .examination)
+            if !silent {
+                errorMessage = ErrorHandler.shared.handleError(error, context: .examination)
+            }
+        }
+    }
+
+    @MainActor
+    func refreshExaminationStatus(examinationId: String) async {
+        await fetchData(examinationId: examinationId, silent: true)
+        if examinationResult?.statusExamination == .FINISHED {
+            Router.shared.navigateBack()
+        }
+    }
+
+    @MainActor
+    func startExaminationStatusPolling(examinationId: String) {
+        stopExaminationStatusPolling()
+        trackedExaminationId = examinationId
+        startRealtimeTracking(examinationId: examinationId)
+
+        trackingTask = Task {
+            await loadCachedProgress(examinationId: examinationId)
+
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: 15_000_000_000)
+                guard !Task.isCancelled else { break }
+                await refreshExaminationStatus(examinationId: examinationId)
+                if let cached = await progressInteractor.fetchProgress(examinationId: examinationId) {
+                    applyProgressUpdate(cached)
+                }
+                guard examinationResult?.statusExamination == .INPROGRESS else { break }
+            }
+        }
+    }
+
+    @MainActor
+    func stopExaminationStatusPolling() {
+        trackingTask?.cancel()
+        trackingTask = nil
+        stopRealtimeTracking()
+        trackedExaminationId = nil
+    }
+
+    @MainActor
+    func startRealtimeTracking(examinationId: String) {
+        Task {
+            await ExaminationNotificationService.shared.requestAuthorizationIfNeeded()
+        }
+
+        AnalysisRealtimeService.shared.subscribe(to: examinationId)
+
+        progressObserver = NotificationCenter.default.addObserver(
+            forName: .examinationAnalysisProgress,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let self,
+                  let update = notification.userInfo?["update"] as? AnalysisProgressUpdate,
+                  update.examId.lowercased() == examinationId.lowercased() else {
+                return
+            }
+
+            Task { @MainActor in
+                self.applyProgressUpdate(update)
+                if update.isReadyForValidation {
+                    await self.refreshExaminationStatus(examinationId: examinationId)
+                }
+            }
+        }
+    }
+
+    @MainActor
+    func stopRealtimeTracking() {
+        if let progressObserver {
+            NotificationCenter.default.removeObserver(progressObserver)
+            self.progressObserver = nil
+        }
+        // Socket stays connected while AnalysisTrackingStore still tracks the exam
+        // (e.g. user left progress screen but analysis runs in background).
+    }
+
+    @MainActor
+    private func loadCachedProgress(examinationId: String) async {
+        guard let cached = await progressInteractor.fetchProgress(examinationId: examinationId) else {
+            return
+        }
+        applyProgressUpdate(cached)
+    }
+
+    @MainActor
+    private func applyProgressUpdate(_ update: AnalysisProgressUpdate) {
+        analysisProgress = update.progress
+        if let message = update.message, !message.isEmpty {
+            analysisStatusMessage = message
         }
     }
 
     @MainActor
     func getStatusExamination(examinationId: String) async {
-        await fetchData(examinationId: examinationId)
-        if examinationResult?.statusExamination == .FINISHED {
-            Router.shared.navigateBack()
-        }
+        await refreshExaminationStatus(examinationId: examinationId)
     }
 }
 
@@ -251,8 +350,9 @@ extension AnalysisResultPresenter {
     func resetState() {
         fetchTask?.cancel()
         fetchTask = nil
-        trackingTask?.cancel()
-        trackingTask = nil
+        stopExaminationStatusPolling()
+        analysisProgress = 0
+        analysisStatusMessage = AppTextExamProgress.analyzingTitle
         examinationResult = nil
         errorMessage = nil
         confidenceLevel = .unpredicted

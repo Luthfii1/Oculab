@@ -57,6 +57,7 @@ struct AnalysisResultView: View {
                     }
                 }
                 .onDisappear {
+                    presenter.stopExaminationStatusPolling()
                     presenter.resetState()
                 }
 

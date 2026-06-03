@@ -116,6 +116,10 @@ class ErrorHandler: ErrorHandlerProtocol {
                 AppError.generic : apiResponse.data.description
             
         case let NetworkError.networkError(message, _):
+            if message.contains("No data received from server")
+                || message.localizedCaseInsensitiveContains("timed out") {
+                return "error.request_timeout".localized
+            }
             // Handle retry-specific messages
             if message.contains("retry attempts failed") {
                 return "error.network_retry_failed".localized

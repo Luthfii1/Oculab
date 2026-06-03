@@ -411,7 +411,11 @@
 
 // Progress View
 "examination.progress.analyzing_title" = "Interpreting data";
-"examination.progress.refresh_instruction" = "Pull down to reload";
+"examination.progress.refresh_instruction" = "Pull down to check status";
+"examination.progress.background_instruction" = "Analysis runs in the background. You can return to tasks and check this screen later from the home list.";
+"examination.progress.button_back_to_tasks" = "Back to tasks";
+"examination.progress.notification_ready_title" = "Analysis ready";
+"examination.progress.notification_ready_body" = "Your examination is ready for validation. Tap to review the results.";
 "examination.progress.button_save_result" = "Save Examination Results";
 "examination.progress.button_verify_fovs" = "Verify All Fields of View";
 
@@ -428,6 +432,11 @@
 "examination.detail.review_summary_hint" = "Review patient and specimen details, then record the slide video to continue.";
 "examination.detail.start_analysis_hint" = "Record the specimen video above to enable Start Analysis.";
 "examination.detail.loading" = "examination details";
+"examination.detail.uploading_video" = "video for analysis";
+"examination.detail.analysis_queued_title" = "Analysis started";
+"examination.detail.analysis_queued_message" = "Your video was sent for analysis. You can continue other tasks on the home screen. Open this examination again when the status shows ready for validation.";
+"examination.detail.analysis_queued_go_home" = "Continue to tasks";
+"examination.detail.analysis_queued_view_progress" = "View progress";
 
 // Guidelines Onboarding
 "examination.guidelines.navigation_title" = "Examination Preparation";
@@ -667,12 +676,27 @@
 // Video Preview Component
 "video_record.video_preview_component.save_video_button" = "Save Video";
 "video_record.video_preview_component.retake_video_button" = "Retake";
+"video_record.video_preview_component.saving" = "video";
+"video_record.video_preview_component.no_video_available" = "No video available";
+"video_record.video_preview_component.duration_format" = "Duration %@";
+"video_record.video_preview_component.file_size_format" = "Size %@";
 
 // Video Input Component
 "video_record.video_input_component.video_error_alert_message" = "Video cannot be played. Please re-record the sample.";
+"video_record.video_input_component.video_error_alert_title" = "Video error";
+"video_record.video_input_component.record_video_button" = "Record video";
 "video_record.video_input_component.create_video_button" = "Image";
 "video_record.video_input_component.view_video_button" = "Video";
 "video_record.video_input_component.video_playback_error_title" = "Playing Video";
+"video_record.video_input_component.empty_title" = "No specimen video yet";
+"video_record.video_input_component.empty_subtitle" = "Record a short video of the slide through the microscope before starting analysis.";
+"video_record.video_input_component.loading" = "video";
+"video_record.video_input_component.play_button" = "Play";
+"video_record.video_input_component.retake_button" = "Retake";
+"video_record.video_input_component.tap_thumbnail_hint" = "Tap the preview or Play to review full screen";
+"video_record.video_input_component.duration_label" = "Duration %@";
+"video_record.video_input_component.file_size_label" = "Size %@";
+"video_record.video_input_component.retake_warning" = "Recording again will replace the current video.";
 
 // MARK: - Status Type Enum
 // StatusType Enum

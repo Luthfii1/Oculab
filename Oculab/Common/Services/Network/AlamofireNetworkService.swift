@@ -11,6 +11,14 @@ import Alamofire
 class AlamofireNetworkService: NetworkServiceProtocol {
     private static let decoder = JSONDecoder()
 
+    /// Video uploads chain through the API into ML processing; default ~60s timeouts are too short.
+    private static let uploadSession: Session = {
+        let configuration = URLSessionConfiguration.default
+        configuration.timeoutIntervalForRequest = 300
+        configuration.timeoutIntervalForResource = 600
+        return Session(configuration: configuration)
+    }()
+
     func get<T: Decodable>(urlString: String, headers: [String: String]?) async throws -> APIResponse<T> {
         try await executeWithAuthRetry(endpoint: urlString, headers: headers) { headers in
             let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
@@ -69,7 +77,7 @@ class AlamofireNetworkService: NetworkServiceProtocol {
     ) async throws -> APIResponse<T> {
         try await executeWithAuthRetry(endpoint: urlString, headers: headers) { headers in
             let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
-            let request = AF.upload(multipartFormData: { multipartFormData in
+            let request = Self.uploadSession.upload(multipartFormData: { multipartFormData in
                 for (key, value) in parameters {
                     multipartFormData.append(value, withName: key, fileName: "\(key).mov", mimeType: "video/quicktime")
                 }
@@ -111,6 +119,9 @@ class AlamofireNetworkService: NetworkServiceProtocol {
         let dataResponse = await request.serializingData().response
 
         guard let data = dataResponse.data else {
+            if let error = dataResponse.error, isRequestTimedOut(error) {
+                throw URLError(.timedOut)
+            }
             throw NetworkError.networkError("No data received from server", endpoint: endpoint)
         }
 
@@ -169,6 +180,19 @@ class AlamofireNetworkService: NetworkServiceProtocol {
         if isNonJSONResponse(data) {
             throw NetworkError.networkError("Server error", endpoint: endpoint)
         }
+    }
+
+    private func isRequestTimedOut(_ error: Error) -> Bool {
+        let nsError = error as NSError
+        if nsError.domain == NSURLErrorDomain, nsError.code == NSURLErrorTimedOut {
+            return true
+        }
+        if let underlying = nsError.userInfo[NSUnderlyingErrorKey] as? NSError,
+           underlying.domain == NSURLErrorDomain,
+           underlying.code == NSURLErrorTimedOut {
+            return true
+        }
+        return false
     }
 
     private func isNonJSONResponse(_ data: Data) -> Bool {
