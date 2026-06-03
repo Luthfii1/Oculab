@@ -3,7 +3,11 @@
 #
 build/
 DerivedData/
-*.xcodeproj
+*.xcodeproj/*
+!Oculab.xcodeproj/project.xcworkspace/
+!Oculab.xcodeproj/project.xcworkspace/xcshareddata/
+!Oculab.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+!Oculab.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
 *.xcworkspace
 *.xcuserdata
 *.xccheckout
@@ -14,8 +18,9 @@ DerivedData/
 #
 Packages/
 Package.pins
-Package.resolved
 .swiftpm/
+# Root-level Package.resolved only (Xcode project lockfile is tracked — see Xcode section above).
+/Package.resolved
 
 # CocoaPods
 #
