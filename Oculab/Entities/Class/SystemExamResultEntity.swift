@@ -8,25 +8,26 @@
 import Foundation
 
 class SystemExamResult: Codable, Identifiable {
-    var _id: UUID
+    var id: String
     var systemGrading: GradingType
     var confidenceLevelAggregated: Double
     var systemBacteriaTotalCount: Int
 
     init(
-        _id: UUID = UUID(),
+        id: String = AppValue.empty,
         systemGrading: GradingType,
         confidenceLevelAggregated: Double,
         systemBacteriaTotalCount: Int
     ) {
-        self._id = _id
+        self.id = id
         self.systemGrading = systemGrading
         self.confidenceLevelAggregated = confidenceLevelAggregated
         self.systemBacteriaTotalCount = systemBacteriaTotalCount
     }
 
-    enum CodingKeys: CodingKey {
-        case _id
+    enum CodingKeys: String, CodingKey {
+        case id
+        case legacyId = "_id"
         case systemGrading
         case confidenceLevelAggregated
         case systemBacteriaTotalCount
@@ -34,7 +35,13 @@ class SystemExamResult: Codable, Identifiable {
 
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self._id = try container.decode(UUID.self, forKey: ._id)
+        if let decodedId = try container.decodeIfPresent(String.self, forKey: .id) {
+            self.id = decodedId
+        } else if let legacyId = try container.decodeIfPresent(String.self, forKey: .legacyId) {
+            self.id = legacyId
+        } else {
+            self.id = AppValue.empty
+        }
         self.systemGrading = try container.decode(GradingType.self, forKey: .systemGrading)
         self.confidenceLevelAggregated = try container.decode(Double.self, forKey: .confidenceLevelAggregated)
         self.systemBacteriaTotalCount = try container.decode(Int.self, forKey: .systemBacteriaTotalCount)
@@ -42,7 +49,9 @@ class SystemExamResult: Codable, Identifiable {
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(_id, forKey: ._id)
+        if !id.isEmpty {
+            try container.encode(id, forKey: .id)
+        }
         try container.encode(systemGrading, forKey: .systemGrading)
         try container.encode(confidenceLevelAggregated, forKey: .confidenceLevelAggregated)
         try container.encode(systemBacteriaTotalCount, forKey: .systemBacteriaTotalCount)

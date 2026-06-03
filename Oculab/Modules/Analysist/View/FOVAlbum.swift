@@ -18,7 +18,7 @@ struct FOVAlbum: View {
                 Spacer().frame(height: Decimal.d24)
 
                 LazyVGrid(columns: presenter.columnsFOVAlbum, spacing: AppConstants.fovGridSpacing) {
-                    ForEach(Array(presenter.selectedFOVs(for: fovGroup).enumerated()), id: \.element._id) { index, fov in
+                    ForEach(Array(presenter.selectedFOVs(for: fovGroup).enumerated()), id: \.element.id) { index, fov in
                         Button {
                             presenter.navigateToDetailed(fovData: fov, order: index, total: presenter.selectedFOVs(for: fovGroup).count, examId: examId)
                         } label: {

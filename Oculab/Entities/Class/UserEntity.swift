@@ -10,7 +10,7 @@ import SwiftData
 
 @Model
 class User: Codable, Identifiable {
-    var _id: String
+    var id: String
     var name: String
     var role: RolesType
     var token: String?
@@ -23,7 +23,7 @@ class User: Codable, Identifiable {
     var businessModel: BusinessModelType?
 
     init(
-        _id: String = UUID().uuidString,
+        id: String = AppValue.empty,
         name: String = "No name",
         role: RolesType = .ADMIN,
         token: String? = nil,
@@ -35,7 +35,7 @@ class User: Codable, Identifiable {
         isFaceIdEnabled: Bool = false,
         businessModel: BusinessModelType? = nil
     ) {
-        self._id = _id
+        self.id = id
         self.name = name
         self.role = role
         self.token = token
@@ -64,10 +64,12 @@ class User: Codable, Identifiable {
 
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        if let id = try container.decodeIfPresent(String.self, forKey: .id) {
-            self._id = id
+        if let decodedId = try container.decodeIfPresent(String.self, forKey: .id) {
+            self.id = decodedId
+        } else if let legacyId = try container.decodeIfPresent(String.self, forKey: .legacyId) {
+            self.id = legacyId
         } else {
-            self._id = try container.decode(String.self, forKey: .legacyId)
+            self.id = AppValue.empty
         }
         self.name = try container.decode(String.self, forKey: .name)
         self.role = try container.decode(RolesType.self, forKey: .role)
@@ -82,7 +84,9 @@ class User: Codable, Identifiable {
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(_id, forKey: .id)
+        if !id.isEmpty {
+            try container.encode(id, forKey: .id)
+        }
         try container.encode(name, forKey: .name)
         try container.encode(role, forKey: .role)
         try container.encodeIfPresent(token, forKey: .token)

@@ -9,14 +9,14 @@ import Foundation
 
 class FOVData: Hashable, Equatable, Codable, Identifiable {
     static func == (lhs: FOVData, rhs: FOVData) -> Bool {
-        lhs._id == rhs._id
+        lhs.id == rhs.id
     }
 
     func hash(into hasher: inout Hasher) {
-        hasher.combine(_id)
+        hasher.combine(id)
     }
 
-    var _id: UUID
+    var id: String
     var imageMLAnalyzed: String
     var imageOriginal: String
     var type: FOVType
@@ -27,7 +27,7 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
     var verified: Bool
 
     init(
-        _id: UUID = UUID(),
+        id: String = AppValue.empty,
         imageMLAnalyzed: String,
         imageOriginal: String,
         type: FOVType,
@@ -37,7 +37,7 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
         confidenceLevel: Double,
         verified: Bool = false
     ) {
-        self._id = _id
+        self.id = id
         self.imageMLAnalyzed = imageMLAnalyzed
         self.imageOriginal = imageOriginal
         self.type = type
@@ -48,8 +48,9 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
         self.verified = verified
     }
 
-    enum CodingKeys: CodingKey {
-        case _id
+    enum CodingKeys: String, CodingKey {
+        case id
+        case legacyId = "_id"
         case imageMLAnalyzed
         case imageOriginal
         case type
@@ -62,7 +63,13 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
 
     required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self._id = try container.decode(UUID.self, forKey: ._id)
+        if let decodedId = try container.decodeIfPresent(String.self, forKey: .id) {
+            self.id = decodedId
+        } else if let legacyId = try container.decodeIfPresent(String.self, forKey: .legacyId) {
+            self.id = legacyId
+        } else {
+            self.id = AppValue.empty
+        }
         self.imageOriginal = try container.decode(String.self, forKey: .imageOriginal)
         self.imageMLAnalyzed = try container.decode(String.self, forKey: .imageMLAnalyzed)
         self.type = try container.decode(FOVType.self, forKey: .type)
@@ -75,7 +82,9 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(_id.uuidString, forKey: ._id) // Store UUID as String for encoding
+        if !id.isEmpty {
+            try container.encode(id, forKey: .id)
+        }
         try container.encode(imageOriginal, forKey: .imageOriginal)
         try container.encode(imageMLAnalyzed, forKey: .imageMLAnalyzed)
         try container.encode(type, forKey: .type)

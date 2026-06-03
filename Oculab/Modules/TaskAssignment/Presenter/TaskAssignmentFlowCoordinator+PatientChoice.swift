@@ -45,7 +45,7 @@ extension TaskAssignmentFlowCoordinator {
         }
     }
 
-    private func syncPatientNameFromSelection() {
+    func syncPatientNameFromSelection() {
         guard let name = patientSelection?.newPatientName else { return }
         patient.name = name
     }

@@ -144,7 +144,7 @@ struct BoxModel: Identifiable, Equatable, Decodable, Encodable {
     var status: BoxStatus
 
     enum CodingKeys: String, CodingKey {
-        case id = "_id"
+        case id
         case width
         case height
         case x = "xCoordinate"

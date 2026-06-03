@@ -35,7 +35,6 @@ struct CreateAccessPinResponse: Codable {
 }
 
 struct RegisterUserBody: Codable {
-    let _id: String?
     let name: String
     let email: String
     let healthFacilityName: String
@@ -65,7 +64,7 @@ class AuthenticationInteractor: ObservableObject {
 
 
     func registerUser(name: String, email: String, healthFacilityName: String, healthFacilityType: String) async throws -> RegisterUserData {
-        let body = RegisterUserBody(_id: nil, name: name, email: email, healthFacilityName: healthFacilityName, healthFacilityType: healthFacilityType)
+        let body = RegisterUserBody(name: name, email: email, healthFacilityName: healthFacilityName, healthFacilityType: healthFacilityType)
         let response: APIResponse<RegisterUserData> = try await networkService.post(
             urlString: apiAuthenticationService + "/register",
             headers: nil,
@@ -151,7 +150,7 @@ class AuthenticationInteractor: ObservableObject {
 
     private func copyUser(from source: User) -> User {
         User(
-            _id: source._id,
+            id: source.id,
             name: source.name,
             role: source.role,
             token: source.token,
@@ -166,7 +165,7 @@ class AuthenticationInteractor: ObservableObject {
     }
 
     private func applyUser(_ source: User, to target: User) {
-        target._id = source._id
+        target.id = source.id
         target.name = source.name
         target.role = source.role
         target.token = source.token

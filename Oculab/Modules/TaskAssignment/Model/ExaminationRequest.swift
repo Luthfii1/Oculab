@@ -6,7 +6,6 @@
 import Foundation
 
 struct ExaminationRequest: Encodable {
-    var _id: String?
     var goal: ExamGoalType?
     var preparationType: ExamPreparationType?
     var slideId: String?
@@ -16,7 +15,6 @@ struct ExaminationRequest: Encodable {
     var examinationPlanDate: Date?
 
     enum CodingKeys: CodingKey {
-        case _id
         case goal
         case preparationType
         case slideId
@@ -29,7 +27,6 @@ struct ExaminationRequest: Encodable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
-        try container.encode(_id, forKey: ._id)
         try container.encode(goal, forKey: .goal)
         try container.encode(preparationType, forKey: .preparationType)
         try container.encode(slideId, forKey: .slideId)

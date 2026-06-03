@@ -17,11 +17,33 @@ struct AdminExaminationDetailData: Decodable {
 }
 
 struct AdminExaminationData: Decodable, Identifiable {
-    let _id: String
+    let id: String
     let preparationType: String
     let slideId: String
     let statusExamination: String
     let expertResult: String?
-    
-    var id: String { _id }
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case legacyId = "_id"
+        case preparationType
+        case slideId
+        case statusExamination
+        case expertResult
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        if let decodedId = try container.decodeIfPresent(String.self, forKey: .id) {
+            id = decodedId
+        } else if let legacyId = try container.decodeIfPresent(String.self, forKey: .legacyId) {
+            id = legacyId
+        } else {
+            id = AppValue.empty
+        }
+        preparationType = try container.decode(String.self, forKey: .preparationType)
+        slideId = try container.decode(String.self, forKey: .slideId)
+        statusExamination = try container.decode(String.self, forKey: .statusExamination)
+        expertResult = try container.decodeIfPresent(String.self, forKey: .expertResult)
+    }
 }

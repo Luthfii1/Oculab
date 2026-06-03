@@ -31,7 +31,7 @@ class ExamInteractor {
             .get(urlString: APIEndpoints.getExaminationById + examId.lowercased(), headers: nil)
 
         return ExaminationDetailData(
-            examinationId: response.data._id,
+            examinationId: response.data.id,
             pic: response.data.PIC?.name ?? AppConstants.defaultUnknownValue,
             slideId: response.data.slideId,
             examinationGoal: response.data.goal?.rawValue ?? AppConstants.defaultNoGoalValue,
@@ -54,7 +54,7 @@ class ExamInteractor {
         )
 
         return PatientDetailData(
-            patientId: response.data._id,
+            patientId: response.data.id,
             name: response.data.name,
             nik: response.data.NIK,
             dob: response.data.DoB?.formattedDayMonthYear() ?? AppValue.empty,

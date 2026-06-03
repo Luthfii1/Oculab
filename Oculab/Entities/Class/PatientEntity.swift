@@ -8,7 +8,7 @@
 import Foundation
 
 class Patient: Encodable, Decodable, Identifiable {
-    var _id: String
+    var id: String
     var name: String
     var NIK: String
     var DoB: Date?
@@ -17,7 +17,7 @@ class Patient: Encodable, Decodable, Identifiable {
     var resultExamination: [String]?
 
     init(
-        _id: String,
+        id: String = AppValue.empty,
         name: String,
         NIK: String,
         DoB: Date,
@@ -25,7 +25,7 @@ class Patient: Encodable, Decodable, Identifiable {
         BPJS: String? = nil,
         resultExamination: [String]? = nil
     ) {
-        self._id = _id
+        self.id = id
         self.name = name
         self.NIK = NIK
         self.DoB = DoB
@@ -34,9 +34,9 @@ class Patient: Encodable, Decodable, Identifiable {
         self.resultExamination = resultExamination
     }
 
-    enum CodingKeys: CodingKey {
-        case _id
+    enum CodingKeys: String, CodingKey {
         case id
+        case legacyId = "_id"
         case name
         case NIK
         case DoB
@@ -49,12 +49,14 @@ class Patient: Encodable, Decodable, Identifiable {
     required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        if let id = try container.decodeIfPresent(String.self, forKey: .id) {
-            self._id = id
+        if let decodedId = try container.decodeIfPresent(String.self, forKey: .id) {
+            self.id = decodedId
         } else if let patientId = try container.decodeIfPresent(String.self, forKey: .patientId) {
-            self._id = patientId
+            self.id = patientId
+        } else if let legacyId = try container.decodeIfPresent(String.self, forKey: .legacyId) {
+            self.id = legacyId
         } else {
-            self._id = try container.decode(String.self, forKey: ._id)
+            self.id = AppValue.empty
         }
         self.name = try container.decode(String.self, forKey: .name)
         self.NIK = try container.decode(String.self, forKey: .NIK)
@@ -82,7 +84,9 @@ class Patient: Encodable, Decodable, Identifiable {
     func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
-        try container.encode(_id, forKey: ._id)
+        if !id.isEmpty {
+            try container.encode(id, forKey: .id)
+        }
         try container.encode(name, forKey: .name)
         try container.encode(NIK, forKey: .NIK)
 

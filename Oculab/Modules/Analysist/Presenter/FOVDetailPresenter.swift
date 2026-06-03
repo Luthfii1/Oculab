@@ -32,7 +32,7 @@ class FOVDetailPresenter: ObservableObject {
     @Published var isAddBacilliActive: Bool = false
     @Published var enableAddBacilliFeature: Bool = true
     @Published var numberOfBacilli: Int = 0
-    @Published var currentFOVId: UUID?
+    @Published var currentFOVId: String?
 
     // For create new box
     @Published var isCreatingNewBox: Bool = false
@@ -140,7 +140,7 @@ class FOVDetailPresenter: ObservableObject {
 
     // network things
     @MainActor
-    func fetchData(fovId: UUID) async {
+    func fetchData(fovId: String) async {
         do {
             let result = try await interactor.fetchData(fovId: fovId)
             currentFOVId = fovId
@@ -175,7 +175,7 @@ class FOVDetailPresenter: ObservableObject {
     }
 
     @MainActor
-    func verifyingFOV(fovId: UUID) async {
+    func verifyingFOV(fovId: String) async {
         // Only attempt to verify if bounding box data is available
         guard isBoundingBoxAvailable else { 
             Logger.info("Skipping FOV verification - no bounding box data available", category: .examination)

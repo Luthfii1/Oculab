@@ -16,7 +16,7 @@ struct Account: Hashable, Codable {
     let accessPin: String?
 
     enum CodingKeys: String, CodingKey {
-        case id = "_id"
+        case id
         case name
         case role
         case email

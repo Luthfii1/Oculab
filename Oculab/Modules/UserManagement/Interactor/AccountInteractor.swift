@@ -114,7 +114,7 @@ class AccountInteractor: ObservableObject {
         
         // Update SwiftData with edited user info
         let updatedUser = User(
-            _id: response.data.id,
+            id: response.data.id,
             name: response.data.name,
             role: response.data.role,
             email: response.data.email,

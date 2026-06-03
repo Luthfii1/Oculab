@@ -8,7 +8,7 @@
 import Foundation
 
 class Examination: Decodable, Identifiable {
-    var _id: String
+    var id: String
     var goal: ExamGoalType?
     var preparationType: ExamPreparationType?
     var slideId: String
@@ -39,7 +39,7 @@ class Examination: Decodable, Identifiable {
     var finalGradingResult: String?
 
     init(
-        _id: String,
+        id: String = AppValue.empty,
         goal: ExamGoalType?,
         preparationType: ExamPreparationType?,
         slideId: String,
@@ -63,7 +63,7 @@ class Examination: Decodable, Identifiable {
         dpjpName: String? = nil,
         finalGradingResult: String? = nil
     ) {
-        self._id = _id
+        self.id = id
         self.goal = goal
         self.preparationType = preparationType
         self.slideId = slideId
@@ -93,7 +93,8 @@ class Examination: Decodable, Identifiable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case _id
+        case id
+        case legacyId = "_id"
         case goal
         case preparationType
         case slideId
@@ -122,18 +123,14 @@ class Examination: Decodable, Identifiable {
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        if let id = try? container.decode(String.self, forKey: ._id) {
-            self._id = id
-        } else if let examinationId = try? container.decode(String.self, forKey: .examinationId) {
-            self._id = examinationId
+        if let decodedId = try container.decodeIfPresent(String.self, forKey: .id) {
+            self.id = decodedId
+        } else if let legacyId = try container.decodeIfPresent(String.self, forKey: .legacyId) {
+            self.id = legacyId
+        } else if let examinationId = try container.decodeIfPresent(String.self, forKey: .examinationId) {
+            self.id = examinationId
         } else {
-            throw DecodingError.keyNotFound(
-                CodingKeys._id,
-                DecodingError.Context(
-                    codingPath: decoder.codingPath,
-                    debugDescription: "Neither _id nor examinationId found"
-                )
-            )
+            self.id = AppValue.empty
         }
 
         self.goal = try container.decodeIfPresent(ExamGoalType.self, forKey: .goal)
@@ -197,7 +194,9 @@ class Examination: Decodable, Identifiable {
     func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
-        try container.encode(_id, forKey: ._id)
+        if !id.isEmpty {
+            try container.encode(id, forKey: .id)
+        }
         try container.encode(goal, forKey: .goal)
         try container.encode(preparationType, forKey: .preparationType)
         try container.encode(slideId, forKey: .slideId)

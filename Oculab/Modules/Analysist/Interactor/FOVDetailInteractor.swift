@@ -17,9 +17,9 @@ class FOVDetailInteractor {
         self.networkService = networkService
     }
 
-    func verifyingFOV(fovId: UUID) async throws -> FOVData {
+    func verifyingFOV(fovId: String) async throws -> FOVData {
         let response: APIResponse<FOVData> = try await networkService.update(
-            urlString: endpoint + "/fov/update-verified-field/" + fovId.uuidString.lowercased(),
+            urlString: endpoint + "/fov/update-verified-field/" + fovId.lowercased(),
             headers: nil,
             body: EmptyBody()
         )
@@ -40,9 +40,9 @@ class FOVDetailInteractor {
         return response
     }
 
-    func fetchData(fovId: UUID) async throws -> FOVDetailData {
+    func fetchData(fovId: String) async throws -> FOVDetailData {
         let fovURL = API.BE + "/boundingBox/get-bounding-box-data/"
-        let url = fovURL + fovId.uuidString.lowercased()
+        let url = fovURL + fovId.lowercased()
 
         let response: APIResponse<FOVDetailData> = try await networkService
             .get(urlString: url, headers: nil)
@@ -50,9 +50,9 @@ class FOVDetailInteractor {
         return response.data
     }
     
-    func addBox(fovId: UUID, newBox: AddBoxRequest) async throws -> APIResponse<BoxModel> {
+    func addBox(fovId: String, newBox: AddBoxRequest) async throws -> APIResponse<BoxModel> {
         let fovURL = API.BE + "/boundingBox/add-bounding-box/"
-        let url = fovURL + fovId.uuidString.lowercased()
+        let url = fovURL + fovId.lowercased()
         let body = newBox
 
         let response: APIResponse<BoxModel> = try await networkService.update(

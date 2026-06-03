@@ -46,7 +46,7 @@ class AnalysisResultInteractor {
             .get(urlString: API.BE + "/examination/get-examination-by-id/" + examId.lowercased(), headers: nil)
 
         let examinationDetail = ExaminationResultData(
-            examinationId: response.data._id,
+            examinationId: response.data.id,
             slideId: response.data.slideId,
             imagePreview: response.data.imagePreview ?? AppValue.empty,
 

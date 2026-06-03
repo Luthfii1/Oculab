@@ -114,6 +114,48 @@ class ValidationManager: ObservableObject {
 
         return true
     }
+
+    /// Non-mutating required-field check for button enablement and computed properties.
+    func meetsRequired(_ value: String) -> Bool {
+        !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    /// Non-mutating NIK check (same rules as `validateNIK`).
+    func meetsNIK(_ nik: String) -> Bool {
+        !nik.isEmpty && nik.count == 16 && nik.allSatisfy(\.isNumber)
+    }
+
+    /// Non-mutating date check (same rules as `validateDate`).
+    func meetsDate(
+        _ date: Date?,
+        allowFuture: Bool = true,
+        allowPast: Bool = true,
+        minimumAge: Int? = nil,
+        maximumAge: Int? = nil
+    ) -> Bool {
+        guard let date else { return false }
+
+        let now = Date()
+        if !allowFuture && date > now { return false }
+        if !allowPast && date < now { return false }
+
+        let calendar = Calendar.current
+        if let minimumAge {
+            let ageComponents = calendar.dateComponents([.year], from: date, to: now)
+            if let age = ageComponents.year, age < minimumAge { return false }
+        }
+        if let maximumAge {
+            let ageComponents = calendar.dateComponents([.year], from: date, to: now)
+            if let age = ageComponents.year, age > maximumAge { return false }
+        }
+        return true
+    }
+
+    /// Non-mutating rule check (optional fields: empty value passes).
+    func meetsRules(_ value: String, rules: [ValidationRule]) -> Bool {
+        guard !value.isEmpty else { return true }
+        return rules.allSatisfy { $0.check(value) }
+    }
     
     /// Validates a PIN code
     func validatePIN(_ pin: String, fieldName: String = "pin", expectedLength: Int = 4) -> Bool {

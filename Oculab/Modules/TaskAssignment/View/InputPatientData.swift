@@ -66,7 +66,7 @@ struct InputPatientData: View {
                             AppButton(
                                 title: proceedButtonTitle,
                                 rightIcon: presenter.isSavingPatient ? nil : AppIcon.arrowForward,
-                                isEnabled: canProceed && !presenter.isSavingPatient
+                                isEnabled: presenter.isPatientStepReady && !presenter.isSavingPatient
                             ) {
                                 presenter.newExam()
                             }
@@ -103,7 +103,7 @@ struct InputPatientData: View {
                     }
 
                     if authentication.user.role == .LAB && authentication.user.businessModel == .B2C {
-                        let picId = authentication.user._id
+                        let picId = authentication.user.id
                         presenter.selectedPIC = picId
                         await presenter.getUserById(userId: picId)
                     }
@@ -183,12 +183,6 @@ struct InputPatientData: View {
             : AppTextTaskAssignInputPatient.fillSpecimenDetailsButton
     }
 
-    private var canProceed: Bool {
-        presenter.canProceedToSpecimen(
-            userRole: authentication.user.role,
-            businessModel: authentication.user.businessModel ?? .B2C
-        )
-    }
 }
 
 // MARK: - Empty list guidance

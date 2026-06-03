@@ -58,7 +58,7 @@ struct FOVDetail: View {
                         
                         Button(AppTextAnalysisFOVDetail.retryButtonTitle) {
                             Task {
-                                await presenter.fetchData(fovId: fovData._id)
+                                await presenter.fetchData(fovId: fovData.id)
                             }
                         }
                         .padding(.horizontal, 20)
@@ -178,9 +178,9 @@ struct FOVDetail: View {
                             if !presenter.isBoundingBoxAvailable {
                                 Button(action: {
                                     Task {
-                                        await presenter.fetchData(fovId: fovData._id)
+                                        await presenter.fetchData(fovId: fovData.id)
                                         if presenter.isBoundingBoxAvailable {
-                                            await presenter.verifyingFOV(fovId: fovData._id)
+                                            await presenter.verifyingFOV(fovId: fovData.id)
                                         }
                                     }
                                 }) {
@@ -230,8 +230,8 @@ struct FOVDetail: View {
                 albumPresenter.setStartTime()
 
                 Task {
-                    await presenter.fetchData(fovId: fovData._id)
-                    await presenter.verifyingFOV(fovId: fovData._id)
+                    await presenter.fetchData(fovId: fovData.id)
+                    await presenter.verifyingFOV(fovId: fovData.id)
                 }
             }
             .onDisappear {

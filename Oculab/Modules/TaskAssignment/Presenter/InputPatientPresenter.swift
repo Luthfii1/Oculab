@@ -151,47 +151,67 @@ final class TaskAssignmentFlowCoordinator: ObservableObject {
         }
     }
     
-    func canProceedToSpecimen(userRole: RolesType, businessModel: BusinessModelType) -> Bool {
-        // Clear all errors before validation
+    /// Read-only check for enabling the proceed button (no error mutation, safe in SwiftUI `body`).
+    var isPatientStepReady: Bool {
+        let validPIC = validationManager.meetsRequired(selectedPIC)
+        let validPatientSelection = validationManager.meetsRequired(
+            patientSelection?.valueForBinding ?? AppValue.empty
+        )
+        let validNIK = validationManager.meetsNIK(patient.NIK)
+        let validGender = validationManager.meetsRequired(selectedSex)
+        let validDoB = validationManager.meetsDate(
+            patient.DoB,
+            allowFuture: false,
+            allowPast: true
+        )
+        let validBPJS = validationManager.meetsRules(
+            BPJSnumber,
+            rules: [.numbersOnly(), .minLength(11), .maxLength(13)]
+        )
+        return validPIC && validPatientSelection && validNIK && validGender && validDoB && validBPJS
+    }
+
+    /// Run on submit only — surfaces field errors and logs once per attempt.
+    @discardableResult
+    func validatePatientStepBeforeProceed() -> Bool {
         validationManager.clearAllErrors()
-        
-        // Validate required dropdowns
-        let validPIC = validationManager.validateRequired(selectedPIC, fieldName: ValidationFieldName.userRole.fieldName)
+
+        let validPIC = validationManager.validateRequired(
+            selectedPIC,
+            fieldName: ValidationFieldName.userRole.fieldName
+        )
         let validPatientSelection = validationManager.validateRequired(
             patientSelection?.valueForBinding ?? AppValue.empty,
             fieldName: ValidationFieldName.patientName.fieldName
         )
-        
-        // Validate patient data using ValidationManager
-        let validNIK = validationManager.validateNIK(patient.NIK, fieldName: ValidationFieldName.patientNIK.fieldName)
-        let validGender = validationManager.validateRequired(selectedSex, fieldName: ValidationFieldName.patientGender.fieldName)
-        
-        // Validate Date of Birth
+        let validNIK = validationManager.validateNIK(
+            patient.NIK,
+            fieldName: ValidationFieldName.patientNIK.fieldName
+        )
+        let validGender = validationManager.validateRequired(
+            selectedSex,
+            fieldName: ValidationFieldName.patientGender.fieldName
+        )
         let validDoB = validationManager.validateDate(
-            patient.DoB, 
+            patient.DoB,
             fieldName: ValidationFieldName.patientDateOfBirth.fieldName,
             allowFuture: false,
             allowPast: true
         )
-        
-        // Validate BPJS (optional but if provided should be valid)
         var validBPJS = true
         if !BPJSnumber.isEmpty {
             validBPJS = validationManager.validateWithRules(
-                BPJSnumber, 
-                fieldName: ValidationFieldName.patientBPJS.fieldName, 
-                rules: [
-                    .numbersOnly(),
-                    .minLength(11),
-                    .maxLength(13)
-                ]
+                BPJSnumber,
+                fieldName: ValidationFieldName.patientBPJS.fieldName,
+                rules: [.numbersOnly(), .minLength(11), .maxLength(13)]
             )
         }
-        
+
         let allValid = validPIC && validPatientSelection && validNIK && validGender && validDoB && validBPJS
-        
-        Logger.debug("Form validation - PIC: \(validPIC), Patient: \(validPatientSelection), NIK: \(validNIK), Gender: \(validGender), DoB: \(validDoB), BPJS: \(validBPJS), Overall: \(allValid)", category: .taskAssignment)
-        
+        Logger.debug(
+            "Form validation - PIC: \(validPIC), Patient: \(validPatientSelection), NIK: \(validNIK), Gender: \(validGender), DoB: \(validDoB), BPJS: \(validBPJS), Overall: \(allValid)",
+            category: .taskAssignment
+        )
         return allValid
     }
     
@@ -225,7 +245,7 @@ extension TaskAssignmentFlowCoordinator {
         
         do {
             let users = try await repository.fetchPICs()
-            picName = users.map { ($0.name, $0._id) }
+            picName = users.map { ($0.name, $0.id) }
         } catch {
             errorMessage = ErrorHandler.shared.handleError(error, context: .generic)
             isError = true
@@ -244,7 +264,7 @@ extension TaskAssignmentFlowCoordinator {
             
             patientNameDoB = patients.map { patient in
                 let formattedDoB = patient.DoB.map { dateFormatter.string(from: $0) } ?? AppValue.empty
-                return (patient.name + AppValue.space + formattedDoB, patient._id)
+                return (patient.name + AppValue.space + formattedDoB, patient.id)
             }
         } catch {
             if repository.isEmptyPatientListError(error) {
@@ -286,9 +306,9 @@ extension TaskAssignmentFlowCoordinator {
             patient = loaded
             patientFound = true
             isAddingNewPatient = false
-            patientSelection = .existing(patientId: loaded._id)
-            savedPatientId = loaded._id
-            examinationPatientId = loaded._id
+            patientSelection = .existing(patientId: loaded.id)
+            savedPatientId = loaded.id
+            examinationPatientId = loaded.id
         } catch {
             if preserveIdentityOnFailure {
                 Logger.warning(
@@ -342,8 +362,8 @@ extension TaskAssignmentFlowCoordinator {
     
     private func applyPersistedPatient(_ persisted: Patient) {
         patient = persisted
-        savedPatientId = persisted._id
-        examinationPatientId = persisted._id
+        savedPatientId = persisted.id
+        examinationPatientId = persisted.id
         patientFound = true
         isAddingNewPatient = false
     }
@@ -375,18 +395,20 @@ extension TaskAssignmentFlowCoordinator {
     @MainActor
     func proceedToSpecimenStep() async {
         guard !isSavingPatient else { return }
+        guard validatePatientStepBeforeProceed() else { return }
+
         isSavingPatient = true
         defer { isSavingPatient = false }
 
         do {
             syncPatientNameFromSelection()
 
-            let picId = pic._id.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            let picId = pic.id.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                 ? selectedPIC.trimmingCharacters(in: .whitespacesAndNewlines)
-                : pic._id.trimmingCharacters(in: .whitespacesAndNewlines)
+                : pic.id.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !picId.isEmpty else { throw TaskAssignmentFlowError.missingPic }
 
-            let preferredId = savedPatientId.isEmpty ? patient._id : savedPatientId
+            let preferredId = savedPatientId.isEmpty ? patient.id : savedPatientId
             let persisted = try await repository.ensurePatientOnServer(
                 draft: patient,
                 preferredId: preferredId
@@ -394,7 +416,7 @@ extension TaskAssignmentFlowCoordinator {
             applyPersistedPatient(persisted)
 
             examinationPICId = picId
-            Router.shared.navigateTo(.newExam(patientId: persisted._id, picId: picId))
+            Router.shared.navigateTo(.newExam(patientId: persisted.id, picId: picId))
         } catch let flowError as TaskAssignmentFlowError {
             errorMessage = flowError.localizedDescription
             isError = true
@@ -516,9 +538,8 @@ extension TaskAssignmentFlowCoordinator {
     }
     
     private func createExaminationRequest(from exam: Examination, DPJPId: String, useFirstExamGoal: Bool = false) -> ExaminationRequest {
-        let picId = pic._id.isEmpty ? examinationPICId : pic._id
+        let picId = pic.id.isEmpty ? examinationPICId : pic.id
         return ExaminationRequest(
-            _id: exam._id,
             goal: useFirstExamGoal ? examination.goal : exam.goal,
             preparationType: exam.preparationType,
             slideId: exam.slideId,
@@ -542,7 +563,7 @@ extension TaskAssignmentFlowCoordinator {
             preferredId: trimmed
         )
         applyPersistedPatient(persisted)
-        return persisted._id.lowercased()
+        return persisted.id.lowercased()
     }
     
     private func validateExaminationResponse(_ response: ExaminationDataResponse, expectedCount: Int) throws {
@@ -552,7 +573,7 @@ extension TaskAssignmentFlowCoordinator {
             throw ExaminationError.incompleteCreation
         }
         
-        guard createdExaminations.allSatisfy({ !$0._id.isEmpty && !$0.slideId.isEmpty }) else {
+        guard createdExaminations.allSatisfy({ !$0.id.isEmpty && !$0.slideId.isEmpty }) else {
             throw ExaminationError.invalidData
         }
     }
@@ -699,7 +720,6 @@ extension TaskAssignmentFlowCoordinator {
 extension Patient {
     static var empty: Patient {
         return Patient(
-            _id: UUID().uuidString.lowercased(),
             name: AppValue.empty,
             NIK: AppValue.empty,
             DoB: Date(),
@@ -710,14 +730,13 @@ extension Patient {
 
 extension User {
     static var empty: User {
-        return User(_id: AppValue.empty, name: AppValue.empty, role: .ADMIN)
+        return User(id: AppValue.empty, name: AppValue.empty, role: .ADMIN)
     }
 }
 
 extension Examination {
     static var empty: Examination {
         return Examination(
-            _id: UUID().uuidString.lowercased(),
             goal: nil,
             preparationType: nil,
             slideId: AppValue.empty,

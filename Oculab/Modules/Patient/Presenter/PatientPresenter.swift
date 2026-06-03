@@ -31,7 +31,6 @@ class PatientPresenter {
 
     // MARK: - Patient Data
     var patient: Patient = .init(
-        _id: UUID().uuidString.lowercased(),
         name: AppConstants.PatientUI.defaultEmptyValue,
         NIK: AppConstants.PatientUI.defaultEmptyValue,
         DoB: Date(),
@@ -228,7 +227,7 @@ extension PatientPresenter {
             patientNameDoB.removeAll()
             for patient in response {
                 let formattedDoB = formatDate(patient.DoB)
-                patientNameDoB.append((patient.name + String(formattedDoB), patient._id))
+                patientNameDoB.append((patient.name + String(formattedDoB), patient.id))
             }
             filterPatients()
             Logger.info("Successfully fetched \(response.count) patients", category: .patient)
@@ -313,7 +312,7 @@ extension PatientPresenter {
         }
 
         do {
-            let updatedPatient = try await interactor.updatePatient(patient: patient, patientId: String(describing: patient._id))
+            let updatedPatient = try await interactor.updatePatient(patient: patient, patientId: String(describing: patient.id))
 
             self.patient = updatedPatient
             Logger.info("Successfully updated patient", category: .patient)

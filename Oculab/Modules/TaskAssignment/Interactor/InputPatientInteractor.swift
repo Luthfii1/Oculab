@@ -103,7 +103,7 @@ class InputPatientInteractor {
         let createdExams = response.data.examinations
         Logger.info("Successfully created \(createdExams.count) examination(s)", category: .taskAssignment)
         for exam in createdExams {
-            Logger.debug("Created exam - ID: \(exam._id), Slide: \(exam.slideId), Type: \(exam.preparationType)", category: .taskAssignment)
+            Logger.debug("Created exam - ID: \(exam.id), Slide: \(exam.slideId), Type: \(exam.preparationType)", category: .taskAssignment)
         }
         
         return response.data
@@ -116,7 +116,7 @@ struct ErrorMessage: Decodable {
 }
 
 struct AddExaminationResponse: Decodable {
-    var _id: String
+    var id: String
     var goal: ExamGoalType
     var preparationType: ExamPreparationType
     var slideId: String
@@ -125,6 +125,38 @@ struct AddExaminationResponse: Decodable {
     var PIC: String
     var examinationPlanDate: String
     var DPJP: String
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case legacyId = "_id"
+        case goal
+        case preparationType
+        case slideId
+        case examinationDate
+        case statusExamination
+        case PIC
+        case examinationPlanDate
+        case DPJP
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        if let decodedId = try container.decodeIfPresent(String.self, forKey: .id) {
+            id = decodedId
+        } else if let legacyId = try container.decodeIfPresent(String.self, forKey: .legacyId) {
+            id = legacyId
+        } else {
+            id = AppValue.empty
+        }
+        goal = try container.decode(ExamGoalType.self, forKey: .goal)
+        preparationType = try container.decode(ExamPreparationType.self, forKey: .preparationType)
+        slideId = try container.decode(String.self, forKey: .slideId)
+        examinationDate = try container.decode(String.self, forKey: .examinationDate)
+        statusExamination = try container.decode(StatusType.self, forKey: .statusExamination)
+        PIC = try container.decode(String.self, forKey: .PIC)
+        examinationPlanDate = try container.decode(String.self, forKey: .examinationPlanDate)
+        DPJP = try container.decode(String.self, forKey: .DPJP)
+    }
 }
 
 enum ExaminationDataResponse: Decodable {
