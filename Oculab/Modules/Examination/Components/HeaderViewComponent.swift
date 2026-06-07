@@ -9,11 +9,16 @@ import SwiftUI
 
 struct HeaderViewComponent: View {
     @Binding var isLeavePopUpVisible: Bool
+    var onClose: (() -> Void)? = nil
 
     var body: some View {
         HStack {
             Button(action: {
-                isLeavePopUpVisible = true
+                if let onClose {
+                    onClose()
+                } else {
+                    isLeavePopUpVisible = true
+                }
             }) {
                 ZStack {
                     Circle()

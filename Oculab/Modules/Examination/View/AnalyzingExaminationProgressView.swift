@@ -177,9 +177,9 @@ struct AnalyzingExaminationProgressView: View {
                     colorType: presenter.hasAnalysisFailed ? .secondary : .primary,
                     size: .large,
                     isEnabled: true
-                ) {
-                    Router.shared.popToRoot()
-                }
+            ) {
+                presenter.exitFromFlow(examinationId: examinationId)
+            }
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 12)

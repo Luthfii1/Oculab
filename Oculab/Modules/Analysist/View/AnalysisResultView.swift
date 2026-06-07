@@ -15,7 +15,12 @@ struct AnalysisResultView: View {
     var body: some View {
         ZStack {
             VStack {
-                HeaderViewComponent(isLeavePopUpVisible: $presenter.isLeavePopUpVisible)
+                HeaderViewComponent(
+                    isLeavePopUpVisible: $presenter.isLeavePopUpVisible,
+                    onClose: {
+                        presenter.handleHeaderClose(examinationId: examinationId)
+                    }
+                )
 
                 AppStepper(
                     stepTitles: AppTextAnalysisResult.stepTitles,
@@ -74,11 +79,6 @@ struct AnalysisResultView: View {
                 Task {
                     await presenter.refreshFOVData(examinationId: examinationId)
                 }
-            }
-            .onDisappear {
-                AnalysisResultSessionStore.shared.unregister(examinationId: examinationId)
-                presenter.stopExaminationStatusPolling()
-                presenter.resetState()
             }
 
             Spacer()

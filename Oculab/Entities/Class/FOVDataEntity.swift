@@ -75,9 +75,10 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
         let resolvedOriginal = try container.decodeIfPresent(String.self, forKey: .imageOriginal)
             ?? container.decodeIfPresent(String.self, forKey: .image)
             ?? AppValue.empty
-        self.imageOriginal = resolvedOriginal
-        self.imageMLAnalyzed = try container.decodeIfPresent(String.self, forKey: .imageMLAnalyzed)
+        self.imageOriginal = MediaURLResolver.resolve(resolvedOriginal)
+        let resolvedML = try container.decodeIfPresent(String.self, forKey: .imageMLAnalyzed)
             ?? resolvedOriginal
+        self.imageMLAnalyzed = MediaURLResolver.resolve(resolvedML)
         self.type = try container.decode(FOVType.self, forKey: .type)
         self.order = try container.decode(Int.self, forKey: .order)
         self.comment = try container.decodeIfPresent([String].self, forKey: .comment)

@@ -43,7 +43,6 @@ class AnalysisResultPresenter: ObservableObject {
     @Published private var currentStep: Int = 3
     @Published var isVerifPopUpVisible = false
     @Published var isLeavePopUpVisible = false
-    @Published var isWSIImageVisible: Bool = false
     @Published var buttonTitle: String = AppTextExamProgress.buttonSaveResult
     @Published var isAllFOVsVerified: Bool = false
     @Published var startTime: Date?
@@ -100,6 +99,12 @@ class AnalysisResultPresenter: ObservableObject {
             || !groupedFOVs.btaabove9.isEmpty
     }
 
+    var previewFOVs: [FOVData] {
+        guard let groupedFOVs else { return [] }
+        let all = groupedFOVs.bta0 + groupedFOVs.bta1to9 + groupedFOVs.btaabove9
+        return Array(all.sorted { $0.order < $1.order }.prefix(4))
+    }
+
     var hasAnalysisFailed: Bool {
         analysisFailureMessage != nil
     }
@@ -123,14 +128,7 @@ class AnalysisResultPresenter: ObservableObject {
         case .INPROGRESS:
             return true
         case .NEEDVALIDATION:
-            if !hasFOVData {
-                return true
-            }
-            if let startedAt = analysisTrackingStartedAt,
-               Date().timeIntervalSince(startedAt) < minimumProgressDisplay {
-                return true
-            }
-            return false
+            return !hasFOVData
         case .NOTSTARTED:
             return AnalysisTrackingStore.isTracked(examination.examinationId)
         default:
@@ -175,6 +173,26 @@ class AnalysisResultPresenter: ObservableObject {
 extension AnalysisResultPresenter {
     func popToRoot() {
         Router.shared.popToRoot()
+    }
+
+    @MainActor
+    func handleHeaderClose(examinationId: String) {
+        if shouldShowResultsUI && !shouldShowAnalyzingUI {
+            exitFromFlow(examinationId: examinationId)
+        } else if hasAnalysisFailed {
+            exitFromFlow(examinationId: examinationId)
+        } else {
+            isLeavePopUpVisible = true
+        }
+    }
+
+    @MainActor
+    func exitFromFlow(examinationId: String) {
+        AnalysisResultSessionStore.shared.unregister(examinationId: examinationId)
+        AnalysisTrackingStore.untrack(examinationId: examinationId)
+        stopExaminationStatusPolling()
+        resetState()
+        popToRoot()
     }
 
     func navigateToAlbum(fovGroup: FOVType) {
@@ -248,11 +266,7 @@ extension AnalysisResultPresenter {
                 await loadFOVData(examinationId: examinationId, silent: silent)
             }
 
-            if let preview = examinationResult?.imagePreview,
-               !preview.isEmpty,
-               preview != "https://is3.cloudhost.id/oculab-fov/oculab-fov" {
-                isWSIImageVisible = true
-            }
+            markAnalysisReadyIfNeeded(examinationId: examinationId)
         } catch {
             if !silent {
                 errorMessage = ErrorHandler.shared.handleError(error, context: .examination)
@@ -273,6 +287,7 @@ extension AnalysisResultPresenter {
 
             if hasFOVData {
                 analysisProgress = max(analysisProgress, 100)
+                markAnalysisReadyIfNeeded(examinationId: examinationId)
             }
         } catch {
             Logger.error("Failed to load FOV data: \(error)", category: .examination)
@@ -285,6 +300,13 @@ extension AnalysisResultPresenter {
     @MainActor
     func refreshExaminationStatus(examinationId: String) async {
         await fetchData(examinationId: examinationId, silent: true)
+    }
+
+    @MainActor
+    private func markAnalysisReadyIfNeeded(examinationId: String) {
+        guard examinationResult?.statusExamination == .NEEDVALIDATION, hasFOVData else { return }
+        analysisProgress = max(analysisProgress, 100)
+        AnalysisTrackingStore.untrack(examinationId: examinationId)
     }
 
     @MainActor
@@ -531,7 +553,6 @@ extension AnalysisResultPresenter {
         inspectorNotes = AppValue.empty
         isVerifPopUpVisible = false
         isLeavePopUpVisible = false
-        isWSIImageVisible = false
         buttonTitle = AppTextExamProgress.buttonSaveResult
         isAllFOVsVerified = false
         startTime = nil

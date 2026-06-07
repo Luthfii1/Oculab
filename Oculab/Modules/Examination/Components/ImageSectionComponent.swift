@@ -25,33 +25,23 @@ struct ImageSectionComponent: View {
                 .font(AppTypography.p3)
                 .foregroundStyle(AppColors.slate300)
 
-            if presenter.isWSIImageVisible,
-               !examination.imagePreview.isEmpty,
-               let imageURL = URL(string: examination.imagePreview) {
-                AsyncImage(url: imageURL) { phase in
-                    switch phase {
-                    case .empty:
-                        ProgressView().frame(height: 114)
-                    case let .success(image):
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .frame(height: 114)
-                            .clipped()
-                    case .failure:
-                        Image(systemName: AppIcon.warning)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 114)
-                            .foregroundColor(.red)
-                    @unknown default:
-                        EmptyView()
+            if presenter.hasFOVData {
+                if !presenter.previewFOVs.isEmpty {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 10) {
+                            ForEach(Array(presenter.previewFOVs.enumerated()), id: \.offset) { _, fov in
+                                RetryableImageView(
+                                    imageURL: fov.imageOriginal,
+                                    size: 72,
+                                    cornerRadius: AppConstants.fovCornerRadius,
+                                    borderColor: AppColors.slate100,
+                                    borderWidth: 1
+                                )
+                            }
+                        }
                     }
                 }
-                .cornerRadius(Decimal.d8)
-            }
 
-            if presenter.hasFOVData {
                 ForEach(presenter.availableFOVTypes, id: \.self) { fovType in
                     if let count = presenter.fovCount(for: fovType) {
                         Button {
@@ -84,7 +74,3 @@ struct ImageSectionComponent: View {
         .padding(.horizontal, Decimal.d20)
     }
 }
-
-// #Preview {
-//    ImageSectionComponent()
-// }

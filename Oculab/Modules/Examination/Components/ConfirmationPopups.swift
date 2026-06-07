@@ -19,7 +19,7 @@ struct ConfirmationPopups: View {
                 description: AppTextExamCompConfirmPopups.unfinishedExaminationDescription,
                 buttons: [
                     AppButton(title: AppAction.exit, colorType: .destructive(.primary)) {
-                        presenter.popToRoot()
+                        presenter.exitFromFlow(examinationId: examinationId)
                     },
                     AppButton(title: AppTextExamCompConfirmPopups.reviewAgainButton, colorType: .destructive(.secondary)) {
                         presenter.isLeavePopUpVisible = false

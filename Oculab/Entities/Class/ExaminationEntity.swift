@@ -169,7 +169,9 @@ class Examination: Decodable, Identifiable {
         }
 
         self.FOV = try container.decodeIfPresent([FOVData].self, forKey: .FOV)
-        self.imagePreview = try container.decodeIfPresent(String.self, forKey: .imagePreview)
+        if let preview = try container.decodeIfPresent(String.self, forKey: .imagePreview) {
+            self.imagePreview = MediaURLResolver.resolve(preview)
+        }
         self.statusExamination = try container.decode(StatusType.self, forKey: .statusExamination)
         self.systemResult = try container.decodeIfPresent(SystemExamResult.self, forKey: .systemResult)
         self.expertResult = try container.decodeIfPresent(ExpertExamResult.self, forKey: .expertResult)

@@ -24,6 +24,10 @@ struct RetryableImageView: View {
         case failed
     }
     
+    private var resolvedImageURL: String {
+        MediaURLResolver.resolve(imageURL)
+    }
+
     init(
         imageURL: String,
         size: CGFloat,
@@ -54,7 +58,7 @@ struct RetryableImageView: View {
                     )
                 
             case .loaded:
-                AsyncImage(url: URL(string: imageURL)) { phase in
+                AsyncImage(url: URL(string: resolvedImageURL)) { phase in
                     switch phase {
                     case .empty:
                         ProgressView()
@@ -124,7 +128,7 @@ struct RetryableImageView: View {
         
         imageLoadingState = .loading
         
-        guard let url = URL(string: imageURL) else {
+        guard let url = URL(string: resolvedImageURL) else {
             imageLoadingState = .failed
             return
         }
