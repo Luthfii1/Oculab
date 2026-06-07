@@ -23,8 +23,13 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
     var order: Int
     var comment: [String]?
     var systemCount: Int
+    var updatedCount: Int?
     var confidenceLevel: Double
     var verified: Bool
+
+    var effectiveBacteriaCount: Int {
+        updatedCount ?? systemCount
+    }
 
     init(
         id: String = AppValue.empty,
@@ -34,6 +39,7 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
         order: Int,
         comment: [String]? = nil,
         systemCount: Int,
+        updatedCount: Int? = nil,
         confidenceLevel: Double,
         verified: Bool = false
     ) {
@@ -44,6 +50,7 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
         self.order = order
         self.comment = comment
         self.systemCount = systemCount
+        self.updatedCount = updatedCount
         self.confidenceLevel = confidenceLevel
         self.verified = verified
     }
@@ -58,6 +65,7 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
         case order
         case comment
         case systemCount
+        case updatedCount
         case confidenceLevel
         case verified
     }
@@ -83,6 +91,7 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
         self.order = try container.decode(Int.self, forKey: .order)
         self.comment = try container.decodeIfPresent([String].self, forKey: .comment)
         self.systemCount = try container.decode(Int.self, forKey: .systemCount)
+        self.updatedCount = try container.decodeIfPresent(Int.self, forKey: .updatedCount)
         self.confidenceLevel = try container.decode(Double.self, forKey: .confidenceLevel)
         self.verified = try container.decodeIfPresent(Bool.self, forKey: .verified) ?? false
     }
@@ -98,6 +107,7 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
         try container.encode(order, forKey: .order)
         try container.encodeIfPresent(comment, forKey: .comment)
         try container.encode(systemCount, forKey: .systemCount)
+        try container.encodeIfPresent(updatedCount, forKey: .updatedCount)
         try container.encode(confidenceLevel, forKey: .confidenceLevel)
         try container.encodeIfPresent(verified, forKey: .verified)
     }

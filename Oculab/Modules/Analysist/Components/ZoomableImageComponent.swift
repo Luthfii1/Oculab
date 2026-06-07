@@ -111,7 +111,9 @@ struct ZoomableImageComponent: UIViewRepresentable {
                             )
                             hostingController.view.backgroundColor = .clear
                             hostingController.view.frame = imageView.frame
+                            hostingController.view.clipsToBounds = true
                             hostingController.view.tag = 3 // Add tag to identify it
+                            imageView.clipsToBounds = true
                             containerView.addSubview(hostingController.view)
                             
                             // Store the hosting controller in the coordinator to manage its lifecycle
@@ -120,7 +122,9 @@ struct ZoomableImageComponent: UIViewRepresentable {
                             // Update existing BoxesGroupComponentView if needed
                             if let existingView = containerView.viewWithTag(3) {
                                 existingView.frame = imageView.frame
+                                existingView.clipsToBounds = true
                             }
+                            imageView.clipsToBounds = true
                         }
                     }
                 }

@@ -62,6 +62,17 @@ class AnalysisResultPresenter: ObservableObject {
         GridItem(.adaptive(minimum: AppConstants.fovGridMinItemSize))
     ]
 
+    var validatedBacteriaTotalCount: Int {
+        guard let groupedFOVs else {
+            return examinationResult?.bacteriaTotalCount ?? 0
+        }
+        let allFOVs = groupedFOVs.bta0 + groupedFOVs.bta1to9 + groupedFOVs.btaabove9
+        guard !allFOVs.isEmpty else {
+            return examinationResult?.bacteriaTotalCount ?? 0
+        }
+        return allFOVs.reduce(0) { $0 + $1.effectiveBacteriaCount }
+    }
+
     var systemGradingCount: Int {
         switch systemGrading {
         case .NEGATIVE:
@@ -71,7 +82,7 @@ class AnalysisResultPresenter: ObservableObject {
         case .Plus3:
             return groupedFOVs?.btaabove9.count ?? 0
         default:
-            return examinationResult?.bacteriaTotalCount ?? 0
+            return validatedBacteriaTotalCount
         }
     }
 
@@ -200,13 +211,20 @@ extension AnalysisResultPresenter {
         Router.shared.navigateTo(.photoAlbum(fovGroup: fovGroup, examId: examId))
     }
 
-    func navigateToDetailed(fovData: FOVData, order: Int, total: Int, examId: String?) {
+    func navigateToDetailed(
+        fovData: FOVData,
+        order: Int,
+        total: Int,
+        examId: String?,
+        fovGroup: FOVType
+    ) {
         let slideId = examinationResult?.slideId ?? AppValue.empty
+        let fovs = selectedFOVs(for: fovGroup)
+        let resolvedIndex = fovs.firstIndex(where: { $0.id == fovData.id }) ?? order
         Router.shared.navigateTo(.detailedPhoto(
             slideId: slideId,
-            fovData: fovData,
-            order: order,
-            total: total,
+            fovs: fovs.isEmpty ? [fovData] : fovs,
+            currentIndex: min(max(resolvedIndex, 0), max(fovs.count - 1, 0)),
             examId: examId
         ))
     }
@@ -280,10 +298,16 @@ extension AnalysisResultPresenter {
     }
 
     @MainActor
+    func refreshValidationData(examinationId: String) async {
+        await fetchData(examinationId: examinationId, silent: true)
+    }
+
+    @MainActor
     private func loadFOVData(examinationId: String, silent: Bool) async {
         do {
             groupedFOVs = try await interactor.fetchFOVData(examId: examinationId)
             checkIsAllFOVsVerified()
+            syncStaffBacteriaCountFromValidation()
 
             if hasFOVData {
                 analysisProgress = max(analysisProgress, 100)
@@ -529,6 +553,16 @@ extension AnalysisResultPresenter {
 
         isAllFOVsVerified = allVerified
         buttonTitle = allVerified ? AppTextExamProgress.buttonSaveResult : AppTextExamProgress.buttonVerifyAllFOVs
+    }
+
+    func syncStaffBacteriaCountFromValidation() {
+        guard hasFOVData else { return }
+        let latestCount = validatedBacteriaTotalCount
+        guard latestCount > 0 else { return }
+
+        if numOfBTA.isEmpty {
+            numOfBTA = String(latestCount)
+        }
     }
 }
 

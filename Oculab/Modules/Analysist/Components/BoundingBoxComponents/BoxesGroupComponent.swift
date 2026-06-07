@@ -61,34 +61,45 @@ struct BoxesGroupComponentView: View {
                 
                 if presenter.fovDetail != nil, presenter.isBoundingBoxVisible {
                     ForEach(presenter.boxes) { box in
+                        let isSelected = presenter.selectedBox?.id == box.id
                         BoxComponentView(
                             box: box,
                             selectedBox: presenter.selectedBox,
-                            zoomScale: zoomScale
+                            zoomScale: zoomScale,
+                            labelNumber: nil
                         )
                         .frame(width: box.width * scaleX, height: box.height * scaleY)
                         .position(
                             x: (box.x + box.width / 2) * scaleX,
                             y: (box.y + box.height / 2) * scaleY
                         )
-                        .opacity(presenter.isAddBacilliActive ? 0.3 : 1.0) // Reduce opacity when in add mode
+                        .opacity(boxOpacity(for: box, isSelected: isSelected))
                         .onTapGesture {
-                            // Only allow selection when not in add mode
                             if !presenter.isAddBacilliActive {
-                                presenter.selectedBox = box
+                                presenter.selectBox(box)
                             }
                         }
-                        .offset(y: -10)
+                    }
+
+                    if let selectedBox = presenter.selectedBox {
+                        selectedBoxLabel(
+                            number: presenter.displayIndex(for: selectedBox, in: presenter.boxes),
+                            box: selectedBox,
+                            scaleX: scaleX,
+                            scaleY: scaleY
+                        )
                     }
                 }
             }
         }
         .sheet(item: $presenter.selectedBox) { selected in
-            // Only show sheet when not in add mode
             if !presenter.isAddBacilliActive {
                 TrayView(
                     selectedBox: $presenter.selectedBox,
                     boxes: presenter.boxes,
+                    onNavigate: { box in
+                        presenter.navigateToBoxInSequence(box)
+                    },
                     onVerify: {
                         Task {
                             await presenter.updateBoxStatus(boxId: selected.id, newStatus: .verified)
@@ -105,8 +116,39 @@ struct BoxesGroupComponentView: View {
                         }
                     }
                 )
+                .presentationDetents([.height(200)])
+                .presentationDragIndicator(.visible)
+                .presentationBackground(AppColors.slate0)
             }
         }
+    }
+
+    private func selectedBoxLabel(
+        number: Int,
+        box: BoxModel,
+        scaleX: Double,
+        scaleY: Double
+    ) -> some View {
+        Text("\(number)")
+            .font(.system(size: 12, weight: .bold))
+            .foregroundColor(.black)
+            .lineLimit(1)
+            .fixedSize(horizontal: true, vertical: true)
+            .padding(.horizontal, 5)
+            .padding(.vertical, 2)
+            .background(Color.yellow)
+            .clipShape(RoundedRectangle(cornerRadius: 3))
+            .position(
+                x: (box.x * scaleX) + 12,
+                y: max(10, (box.y * scaleY) - 8)
+            )
+            .allowsHitTesting(false)
+    }
+
+    private func boxOpacity(for box: BoxModel, isSelected: Bool) -> Double {
+        if presenter.isAddBacilliActive { return 0.3 }
+        if presenter.selectedBox == nil { return 1.0 }
+        return isSelected ? 1.0 : 0.45
     }
 }
 
@@ -137,6 +179,7 @@ enum BoxStatus: String, Decodable, Encodable {
 
 struct BoxModel: Identifiable, Equatable, Decodable, Encodable {
     let id: String
+    var order: Int?
     var width: Double
     var height: Double
     var x: Double
@@ -145,6 +188,7 @@ struct BoxModel: Identifiable, Equatable, Decodable, Encodable {
 
     enum CodingKeys: String, CodingKey {
         case id
+        case order
         case width
         case height
         case x = "xCoordinate"

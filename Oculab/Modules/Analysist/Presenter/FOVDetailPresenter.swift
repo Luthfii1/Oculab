@@ -19,12 +19,14 @@ class FOVDetailPresenter: ObservableObject {
     @Published var offset: CGSize = .zero
     @Published var description: String?
     @Published var isError: Bool = false
+    @Published var isLoading: Bool = false
     @Published var boxes: [BoxModel] = [] {
         didSet {
             numberOfBacilli = boxes.count
         }
     }
     @Published var selectedBox: BoxModel?
+    @Published var isSequentialReviewActive: Bool = false
     @Published var fovDetail: FOVDetailData?
     @Published var errorMessage: String?
     @Published var isBoundingBoxAvailable: Bool = true
@@ -33,6 +35,7 @@ class FOVDetailPresenter: ObservableObject {
     @Published var enableAddBacilliFeature: Bool = true
     @Published var numberOfBacilli: Int = 0
     @Published var currentFOVId: String?
+    var examId: String?
 
     // For create new box
     @Published var isCreatingNewBox: Bool = false
@@ -58,6 +61,94 @@ class FOVDetailPresenter: ObservableObject {
         isAddBacilliActive ? 0 : 1
     }
 
+    var remainingToVerifyCount: Int {
+        boxes.filter { $0.status == .none || $0.status == .flagged }.count
+    }
+
+    var reviewedCount: Int {
+        boxes.filter { $0.status == .verified }.count
+    }
+
+    func sortedBoxes(_ source: [BoxModel]) -> [BoxModel] {
+        source.sorted { lhs, rhs in
+            let leftOrder = lhs.order ?? Int.max
+            let rightOrder = rhs.order ?? Int.max
+            if leftOrder != rightOrder { return leftOrder < rightOrder }
+            return lhs.id < rhs.id
+        }
+    }
+
+    func pendingBoxes(from source: [BoxModel]) -> [BoxModel] {
+        sortedBoxes(source).filter { $0.status == .none || $0.status == .flagged }
+    }
+
+    func recommendedNextBox(from source: [BoxModel], excluding boxId: String? = nil) -> BoxModel? {
+        if let boxId {
+            return nextPendingBox(after: boxId, in: source)
+        }
+        return pendingBoxes(from: source).first
+    }
+
+    func nextPendingBox(after boxId: String, in source: [BoxModel]) -> BoxModel? {
+        let sorted = sortedBoxes(source)
+        guard let currentIndex = sorted.firstIndex(where: { $0.id == boxId }) else {
+            return pendingBoxes(from: source).first
+        }
+
+        for index in (currentIndex + 1)..<sorted.count {
+            let box = sorted[index]
+            if box.status == .none || box.status == .flagged {
+                return box
+            }
+        }
+
+        for index in 0..<currentIndex {
+            let box = sorted[index]
+            if box.status == .none || box.status == .flagged {
+                return box
+            }
+        }
+
+        return nil
+    }
+
+    @MainActor
+    func jumpToNextRemaining() {
+        isSequentialReviewActive = true
+        if let current = selectedBox {
+            selectedBox = nextPendingBox(after: current.id, in: boxes)
+                ?? pendingBoxes(from: boxes).first
+        } else {
+            selectedBox = pendingBoxes(from: boxes).first
+        }
+        resetView()
+    }
+
+    @MainActor
+    func navigateToBoxInSequence(_ box: BoxModel) {
+        isSequentialReviewActive = true
+        selectedBox = box
+    }
+
+    @MainActor
+    func startReviewFromFirst() {
+        isSequentialReviewActive = true
+        selectedBox = pendingBoxes(from: boxes).first
+        resetView()
+    }
+
+    @MainActor
+    func selectBox(_ box: BoxModel) {
+        isSequentialReviewActive = false
+        selectedBox = box
+    }
+
+    func displayIndex(for box: BoxModel, in source: [BoxModel]) -> Int {
+        if let order = box.order { return order }
+        guard let index = sortedBoxes(source).firstIndex(where: { $0.id == box.id }) else { return 1 }
+        return index + 1
+    }
+
     func resetView() {
         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
             zoomScale = 1.0
@@ -73,6 +164,7 @@ class FOVDetailPresenter: ObservableObject {
         isError = false
         boxes = []
         selectedBox = nil
+        isSequentialReviewActive = false
         fovDetail = nil
         errorMessage = nil
         isBoundingBoxAvailable = true
@@ -80,8 +172,18 @@ class FOVDetailPresenter: ObservableObject {
         isAddBacilliActive = false
         numberOfBacilli = 0
         currentFOVId = nil
+        examId = nil
         isCreatingNewBox = false
         newBoxLocation = nil
+    }
+
+    func notifyValidationDataChanged() {
+        guard let examId, !examId.isEmpty else { return }
+        NotificationCenter.default.post(
+            name: .fovVerificationUpdated,
+            object: nil,
+            userInfo: ["examId": examId]
+        )
     }
 
     // functions for create new button
@@ -129,6 +231,7 @@ class FOVDetailPresenter: ObservableObject {
         do {
             _ = try await interactor.addBox(fovId: currentFOVId, newBox: newBox)
             await fetchData(fovId: currentFOVId)
+            notifyValidationDataChanged()
         } catch {
             _ = ErrorHandler.shared.handleError(error, context: .examination)
         }
@@ -140,15 +243,23 @@ class FOVDetailPresenter: ObservableObject {
 
     // network things
     @MainActor
-    func fetchData(fovId: String) async {
+    func fetchData(fovId: String, autoSelectFirst: Bool = false) async {
+        guard !isLoading else { return }
+        isLoading = true
+        defer { isLoading = false }
+
         do {
             let result = try await interactor.fetchData(fovId: fovId)
             currentFOVId = fovId
             fovDetail = result
-            boxes = result.boxes.filter { $0.status != .trashed }
+            boxes = sortedBoxes(result.boxes.filter { $0.status != .trashed })
             isBoundingBoxAvailable = true
             isError = false
             errorMessage = nil
+
+            if autoSelectFirst {
+                selectedBox = recommendedNextBox(from: boxes)
+            }
         } catch {
             let errorDetails = ErrorHandler.shared.handleError(error, context: .examination)
             
@@ -195,33 +306,53 @@ class FOVDetailPresenter: ObservableObject {
     func updateBoxStatus(boxId: String, newStatus: BoxStatus) async {
         do {
             guard let index = boxes.firstIndex(where: { $0.id == boxId }) else { return }
+
+            let advanceSequentially = isSequentialReviewActive
+            let nextBox = advanceSequentially ? nextPendingBox(after: boxId, in: boxes) : nil
+
             boxes[index].status = newStatus
+            if newStatus == .trashed {
+                boxes.remove(at: index)
+            }
 
-            _ = try await interactor.updateBoxStatus(boxId: boxId, newStatus: newStatus.rawValue)
-
-            // Move selection to the next box with status .none or .flagged, else nil
-            if let currentIndex = boxes.firstIndex(where: { $0.id == boxId }),
-               !boxes.isEmpty {
-                let safeIndex = min(currentIndex, boxes.count - 1)
-                let forwardSlice = (safeIndex + 1) < boxes.count
-                    ? Array(boxes[(safeIndex + 1)...])
-                    : []
-                let backwardSlice = safeIndex > 0
-                    ? Array(boxes[..<safeIndex])
-                    : []
-                let nextCandidates = forwardSlice + backwardSlice
-                selectedBox = nextCandidates.first(where: { $0.status == .none || $0.status == .flagged })
+            if advanceSequentially {
+                selectedBox = nextBox
+                if nextBox == nil {
+                    isSequentialReviewActive = false
+                }
             } else {
                 selectedBox = nil
             }
 
-            // refetch all boxes
+            _ = try await interactor.updateBoxStatus(boxId: boxId, newStatus: newStatus.rawValue)
+
             guard let fovId = currentFOVId else { Logger.error("No fovId set"); return }
-            await fetchData(fovId: fovId)
+            await refreshBoxesQuietly(fovId: fovId)
+            notifyValidationDataChanged()
 
         } catch {
             errorMessage = ErrorHandler.shared.handleError(error)
             isError = true
+            if let fovId = currentFOVId {
+                await fetchData(fovId: fovId)
+            }
+        }
+    }
+
+    @MainActor
+    private func refreshBoxesQuietly(fovId: String) async {
+        do {
+            let result = try await interactor.fetchData(fovId: fovId)
+            fovDetail = result
+            boxes = sortedBoxes(result.boxes.filter { $0.status != .trashed })
+
+            if let selected = selectedBox,
+               let refreshed = boxes.first(where: { $0.id == selected.id })
+            {
+                selectedBox = refreshed
+            }
+        } catch {
+            Logger.error("Failed to refresh boxes after status update", category: .examination)
         }
     }
 }

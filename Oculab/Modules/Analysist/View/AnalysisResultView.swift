@@ -77,7 +77,7 @@ struct AnalysisResultView: View {
                     return
                 }
                 Task {
-                    await presenter.refreshFOVData(examinationId: examinationId)
+                    await presenter.refreshValidationData(examinationId: examinationId)
                 }
             }
 

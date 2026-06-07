@@ -313,6 +313,15 @@
 "analysist.verification.sheet.flag_button" = "Cek Kembali";
 "analysist.verification.sheet.delete_button" = "Hapus Anotasi";
 "analysist.verification.sheet.index_bacilli" = "Bakteri ke %@";
+"analysist.verification.sheet.progress_bacilli" = "Bakteri %@ dari %@";
+"analysist.fov_detail.navigation_title" = "Validasi Deteksi";
+"analysist.fov_detail.pending_review" = "%d belum diverifikasi";
+"analysist.fov_detail.remaining_to_verify" = "%d dari %d bakteri belum diverifikasi";
+"analysist.fov_detail.all_reviewed" = "Semua bakteri sudah diverifikasi";
+"analysist.fov_detail.review_remaining" = "Review sisa bakteri";
+"analysist.fov_detail.start_from_first" = "Mulai dari pertama";
+"analysist.fov_detail.tap_to_review_hint" = "Ketuk deteksi yang salah untuk verifikasi atau hapus";
+"analysist.fov_detail.swipe_hint" = "Geser untuk ganti gambar";
 
 // MARK: - Authentication Module
 // Login View

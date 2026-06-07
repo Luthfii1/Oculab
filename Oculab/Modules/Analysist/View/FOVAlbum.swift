@@ -36,7 +36,8 @@ struct FOVAlbum: View {
                             fovData: fov,
                             order: index,
                             total: presenter.selectedFOVs(for: fovGroup).count,
-                            examId: examId
+                            examId: examId,
+                            fovGroup: fovGroup
                         )
                     } label: {
                         RetryableImageView(

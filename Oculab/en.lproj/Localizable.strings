@@ -305,6 +305,15 @@
 "analysist.verification.sheet.flag_button" = "Flag";
 "analysist.verification.sheet.delete_button" = "Delete Annotation";
 "analysist.verification.sheet.index_bacilli" = "Bacteria number %@";
+"analysist.verification.sheet.progress_bacilli" = "Bacteria %@ of %@";
+"analysist.fov_detail.navigation_title" = "Verify Detections";
+"analysist.fov_detail.pending_review" = "%d pending";
+"analysist.fov_detail.remaining_to_verify" = "%d of %d remaining to verify";
+"analysist.fov_detail.all_reviewed" = "All bacteria reviewed";
+"analysist.fov_detail.review_remaining" = "Review remaining";
+"analysist.fov_detail.start_from_first" = "Start from first";
+"analysist.fov_detail.tap_to_review_hint" = "Tap incorrect detections to verify or delete";
+"analysist.fov_detail.swipe_hint" = "Swipe to change image";
 
 // MARK: - Authentication Module
 // Login View

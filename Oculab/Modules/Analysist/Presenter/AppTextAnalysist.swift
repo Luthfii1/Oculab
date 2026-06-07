@@ -49,11 +49,25 @@ extension AppText {
         }
         
         enum FOVDetailView {
+            static let navigationTitle = "analysist.fov_detail.navigation_title".localized
             static let loadingDataMessage = AppState.loading("analysist.examination_data".localized)
             static let processingInProgressTitle = "Processing in Progress"
             static let boundingBoxNotAvailableMessage = "This image is still being processed. Bounding box data is not available yet."
             static let errorLoadingDataTitle = "Error Loading Data"
             static let retryButtonTitle = "Retry"
+            static let allBacteriaReviewedMessage = "analysist.fov_detail.all_reviewed".localized
+            static let reviewRemainingButton = "analysist.fov_detail.review_remaining".localized
+            static let startFromFirstButton = "analysist.fov_detail.start_from_first".localized
+            static let tapToReviewHint = "analysist.fov_detail.tap_to_review_hint".localized
+            static let swipeBetweenImagesHint = "analysist.fov_detail.swipe_hint".localized
+
+            static func remainingToVerifyFormat(_ remaining: Int, _ total: Int) -> String {
+                "analysist.fov_detail.remaining_to_verify".localized(with: remaining, total)
+            }
+
+            static func pendingReviewFormat(_ count: Int) -> String {
+                "analysist.fov_detail.pending_review".localized(with: count)
+            }
         }
         
         enum PDFView {
@@ -92,6 +106,10 @@ extension AppText {
             
             static func indexBacilliFormat(_ index: String) -> String {
                 return "analysist.verification.sheet.index_bacilli".localized(with: index)
+            }
+
+            static func progressBacilliFormat(_ index: String, _ total: String) -> String {
+                "analysist.verification.sheet.progress_bacilli".localized(with: index, total)
             }
         }
     }

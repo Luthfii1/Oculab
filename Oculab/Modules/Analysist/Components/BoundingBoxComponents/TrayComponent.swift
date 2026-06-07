@@ -10,115 +10,134 @@ import SwiftUI
 struct TrayView: View {
     @Binding var selectedBox: BoxModel?
     let boxes: [BoxModel]
+    var onNavigate: ((BoxModel) -> Void)? = nil
     var onVerify: (() -> Void)? = nil
     var onFlag: (() -> Void)? = nil
     var onReject: (() -> Void)? = nil
 
+    private var sortedBoxes: [BoxModel] {
+        boxes.sorted {
+            ($0.order ?? Int.max, $0.id) < ($1.order ?? Int.max, $1.id)
+        }
+    }
+
+    private var reviewableBoxes: [BoxModel] {
+        sortedBoxes.filter { $0.status == .none || $0.status == .flagged }
+    }
+
+    private func displayIndex(for box: BoxModel) -> Int {
+        if let order = box.order { return order }
+        return (sortedBoxes.firstIndex(where: { $0.id == box.id }) ?? 0) + 1
+    }
+
     var body: some View {
         if let selectedBox = selectedBox,
-           let currentIndex = boxes.firstIndex(where: { $0.id == selectedBox.id })
+           let sortedIndex = reviewableBoxes.firstIndex(where: { $0.id == selectedBox.id })
         {
-            ZStack {
-                AppColors.slate0.ignoresSafeArea()
-                VStack(alignment: .leading, spacing: Decimal.d32) {
-                    VStack(alignment: .leading, spacing: Decimal.d12) {
-                        VStack(alignment: .leading) {
-                            Text(AppTextAnalysisVerifSheet.title)
-                                .font(AppTypography.s4)
-                                .foregroundColor(.black)
-                        }
-                        
-                        VStack(alignment: .leading) {
-                            HStack(alignment: .center, spacing: Decimal.d16) {
-                                Text(AppTextAnalysisVerifSheet.indexBacilliFormat(String(currentIndex+1)))
-                                    .font(AppTypography.p3)
-                                    .foregroundColor(.black)
-                                Spacer()
-                                HStack(spacing: Decimal.d20) {
-                                    Button(action: {
-                                        if currentIndex > 0 {
-                                            self.selectedBox = boxes[currentIndex - 1]
-                                        }
-                                    }) {
-                                        Image(systemName: AppIcon.back)
-                                            .frame(width: 30, height: 30)
-                                            .background(currentIndex > 0 ? AppColors.slate100 : AppColors.slate50)
-                                            .foregroundColor(currentIndex > 0 ? .black : AppColors.slate300)
-                                            .clipShape(Circle())
-                                    }
-                                    .disabled(currentIndex == 0)
+            VStack(alignment: .leading, spacing: Decimal.d16) {
+                Text(AppTextAnalysisVerifSheet.title)
+                    .font(AppTypography.s4)
+                    .foregroundColor(.black)
 
-                                    Button(action: {
-                                        if currentIndex < boxes.count - 1 {
-                                            self.selectedBox = boxes[currentIndex + 1]
-                                        }
-                                    }) {
-                                        Image(systemName: AppIcon.forward)
-                                            .frame(width: 30, height: 30)
-                                            .background(currentIndex < boxes.count - 1 ? AppColors.slate100 : AppColors.slate50)
-                                            .foregroundColor(currentIndex < boxes.count - 1 ? .black : AppColors.slate300)
-                                            .clipShape(Circle())
-                                    }
-                                    .disabled(currentIndex == boxes.count - 1)
-                                }
+                HStack(alignment: .center, spacing: Decimal.d16) {
+                    Text(
+                        AppTextAnalysisVerifSheet.progressBacilliFormat(
+                            String(displayIndex(for: selectedBox)),
+                            String(sortedBoxes.count)
+                        )
+                    )
+                    .font(AppTypography.p3)
+                    .foregroundColor(.black)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
+
+                    Spacer(minLength: Decimal.d8)
+
+                    HStack(spacing: Decimal.d12) {
+                        Button(action: {
+                            if sortedIndex > 0 {
+                                let previous = reviewableBoxes[sortedIndex - 1]
+                                onNavigate?(previous)
+                                self.selectedBox = previous
                             }
-                            .padding(.horizontal, Decimal.d12)
-                            .padding(.vertical, Decimal.d12)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(AppColors.slate50)
-                            .cornerRadius(Decimal.d8)
-                            .shadow(color: .black.opacity(0.05), radius: 1, x: 0, y: 1)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: Decimal.d8)
-                                    .inset(by: 0.5)
-                                    .stroke(AppColors.slate200, lineWidth: 1)
-                            )
+                        }) {
+                            Image(systemName: AppIcon.back)
+                                .frame(width: 30, height: 30)
+                                .background(sortedIndex > 0 ? AppColors.slate100 : AppColors.slate50)
+                                .foregroundColor(sortedIndex > 0 ? .black : AppColors.slate300)
+                                .clipShape(Circle())
                         }
-                    }
-                    .padding(.top, Decimal.m12)
+                        .disabled(sortedIndex == 0)
 
-                    HStack(spacing: Decimal.d16) {
-                        AppButton(
-                            title: AppTextAnalysisVerifSheet.deletingButton,
-                            leftIcon: AppIcon.delete,
-                            colorType: .destructive(.primary),
-                            size: .large,
-                            isEnabled: true
-                        ) {
-                            onReject?()
+                        Button(action: {
+                            if sortedIndex < reviewableBoxes.count - 1 {
+                                let next = reviewableBoxes[sortedIndex + 1]
+                                onNavigate?(next)
+                                self.selectedBox = next
+                            }
+                        }) {
+                            Image(systemName: AppIcon.forward)
+                                .frame(width: 30, height: 30)
+                                .background(
+                                    sortedIndex < reviewableBoxes.count - 1
+                                        ? AppColors.slate100
+                                        : AppColors.slate50
+                                )
+                                .foregroundColor(
+                                    sortedIndex < reviewableBoxes.count - 1 ? .black : AppColors.slate300
+                                )
+                                .clipShape(Circle())
                         }
-                        
-                        /// Disable flagging feature since we focus on B2C approach
-//                        Spacer(minLength: Decimal.d4)
-//                        
-//                        AppButton(
-//                            title: AppTextAnalysisVerifSheet.flaggingButton,
-//                            leftIcon: AppIcon.alert,
-//                            colorType: .tertiary,
-//                            size: .large,
-//                            isEnabled: true
-//                        ) {
-//                            onFlag?()
-//                        }
-                        
-                        Spacer(minLength: Decimal.d4)
-                        
-                        AppButton(
-                            title: AppTextAnalysisVerifSheet.verifyingButton,
-                            leftIcon: AppIcon.success,
-                            colorType: .primary,
-                            size: .large,
-                            isEnabled: true
-                        ) {
-                            onVerify?()
-                        }
+                        .disabled(sortedIndex == reviewableBoxes.count - 1)
                     }
                 }
-                .padding(.horizontal, Decimal.d16)
+                .padding(.horizontal, Decimal.d12)
+                .padding(.vertical, Decimal.d12)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .presentationDetents([.height(230)])
-                .presentationDragIndicator(.visible)
+                .background(AppColors.slate50)
+                .cornerRadius(Decimal.d8)
+                .overlay(
+                    RoundedRectangle(cornerRadius: Decimal.d8)
+                        .inset(by: 0.5)
+                        .stroke(AppColors.slate200, lineWidth: 1)
+                )
+
+                HStack(spacing: Decimal.d12) {
+                    AppButton(
+                        title: AppTextAnalysisVerifSheet.deletingButton,
+                        leftIcon: AppIcon.delete,
+                        colorType: .destructive(.primary),
+                        size: .large,
+                        isEnabled: true
+                    ) {
+                        onReject?()
+                    }
+
+                    AppButton(
+                        title: AppTextAnalysisVerifSheet.verifyingButton,
+                        leftIcon: AppIcon.success,
+                        colorType: .primary,
+                        size: .large,
+                        isEnabled: true
+                    ) {
+                        onVerify?()
+                    }
+                }
             }
+            .padding(.horizontal, Decimal.d16)
+            .padding(.top, Decimal.d12)
+            .padding(.bottom, Decimal.d16)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .background(AppColors.slate0)
+        } else {
+            VStack(spacing: Decimal.d12) {
+                ProgressView()
+                Text(AppTextAnalysisFOVDetail.loadingDataMessage)
+                    .font(AppTypography.p3)
+                    .foregroundColor(AppColors.slate400)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(AppColors.slate0)
         }
     }
 }

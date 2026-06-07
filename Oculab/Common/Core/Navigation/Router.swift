@@ -25,7 +25,7 @@ class Router: ObservableObject {
         case login
         case register
         case photoAlbum(fovGroup: FOVType, examId: String)
-        case detailedPhoto(slideId: String, fovData: FOVData, order: Int, total: Int, examId: String?)
+        case detailedPhoto(slideId: String, fovs: [FOVData], currentIndex: Int, examId: String?)
         case profile
         case editPassword
         case inputPatientData(patientId: String? = nil)
@@ -116,8 +116,8 @@ class Router: ObservableObject {
                 .environmentObject(DependencyInjection.shared.createAuthPresenter())
         case let .photoAlbum(fovGroup, examId):
             FOVAlbum(fovGroup: fovGroup, examId: examId)
-        case let .detailedPhoto(slideId, fovData, order, total, examId):
-            FOVDetail(slideId: slideId, fovData: fovData, order: order, total: total, examId: examId)
+        case let .detailedPhoto(slideId, fovs, currentIndex, examId):
+            FOVDetail(slideId: slideId, fovs: fovs, currentIndex: currentIndex, examId: examId)
         case .profile:
             ProfileView()
                 .environmentObject(DependencyInjection.shared.createProfilePresenter())
