@@ -19,7 +19,11 @@ class AnalysisResultPresenter: ObservableObject {
     private var progressObserver: NSObjectProtocol?
     private var trackedExaminationId: String?
     private var analysisTrackingStartedAt: Date?
+    private var lastProgressChangeAt: Date?
     private let minimumProgressDisplay: TimeInterval = 1.2
+    private let analysisStallTimeout: TimeInterval = 10 * 60
+    private let analysisMaxDuration: TimeInterval = 30 * 60
+    private let fovLoadStallTimeout: TimeInterval = 5 * 60
 
     init(interactor: AnalysisResultInteractor = AnalysisResultInteractor()) {
         self.interactor = interactor
@@ -118,6 +122,13 @@ class AnalysisResultPresenter: ObservableObject {
 
     var hasAnalysisFailed: Bool {
         analysisFailureMessage != nil
+    }
+
+    var analysisRecoveryHint: String {
+        if analysisFailureMessage == AppTextExamProgress.analysisStalledMessage {
+            return AppTextExamProgress.analysisStalledHint
+        }
+        return AppTextExamProgress.analysisFailedHint
     }
 
     var shouldShowResultsUI: Bool {
@@ -285,6 +296,7 @@ extension AnalysisResultPresenter {
             }
 
             markAnalysisReadyIfNeeded(examinationId: examinationId)
+            evaluateAnalysisHealth(examinationId: examinationId)
         } catch {
             if !silent {
                 errorMessage = ErrorHandler.shared.handleError(error, context: .examination)
@@ -339,7 +351,9 @@ extension AnalysisResultPresenter {
 
         stopExaminationStatusPolling()
         trackedExaminationId = examinationId
-        analysisTrackingStartedAt = Date()
+        let now = Date()
+        analysisTrackingStartedAt = now
+        lastProgressChangeAt = now
         startRealtimeTracking(examinationId: examinationId)
 
         trackingTask = Task {
@@ -351,6 +365,7 @@ extension AnalysisResultPresenter {
                     if let cached = await progressInteractor.fetchProgress(examinationId: examinationId) {
                         applyProgressUpdate(cached, examinationId: examinationId)
                     }
+                    evaluateAnalysisHealth(examinationId: examinationId)
                 } else if !shouldShowAnalyzingUI {
                     break
                 }
@@ -433,9 +448,44 @@ extension AnalysisResultPresenter {
             return
         }
 
+        if update.progress != analysisProgress {
+            lastProgressChangeAt = Date()
+        }
+
         analysisProgress = update.progress
         if let message = update.message, !message.isEmpty {
             analysisStatusMessage = message
+        }
+    }
+
+    @MainActor
+    private func evaluateAnalysisHealth(examinationId: String) {
+        guard !hasAnalysisFailed, let examination = examinationResult else { return }
+
+        if AnalysisTrackingStore.isTracked(examinationId),
+           examination.statusExamination == .NOTSTARTED {
+            markAnalysisFailed(
+                message: AppTextExamProgress.analysisFailedDefault,
+                examinationId: examinationId
+            )
+            return
+        }
+
+        let isWaitingForAnalysis = examination.statusExamination == .INPROGRESS
+        let isWaitingForFOVs = examination.statusExamination == .NEEDVALIDATION && !hasFOVData
+        guard isWaitingForAnalysis || isWaitingForFOVs else { return }
+
+        let startedAt = analysisTrackingStartedAt ?? Date()
+        let progressAnchor = lastProgressChangeAt ?? startedAt
+        let elapsed = Date().timeIntervalSince(startedAt)
+        let sinceProgressChange = Date().timeIntervalSince(progressAnchor)
+        let stallTimeout = isWaitingForFOVs ? fovLoadStallTimeout : analysisStallTimeout
+
+        if elapsed >= analysisMaxDuration || sinceProgressChange >= stallTimeout {
+            markAnalysisFailed(
+                message: AppTextExamProgress.analysisStalledMessage,
+                examinationId: examinationId
+            )
         }
     }
 
@@ -460,9 +510,22 @@ extension AnalysisResultPresenter {
     }
 
     @MainActor
-    func retryAnalysis() {
+    func retryAnalysis(examinationId: String) async {
+        let patientId = examinationResult?.patientId
         analysisFailureMessage = nil
-        Router.shared.navigateBack()
+        stopExaminationStatusPolling()
+        AnalysisTrackingStore.untrack(examinationId: examinationId)
+        AnalysisRealtimeService.shared.unsubscribe(from: examinationId)
+        AnalysisResultSessionStore.shared.unregister(examinationId: examinationId)
+        resetState()
+
+        if let patientId, !patientId.isEmpty {
+            Router.shared.popToRoot()
+            Router.shared.navigateTo(.examDetail(examId: examinationId, patientId: patientId))
+            return
+        }
+
+        Router.shared.popToRoot()
     }
 
     @MainActor
@@ -591,5 +654,6 @@ extension AnalysisResultPresenter {
         isAllFOVsVerified = false
         startTime = nil
         analysisTrackingStartedAt = nil
+        lastProgressChangeAt = nil
     }
 }

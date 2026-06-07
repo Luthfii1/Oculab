@@ -85,7 +85,7 @@ struct AnalyzingExaminationProgressView: View {
                 .foregroundStyle(AppColors.orange500)
                 .padding(.top, 2)
 
-            Text(AppTextExamProgress.analysisFailedHint)
+            Text(presenter.analysisRecoveryHint)
                 .font(AppTypography.p3)
                 .foregroundStyle(AppColors.slate600)
                 .fixedSize(horizontal: false, vertical: true)
@@ -164,11 +164,24 @@ struct AnalyzingExaminationProgressView: View {
             VStack(spacing: 10) {
                 if presenter.hasAnalysisFailed {
                     AppButton(
-                        title: AppTextExamProgress.buttonTryAgain,
+                        title: AppTextExamProgress.buttonResubmitVideo,
                         size: .large,
                         isEnabled: true
                     ) {
-                        presenter.retryAnalysis()
+                        Task {
+                            await presenter.retryAnalysis(examinationId: examinationId)
+                        }
+                    }
+                } else {
+                    AppButton(
+                        title: AppTextExamProgress.buttonCheckStatus,
+                        colorType: .secondary,
+                        size: .large,
+                        isEnabled: true
+                    ) {
+                        Task {
+                            await presenter.refreshExaminationStatus(examinationId: examinationId)
+                        }
                     }
                 }
 
@@ -177,9 +190,9 @@ struct AnalyzingExaminationProgressView: View {
                     colorType: presenter.hasAnalysisFailed ? .secondary : .primary,
                     size: .large,
                     isEnabled: true
-            ) {
-                presenter.exitFromFlow(examinationId: examinationId)
-            }
+                ) {
+                    presenter.exitFromFlow(examinationId: examinationId)
+                }
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 12)

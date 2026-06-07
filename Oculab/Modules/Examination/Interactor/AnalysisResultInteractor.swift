@@ -59,7 +59,8 @@ class AnalysisResultInteractor {
                 let notes = response.data.expertResult?.notes ?? AppValue.empty
                 return notes.isEmpty ? "examination.interpretation.no_staff_notes".localized : notes
             }(),
-            statusExamination: response.data.statusExamination)
+            statusExamination: response.data.statusExamination,
+            patientId: response.data.patientId)
 
         return examinationDetail
     }
@@ -103,6 +104,7 @@ struct ExaminationResultData: Decodable {
     var bacteriaTotalCount: Int
     var expertNote: String?
     var statusExamination: StatusType
+    var patientId: String?
 }
 
 struct FOVGrouping: Decodable {

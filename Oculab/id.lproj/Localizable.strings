@@ -441,6 +441,10 @@
 "examination.progress.analysis_failed_title" = "Analisis tidak dapat dimulai";
 "examination.progress.analysis_failed_default" = "Analisis gagal. Silakan coba lagi.";
 "examination.progress.analysis_failed_hint" = "Video tidak dapat dikirim ke layanan AI. Periksa koneksi Anda dan kirim ulang.";
+"examination.progress.analysis_stalled_message" = "Analisis memakan waktu lebih lama dari biasanya atau mungkin terhenti.";
+"examination.progress.analysis_stalled_hint" = "Tarik ke bawah untuk refresh, atau kirim ulang video sediaan untuk memulai analisis lagi.";
+"examination.progress.button_resubmit_video" = "Kirim ulang video";
+"examination.progress.button_check_status" = "Cek status";
 "examination.progress.button_try_again" = "Coba lagi";
 "examination.image.loading_images" = "Memuat gambar bidang pandang…";
 "examination.progress.progress_label" = "selesai";

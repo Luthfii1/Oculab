@@ -35,7 +35,11 @@ extension AppText {
             static let analysisFailedTitle = "examination.progress.analysis_failed_title".localized
             static let analysisFailedDefault = "examination.progress.analysis_failed_default".localized
             static let analysisFailedHint = "examination.progress.analysis_failed_hint".localized
+            static let analysisStalledMessage = "examination.progress.analysis_stalled_message".localized
+            static let analysisStalledHint = "examination.progress.analysis_stalled_hint".localized
             static let buttonTryAgain = "examination.progress.button_try_again".localized
+            static let buttonResubmitVideo = "examination.progress.button_resubmit_video".localized
+            static let buttonCheckStatus = "examination.progress.button_check_status".localized
             static let progressLabel = "examination.progress.progress_label".localized
             static let refreshInstruction = "examination.progress.refresh_instruction".localized
             static let backgroundInstruction = "examination.progress.background_instruction".localized

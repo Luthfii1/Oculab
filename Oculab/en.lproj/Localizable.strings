@@ -425,7 +425,11 @@
 "examination.progress.analysis_failed_title" = "Analysis could not start";
 "examination.progress.analysis_failed_default" = "Analysis failed. Please try again.";
 "examination.progress.analysis_failed_hint" = "The video could not be sent to the AI service. Check your connection and try submitting again.";
+"examination.progress.analysis_stalled_message" = "Analysis is taking longer than expected or may have stopped.";
+"examination.progress.analysis_stalled_hint" = "Pull down to refresh, or resubmit the specimen video to start analysis again.";
 "examination.progress.button_try_again" = "Try again";
+"examination.progress.button_resubmit_video" = "Resubmit video";
+"examination.progress.button_check_status" = "Check status";
 "examination.image.loading_images" = "Loading field of view images…";
 "examination.progress.progress_label" = "complete";
 "examination.progress.accessibility_percent" = "Analysis %d percent complete";
