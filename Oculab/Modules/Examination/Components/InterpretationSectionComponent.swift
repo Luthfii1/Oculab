@@ -18,6 +18,10 @@ struct InterpretationSectionComponent: View {
     var examination: ExaminationResultData
     @FocusState var focusedField: AnalysisFocusField?
 
+    private var isCompleted: Bool {
+        examination.statusExamination == .FINISHED
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: Decimal.d24) {
             HStack {
@@ -27,12 +31,36 @@ struct InterpretationSectionComponent: View {
                     .font(AppTypography.s4_1)
                     .padding(.leading, Decimal.d8)
                 Spacer()
-                StatusTagComponent(type: .NEEDVALIDATION)
+                StatusTagComponent(type: isCompleted ? .FINISHED : .NEEDVALIDATION)
             }
 
+            if isCompleted {
+                completedContent
+            } else {
+                validationContent
+            }
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button(AppAction.done) {
+                    focusedField = nil
+                }
+            }
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(Decimal.d12)
+        .overlay(RoundedRectangle(cornerRadius: Decimal.d12).stroke(AppColors.slate100))
+        .padding(.horizontal, Decimal.d20)
+    }
+
+    private var validationContent: some View {
+        Group {
             GradingCardComponent(
                 type: examination.systemGrading,
-                n: presenter.resultQuantity
+                confidenceLevel: presenter.systemConfidenceLevel,
+                n: presenter.systemGradingCount
             )
 
             AppDropdown(
@@ -68,24 +96,53 @@ struct InterpretationSectionComponent: View {
 
             AppButton(
                 title: presenter.buttonTitle,
-                rightIcon: AppIcon.checkmark,
-                isEnabled: presenter.isEnableToSubmit()
+                rightIcon: presenter.isAllFOVsVerified ? AppIcon.checkmark : AppIcon.arrowRight,
+                isEnabled: presenter.isPrimaryActionEnabled()
             ) {
-                presenter.isVerifPopUpVisible = true
+                presenter.handlePrimaryValidationAction()
             }
         }
-        .toolbar {
-            ToolbarItemGroup(placement: .keyboard) {
-                Spacer()
-                Button(AppAction.done) {
-                    focusedField = nil
+    }
+
+    private var completedContent: some View {
+        Group {
+            VStack(alignment: .leading, spacing: Decimal.d8) {
+                Text(AppMedical.Examination.staffInterpretation)
+                    .font(AppTypography.s5)
+                    .foregroundColor(AppColors.slate300)
+                GradingCardComponent(
+                    type: examination.expertGrading ?? .unknown,
+                    isExpert: true,
+                    expertNote: examination.expertNote
+                )
+            }
+
+            VStack(alignment: .leading, spacing: Decimal.d8) {
+                Text(AppMedical.Examination.systemInterpretation)
+                    .font(AppTypography.s5)
+                    .foregroundColor(AppColors.slate300)
+                HStack(alignment: .top) {
+                    Image(systemName: AppIcon.warning)
+                        .foregroundColor(AppColors.orange500)
+                    Text(AppTextExamSavedResult.systemInterpretationWarning)
+                        .font(AppTypography.p4)
                 }
+                GradingCardComponent(
+                    type: examination.systemGrading,
+                    confidenceLevel: presenter.systemConfidenceLevel,
+                    n: presenter.systemGradingCount
+                )
+            }
+
+            AppButton(
+                title: AppTextExamSavedResult.actionViewPdf,
+                rightIcon: AppIcon.document,
+                colorType: .secondary,
+                size: .small,
+                isEnabled: true
+            ) {
+                presenter.navigateToPDFView()
             }
         }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(Decimal.d12)
-        .overlay(RoundedRectangle(cornerRadius: Decimal.d12).stroke(AppColors.slate100))
-        .padding(.horizontal, Decimal.d20)
     }
 }

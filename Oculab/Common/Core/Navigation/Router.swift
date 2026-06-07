@@ -131,7 +131,7 @@ class Router: ObservableObject {
         case .privacyPolicy:
             PrivacyPolicyView()
         case let .analyzingStatusProgress(examinationId):
-            AnalyzingExaminationProgressView(examinationId: examinationId)
+            AnalysisResultView(examinationId: examinationId)
         case .accountManagement:
             UserManagementView()
                 .environmentObject(DependencyInjection.shared.createAccountPresenter())

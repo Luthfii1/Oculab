@@ -427,8 +427,17 @@
 
 // Progress View
 "examination.progress.analyzing_title" = "Menginterpretasikan data";
-"examination.progress.refresh_instruction" = "Tarik ke bawah untuk memeriksa status";
-"examination.progress.background_instruction" = "Analisis berjalan di latar belakang. Anda dapat kembali ke tugas dan membuka layar ini lagi dari daftar beranda.";
+"examination.progress.analyzing_subtitle" = "Spesimen Anda sedang dianalisis";
+"examination.progress.loading_images_subtitle" = "Menyiapkan gambar bidang pandang";
+"examination.progress.analysis_failed_title" = "Analisis tidak dapat dimulai";
+"examination.progress.analysis_failed_default" = "Analisis gagal. Silakan coba lagi.";
+"examination.progress.analysis_failed_hint" = "Video tidak dapat dikirim ke layanan AI. Periksa koneksi Anda dan kirim ulang.";
+"examination.progress.button_try_again" = "Coba lagi";
+"examination.image.loading_images" = "Memuat gambar bidang pandang…";
+"examination.progress.progress_label" = "selesai";
+"examination.progress.accessibility_percent" = "Analisis %d persen selesai";
+"examination.progress.refresh_instruction" = "Tarik ke bawah untuk memperbarui status";
+"examination.progress.background_instruction" = "Analisis berlanjut di latar belakang. Anda bisa kembali ke daftar tugas dan membuka layar ini lagi dari Beranda.";
 "examination.progress.button_back_to_tasks" = "Kembali ke tugas";
 "examination.progress.notification_ready_title" = "Analisis selesai";
 "examination.progress.notification_ready_body" = "Pemeriksaan Anda siap divalidasi. Ketuk untuk melihat hasil.";

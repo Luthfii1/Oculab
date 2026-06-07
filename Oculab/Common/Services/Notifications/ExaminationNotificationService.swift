@@ -10,6 +10,7 @@ import UserNotifications
 extension Notification.Name {
     static let examinationAnalysisReady = Notification.Name("examinationAnalysisReady")
     static let examinationAnalysisProgress = Notification.Name("examinationAnalysisProgress")
+    static let fovVerificationUpdated = Notification.Name("fovVerificationUpdated")
 }
 
 final class ExaminationNotificationService {

@@ -411,8 +411,17 @@
 
 // Progress View
 "examination.progress.analyzing_title" = "Interpreting data";
-"examination.progress.refresh_instruction" = "Pull down to check status";
-"examination.progress.background_instruction" = "Analysis runs in the background. You can return to tasks and check this screen later from the home list.";
+"examination.progress.analyzing_subtitle" = "Your specimen is being analyzed";
+"examination.progress.loading_images_subtitle" = "Preparing field of view images";
+"examination.progress.analysis_failed_title" = "Analysis could not start";
+"examination.progress.analysis_failed_default" = "Analysis failed. Please try again.";
+"examination.progress.analysis_failed_hint" = "The video could not be sent to the AI service. Check your connection and try submitting again.";
+"examination.progress.button_try_again" = "Try again";
+"examination.image.loading_images" = "Loading field of view images…";
+"examination.progress.progress_label" = "complete";
+"examination.progress.accessibility_percent" = "Analysis %d percent complete";
+"examination.progress.refresh_instruction" = "Pull down to refresh status";
+"examination.progress.background_instruction" = "Analysis continues in the background. You can go back to your task list and return here anytime from Home.";
 "examination.progress.button_back_to_tasks" = "Back to tasks";
 "examination.progress.notification_ready_title" = "Analysis ready";
 "examination.progress.notification_ready_body" = "Your examination is ready for validation. Tap to review the results.";

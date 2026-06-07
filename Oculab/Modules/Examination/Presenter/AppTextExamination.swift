@@ -30,8 +30,19 @@ extension AppText {
         enum ProgressView {
             static let loadingAnimationName = "loadingPaperplane"
             static let analyzingTitle = "examination.progress.analyzing_title".localized
+            static let analyzingSubtitle = "examination.progress.analyzing_subtitle".localized
+            static let loadingImagesSubtitle = "examination.progress.loading_images_subtitle".localized
+            static let analysisFailedTitle = "examination.progress.analysis_failed_title".localized
+            static let analysisFailedDefault = "examination.progress.analysis_failed_default".localized
+            static let analysisFailedHint = "examination.progress.analysis_failed_hint".localized
+            static let buttonTryAgain = "examination.progress.button_try_again".localized
+            static let progressLabel = "examination.progress.progress_label".localized
             static let refreshInstruction = "examination.progress.refresh_instruction".localized
             static let backgroundInstruction = "examination.progress.background_instruction".localized
+
+            static func progressAccessibility(_ percent: Int) -> String {
+                String(format: "examination.progress.accessibility_percent".localized, percent)
+            }
             static let buttonBackToTasks = "examination.progress.button_back_to_tasks".localized
             static let notificationReadyTitle = "examination.progress.notification_ready_title".localized
             static let notificationReadyBody = "examination.progress.notification_ready_body".localized
@@ -107,6 +118,7 @@ extension AppText {
         
         enum ImageSectionComponent {
             static let imageResultInstruction = "examination.image.result_instruction".localized
+            static let loadingImagesMessage = "examination.image.loading_images".localized
         }
         
         enum InterpretationSectionComponent {

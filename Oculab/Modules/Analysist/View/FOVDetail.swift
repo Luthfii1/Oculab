@@ -16,11 +16,14 @@ struct FOVDetail: View {
     var examId: String?
 
     @StateObject private var presenter = FOVDetailPresenter()
-    @StateObject private var albumPresenter = AnalysisResultPresenter()
+
+    private var analysisPresenter: AnalysisResultPresenter? {
+        guard let examId, !examId.isEmpty else { return nil }
+        return AnalysisResultSessionStore.shared.presenter(for: examId)
+    }
 
     var body: some View {
-        NavigationView {
-            ZStack {
+        ZStack {
                 Color.black.edgesIgnoringSafeArea(.all)
 
                 if presenter.isError {
@@ -211,9 +214,9 @@ struct FOVDetail: View {
 
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
-                        if let id = examId, !id.isEmpty {
+                        if let id = examId, !id.isEmpty, let analysisPresenter {
                             Task {
-                                await albumPresenter.submitTrackingDuration(examinationId: id)
+                                await analysisPresenter.submitTrackingDuration(examinationId: id)
                             }
                         }
                         Router.shared.navigateBack()
@@ -227,18 +230,24 @@ struct FOVDetail: View {
             }
             .toolbarBackground(.hidden, for: .navigationBar)
             .onAppear {
-                albumPresenter.setStartTime()
+                analysisPresenter?.setStartTime()
 
                 Task {
                     await presenter.fetchData(fovId: fovData.id)
                     await presenter.verifyingFOV(fovId: fovData.id)
+                    if let id = examId, !id.isEmpty {
+                        NotificationCenter.default.post(
+                            name: .fovVerificationUpdated,
+                            object: nil,
+                            userInfo: ["examId": id]
+                        )
+                    }
                 }
             }
             .onDisappear {
                 presenter.resetState()
             }
-        }
-        .navigationBarBackButtonHidden()
+        .navigationBarBackButtonHidden(true)
     }
 }
 

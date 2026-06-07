@@ -18,6 +18,8 @@ class AnalysisResultPresenter: ObservableObject {
     private var trackingTask: Task<Void, Never>?
     private var progressObserver: NSObjectProtocol?
     private var trackedExaminationId: String?
+    private var analysisTrackingStartedAt: Date?
+    private let minimumProgressDisplay: TimeInterval = 1.2
 
     init(interactor: AnalysisResultInteractor = AnalysisResultInteractor()) {
         self.interactor = interactor
@@ -32,6 +34,7 @@ class AnalysisResultPresenter: ObservableObject {
     @Published var isLoading = false
     @Published var analysisProgress: Int = 0
     @Published var analysisStatusMessage: String = AppTextExamProgress.analyzingTitle
+    @Published var analysisFailureMessage: String?
 
     // MARK: - UI State Properties
     @Published var selectedTBGrade: String = AppValue.empty
@@ -88,6 +91,69 @@ class AnalysisResultPresenter: ObservableObject {
 
     var availableFOVTypes: [FOVType] {
         return [.BTA0, .BTA1TO9, .BTAABOVE9]
+    }
+
+    var hasFOVData: Bool {
+        guard let groupedFOVs else { return false }
+        return !groupedFOVs.bta0.isEmpty
+            || !groupedFOVs.bta1to9.isEmpty
+            || !groupedFOVs.btaabove9.isEmpty
+    }
+
+    var hasAnalysisFailed: Bool {
+        analysisFailureMessage != nil
+    }
+
+    var shouldShowResultsUI: Bool {
+        guard let examination = examinationResult, !hasAnalysisFailed else { return false }
+        return examination.statusExamination == .NEEDVALIDATION
+            || examination.statusExamination == .FINISHED
+    }
+
+    var shouldShowAnalyzingUI: Bool {
+        if hasAnalysisFailed {
+            return true
+        }
+
+        guard let examination = examinationResult else {
+            return isLoading
+        }
+
+        switch examination.statusExamination {
+        case .INPROGRESS:
+            return true
+        case .NEEDVALIDATION:
+            if !hasFOVData {
+                return true
+            }
+            if let startedAt = analysisTrackingStartedAt,
+               Date().timeIntervalSince(startedAt) < minimumProgressDisplay {
+                return true
+            }
+            return false
+        case .NOTSTARTED:
+            return AnalysisTrackingStore.isTracked(examination.examinationId)
+        default:
+            return false
+        }
+    }
+
+    private var shouldKeepPolling: Bool {
+        if hasAnalysisFailed {
+            return false
+        }
+
+        guard let examination = examinationResult else { return true }
+
+        if examination.statusExamination == .INPROGRESS {
+            return true
+        }
+
+        if examination.statusExamination == .NEEDVALIDATION, !hasFOVData {
+            return true
+        }
+
+        return false
     }
 
     // MARK: - Helper Methods
@@ -179,8 +245,13 @@ extension AnalysisResultPresenter {
             examinationResult = try await interactor.fetchData(examId: examinationId)
 
             if examinationResult?.statusExamination != .INPROGRESS {
-                groupedFOVs = try await interactor.fetchFOVData(examId: examinationId)
-                checkIsAllFOVsVerified()
+                await loadFOVData(examinationId: examinationId, silent: silent)
+            }
+
+            if let preview = examinationResult?.imagePreview,
+               !preview.isEmpty,
+               preview != "https://is3.cloudhost.id/oculab-fov/oculab-fov" {
+                isWSIImageVisible = true
             }
         } catch {
             if !silent {
@@ -190,32 +261,64 @@ extension AnalysisResultPresenter {
     }
 
     @MainActor
-    func refreshExaminationStatus(examinationId: String) async {
-        await fetchData(examinationId: examinationId, silent: true)
-        if examinationResult?.statusExamination == .FINISHED {
-            Router.shared.navigateBack()
+    func refreshFOVData(examinationId: String) async {
+        await loadFOVData(examinationId: examinationId, silent: true)
+    }
+
+    @MainActor
+    private func loadFOVData(examinationId: String, silent: Bool) async {
+        do {
+            groupedFOVs = try await interactor.fetchFOVData(examId: examinationId)
+            checkIsAllFOVsVerified()
+
+            if hasFOVData {
+                analysisProgress = max(analysisProgress, 100)
+            }
+        } catch {
+            Logger.error("Failed to load FOV data: \(error)", category: .examination)
+            if !silent, groupedFOVs == nil {
+                errorMessage = ErrorHandler.shared.handleError(error, context: .examination)
+            }
         }
     }
 
     @MainActor
-    func startExaminationStatusPolling(examinationId: String) {
+    func refreshExaminationStatus(examinationId: String) async {
+        await fetchData(examinationId: examinationId, silent: true)
+    }
+
+    @MainActor
+    func beginExaminationTracking(examinationId: String) {
+        guard trackedExaminationId != examinationId else { return }
+
         stopExaminationStatusPolling()
         trackedExaminationId = examinationId
+        analysisTrackingStartedAt = Date()
         startRealtimeTracking(examinationId: examinationId)
 
         trackingTask = Task {
             await loadCachedProgress(examinationId: examinationId)
 
             while !Task.isCancelled {
-                try? await Task.sleep(nanoseconds: 15_000_000_000)
-                guard !Task.isCancelled else { break }
-                await refreshExaminationStatus(examinationId: examinationId)
-                if let cached = await progressInteractor.fetchProgress(examinationId: examinationId) {
-                    applyProgressUpdate(cached)
+                if shouldKeepPolling {
+                    await refreshExaminationStatus(examinationId: examinationId)
+                    if let cached = await progressInteractor.fetchProgress(examinationId: examinationId) {
+                        applyProgressUpdate(cached, examinationId: examinationId)
+                    }
+                } else if !shouldShowAnalyzingUI {
+                    break
                 }
-                guard examinationResult?.statusExamination == .INPROGRESS else { break }
+
+                let pollInterval: UInt64 = hasFOVData ? 15_000_000_000 : 5_000_000_000
+                try? await Task.sleep(nanoseconds: pollInterval)
+                guard !Task.isCancelled else { break }
             }
         }
+    }
+
+    @MainActor
+    func startExaminationStatusPolling(examinationId: String) {
+        beginExaminationTracking(examinationId: examinationId)
     }
 
     @MainActor
@@ -224,6 +327,7 @@ extension AnalysisResultPresenter {
         trackingTask = nil
         stopRealtimeTracking()
         trackedExaminationId = nil
+        analysisTrackingStartedAt = nil
     }
 
     @MainActor
@@ -246,9 +350,13 @@ extension AnalysisResultPresenter {
             }
 
             Task { @MainActor in
-                self.applyProgressUpdate(update)
+                self.applyProgressUpdate(update, examinationId: examinationId)
+                if update.isFailed {
+                    return
+                }
                 if update.isReadyForValidation {
                     await self.refreshExaminationStatus(examinationId: examinationId)
+                    await self.loadFOVData(examinationId: examinationId, silent: true)
                 }
             }
         }
@@ -269,15 +377,46 @@ extension AnalysisResultPresenter {
         guard let cached = await progressInteractor.fetchProgress(examinationId: examinationId) else {
             return
         }
-        applyProgressUpdate(cached)
+        applyProgressUpdate(cached, examinationId: examinationId)
     }
 
     @MainActor
-    private func applyProgressUpdate(_ update: AnalysisProgressUpdate) {
+    private func applyProgressUpdate(_ update: AnalysisProgressUpdate, examinationId: String) {
+        if update.isFailed {
+            markAnalysisFailed(message: update.message, examinationId: examinationId)
+            return
+        }
+
         analysisProgress = update.progress
         if let message = update.message, !message.isEmpty {
             analysisStatusMessage = message
         }
+    }
+
+    @MainActor
+    func markAnalysisFailed(message: String?, examinationId: String) {
+        if let message, !message.isEmpty {
+            analysisFailureMessage = message
+        } else if let statusMessage = analysisStatusMessage.isEmpty ? nil : analysisStatusMessage,
+                  statusMessage.localizedCaseInsensitiveContains("fail")
+                    || statusMessage.localizedCaseInsensitiveContains("gagal") {
+            analysisFailureMessage = statusMessage
+        } else {
+            analysisFailureMessage = AppTextExamProgress.analysisFailedDefault
+        }
+
+        analysisProgress = 0
+        AnalysisTrackingStore.untrack(examinationId: examinationId)
+        AnalysisRealtimeService.shared.unsubscribe(from: examinationId)
+        trackingTask?.cancel()
+        trackingTask = nil
+        stopRealtimeTracking()
+    }
+
+    @MainActor
+    func retryAnalysis() {
+        analysisFailureMessage = nil
+        Router.shared.navigateBack()
     }
 
     @MainActor
@@ -291,7 +430,9 @@ extension AnalysisResultPresenter {
     @MainActor
     func submitExpertResult(examinationId: String) async {
         do {
-            guard let validGrading = GradingType(rawValue: selectedTBGrade) else {
+            let validGrading = GradingType(rawValue: selectedTBGrade)
+                ?? GradingType.fromAPIValue(selectedTBGrade)
+            guard validGrading != .unknown else {
                 throw NetworkError.networkError("Error: Invalid TB Grade", endpoint: "submitExpertResult")
             }
 
@@ -314,7 +455,32 @@ extension AnalysisResultPresenter {
     }
 
     func isEnableToSubmit() -> Bool {
+        isAllFOVsVerified && isValidGradingSelection()
+    }
+
+    func isPrimaryActionEnabled() -> Bool {
+        if !isAllFOVsVerified {
+            return hasFOVData
+        }
         return isValidGradingSelection()
+    }
+
+    @MainActor
+    func handlePrimaryValidationAction() {
+        if isAllFOVsVerified {
+            isVerifPopUpVisible = true
+        } else {
+            navigateToFirstUnverifiedAlbum()
+        }
+    }
+
+    func navigateToFirstUnverifiedAlbum() {
+        for fovType in availableFOVTypes {
+            let fovs = selectedFOVs(for: fovType)
+            guard !fovs.isEmpty, fovs.contains(where: { !$0.verified }) else { continue }
+            navigateToAlbum(fovGroup: fovType)
+            return
+        }
     }
 
     private func isValidGradingSelection() -> Bool {
@@ -353,6 +519,7 @@ extension AnalysisResultPresenter {
         stopExaminationStatusPolling()
         analysisProgress = 0
         analysisStatusMessage = AppTextExamProgress.analyzingTitle
+        analysisFailureMessage = nil
         examinationResult = nil
         errorMessage = nil
         confidenceLevel = .unpredicted
@@ -368,5 +535,6 @@ extension AnalysisResultPresenter {
         buttonTitle = AppTextExamProgress.buttonSaveResult
         isAllFOVsVerified = false
         startTime = nil
+        analysisTrackingStartedAt = nil
     }
 }

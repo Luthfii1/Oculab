@@ -52,13 +52,8 @@ class AnalysisResultInteractor {
 
             fov: response.data.FOV ?? [],
             confidenceLevelAggregated: response.data.systemResult?.confidenceLevelAggregated ?? 0,
-            systemGrading: GradingType(
-                rawValue: response.data.systemResult?.systemGrading.rawValue ?? GradingType.NEGATIVE
-                    .rawValue) ??
-                .unknown,
-            expertGrading: GradingType(
-                rawValue: response.data.expertResult?.finalGrading.rawValue ?? GradingType.NEGATIVE
-                    .rawValue) ?? .unknown,
+            systemGrading: response.data.systemResult?.systemGrading ?? .unknown,
+            expertGrading: response.data.expertResult?.finalGrading,
             bacteriaTotalCount: response.data.systemResult?.systemBacteriaTotalCount ?? 0,
             expertNote: {
                 let notes = response.data.expertResult?.notes ?? AppValue.empty

@@ -16,14 +16,24 @@ enum FOVType: String, Hashable, Codable {
         let container = try decoder.singleValueContainer()
         let rawValue = try container.decode(String.self)
 
-        guard let type = FOVType(rawValue: rawValue) else {
+        if let type = FOVType(rawValue: rawValue) {
+            self = type
+            return
+        }
+
+        switch rawValue {
+        case "BTA_0":
+            self = .BTA0
+        case "BTA_1_TO_9":
+            self = .BTA1TO9
+        case "BTA_ABOVE_9":
+            self = .BTAABOVE9
+        default:
             throw DecodingError.dataCorruptedError(
                 in: container,
                 debugDescription: "Invalid FOVType value: \(rawValue)"
             )
         }
-
-        self = type
     }
 
     func encode(to encoder: Encoder) throws {

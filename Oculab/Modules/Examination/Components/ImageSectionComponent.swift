@@ -51,17 +51,29 @@ struct ImageSectionComponent: View {
                 .cornerRadius(Decimal.d8)
             }
 
-            ForEach(presenter.availableFOVTypes, id: \.self) { fovType in
-                if let count = presenter.fovCount(for: fovType) {
-                    Button {
-                        presenter.navigateToAlbum(fovGroup: fovType)
-                    } label: {
-                        FolderCardComponent(
-                            title: fovType,
-                            numOfImage: count
-                        )
+            if presenter.hasFOVData {
+                ForEach(presenter.availableFOVTypes, id: \.self) { fovType in
+                    if let count = presenter.fovCount(for: fovType) {
+                        Button {
+                            presenter.navigateToAlbum(fovGroup: fovType)
+                        } label: {
+                            FolderCardComponent(
+                                title: fovType,
+                                numOfImage: count
+                            )
+                        }
                     }
                 }
+            } else if examination.statusExamination == .NEEDVALIDATION {
+                HStack(alignment: .center, spacing: Decimal.d12) {
+                    ProgressView()
+                    Text(AppTextExamCompImageSection.loadingImagesMessage)
+                        .font(AppTypography.p3)
+                        .foregroundStyle(AppColors.slate400)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.vertical, Decimal.d8)
             }
         }
         .padding(.horizontal, Decimal.d16)

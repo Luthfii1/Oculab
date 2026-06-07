@@ -13,59 +13,78 @@ struct AnalysisResultView: View {
     @StateObject private var presenter = AnalysisResultPresenter()
 
     var body: some View {
-        NavigationView {
-            ZStack {
-                VStack {
-                    HeaderViewComponent(isLeavePopUpVisible: $presenter.isLeavePopUpVisible)
+        ZStack {
+            VStack {
+                HeaderViewComponent(isLeavePopUpVisible: $presenter.isLeavePopUpVisible)
 
-                    AppStepper(
-                        stepTitles: AppTextAnalysisResult.stepTitles,
-                        currentStep: AppTextAnalysisResult.currentStepIndex
-                    )
-                    .padding(.vertical, Decimal.d16)
+                AppStepper(
+                    stepTitles: AppTextAnalysisResult.stepTitles,
+                    currentStep: AppTextAnalysisResult.currentStepIndex
+                )
+                .padding(.vertical, Decimal.d16)
 
-                    if let errorMessage = presenter.errorMessage {
-                        Text(errorMessage)
-                            .foregroundColor(.red)
-                            .padding()
-                    } else if let examination = presenter.examinationResult {
-                        if examination.statusExamination == .INPROGRESS {
-                            AnalyzingExaminationProgressView(examinationId: examinationId)
-                                .environmentObject(presenter)
-                        } else {
-                            ScrollView(showsIndicators: false) {
-                                VStack(alignment: .leading, spacing: Decimal.d24) {
-                                    ImageSectionComponent(presenter: presenter, examination: examination)
-                                    InterpretationSectionComponent(
-                                        examination: examination
-                                    )
-                                    .environmentObject(presenter)
+                if let examination = presenter.examinationResult {
+                    if presenter.shouldShowAnalyzingUI {
+                        AnalyzingExaminationProgressView(examinationId: examinationId)
+                            .environmentObject(presenter)
+                    } else if presenter.shouldShowResultsUI {
+                        ScrollView(showsIndicators: false) {
+                            VStack(alignment: .leading, spacing: Decimal.d24) {
+                                if let errorMessage = presenter.errorMessage {
+                                    Text(errorMessage)
+                                        .font(AppTypography.p3)
+                                        .foregroundStyle(AppColors.red500)
+                                        .padding(12)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .background(AppColors.red50)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        .padding(.horizontal, Decimal.d20)
                                 }
+
+                                ImageSectionComponent(presenter: presenter, examination: examination)
+                                InterpretationSectionComponent(
+                                    examination: examination
+                                )
+                                .environmentObject(presenter)
                             }
                         }
-                    } else {
-                        Spacer()
-                        Text(AppTextAnalysisResult.loadingExaminationMessage)
-                            .foregroundColor(.gray)
-                            .padding()
-                        Spacer()
                     }
+                } else {
+                    Spacer()
+                    Text(AppTextAnalysisResult.loadingExaminationMessage)
+                        .foregroundColor(.gray)
+                        .padding()
+                    Spacer()
                 }
-                .onAppear {
-                    Task {
-                        await presenter.fetchData(examinationId: examinationId)
-                    }
-                }
-                .onDisappear {
-                    presenter.stopExaminationStatusPolling()
-                    presenter.resetState()
-                }
-
-                Spacer()
-
-                ConfirmationPopups(examinationId: examinationId)
-                    .environmentObject(presenter)
             }
+            .onAppear {
+                AnalysisResultSessionStore.shared.register(presenter, for: examinationId)
+                presenter.beginExaminationTracking(examinationId: examinationId)
+                Task {
+                    await presenter.fetchData(examinationId: examinationId)
+                }
+            }
+            .onReceive(
+                NotificationCenter.default.publisher(for: .fovVerificationUpdated)
+            ) { notification in
+                guard let examId = notification.userInfo?["examId"] as? String,
+                      examId.lowercased() == examinationId.lowercased() else {
+                    return
+                }
+                Task {
+                    await presenter.refreshFOVData(examinationId: examinationId)
+                }
+            }
+            .onDisappear {
+                AnalysisResultSessionStore.shared.unregister(examinationId: examinationId)
+                presenter.stopExaminationStatusPolling()
+                presenter.resetState()
+            }
+
+            Spacer()
+
+            ConfirmationPopups(examinationId: examinationId)
+                .environmentObject(presenter)
         }
         .navigationBarHidden(true)
     }

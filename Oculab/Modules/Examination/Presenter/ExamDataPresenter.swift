@@ -38,8 +38,6 @@ class ExamDataPresenter: ObservableObject {
     )
     @Published var examinations: [AdminExaminationData] = []
     @Published var submissionError: String?
-    @Published var showAnalysisQueuedConfirmation = false
-    private var queuedExaminationId: String?
 
     // MARK: - Initialization
     init(interactor: ExamInteractor) {
@@ -162,21 +160,6 @@ extension ExamDataPresenter {
     func navigateToAnalysisResult(examinationId: String) {
         Router.shared.navigateTo(.analysisResult(examinationId: examinationId))
     }
-
-    @MainActor
-    func confirmAnalysisQueuedAndGoHome() {
-        showAnalysisQueuedConfirmation = false
-        queuedExaminationId = nil
-        Router.shared.popToRoot()
-    }
-
-    @MainActor
-    func viewAnalysisProgressFromQueue() {
-        guard let examinationId = queuedExaminationId else { return }
-        showAnalysisQueuedConfirmation = false
-        queuedExaminationId = nil
-        navigateToAnalysisResult(examinationId: examinationId)
-    }
 }
 
 // MARK: - Submission Methods
@@ -208,13 +191,13 @@ extension ExamDataPresenter {
             videoPresenter.previewURL = nil
             deleteTemporaryFile(at: fileURL)
 
-            queuedExaminationId = examDetailData.examinationId
-            AnalysisTrackingStore.track(examinationId: examDetailData.examinationId)
+            let examinationId = examDetailData.examinationId
+            AnalysisTrackingStore.track(examinationId: examinationId)
             Task { @MainActor in
-                AnalysisRealtimeService.shared.subscribe(to: examDetailData.examinationId)
+                AnalysisRealtimeService.shared.subscribe(to: examinationId)
                 await ExaminationNotificationService.shared.requestAuthorizationIfNeeded()
             }
-            showAnalysisQueuedConfirmation = true
+            navigateToAnalysisResult(examinationId: examinationId)
             return true
         } catch {
             Logger.error("Error submitting or loading video data: \(error)", category: .examination)

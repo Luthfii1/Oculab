@@ -51,6 +51,7 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
     enum CodingKeys: String, CodingKey {
         case id
         case legacyId = "_id"
+        case image
         case imageMLAnalyzed
         case imageOriginal
         case type
@@ -70,8 +71,13 @@ class FOVData: Hashable, Equatable, Codable, Identifiable {
         } else {
             self.id = AppValue.empty
         }
-        self.imageOriginal = try container.decode(String.self, forKey: .imageOriginal)
-        self.imageMLAnalyzed = try container.decode(String.self, forKey: .imageMLAnalyzed)
+
+        let resolvedOriginal = try container.decodeIfPresent(String.self, forKey: .imageOriginal)
+            ?? container.decodeIfPresent(String.self, forKey: .image)
+            ?? AppValue.empty
+        self.imageOriginal = resolvedOriginal
+        self.imageMLAnalyzed = try container.decodeIfPresent(String.self, forKey: .imageMLAnalyzed)
+            ?? resolvedOriginal
         self.type = try container.decode(FOVType.self, forKey: .type)
         self.order = try container.decode(Int.self, forKey: .order)
         self.comment = try container.decodeIfPresent([String].self, forKey: .comment)

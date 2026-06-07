@@ -15,15 +15,39 @@ enum GradingType: String, Codable, CaseIterable {
     case Plus3 = "POSITIVE 3+"
     case unknown = "Unknown"
 
+    /// Canonical value expected by the backend API (`PLUS_1`, not `POSITIVE 1+`).
+    var apiValue: String {
+        switch self {
+        case .Plus1: return "PLUS_1"
+        case .Plus2: return "PLUS_2"
+        case .Plus3: return "PLUS_3"
+        default: return rawValue
+        }
+    }
+
+    static func fromAPIValue(_ value: String) -> GradingType {
+        switch value.uppercased() {
+        case "NEGATIVE": return .NEGATIVE
+        case "SCANTY": return .SCANTY
+        case "PLUS_1", "POSITIVE 1+": return .Plus1
+        case "PLUS_2", "POSITIVE 2+": return .Plus2
+        case "PLUS_3", "POSITIVE 3+": return .Plus3
+        default:
+            return GradingType.allCases.first {
+                $0.rawValue.caseInsensitiveCompare(value) == .orderedSame
+            } ?? .unknown
+        }
+    }
+
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let rawValue = try container.decode(String.self)
-        self = GradingType.allCases.first { $0.rawValue.caseInsensitiveCompare(rawValue) == .orderedSame } ?? .unknown
+        self = GradingType.fromAPIValue(rawValue)
     }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
-        try container.encode(rawValue)
+        try container.encode(apiValue)
     }
     
     var displayValue: String {

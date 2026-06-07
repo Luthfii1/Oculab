@@ -133,19 +133,6 @@ struct ExamDetailView: View {
             }
         }
         .alert(
-            AppTextExamDetail.analysisQueuedTitle,
-            isPresented: $presenter.showAnalysisQueuedConfirmation
-        ) {
-            Button(AppTextExamDetail.analysisQueuedGoHome) {
-                presenter.confirmAnalysisQueuedAndGoHome()
-            }
-            Button(AppTextExamDetail.analysisQueuedViewProgress) {
-                presenter.viewAnalysisProgressFromQueue()
-            }
-        } message: {
-            Text(AppTextExamDetail.analysisQueuedMessage)
-        }
-        .alert(
             AppState.error,
             isPresented: Binding(
                 get: { presenter.submissionError != nil },
