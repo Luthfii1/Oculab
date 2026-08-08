@@ -139,6 +139,8 @@ struct ExamDetailAdminView: View {
             }
             .onAppear {
                 Task {
+                    presenter.resetState()
+                    resultPresenter.resetState()
                     await presenter.fetchData(examId: examId, patientId: patientId, userRole: .ADMIN)
                     await resultPresenter.fetchData(examinationId: examId)
                 }
