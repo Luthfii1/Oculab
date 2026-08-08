@@ -433,6 +433,7 @@
 "examination.title_result_interpretation" = "Hasil Interpretasi";
 "examination.button_start_analysis" = "Mulai Analisis";
 "examination.button_submitting" = "Mengirimkan...";
+"examination.temp_file_cleanup_warning" = "Pemeriksaan terkirim, tapi rekaman sementara tidak dapat dihapus dari perangkat.";
 
 // Progress View
 "examination.progress.analyzing_title" = "Menginterpretasikan data";

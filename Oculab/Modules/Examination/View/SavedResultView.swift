@@ -143,6 +143,8 @@ struct SavedResultView: View {
             }
             .onAppear {
                 Task {
+                    presenter.resetState()
+                    resultPresenter.resetState()
                     await presenter.fetchData(examId: examId, patientId: patientId, userRole: .LAB)
                     await resultPresenter.fetchData(examinationId: examId)
                 }

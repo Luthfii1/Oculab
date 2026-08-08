@@ -38,6 +38,7 @@ class ExamDataPresenter: ObservableObject {
     )
     @Published var examinations: [AdminExaminationData] = []
     @Published var submissionError: String?
+    @Published var cleanupWarning: String?
 
     // MARK: - Initialization
     init(interactor: ExamInteractor) {
@@ -135,18 +136,21 @@ extension ExamDataPresenter {
         recordVideo = videoPresenter.previewURL
     }
 
-    private func deleteTemporaryFile(at url: URL) {
+    @discardableResult
+    private func deleteTemporaryFile(at url: URL) -> Bool {
         let fileManager = FileManager.default
         guard fileManager.fileExists(atPath: url.path) else {
             Logger.warning("Temporary file does not exist at path: \(url.path)", category: .examination)
-            return
+            return true
         }
-        
+
         do {
             try fileManager.removeItem(at: url)
             Logger.info("Successfully deleted temporary video file at: \(url.path)", category: .examination)
+            return true
         } catch {
             Logger.error("Error deleting temporary video file: \(error.localizedDescription)", category: .examination)
+            return false
         }
     }
 }
@@ -189,7 +193,9 @@ extension ExamDataPresenter {
 
             recordVideo = nil
             videoPresenter.previewURL = nil
-            deleteTemporaryFile(at: fileURL)
+            if !deleteTemporaryFile(at: fileURL) {
+                cleanupWarning = AppTextExam.tempFileCleanupWarning
+            }
 
             let examinationId = examDetailData.examinationId
             AnalysisTrackingStore.track(examinationId: examinationId)
@@ -204,6 +210,34 @@ extension ExamDataPresenter {
             submissionError = ErrorHandler.shared.handleError(error, context: .examination)
             return false
         }
+    }
+}
+
+// MARK: - State Reset
+extension ExamDataPresenter {
+    @MainActor
+    func resetState() {
+        isLoading = false
+        recordVideo = nil
+        examDetailData = .init(
+            examinationId: AppValue.empty,
+            pic: AppValue.empty,
+            slideId: AppValue.empty,
+            examinationGoal: AppValue.empty,
+            type: AppValue.empty,
+            dpjp: AppValue.empty
+        )
+        patientDetailData = .init(
+            patientId: AppValue.empty,
+            name: AppValue.empty,
+            nik: AppValue.empty,
+            dob: AppValue.empty,
+            sex: AppValue.empty,
+            bpjs: AppValue.empty
+        )
+        examinations = []
+        submissionError = nil
+        cleanupWarning = nil
     }
 }
 
