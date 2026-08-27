@@ -51,10 +51,10 @@ extension AppText {
         enum FOVDetailView {
             static let navigationTitle = "analysist.fov_detail.navigation_title".localized
             static let loadingDataMessage = AppState.loading("analysist.examination_data".localized)
-            static let processingInProgressTitle = "Processing in Progress"
-            static let boundingBoxNotAvailableMessage = "This image is still being processed. Bounding box data is not available yet."
-            static let errorLoadingDataTitle = "Error Loading Data"
-            static let retryButtonTitle = "Retry"
+            static let processingInProgressTitle = "analysist.fov_detail.processing_in_progress".localized
+            static let boundingBoxNotAvailableMessage = "analysist.fov_detail.bounding_box_not_available".localized
+            static let errorLoadingDataTitle = "analysist.fov_detail.error_loading_data".localized
+            static let retryButtonTitle = "common.retry".localized
             static let allBacteriaReviewedMessage = "analysist.fov_detail.all_reviewed".localized
             static let reviewRemainingButton = "analysist.fov_detail.review_remaining".localized
             static let startFromFirstButton = "analysist.fov_detail.start_from_first".localized

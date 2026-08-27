@@ -63,4 +63,20 @@ class MockNetworkService: NetworkServiceProtocol {
             throw NetworkError.networkError("Mock MULTIPART failed")
         }
     }
+
+    func multipartFile<T: Decodable>(
+        urlString: String,
+        headers: [String: String]?,
+        fileURL: URL,
+        fieldName: String,
+        fileName: String?,
+        mimeType: String?
+    ) async throws -> APIResponse<T> {
+        try await multipart(
+            urlString: urlString,
+            headers: headers,
+            parameters: [fieldName: Data()],
+            boundary: nil
+        )
+    }
 }

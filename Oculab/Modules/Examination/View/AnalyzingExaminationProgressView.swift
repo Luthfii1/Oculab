@@ -206,7 +206,7 @@ struct AnalyzingExaminationProgressView: View {
         .environmentObject({
             let presenter = AnalysisResultPresenter()
             presenter.analysisProgress = 55
-            presenter.analysisStatusMessage = "Extracting fields of view"
+            presenter.analysisStatusMessage = AppTextExamProgress.extractingFovsPreview
             return presenter
         }())
 }

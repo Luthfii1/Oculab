@@ -11,7 +11,7 @@ class PDFInteractor {
     private var endpoint = API.BE
     private let networkService: NetworkServiceProtocol
 
-    init(networkService: NetworkServiceProtocol = AlamofireNetworkService()) {
+    init(networkService: NetworkServiceProtocol = DependencyInjection.shared.networkService) {
         self.networkService = networkService
     }
 

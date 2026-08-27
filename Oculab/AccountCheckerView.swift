@@ -45,6 +45,11 @@ struct AccountCheckerView: View {
                 appStateManager.setUnauthenticated()
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: AuthSessionManager.sessionDidInvalidateNotification)) { _ in
+            Task { @MainActor in
+                await authPresenter.performLogout()
+            }
+        }
     }
 }
 

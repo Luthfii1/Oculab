@@ -13,11 +13,15 @@ class User: Codable, Identifiable {
     var id: String = AppValue.empty
     var name: String
     var role: RolesType
+    /// Deprecated: tokens live in Keychain. Kept for SwiftData schema compatibility; always nil.
     var token: String?
     var healthFacilityName: String?
     var email: String?
+    /// Deprecated: never persist passwords. Kept for schema compatibility; always nil.
     var password: String?
+    /// Access PIN is stored in Keychain (`KeychainKey.accessPin`). This field is a non-persisted mirror for UI/decoding only — scrubbed before SwiftData save.
     var accessPin: String?
+    /// Deprecated: never persist. Kept for schema compatibility; always nil.
     var previousPassword: String?
     var isFaceIdEnabled: Bool = false
     var businessModel: BusinessModelType?
@@ -38,11 +42,11 @@ class User: Codable, Identifiable {
         self.id = id
         self.name = name
         self.role = role
-        self.token = token
+        self.token = nil
         self.healthFacilityName = healthFacilityName
         self.email = email
-        self.password = password
-        self.previousPassword = previousPassword
+        self.password = nil
+        self.previousPassword = nil
         self.accessPin = accessPin
         self.isFaceIdEnabled = isFaceIdEnabled
         self.businessModel = businessModel
@@ -53,12 +57,10 @@ class User: Codable, Identifiable {
         case legacyId = "_id"
         case name
         case role
-        case token
         case healthFacilityName
         case email
-        case password
         case accessPin
-        case previousPassword
+        case hasAccessPin
         case businessModel
     }
 
@@ -73,28 +75,60 @@ class User: Codable, Identifiable {
         }
         self.name = try container.decode(String.self, forKey: .name)
         self.role = try container.decode(RolesType.self, forKey: .role)
-        self.token = try container.decodeIfPresent(String.self, forKey: .token)
+        self.token = nil
         self.healthFacilityName = try container.decodeIfPresent(String.self, forKey: .healthFacilityName)
         self.email = try container.decodeIfPresent(String.self, forKey: .email)
-        self.password = try container.decodeIfPresent(String.self, forKey: .password)
-        self.accessPin = try container.decodeIfPresent(String.self, forKey: .accessPin)
-        self.previousPassword = try container.decodeIfPresent(String.self, forKey: .previousPassword)
+        self.password = nil
+        self.previousPassword = nil
+        // Prefer Keychain PIN; API may only send hasAccessPin (no plaintext).
+        if let pin = try container.decodeIfPresent(String.self, forKey: .accessPin), !pin.isEmpty {
+            self.accessPin = pin
+        } else if let hasPin = try container.decodeIfPresent(Bool.self, forKey: .hasAccessPin), hasPin {
+            self.accessPin = KeychainHelper.string(for: .accessPin)
+        } else {
+            self.accessPin = KeychainHelper.string(for: .accessPin)
+        }
         self.businessModel = try container.decodeIfPresent(BusinessModelType.self, forKey: .businessModel)
+        self.isFaceIdEnabled = false
     }
 
     func encode(to encoder: Encoder) throws {
+        // Never encode secrets — update-user payloads must not leak password/PIN/token.
         var container = encoder.container(keyedBy: CodingKeys.self)
         if !id.isEmpty {
             try container.encode(id, forKey: .id)
         }
         try container.encode(name, forKey: .name)
         try container.encode(role, forKey: .role)
-        try container.encodeIfPresent(token, forKey: .token)
         try container.encodeIfPresent(healthFacilityName, forKey: .healthFacilityName)
         try container.encodeIfPresent(email, forKey: .email)
-        try container.encodeIfPresent(password, forKey: .password)
-        try container.encodeIfPresent(accessPin, forKey: .accessPin)
-        try container.encodeIfPresent(previousPassword, forKey: .previousPassword)
         try container.encodeIfPresent(businessModel, forKey: .businessModel)
+    }
+
+    /// Persist PIN in Keychain and keep an in-memory mirror for the current session.
+    func setAccessPinSecurely(_ pin: String?) {
+        if let pin, !pin.isEmpty {
+            KeychainHelper.set(pin, for: .accessPin)
+            accessPin = pin
+        } else {
+            KeychainHelper.remove(.accessPin)
+            accessPin = nil
+        }
+    }
+
+    func loadAccessPinFromKeychain() {
+        accessPin = KeychainHelper.string(for: .accessPin)
+    }
+
+    /// Strip secrets before writing to SwiftData.
+    func scrubSecretsForPersistence() {
+        token = nil
+        password = nil
+        previousPassword = nil
+        // Keep Keychain as source of truth; do not leave PIN on disk.
+        if let pin = accessPin, !pin.isEmpty {
+            KeychainHelper.set(pin, for: .accessPin)
+        }
+        accessPin = nil
     }
 }

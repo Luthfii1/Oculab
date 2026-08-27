@@ -87,6 +87,50 @@ class AlamofireNetworkService: NetworkServiceProtocol {
         }
     }
 
+    func multipartFile<T: Decodable>(
+        urlString: String,
+        headers: [String: String]?,
+        fileURL: URL,
+        fieldName: String,
+        fileName: String?,
+        mimeType: String?
+    ) async throws -> APIResponse<T> {
+        let resolvedFileName = fileName ?? fileURL.lastPathComponent
+        let resolvedMime = mimeType ?? Self.mimeType(for: fileURL)
+
+        return try await executeWithAuthRetry(endpoint: urlString, headers: headers) { headers in
+            let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
+            let request = Self.uploadSession.upload(
+                multipartFormData: { multipartFormData in
+                    multipartFormData.append(
+                        fileURL,
+                        withName: fieldName,
+                        fileName: resolvedFileName,
+                        mimeType: resolvedMime
+                    )
+                },
+                to: urlString,
+                headers: afHeaders
+            )
+            return try await self.handleRequest(request, endpoint: urlString)
+        }
+    }
+
+    private static func mimeType(for fileURL: URL) -> String {
+        switch fileURL.pathExtension.lowercased() {
+        case "mp4":
+            return "video/mp4"
+        case "mov":
+            return "video/quicktime"
+        case "avi":
+            return "video/x-msvideo"
+        case "webm":
+            return "video/webm"
+        default:
+            return "video/quicktime"
+        }
+    }
+
     private func executeWithAuthRetry<T>(
         endpoint: String,
         headers: [String: String]?,
@@ -98,12 +142,18 @@ class AlamofireNetworkService: NetworkServiceProtocol {
             return try await perform(initialHeaders)
         } catch NetworkError.unauthorized {
             guard AuthSessionManager.shouldAttemptTokenRefresh(for: endpoint) else {
+                await MainActor.run { AuthSessionManager.invalidateSession() }
                 throw NetworkError.unauthorized(endpoint: endpoint)
             }
 
-            try await AuthTokenRefresher.shared.refreshAccessToken(using: self)
-            let refreshedHeaders = try AuthSessionManager.headersByReplacingAuthorization(headers)
-            return try await perform(refreshedHeaders)
+            do {
+                try await AuthTokenRefresher.shared.refreshAccessToken(using: self)
+                let refreshedHeaders = try AuthSessionManager.headersByReplacingAuthorization(headers)
+                return try await perform(refreshedHeaders)
+            } catch {
+                await MainActor.run { AuthSessionManager.invalidateSession() }
+                throw NetworkError.unauthorized(endpoint: endpoint)
+            }
         }
     }
 

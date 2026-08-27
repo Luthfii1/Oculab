@@ -13,7 +13,6 @@ class ExamInteractor {
 
     // MARK: - API Endpoints
     private struct APIEndpoints {
-        static let createExamination = API.BE + "/examination/create-examination/2t3g4837-13da-4335-97c1-dd5e7eaba549"
         static let getExaminationById = API.BE + "/examination/get-examination-by-id/"
         static let getPatientById = API.BE + "/patient/get-patient-by-id/"
         static let forwardVideoToML = API.BE + "/examination/forward-video-to-ml/"
@@ -21,7 +20,7 @@ class ExamInteractor {
     }
     
     // MARK: - Initialization
-    init(networkService: NetworkServiceProtocol = AlamofireNetworkService()) {
+    init(networkService: NetworkServiceProtocol = DependencyInjection.shared.networkService) {
         self.networkService = networkService
     }
 
@@ -64,18 +63,19 @@ class ExamInteractor {
     }
 
     func submitExamination(
-        examVideo: Data,
+        videoFileURL: URL,
         examinationId: String,
         patientId: String
     ) async throws -> APIResponse<ForwardVideoToMLData> {
         let urlString = APIEndpoints.forwardVideoToML + "\(examinationId.lowercased())"
-        let parameters = ["video": examVideo]
 
-        return try await networkService.multipart(
+        return try await networkService.multipartFile(
             urlString: urlString,
             headers: nil,
-            parameters: parameters,
-            boundary: nil
+            fileURL: videoFileURL,
+            fieldName: "video",
+            fileName: videoFileURL.lastPathComponent,
+            mimeType: nil
         )
     }
 }

@@ -19,7 +19,7 @@ class AccountInteractor: ObservableObject {
     init(
         authInteractor: AuthenticationInteractor,
         authPresenter: AuthenticationPresenter? = nil,
-        networkService: NetworkServiceProtocol = AlamofireNetworkService()
+        networkService: NetworkServiceProtocol = DependencyInjection.shared.networkService
     ) {
         self.authInteractor = authInteractor
         self.authPresenter = authPresenter

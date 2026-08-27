@@ -886,3 +886,9 @@
 "register.facility_type.optical" = "Optik";
 "register.facility_type.medical_law_facility" = "Fasilitas Hukum Medis";
 "register.facility_type.traditional_health_facility" = "Fasilitas Kesehatan Tradisional";
+
+"video_record.video_record_view.setting_up_camera" = "Menyiapkan kamera...";
+"examination.progress.extracting_fovs" = "Mengekstrak bidang pandang";
+"analysist.fov_detail.processing_in_progress" = "Sedang Diproses";
+"analysist.fov_detail.bounding_box_not_available" = "Gambar masih diproses. Data bounding box belum tersedia.";
+"analysist.fov_detail.error_loading_data" = "Gagal Memuat Data";

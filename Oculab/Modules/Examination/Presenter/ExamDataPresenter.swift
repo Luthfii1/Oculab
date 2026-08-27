@@ -10,7 +10,7 @@ import SwiftUI
 class ExamDataPresenter: ObservableObject {
     // MARK: - Dependencies
     private let interactor: ExamInteractor
-    let videoPresenter = VideoRecordPresenter.shared
+    var videoPresenter: VideoRecordPresenter { VideoRecordSession.current }
     
     // MARK: - Published Properties
     @Published var isLoading: Bool = false
@@ -158,7 +158,10 @@ extension ExamDataPresenter {
 // MARK: - Navigation Methods
 extension ExamDataPresenter {
     func newVideoRecord() {
-        Router.shared.navigateTo(.videoRecord(slideId: examDetailData.slideId))
+        Task { @MainActor in
+            await VideoRecordSession.current.resetForNewSession()
+            Router.shared.navigateTo(.videoRecord(slideId: examDetailData.slideId))
+        }
     }
 
     func navigateToAnalysisResult(examinationId: String) {
@@ -180,11 +183,10 @@ extension ExamDataPresenter {
         }
 
         do {
-            let videoData = try Data(contentsOf: fileURL)
-            Logger.info("Video data loaded successfully with size: \(videoData.count) bytes", category: .examination)
+            Logger.info("Streaming video upload from \(fileURL.lastPathComponent)", category: .examination)
 
             _ = try await interactor.submitExamination(
-                examVideo: videoData,
+                videoFileURL: fileURL,
                 examinationId: examDetailData.examinationId,
                 patientId: patientDetailData.patientId
             )
@@ -196,6 +198,7 @@ extension ExamDataPresenter {
             if !deleteTemporaryFile(at: fileURL) {
                 cleanupWarning = AppTextExam.tempFileCleanupWarning
             }
+            await VideoRecordSession.replaceSession()
 
             let examinationId = examDetailData.examinationId
             AnalysisTrackingStore.track(examinationId: examinationId)

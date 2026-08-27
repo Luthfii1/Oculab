@@ -48,8 +48,8 @@ struct RegisterAccountBody: Codable {
 struct RegisterAccountResponse: Codable {
     var id: String
     var email: String
-    var currentPassword: String
-    
+    var currentPassword: String?
+
     enum CodingKeys: String, CodingKey {
         case id = "userId"
         case email

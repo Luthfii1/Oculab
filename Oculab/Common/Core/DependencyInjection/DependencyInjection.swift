@@ -25,13 +25,17 @@ class DependencyInjection: ObservableObject {
     // MARK: - Stored Properties for All Modules
     private var authenticationPresenterInstance: AuthenticationPresenter?
     lazy var authenticationInteractor: AuthenticationInteractor = {
-        AuthenticationInteractor(modelContext: safeModelContext)
+        AuthenticationInteractor(
+            modelContext: safeModelContext,
+            networkService: networkService
+        )
     }()
-    lazy var profileInteractor: ProfileInteractor = ProfileInteractor()
+    lazy var profileInteractor: ProfileInteractor = ProfileInteractor(networkService: networkService)
     lazy var accountInteractor: AccountInteractor = {
         AccountInteractor(
             authInteractor: authenticationInteractor,
-            authPresenter: createAuthPresenter()
+            authPresenter: createAuthPresenter(),
+            networkService: networkService
         )
     }()
     lazy var examInteractor: ExamInteractor = {

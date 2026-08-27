@@ -11,9 +11,12 @@ struct RefreshTokenBody: Codable {
 
 struct RefreshTokenResponse: Codable {
     let accessToken: String
+    let refreshToken: String?
 }
 
 enum AuthSessionManager {
+    static let sessionDidInvalidateNotification = Notification.Name("oculab.auth.sessionDidInvalidate")
+
     private static let unauthenticatedPaths = [
         "/user/login",
         "/user/register",
@@ -69,7 +72,7 @@ enum AuthSessionManager {
     }
 
     static func refreshAccessToken(
-        using networkService: NetworkServiceProtocol = AlamofireNetworkService()
+        using networkService: NetworkServiceProtocol = DependencyInjection.shared.networkService
     ) async throws {
         guard let refreshToken = KeychainHelper.string(for: .refreshToken),
               let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue)
@@ -88,6 +91,19 @@ enum AuthSessionManager {
         )
 
         KeychainHelper.set(response.data.accessToken, for: .accessToken)
+        if let newRefresh = response.data.refreshToken, !newRefresh.isEmpty {
+            KeychainHelper.set(newRefresh, for: .refreshToken)
+        }
+    }
+
+    /// Clears local auth state and notifies the UI to return to login.
+    @MainActor
+    static func invalidateSession() {
+        UserDefaults.standard.set(false, forKey: UserDefaultType.isUserLoggedIn.rawValue)
+        UserDefaults.standard.removeObject(forKey: UserDefaultType.userId.rawValue)
+        UserDefaults.standard.removeObject(forKey: UserDefaultType.isPinSessionAuthorized.rawValue)
+        KeychainHelper.removeAll()
+        NotificationCenter.default.post(name: sessionDidInvalidateNotification, object: nil)
     }
 }
 
@@ -97,7 +113,7 @@ actor AuthTokenRefresher {
     private var refreshTask: Task<Void, Error>?
 
     func refreshAccessToken(
-        using networkService: NetworkServiceProtocol = AlamofireNetworkService()
+        using networkService: NetworkServiceProtocol = DependencyInjection.shared.networkService
     ) async throws {
         if let refreshTask {
             try await refreshTask.value

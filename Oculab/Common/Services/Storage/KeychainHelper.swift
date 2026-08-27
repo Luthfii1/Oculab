@@ -9,6 +9,7 @@ import Security
 enum KeychainKey: String {
     case accessToken
     case refreshToken
+    case accessPin
 }
 
 enum KeychainHelper {
@@ -70,7 +71,7 @@ enum KeychainHelper {
     }
 
     static func removeAll() {
-        for key in [KeychainKey.accessToken, .refreshToken] {
+        for key in [KeychainKey.accessToken, .refreshToken, .accessPin] {
             remove(key)
         }
     }
@@ -100,6 +101,13 @@ enum KeychainHelper {
         if let refresh = defaults.string(forKey: legacyRefresh), !refresh.isEmpty {
             set(refresh, for: .refreshToken)
             defaults.removeObject(forKey: legacyRefresh)
+        }
+
+        // Migrate legacy SwiftData-stored PINs if UserDefaults mirror exists.
+        let legacyPin = "accessPin"
+        if let pin = defaults.string(forKey: legacyPin), !pin.isEmpty {
+            set(pin, for: .accessPin)
+            defaults.removeObject(forKey: legacyPin)
         }
     }
 }

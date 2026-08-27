@@ -20,9 +20,10 @@ struct LoginResponse: Codable {
 }
 
 struct UserUpdateAccessPinResponse: Codable {
-    var userId: String
-    var email: String
-    var newAccessPin: String
+    var userId: String?
+    var email: String?
+    var hasAccessPin: Bool?
+    var newAccessPin: String?
 }
 
 struct UserUpdateAccessPinBody: Codable {
@@ -31,7 +32,8 @@ struct UserUpdateAccessPinBody: Codable {
 }
 
 struct CreateAccessPinResponse: Codable {
-    var accessPin: String
+    var accessPin: String?
+    var hasAccessPin: Bool?
 }
 
 struct RegisterUserBody: Codable {
@@ -44,18 +46,19 @@ struct RegisterUserBody: Codable {
 struct RegisterUserData: Codable {
     let userId: String
     let email: String
-    let currentPassword: String
+    let currentPassword: String?
 }
 
 struct DeleteAccessPinResponse: Codable {
     let accessPin: String?
+    let hasAccessPin: Bool?
 }
 
 class AuthenticationInteractor: ObservableObject {
     private var modelContext: ModelContext
     private let networkService: NetworkServiceProtocol
 
-    init(modelContext: ModelContext, networkService: NetworkServiceProtocol = AlamofireNetworkService()) {
+    init(modelContext: ModelContext, networkService: NetworkServiceProtocol = DependencyInjection.shared.networkService) {
         self.modelContext = modelContext
         self.networkService = networkService
     }
@@ -149,33 +152,32 @@ class AuthenticationInteractor: ObservableObject {
     }
 
     private func copyUser(from source: User) -> User {
-        User(
+        let user = User(
             id: source.id,
             name: source.name,
             role: source.role,
-            token: source.token,
             healthFacilityName: source.healthFacilityName,
             email: source.email,
-            password: source.password,
-            previousPassword: source.previousPassword,
-            accessPin: source.accessPin,
+            accessPin: source.accessPin ?? KeychainHelper.string(for: .accessPin),
             isFaceIdEnabled: source.isFaceIdEnabled,
             businessModel: source.businessModel
         )
+        return user
     }
 
     private func applyUser(_ source: User, to target: User) {
         target.id = source.id
         target.name = source.name
         target.role = source.role
-        target.token = source.token
         target.healthFacilityName = source.healthFacilityName
         target.email = source.email
-        target.password = source.password
-        target.previousPassword = source.previousPassword
-        target.accessPin = source.accessPin
         target.isFaceIdEnabled = source.isFaceIdEnabled
         target.businessModel = source.businessModel
+        // Secrets: keep Keychain PIN; never write password/token to SwiftData.
+        if let pin = source.accessPin, !pin.isEmpty {
+            KeychainHelper.set(pin, for: .accessPin)
+        }
+        target.scrubSecretsForPersistence()
     }
 
     private func getUserSwiftData() async -> User? {
@@ -183,7 +185,19 @@ class AuthenticationInteractor: ObservableObject {
             let fetchDescriptor = FetchDescriptor<User>()
             do {
                 let localData = try modelContext.fetch(fetchDescriptor)
-                return localData.first
+                guard let user = localData.first else { return nil }
+
+                // One-time migration: move any leftover SwiftData PIN into Keychain.
+                if let legacyPin = user.accessPin, !legacyPin.isEmpty,
+                   KeychainHelper.string(for: .accessPin) == nil {
+                    KeychainHelper.set(legacyPin, for: .accessPin)
+                }
+                if user.password != nil || user.token != nil || user.previousPassword != nil || user.accessPin != nil {
+                    user.scrubSecretsForPersistence()
+                    try? modelContext.save()
+                }
+                user.loadAccessPinFromKeychain()
+                return user
             } catch {
                 Logger.error("Failed to fetch user from SwiftData: \(error.localizedDescription)", category: .authentication)
                 return nil
@@ -196,10 +210,15 @@ class AuthenticationInteractor: ObservableObject {
             let fetchDescriptor = FetchDescriptor<User>()
             do {
                 let existing = try modelContext.fetch(fetchDescriptor)
+                if let pin = data.accessPin, !pin.isEmpty {
+                    KeychainHelper.set(pin, for: .accessPin)
+                }
                 if let current = existing.first {
                     applyUser(data, to: current)
                 } else {
-                    modelContext.insert(copyUser(from: data))
+                    let copy = copyUser(from: data)
+                    copy.scrubSecretsForPersistence()
+                    modelContext.insert(copy)
                 }
                 try modelContext.save()
             } catch {
@@ -227,80 +246,58 @@ class AuthenticationInteractor: ObservableObject {
     }
     
     func editNewPIN(newAccessPin: String, previousAccessPin: String) async throws -> UserUpdateAccessPinResponse {
-        guard let token = KeychainHelper.string(for: .accessToken) else {
-            throw URLError(.userAuthenticationRequired)
-        }
-        
         guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
             throw URLError(.userAuthenticationRequired)
         }
-        
-        let headers = [
-            "Authorization": "Bearer \(token)",
-            "Content-Type": "application/json"
-        ]
-        
+
         let response: APIResponse<UserUpdateAccessPinResponse> = try await networkService.update(
             urlString: apiAuthenticationService + "/update-user-accessPin/\(userId)",
-            headers: headers,
+            headers: try authorizationHeaders(),
             body: UserUpdateAccessPinBody(
                 newAccessPin: newAccessPin,
                 previousAccessPin: previousAccessPin
             )
         )
 
+        KeychainHelper.set(newAccessPin, for: .accessPin)
+
         return UserUpdateAccessPinResponse(
-            userId: response.data.userId,
+            userId: response.data.userId ?? userId,
             email: response.data.email,
-            newAccessPin: response.data.newAccessPin
+            hasAccessPin: true,
+            newAccessPin: newAccessPin
         )
     }
-    
+
     func createAccessPin(accessPin: String) async throws -> CreateAccessPinResponse {
-        guard let token = KeychainHelper.string(for: .accessToken) else {
-            throw URLError(.userAuthenticationRequired)
-        }
-        
         guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
             throw URLError(.userAuthenticationRequired)
         }
-        
-        let headers = [
-            "Authorization": "Bearer \(token)",
-            "Content-Type": "application/json"
-        ]
-        
-        let response: APIResponse<CreateAccessPinResponse> = try await networkService.post(
+
+        let _: APIResponse<CreateAccessPinResponse> = try await networkService.post(
             urlString: apiAuthenticationService + "/create-user-accessPin/\(userId)",
-            headers: headers,
-            body: CreateAccessPinResponse(accessPin: accessPin)
+            headers: try authorizationHeaders(),
+            body: CreateAccessPinResponse(accessPin: accessPin, hasAccessPin: true)
         )
-        
-        return CreateAccessPinResponse(accessPin: response.data.accessPin)
+
+        KeychainHelper.set(accessPin, for: .accessPin)
+        return CreateAccessPinResponse(accessPin: accessPin, hasAccessPin: true)
     }
 
     func deleteAccessPin() async throws -> DeleteAccessPinResponse {
-        guard let token = KeychainHelper.string(for: .accessToken) else {
-            throw URLError(.userAuthenticationRequired)
-        }
-        
         guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
             throw URLError(.userAuthenticationRequired)
         }
-        
-        let headers = [
-            "Authorization": "Bearer \(token)",
-            "Content-Type": "application/json"
-        ]
-        
+
         struct EmptyBody: Codable {}
-        
-        let response: APIResponse<DeleteAccessPinResponse> = try await networkService.delete(
+
+        let _: APIResponse<DeleteAccessPinResponse> = try await networkService.delete(
             urlString: apiAuthenticationService + "/delete-user-accessPin/\(userId)",
-            headers: headers,
+            headers: try authorizationHeaders(),
             body: EmptyBody()
         )
-        
-        return DeleteAccessPinResponse(accessPin: response.data.accessPin)
+
+        KeychainHelper.remove(.accessPin)
+        return DeleteAccessPinResponse(accessPin: nil, hasAccessPin: false)
     }
 }

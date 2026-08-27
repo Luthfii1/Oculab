@@ -9,7 +9,7 @@ import AVKit
 import SwiftUI
 
 struct VideoRecordView: View {
-    @StateObject private var videoRecordPresenter = VideoRecordPresenter.shared
+    @ObservedObject private var videoRecordPresenter = VideoRecordSession.current
     @Environment(\.dismiss) private var dismiss
     @State private var showGuidelines = false
     @State private var didFinishOnboarding = false
@@ -50,7 +50,7 @@ struct VideoRecordView: View {
                     Color.black.opacity(0.3)
                         .ignoresSafeArea()
                     
-                    ProgressView("Setting up camera...")
+                    ProgressView(AppTextVideoRecordView.settingUpCamera)
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }

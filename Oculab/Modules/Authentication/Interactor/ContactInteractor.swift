@@ -16,7 +16,7 @@ struct ContactResponse: Decodable {
 class ContactInteractor {
     private let networkService: NetworkServiceProtocol
 
-    init(networkService: NetworkServiceProtocol = AlamofireNetworkService()) {
+    init(networkService: NetworkServiceProtocol = DependencyInjection.shared.networkService) {
         self.networkService = networkService
     }
     

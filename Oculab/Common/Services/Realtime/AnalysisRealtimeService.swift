@@ -36,9 +36,20 @@ final class AnalysisRealtimeService {
         guard socket == nil, !isConnecting else { return }
         isConnecting = true
 
+        var config: SocketIOClientConfiguration = [
+            .log(false),
+            .compress,
+            .forceWebsockets(true),
+        ]
+
+        if let token = KeychainHelper.string(for: .accessToken) {
+            config.insert(.auth(["token": token]))
+            config.insert(.extraHeaders(["Authorization": "Bearer \(token)"]))
+        }
+
         manager = SocketManager(
             socketURL: API.socketURL,
-            config: [.log(false), .compress, .forceWebsockets(true)]
+            config: config
         )
         let client = manager?.defaultSocket
         socket = client
@@ -56,6 +67,10 @@ final class AnalysisRealtimeService {
 
         client?.on(clientEvent: .disconnect) { _, _ in
             Logger.info("Analysis socket disconnected", category: .examination)
+        }
+
+        client?.on(clientEvent: .error) { data, _ in
+            Logger.error("Analysis socket error: \(data)", category: .examination)
         }
 
         client?.on("analysis:update") { [weak self] data, _ in

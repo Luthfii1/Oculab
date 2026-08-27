@@ -11,7 +11,7 @@ struct ExamDetailView: View {
     var examId: String
     var patientId: String
 
-    @StateObject private var videoRecordPresenter = VideoRecordPresenter.shared
+    @ObservedObject private var videoRecordPresenter = VideoRecordSession.current
     @StateObject private var presenter = ExamDataPresenter(interactor: ExamInteractor())
     @State private var showGuidelines = false
     @State private var didFinishOnboarding = false

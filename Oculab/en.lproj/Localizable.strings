@@ -868,3 +868,9 @@
 "register.facility_type.optical" = "Optical";
 "register.facility_type.medical_law_facility" = "Medical Law Facility";
 "register.facility_type.traditional_health_facility" = "Traditional Health Facility";
+
+"video_record.video_record_view.setting_up_camera" = "Setting up camera...";
+"examination.progress.extracting_fovs" = "Extracting fields of view";
+"analysist.fov_detail.processing_in_progress" = "Processing in Progress";
+"analysist.fov_detail.bounding_box_not_available" = "This image is still being processed. Bounding box data is not available yet.";
+"analysist.fov_detail.error_loading_data" = "Error Loading Data";

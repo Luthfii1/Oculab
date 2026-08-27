@@ -15,11 +15,9 @@ import CoreImage
 class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate,
     AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelegate
 {
-    static let shared = VideoRecordPresenter(interactor: VideoInteractor())
-
     private let interactor: VideoInteractor
 
-    init(interactor: VideoInteractor) {
+    init(interactor: VideoInteractor = VideoInteractor()) {
         self.interactor = interactor
         super.init()
     }

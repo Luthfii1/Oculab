@@ -33,6 +33,7 @@ extension AppText {
             static let analyzingTitle = "examination.progress.analyzing_title".localized
             static let analyzingSubtitle = "examination.progress.analyzing_subtitle".localized
             static let loadingImagesSubtitle = "examination.progress.loading_images_subtitle".localized
+            static let extractingFovsPreview = "examination.progress.extracting_fovs".localized
             static let analysisFailedTitle = "examination.progress.analysis_failed_title".localized
             static let analysisFailedDefault = "examination.progress.analysis_failed_default".localized
             static let analysisFailedHint = "examination.progress.analysis_failed_hint".localized

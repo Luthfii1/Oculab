@@ -157,5 +157,5 @@ struct CameraView: View {
 
 #Preview {
     CameraView()
-        .environmentObject(VideoRecordPresenter.shared)
+        .environmentObject(VideoRecordSession.current)
 }

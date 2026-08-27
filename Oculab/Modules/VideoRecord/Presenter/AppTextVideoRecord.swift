@@ -35,6 +35,7 @@ extension AppText {
             }
             
             static let specimenTitleDefault = "video_record.video_record_view.specimen_title_default".localized
+            static let settingUpCamera = "video_record.video_record_view.setting_up_camera".localized
         }
         
         enum InstructionRecordView {

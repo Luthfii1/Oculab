@@ -12,6 +12,7 @@ class AnalysisResultPresenter: ObservableObject {
     // MARK: - Dependencies
     private let interactor: AnalysisResultInteractor
     private let progressInteractor = AnalysisProgressInteractor()
+    private let progressTracker = AnalysisProgressTracker()
 
     // MARK: - Task Handles
     private var fetchTask: Task<Void, Never>?
@@ -27,6 +28,21 @@ class AnalysisResultPresenter: ObservableObject {
 
     init(interactor: AnalysisResultInteractor = AnalysisResultInteractor()) {
         self.interactor = interactor
+        progressTracker.onReadyForValidation = { [weak self] examinationId in
+            guard let self else { return }
+            await self.refreshExaminationStatus(examinationId: examinationId)
+            await self.loadFOVData(examinationId: examinationId, silent: true)
+        }
+        progressTracker.onFailed = { [weak self] examinationId, message in
+            guard let self else { return }
+            Task { @MainActor in
+                self.analysisFailureMessage = message
+                self.analysisStatusMessage = message
+                self.analysisProgress = 0
+                AnalysisTrackingStore.untrack(examinationId: examinationId)
+                AnalysisRealtimeService.shared.unsubscribe(from: examinationId)
+            }
+        }
     }
 
     // MARK: - Published Properties
@@ -401,69 +417,55 @@ extension AnalysisResultPresenter {
 
     @MainActor
     func startRealtimeTracking(examinationId: String) {
-        Task {
-            await ExaminationNotificationService.shared.requestAuthorizationIfNeeded()
+        progressTracker.onReadyForValidation = { [weak self] id in
+            guard let self else { return }
+            await self.refreshExaminationStatus(examinationId: id)
+            await self.loadFOVData(examinationId: id, silent: true)
+            self.syncProgressUI(from: self.progressTracker)
         }
-
-        AnalysisRealtimeService.shared.subscribe(to: examinationId)
-
-        progressObserver = NotificationCenter.default.addObserver(
-            forName: .examinationAnalysisProgress,
-            object: nil,
-            queue: .main
-        ) { [weak self] notification in
-            guard let self,
-                  let update = notification.userInfo?["update"] as? AnalysisProgressUpdate,
-                  update.examId.lowercased() == examinationId.lowercased() else {
-                return
-            }
-
+        progressTracker.onFailed = { [weak self] id, message in
+            guard let self else { return }
             Task { @MainActor in
-                self.applyProgressUpdate(update, examinationId: examinationId)
-                if update.isFailed {
-                    return
-                }
-                if update.isReadyForValidation {
-                    await self.refreshExaminationStatus(examinationId: examinationId)
-                    await self.loadFOVData(examinationId: examinationId, silent: true)
-                }
+                self.markAnalysisFailed(message: message, examinationId: id)
             }
         }
+        progressTracker.onProgressChange = { [weak self] in
+            guard let self else { return }
+            Task { @MainActor in
+                self.syncProgressUI(from: self.progressTracker)
+            }
+        }
+        progressTracker.beginTracking(examinationId: examinationId)
+        syncProgressUI(from: progressTracker)
     }
 
     @MainActor
     func stopRealtimeTracking() {
-        if let progressObserver {
-            NotificationCenter.default.removeObserver(progressObserver)
-            self.progressObserver = nil
-        }
-        // Socket stays connected while AnalysisTrackingStore still tracks the exam
-        // (e.g. user left progress screen but analysis runs in background).
+        progressTracker.stopRealtimeTracking()
     }
 
     @MainActor
-    private func loadCachedProgress(examinationId: String) async {
-        guard let cached = await progressInteractor.fetchProgress(examinationId: examinationId) else {
-            return
+    private func syncProgressUI(from tracker: AnalysisProgressTracker) {
+        analysisProgress = tracker.analysisProgress
+        analysisStatusMessage = tracker.analysisStatusMessage
+        if tracker.hasAnalysisFailed {
+            analysisFailureMessage = tracker.analysisFailureMessage
         }
-        applyProgressUpdate(cached, examinationId: examinationId)
     }
 
     @MainActor
     private func applyProgressUpdate(_ update: AnalysisProgressUpdate, examinationId: String) {
+        progressTracker.applyProgressUpdate(update, examinationId: examinationId)
+        syncProgressUI(from: progressTracker)
         if update.isFailed {
             markAnalysisFailed(message: update.message, examinationId: examinationId)
-            return
         }
+    }
 
-        if update.progress != analysisProgress {
-            lastProgressChangeAt = Date()
-        }
-
-        analysisProgress = update.progress
-        if let message = update.message, !message.isEmpty {
-            analysisStatusMessage = message
-        }
+    @MainActor
+    private func loadCachedProgress(examinationId: String) async {
+        // Cached load is handled inside AnalysisProgressTracker.beginTracking
+        syncProgressUI(from: progressTracker)
     }
 
     @MainActor

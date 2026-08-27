@@ -23,7 +23,7 @@ class HomeInteractor {
     }
 
     // MARK: - Initialization
-    init(networkService: NetworkServiceProtocol = AlamofireNetworkService()) {
+    init(networkService: NetworkServiceProtocol = DependencyInjection.shared.networkService) {
         self.networkService = networkService
     }
 

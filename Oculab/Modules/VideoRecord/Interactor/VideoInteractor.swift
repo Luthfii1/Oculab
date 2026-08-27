@@ -12,7 +12,7 @@ import CoreImage
 class VideoInteractor {
     private let networkService: NetworkServiceProtocol
 
-    init(networkService: NetworkServiceProtocol = AlamofireNetworkService()) {
+    init(networkService: NetworkServiceProtocol = DependencyInjection.shared.networkService) {
         self.networkService = networkService
     }
     

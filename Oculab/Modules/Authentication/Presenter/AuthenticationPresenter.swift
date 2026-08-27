@@ -165,9 +165,9 @@ extension AuthenticationPresenter {
             )
 
             email = registration.email
-            password = registration.currentPassword
+            password = registration.currentPassword ?? AppValue.empty
 
-            guard await login() else {
+            guard !password.isEmpty, await login() else {
                 prepareForLoginAfterRegister()
                 showRegisterSuccessAlert = true
                 registerSuccessMessage = AppTextAuthRegister.successRegisterMessage
@@ -275,8 +275,9 @@ extension AuthenticationPresenter {
             
             // Store the user data locally
             await interactor.updateUserLocalData(user: account)
-            
+
             user = account
+            user.loadAccessPinFromKeychain()
             isLogin = true
             
             // Clear any PIN state
@@ -287,7 +288,8 @@ extension AuthenticationPresenter {
             newAccessPin = AppValue.empty
             isAccessPinChangeInProgress = false
 
-            if account.accessPin == nil {
+            let hasPin = KeychainHelper.string(for: .accessPin) != nil || account.accessPin != nil
+            if !hasPin {
                 // User needs to create PIN
                 state = .create
                 isPinAuthorized = false
@@ -337,8 +339,10 @@ extension AuthenticationPresenter {
                 return false
             }
         } else {
-            // Normal authentication - check against stored PIN
-            let storedPin = await interactor.getUserLocalData()?.accessPin ?? AppValue.empty
+            // Normal authentication - check against Keychain PIN
+            let storedPin = KeychainHelper.string(for: .accessPin)
+                ?? await interactor.getUserLocalData()?.accessPin
+                ?? AppValue.empty
             if !Self.constantTimeEquals(storedPin, inputPin) {
                 description = AppTextAuthCompPin.invalidPinText
                 isError = true
@@ -452,8 +456,8 @@ extension AuthenticationPresenter {
                 previousAccessPin: oldAccessPin
             )
             
-            // Update local user data
-            user.accessPin = newAccessPin
+            // Update local user data — PIN stored in Keychain
+            user.setAccessPinSecurely(newAccessPin)
             await interactor.updateUserLocalData(user: user)
             
             // Show success and reset
@@ -486,13 +490,13 @@ extension AuthenticationPresenter {
             }
             
             _ = try await interactor.createAccessPin(accessPin: firstPin)
-            localUser.accessPin = firstPin
+            localUser.setAccessPinSecurely(firstPin)
             await interactor.updateUserLocalData(user: localUser)
             await refreshUserFromSwiftData()
         } catch {
             if case let NetworkError.apiError(apiResponse, _) = error, apiResponse.code == 409 {
                 if var localUser = await interactor.getUserLocalData() {
-                    localUser.accessPin = firstPin
+                    localUser.setAccessPinSecurely(firstPin)
                     await interactor.updateUserLocalData(user: localUser)
                     await refreshUserFromSwiftData()
                 }
@@ -583,7 +587,7 @@ extension AuthenticationPresenter {
             
             // Update local user data to remove PIN
             if var localUser = await interactor.getUserLocalData() {
-                localUser.accessPin = nil
+                localUser.setAccessPinSecurely(nil)
                 await interactor.updateUserLocalData(user: localUser)
             }
             
@@ -626,6 +630,9 @@ extension AuthenticationPresenter {
     }
 
     func hasStoredAccessPin() async -> Bool {
+        if KeychainHelper.string(for: .accessPin) != nil {
+            return true
+        }
         return await interactor.getUserLocalData()?.accessPin != nil
     }
 

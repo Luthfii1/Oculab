@@ -7,19 +7,44 @@ import Foundation
 
 enum MediaURLResolver {
     private static let internalHostMarkers = ["rustfs-server", "localhost", "127.0.0.1"]
+
     static func resolve(_ urlString: String) -> String {
         guard !urlString.isEmpty else { return urlString }
-        guard isInternalAssetURL(urlString) else { return urlString }
-        guard let objectKey = extractObjectKey(from: urlString) else { return urlString }
-        return "\(publicAssetBaseURL)/\(objectKey)"
+
+        if isInternalAssetURL(urlString),
+           let objectKey = extractObjectKey(from: urlString) {
+            return authenticatedMediaURL(objectKey: objectKey)
+        }
+
+        // BE may already rewrite to /fov/media/<key> — still need a query token for AsyncImage.
+        if urlString.contains("/fov/media/") {
+            return appendAccessTokenIfNeeded(to: urlString)
+        }
+
+        return urlString
     }
 
     static func resolveURL(_ urlString: String) -> URL? {
         URL(string: resolve(urlString))
     }
 
-    private static var publicAssetBaseURL: String {
-        "\(API.BE)/fov/media"
+    /// FOV media requires auth; AsyncImage cannot set headers, so append access_token.
+    private static func authenticatedMediaURL(objectKey: String) -> String {
+        appendAccessTokenIfNeeded(to: "\(API.BE)/fov/media/\(objectKey)")
+    }
+
+    private static func appendAccessTokenIfNeeded(to urlString: String) -> String {
+        guard let token = KeychainHelper.string(for: .accessToken),
+              var components = URLComponents(string: urlString)
+        else {
+            return urlString
+        }
+
+        var items = components.queryItems ?? []
+        items.removeAll { $0.name == "access_token" }
+        items.append(URLQueryItem(name: "access_token", value: token))
+        components.queryItems = items
+        return components.url?.absoluteString ?? urlString
     }
 
     private static func isInternalAssetURL(_ urlString: String) -> Bool {

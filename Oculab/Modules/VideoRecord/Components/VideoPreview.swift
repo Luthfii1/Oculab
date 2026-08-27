@@ -233,7 +233,7 @@ struct VideoPreview: View {
 }
 
 #Preview {
-    let videoRecordPresenter = VideoRecordPresenter.shared
+    let videoRecordPresenter = VideoRecordSession.current
     VideoPreview()
         .environmentObject(videoRecordPresenter)
 }

@@ -126,6 +126,25 @@ class NetworkService: NetworkServiceProtocol {
             )
         }
     }
+
+    /// Video uploads bypass the short retry timeout — stream from disk via Alamofire.
+    func multipartFile<T: Decodable>(
+        urlString: String,
+        headers: [String: String]?,
+        fileURL: URL,
+        fieldName: String,
+        fileName: String?,
+        mimeType: String?
+    ) async throws -> APIResponse<T> {
+        try await baseService.multipartFile(
+            urlString: urlString,
+            headers: headers,
+            fileURL: fileURL,
+            fieldName: fieldName,
+            fileName: fileName,
+            mimeType: mimeType
+        )
+    }
     
     // MARK: - Private Request Methods
     

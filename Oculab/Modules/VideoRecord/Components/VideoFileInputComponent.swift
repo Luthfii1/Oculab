@@ -9,7 +9,7 @@ import AVKit
 import SwiftUI
 
 struct VideoInput: View {
-    let videoPresenter = VideoRecordPresenter.shared
+    let videoPresenter = VideoRecordSession.current
     @EnvironmentObject var examPresenter: ExamDataPresenter
 
     var title: String
