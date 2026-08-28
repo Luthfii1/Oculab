@@ -470,6 +470,8 @@
 "examination.progress.accessibility_percent" = "Analisis %d persen selesai";
 "examination.progress.refresh_instruction" = "Tarik ke bawah untuk memperbarui status";
 "examination.progress.background_instruction" = "Analisis berlanjut di latar belakang. Anda bisa kembali ke daftar tugas dan membuka layar ini lagi dari Beranda.";
+"examination.progress.analysis_queued_title" = "Analisis dalam antrian";
+"examination.progress.analysis_queued_subtitle" = "Video Anda sedang mengantri untuk dianalisis. Layar ini akan diperbarui saat pemrosesan dimulai.";
 "examination.progress.button_back_to_tasks" = "Kembali ke tugas";
 "examination.progress.notification_ready_title" = "Analisis selesai";
 "examination.progress.notification_ready_body" = "Pemeriksaan Anda siap divalidasi. Ketuk untuk melihat hasil.";
@@ -549,6 +551,7 @@
 "home_history.no_tasks_in_search_message" = "Tidak ada tugas yang cocok dengan pencarian Anda.";
 "home_history.load_error_retry" = "Coba lagi";
 "home_history.offline_cache_banner" = "Anda sedang offline. Menampilkan tugas tersimpan dari %@.";
+"home_history.analysis_resume_banner" = "%d analisis masih berjalan. Ketuk untuk lihat progres.";
 "auth.profile.verify_email_title" = "Verifikasi email Anda";
 "auth.profile.verify_email_message" = "Konfirmasi email agar kami dapat menghubungi Anda untuk pemulihan password dan keamanan akun.";
 "auth.profile.verify_email_resend" = "Kirim ulang email verifikasi";

@@ -16,6 +16,10 @@ struct AnalyzingExaminationProgressView: View {
             return presenter.analysisFailureMessage ?? AppTextExamProgress.analysisFailedDefault
         }
 
+        if presenter.isAnalysisQueued {
+            return AppTextExamProgress.analysisQueuedSubtitle
+        }
+
         if presenter.examinationResult?.statusExamination == .NEEDVALIDATION, !presenter.hasFOVData {
             return AppTextExamProgress.loadingImagesSubtitle
         }
@@ -34,6 +38,9 @@ struct AnalyzingExaminationProgressView: View {
                     if presenter.hasAnalysisFailed {
                         failureHeroCard
                         failureInstructionsCard
+                    } else if presenter.isAnalysisQueued {
+                        queuedHeroCard
+                        queuedInstructionsCard
                     } else {
                         progressHeroCard
                         instructionsCard
@@ -90,6 +97,56 @@ struct AnalyzingExaminationProgressView: View {
                 .padding(.top, 2)
 
             Text(presenter.analysisRecoveryHint)
+                .font(AppTypography.p3)
+                .foregroundStyle(AppColors.slate600)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppColors.slate0)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(AppColors.slate100, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var queuedHeroCard: some View {
+        VStack(spacing: 20) {
+            Text(AppTextExamProgress.analysisQueuedTitle)
+                .font(AppTypography.s4_1)
+                .foregroundStyle(AppColors.slate900)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            Image(systemName: AppIcon.clockArrowCirclepath)
+                .font(.system(size: 48))
+                .foregroundStyle(AppColors.purple500)
+
+            Text(statusMessage)
+                .font(AppTypography.p2)
+                .foregroundStyle(AppColors.slate600)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if presenter.analysisProgress > 0 {
+                AnalysisProgressRing(progress: presenter.analysisProgress)
+            }
+        }
+        .padding(20)
+        .frame(maxWidth: .infinity)
+        .background(AppColors.slate50)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private var queuedInstructionsCard: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: AppIcon.info)
+                .font(.system(size: 20))
+                .foregroundStyle(AppColors.purple500)
+                .padding(.top, 2)
+
+            Text(AppTextExamDetail.analysisQueuedMessage)
                 .font(AppTypography.p3)
                 .foregroundStyle(AppColors.slate600)
                 .fixedSize(horizontal: false, vertical: true)

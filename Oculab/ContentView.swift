@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject private var authPresenter: AuthenticationPresenter
+    @Environment(\.scenePhase) private var scenePhase
     
     var body: some View {
         TabView {
@@ -18,6 +19,15 @@ struct ContentView: View {
         }
         .tint(AppColors.purple500)
         .navigationBarBackButtonHidden(true)
+        .task {
+            await AnalysisResumeService.shared.restoreOnLaunch()
+        }
+        .onChange(of: scenePhase) { _, phase in
+            guard phase == .active else { return }
+            Task {
+                await AnalysisResumeService.shared.reconnectOnForeground()
+            }
+        }
     }
 }
 

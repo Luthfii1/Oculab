@@ -51,6 +51,10 @@ extension AppText {
             static let progressLabel = "examination.progress.progress_label".localized
             static let refreshInstruction = "examination.progress.refresh_instruction".localized
             static let backgroundInstruction = "examination.progress.background_instruction".localized
+            static let analysisQueuedTitle = "examination.progress.analysis_queued_title".localized
+            static let analysisQueuedSubtitle = "examination.progress.analysis_queued_subtitle".localized
+            static let analysisQueuedTitle = "examination.progress.analysis_queued_title".localized
+            static let analysisQueuedSubtitle = "examination.progress.analysis_queued_subtitle".localized
 
             static func progressAccessibility(_ percent: Int) -> String {
                 String(format: "examination.progress.accessibility_percent".localized, percent)

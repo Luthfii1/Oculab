@@ -14,6 +14,7 @@ struct HomeView: View {
     @EnvironmentObject private var authentication: AuthenticationPresenter
     @State private var loadTask: Task<Void, Never>?
     @State private var refreshTask: Task<Void, Never>?
+    @State private var trackedAnalysisIds: [String] = []
 
     private let tabBarScrollInset: CGFloat = 96
 
@@ -59,6 +60,7 @@ struct HomeView: View {
             Text(AppTextAuthProfile.clinicalActionBlockedMessage)
         }
         .onAppear {
+            refreshTrackedAnalysisIds()
             loadTask?.cancel()
             loadTask = Task {
                 await presenter.getStatisticData()
@@ -85,6 +87,7 @@ struct HomeView: View {
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .examinationAnalysisProgress)) { _ in
+            refreshTrackedAnalysisIds()
             refreshTask?.cancel()
             refreshTask = Task {
                 await presenter.fetchData(userRole: authentication.user.role)
@@ -153,6 +156,32 @@ struct HomeView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(AppColors.slate50)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+
+            if !trackedAnalysisIds.isEmpty {
+                Button {
+                    if let examId = trackedAnalysisIds.first {
+                        Router.shared.navigateTo(.analysisResult(examinationId: examId))
+                    }
+                } label: {
+                    HStack(alignment: .top, spacing: 8) {
+                        Image(systemName: AppIcon.clockArrowCirclepath)
+                            .foregroundStyle(AppColors.purple500)
+                        Text(String(format: AppTextHomeHistory.analysisResumeBanner, trackedAnalysisIds.count))
+                            .font(AppTypography.p3)
+                            .foregroundStyle(AppColors.slate600)
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                        Spacer(minLength: 0)
+                        Image(systemName: AppIcon.forward)
+                            .foregroundStyle(AppColors.purple500)
+                    }
+                    .padding(12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(AppColors.purple50)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                }
+                .buttonStyle(.plain)
             }
 
             AppSearchBar(
@@ -293,6 +322,10 @@ struct HomeView: View {
         guard networkStatus.isConnected, !presenter.isShowingCachedData else { return false }
         return authentication.user.role == .ADMIN
             || (authentication.user.role == .LAB && authentication.user.businessModel == .B2C)
+    }
+
+    private func refreshTrackedAnalysisIds() {
+        trackedAnalysisIds = Array(AnalysisTrackingStore.trackedIds).sorted()
     }
 
     private func openExamination(_ exam: ExaminationCardData) {

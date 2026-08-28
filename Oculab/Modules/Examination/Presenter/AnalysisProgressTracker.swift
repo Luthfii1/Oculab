@@ -15,6 +15,7 @@ final class AnalysisProgressTracker: ObservableObject {
     @Published var analysisStatusMessage: String = AppTextExamProgress.analyzingTitle
     @Published var analysisFailureMessage: String?
     @Published var hasAnalysisFailed: Bool = false
+    @Published var isAnalysisQueued: Bool = false
 
     private let progressInteractor: AnalysisProgressInteractor
     private var progressObserver: NSObjectProtocol?
@@ -41,6 +42,7 @@ final class AnalysisProgressTracker: ObservableObject {
         lastProgressChangeAt = Date()
         hasAnalysisFailed = false
         analysisFailureMessage = nil
+        isAnalysisQueued = false
         startRealtimeTracking(examinationId: examinationId)
         Task { await loadCachedProgress(examinationId: examinationId) }
     }
@@ -101,8 +103,11 @@ final class AnalysisProgressTracker: ObservableObject {
         }
 
         analysisProgress = update.progress
+        isAnalysisQueued = update.isQueued
         if let message = update.message, !message.isEmpty {
             analysisStatusMessage = message
+        } else if update.isQueued {
+            analysisStatusMessage = AppText.Examination.ProgressView.analysisQueuedTitle
         }
         onProgressChange?()
     }

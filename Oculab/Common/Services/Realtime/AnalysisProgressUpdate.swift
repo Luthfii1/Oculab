@@ -31,6 +31,10 @@ struct AnalysisProgressUpdate: Equatable, Decodable {
         status == "failed"
     }
 
+    var isQueued: Bool {
+        status == "queued"
+    }
+
     var progressFraction: Double {
         Double(min(100, max(0, progress))) / 100.0
     }

@@ -39,7 +39,9 @@ class AnalysisResultPresenter: ObservableObject {
                 self.analysisFailureMessage = message
                 self.analysisStatusMessage = message
                 self.analysisProgress = 0
+                self.isAnalysisQueued = false
                 AnalysisTrackingStore.untrack(examinationId: examinationId)
+                AnalysisTrackingStore.clearPendingResume()
                 AnalysisRealtimeService.shared.unsubscribe(from: examinationId)
             }
         }
@@ -55,6 +57,7 @@ class AnalysisResultPresenter: ObservableObject {
     @Published var analysisProgress: Int = 0
     @Published var analysisStatusMessage: String = AppTextExamProgress.analyzingTitle
     @Published var analysisFailureMessage: String?
+    @Published var isAnalysisQueued: Bool = false
 
     // MARK: - UI State Properties
     @Published var selectedTBGrade: String = AppValue.empty {
@@ -247,6 +250,7 @@ extension AnalysisResultPresenter {
     func exitFromFlow(examinationId: String) {
         AnalysisResultSessionStore.shared.unregister(examinationId: examinationId)
         AnalysisTrackingStore.untrack(examinationId: examinationId)
+        AnalysisTrackingStore.clearPendingResume()
         stopExaminationStatusPolling()
         resetState()
         popToRoot()
@@ -378,7 +382,9 @@ extension AnalysisResultPresenter {
     private func markAnalysisReadyIfNeeded(examinationId: String) {
         guard examinationResult?.statusExamination == .NEEDVALIDATION, hasFOVData else { return }
         analysisProgress = max(analysisProgress, 100)
+        isAnalysisQueued = false
         AnalysisTrackingStore.untrack(examinationId: examinationId)
+        AnalysisTrackingStore.clearPendingResume()
     }
 
     @MainActor
@@ -387,6 +393,7 @@ extension AnalysisResultPresenter {
 
         stopExaminationStatusPolling()
         trackedExaminationId = examinationId
+        AnalysisTrackingStore.markPendingResume(examinationId: examinationId)
         let now = Date()
         analysisTrackingStartedAt = now
         lastProgressChangeAt = now
@@ -460,6 +467,7 @@ extension AnalysisResultPresenter {
     private func syncProgressUI(from tracker: AnalysisProgressTracker) {
         analysisProgress = tracker.analysisProgress
         analysisStatusMessage = tracker.analysisStatusMessage
+        isAnalysisQueued = tracker.isAnalysisQueued
         if tracker.hasAnalysisFailed {
             analysisFailureMessage = tracker.analysisFailureMessage
         }
@@ -524,7 +532,9 @@ extension AnalysisResultPresenter {
         }
 
         analysisProgress = 0
+        isAnalysisQueued = false
         AnalysisTrackingStore.untrack(examinationId: examinationId)
+        AnalysisTrackingStore.clearPendingResume()
         AnalysisRealtimeService.shared.unsubscribe(from: examinationId)
         stopExaminationStatusPolling()
     }
@@ -538,8 +548,10 @@ extension AnalysisResultPresenter {
         switch status {
         case .NEEDVALIDATION, .FINISHED:
             analysisFailureMessage = nil
+            isAnalysisQueued = false
             progressTracker.clearFailure()
             AnalysisTrackingStore.untrack(examinationId: examinationId)
+            AnalysisTrackingStore.clearPendingResume()
         default:
             break
         }

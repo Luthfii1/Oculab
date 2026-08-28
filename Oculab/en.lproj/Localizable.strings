@@ -459,6 +459,8 @@
 "examination.progress.accessibility_percent" = "Analysis %d percent complete";
 "examination.progress.refresh_instruction" = "Pull down to refresh status";
 "examination.progress.background_instruction" = "Analysis continues in the background. You can go back to your task list and return here anytime from Home.";
+"examination.progress.analysis_queued_title" = "Analysis queued";
+"examination.progress.analysis_queued_subtitle" = "Your video is in the analysis queue. We'll update this screen as soon as processing starts.";
 "examination.progress.button_back_to_tasks" = "Back to tasks";
 "examination.progress.notification_ready_title" = "Analysis ready";
 "examination.progress.notification_ready_body" = "Your examination is ready for validation. Tap to review the results.";
@@ -538,6 +540,7 @@
 "home_history.no_tasks_in_search_message" = "No tasks match your search.";
 "home_history.load_error_retry" = "Try again";
 "home_history.offline_cache_banner" = "You're offline. Showing saved tasks from %@.";
+"home_history.analysis_resume_banner" = "%d analysis still running. Tap to view progress.";
 "home_history.task_count_format" = "%d shown";
 "home_history.examination_data" = "your examination data";
 
