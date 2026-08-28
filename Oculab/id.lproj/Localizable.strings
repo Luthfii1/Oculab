@@ -548,6 +548,7 @@
 "home_history.task_search_placeholder" = "Cari berdasarkan ID slide, pasien, atau PIC";
 "home_history.no_tasks_in_search_message" = "Tidak ada tugas yang cocok dengan pencarian Anda.";
 "home_history.load_error_retry" = "Coba lagi";
+"home_history.offline_cache_banner" = "Anda sedang offline. Menampilkan tugas tersimpan dari %@.";
 "auth.profile.verify_email_title" = "Verifikasi email Anda";
 "auth.profile.verify_email_message" = "Konfirmasi email agar kami dapat menghubungi Anda untuk pemulihan password dan keamanan akun.";
 "auth.profile.verify_email_resend" = "Kirim ulang email verifikasi";

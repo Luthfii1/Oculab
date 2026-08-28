@@ -846,6 +846,7 @@ extension AuthenticationPresenter {
     @MainActor
     func performLogout() async {
         await interactor.clearLocalUserData()
+        ExamListCacheService.shared.clearAll()
 
         for item in UserDefaultType.allCases where item != .hasSeenOnboarding {
             UserDefaults.standard.removeObject(forKey: item.rawValue)

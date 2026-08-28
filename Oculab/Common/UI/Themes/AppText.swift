@@ -94,6 +94,7 @@ enum AppText {
         // Network related icons
         static let network = "network"
         static let wifi = "wifi"
+        static let wifiSlash = "wifi.slash"
         static let antennaRadiowaves = "antenna.radiowaves.left.and.right"
         static let cableConnector = "cable.connector"
         static let arrowClockwise = "arrow.clockwise"

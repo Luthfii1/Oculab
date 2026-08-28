@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ExaminationCardData: Decodable, Identifiable {
+struct ExaminationCardData: Codable, Identifiable {
     var id: String {
         examinationId
     }

@@ -32,6 +32,7 @@ extension AppText {
         static let noTasksInSearchMessage = "home_history.no_tasks_in_search_message".localized
         static let loadErrorRetry = "home_history.load_error_retry".localized
         static let loadingState = AppState.loading("home_history.examination_data".localized)
+        static let offlineCacheBanner = "home_history.offline_cache_banner".localized
 
         enum FinishedExaminationCardComponent {
             static let dpjpLabel = "home_history.finished_card.dpjp_label".localized

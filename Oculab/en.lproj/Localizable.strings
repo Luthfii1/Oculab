@@ -537,6 +537,7 @@
 "home_history.task_search_placeholder" = "Search by slide ID, patient, or PIC";
 "home_history.no_tasks_in_search_message" = "No tasks match your search.";
 "home_history.load_error_retry" = "Try again";
+"home_history.offline_cache_banner" = "You're offline. Showing saved tasks from %@.";
 "home_history.task_count_format" = "%d shown";
 "home_history.examination_data" = "your examination data";
 

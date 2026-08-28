@@ -10,6 +10,7 @@ import SwiftUI
 struct HomeView: View {
     @StateObject private var presenter = HomeHistoryPresenter()
     @ObservedObject private var uploadQueue = VideoUploadQueueService.shared
+    @ObservedObject private var networkStatus = DependencyInjection.shared.networkRetryManager
     @EnvironmentObject private var authentication: AuthenticationPresenter
     @State private var loadTask: Task<Void, Never>?
     @State private var refreshTask: Task<Void, Never>?
@@ -67,6 +68,14 @@ struct HomeView: View {
         .onDisappear {
             loadTask?.cancel()
             refreshTask?.cancel()
+        }
+        .onChange(of: networkStatus.isConnected) { _, isConnected in
+            guard isConnected else { return }
+            loadTask?.cancel()
+            loadTask = Task {
+                await presenter.getStatisticData()
+                await presenter.fetchData(userRole: authentication.user.role)
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: .examinationAnalysisReady)) { _ in
             refreshTask?.cancel()
@@ -128,6 +137,21 @@ struct HomeView: View {
                 .padding(12)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(AppColors.orange50)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+
+            if presenter.isShowingCachedData, let cachedAt = presenter.cachedAt {
+                HStack(alignment: .top, spacing: 8) {
+                    Image(systemName: AppIcon.wifiSlash)
+                        .foregroundStyle(AppColors.slate500)
+                    Text(String(format: AppTextHomeHistory.offlineCacheBanner, cachedAt.formattedDayMonthYearTime()))
+                        .font(AppTypography.p3)
+                        .foregroundStyle(AppColors.slate600)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(AppColors.slate50)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             }
 
@@ -266,7 +290,8 @@ struct HomeView: View {
     }
 
     private var showsNewExaminationButton: Bool {
-        authentication.user.role == .ADMIN
+        guard networkStatus.isConnected, !presenter.isShowingCachedData else { return false }
+        return authentication.user.role == .ADMIN
             || (authentication.user.role == .LAB && authentication.user.businessModel == .B2C)
     }
 

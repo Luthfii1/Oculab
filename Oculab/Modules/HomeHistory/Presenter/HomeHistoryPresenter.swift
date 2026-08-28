@@ -11,9 +11,17 @@ class HomeHistoryPresenter: ObservableObject {
     // MARK: - Dependencies
     var view: HomeView?
     private let interactor: HomeInteractor
+    private let cacheService: ExamListCacheService
+    private let networkRetryManager: NetworkRetryManager
 
-    init(interactor: HomeInteractor = HomeInteractor()) {
+    init(
+        interactor: HomeInteractor = HomeInteractor(),
+        cacheService: ExamListCacheService = .shared,
+        networkRetryManager: NetworkRetryManager = DependencyInjection.shared.networkRetryManager
+    ) {
         self.interactor = interactor
+        self.cacheService = cacheService
+        self.networkRetryManager = networkRetryManager
     }
 
     // MARK: - Published Properties
@@ -34,6 +42,8 @@ class HomeHistoryPresenter: ObservableObject {
     @Published var isAllExamsLoading: Bool = false
     @Published var isStatisticLoading: Bool = false
     @Published var loadErrorMessage: String = ""
+    @Published var isShowingCachedData: Bool = false
+    @Published var cachedAt: Date?
     
     // MARK: - Constants
     private struct Constants {
@@ -189,13 +199,47 @@ extension HomeHistoryPresenter {
         do {
             latestExamination = try await getExaminationData(for: userRole)
             loadErrorMessage = ""
+            isShowingCachedData = false
+            cachedAt = nil
+
+            if let userId = currentUserId() {
+                cacheService.save(examinations: latestExamination, userId: userId, role: userRole)
+            }
+
             await filterLatestActivity(typeActivity: selectedLatestActivity)
         } catch {
-            latestExamination = []
-            filteredExamination = []
-            loadErrorMessage = ErrorHandler.shared.handleError(error)
-            Logger.error("Failed to fetch examination data for role \(userRole): \(error.localizedDescription)", category: .general)
+            if tryLoadCachedExamList(for: userRole) {
+                Logger.info("Showing cached exam list while offline", category: .general)
+            } else {
+                latestExamination = []
+                filteredExamination = []
+                isShowingCachedData = false
+                cachedAt = nil
+                loadErrorMessage = ErrorHandler.shared.handleError(error)
+                Logger.error("Failed to fetch examination data for role \(userRole): \(error.localizedDescription)", category: .general)
+            }
         }
+    }
+
+    @MainActor
+    @discardableResult
+    private func tryLoadCachedExamList(for userRole: RolesType) -> Bool {
+        guard !networkRetryManager.isConnected,
+              let userId = currentUserId(),
+              let cached = cacheService.load(userId: userId, role: userRole),
+              !cached.examinations.isEmpty
+        else { return false }
+
+        latestExamination = cached.examinations
+        isShowingCachedData = true
+        cachedAt = cached.cachedAt
+        loadErrorMessage = ""
+        applyTaskFilters()
+        return true
+    }
+
+    private func currentUserId() -> String? {
+        UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue)
     }
     
     private func getExaminationData(for userRole: RolesType) async throws -> [ExaminationCardData] {
@@ -222,5 +266,7 @@ extension HomeHistoryPresenter {
         isStatisticLoading = false
         selectedLatestActivity = .belumDimulai
         taskSearchQuery = ""
+        isShowingCachedData = false
+        cachedAt = nil
     }
 }
