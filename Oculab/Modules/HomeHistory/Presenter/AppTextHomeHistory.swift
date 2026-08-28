@@ -28,6 +28,9 @@ extension AppText {
         static let noTaskMessage = "home_history.no_task_message".localized
         static let noTasksInFilterMessage = "home_history.no_tasks_in_filter_message".localized
         static let taskCountFormat = "home_history.task_count_format".localized
+        static let searchPlaceholder = "home_history.task_search_placeholder".localized
+        static let noTasksInSearchMessage = "home_history.no_tasks_in_search_message".localized
+        static let loadErrorRetry = "home_history.load_error_retry".localized
         static let loadingState = AppState.loading("home_history.examination_data".localized)
 
         enum FinishedExaminationCardComponent {

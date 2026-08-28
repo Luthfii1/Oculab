@@ -48,12 +48,13 @@ struct RegisterAccountBody: Codable {
 struct RegisterAccountResponse: Codable {
     var id: String
     var email: String
-    var currentPassword: String?
+    /// True when the provisional password was emailed (B2B). Password is never returned in the API body.
+    var passwordEmailed: Bool?
 
     enum CodingKeys: String, CodingKey {
         case id = "userId"
         case email
-        case currentPassword
+        case passwordEmailed
     }
 }
 

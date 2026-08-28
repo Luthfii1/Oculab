@@ -23,6 +23,8 @@ enum AuthSessionManager {
         "/user/refresh-token/",
         "/user/request-reset-password-by-email",
         "/user/reset-password",
+        "/user/verify-email",
+        "/user/request-email-verification",
     ]
 
     static func authorizationHeaders() throws -> [String: String] {

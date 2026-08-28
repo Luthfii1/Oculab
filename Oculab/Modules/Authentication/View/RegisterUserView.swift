@@ -49,6 +49,28 @@ struct RegisterUserView: View {
                                 validationType: .email
                             )
                             ValidatedTextField(
+                                title: AppTextAuthRegister.passwordTitle,
+                                isRequired: true,
+                                placeholder: AppTextAuthRegister.passwordPlaceholder,
+                                leftIcon: AppIcon.lock,
+                                rightIcon: AppIcon.eye,
+                                isDisabled: presenter.isLoading,
+                                text: $presenter.registerPassword,
+                                fieldName: .newPassword,
+                                validationType: .password
+                            )
+                            ValidatedTextField(
+                                title: AppTextAuthRegister.confirmPasswordTitle,
+                                isRequired: true,
+                                placeholder: AppTextAuthRegister.confirmPasswordPlaceholder,
+                                leftIcon: AppIcon.lock,
+                                rightIcon: AppIcon.eye,
+                                isDisabled: presenter.isLoading,
+                                text: $presenter.registerConfirmPassword,
+                                fieldName: .confirmPassword,
+                                validationType: .password
+                            )
+                            ValidatedTextField(
                                 title: AppTextAuthRegister.healthFacilityNameTitle,
                                 isRequired: true,
                                 placeholder: AppTextAuthRegister.healthFacilityNamePlaceholder,

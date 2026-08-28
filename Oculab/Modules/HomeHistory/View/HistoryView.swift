@@ -30,6 +30,24 @@ struct HistoryView: View {
                         }
                         .frame(maxWidth: .infinity)
 
+                    } else if !presenter.loadErrorMessage.isEmpty {
+                        VStack(spacing: Decimal.d12) {
+                            Text(presenter.loadErrorMessage)
+                                .font(AppTypography.p3)
+                                .foregroundStyle(AppColors.slate600)
+                                .multilineTextAlignment(.center)
+                            AppButton(
+                                title: AppTextHomeHistory.loadErrorRetry,
+                                colorType: .primary,
+                                size: .large,
+                                isEnabled: true
+                            ) {
+                                loadDataForDate(selectedDate)
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, Decimal.d24)
+
                     } else if shouldShowEmptyState() {
                         VStack(alignment: .center) {
                             Image(AppTextHomeHistory.emptyStateImageName)

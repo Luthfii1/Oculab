@@ -88,7 +88,7 @@ class AccountInteractor: ObservableObject {
         return RegisterAccountResponse(
             id: response.data.id,
             email: response.data.email,
-            currentPassword: response.data.currentPassword
+            passwordEmailed: response.data.passwordEmailed
         )
     }
     

@@ -57,10 +57,7 @@ targets:
             CFBundleURLSchemes:
               - oculab
         NSAppTransportSecurity:
-          NSExceptionDomains:
-            "b4wgswckgks8488og484s8co.34.50.75.183.sslip.io":
-              NSIncludesSubdomains: true
-              NSExceptionAllowsInsecureHTTPLoads: true
+          NSAllowsArbitraryLoads: false
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.Oculab.Oculab

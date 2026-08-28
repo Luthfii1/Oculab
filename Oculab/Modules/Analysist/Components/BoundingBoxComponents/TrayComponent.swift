@@ -4,7 +4,6 @@
 //
 //  Created by Alifiyah Ariandri on 20/05/25.
 //
-// TODO: Revamp the hardcoded strings and use AppText for consistency
 import SwiftUI
 
 struct TrayView: View {
@@ -68,6 +67,7 @@ struct TrayView: View {
                                 .clipShape(Circle())
                         }
                         .disabled(sortedIndex == 0)
+                        .accessibilityLabel("Previous detection")
 
                         Button(action: {
                             if sortedIndex < reviewableBoxes.count - 1 {
@@ -89,6 +89,7 @@ struct TrayView: View {
                                 .clipShape(Circle())
                         }
                         .disabled(sortedIndex == reviewableBoxes.count - 1)
+                        .accessibilityLabel("Next detection")
                     }
                 }
                 .padding(.horizontal, Decimal.d12)

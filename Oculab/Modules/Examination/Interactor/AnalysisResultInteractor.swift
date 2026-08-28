@@ -73,6 +73,15 @@ class AnalysisResultInteractor {
         return response.data
     }
 
+    func verifyingFOV(fovId: String) async throws -> FOVData {
+        let response: APIResponse<FOVData> = try await networkService.update(
+            urlString: API.BE + "/fov/update-verified-field/" + fovId.lowercased(),
+            headers: nil,
+            body: EmptyBody()
+        )
+        return response.data
+    }
+
     func submitTrackingDuration(examId: String, body: TrackingDurationRequest) async throws -> TrackingDurationRequest {
         Logger.info("Submitting tracking duration for exam: \(examId)", category: .examination)
         

@@ -17,6 +17,7 @@ struct LoginResponse: Codable {
     let accessToken: String
     let refreshToken: String
     let userId: String
+    let emailVerified: Bool?
 }
 
 struct UserUpdateAccessPinResponse: Codable {
@@ -41,12 +42,13 @@ struct RegisterUserBody: Codable {
     let email: String
     let healthFacilityName: String
     let healthFacilityType: String
+    let password: String
 }
 
 struct RegisterUserData: Codable {
     let userId: String
     let email: String
-    let currentPassword: String?
+    let emailVerified: Bool?
 }
 
 struct DeleteAccessPinResponse: Codable {
@@ -66,14 +68,38 @@ class AuthenticationInteractor: ObservableObject {
     private let apiAuthenticationService = API.BE + "/user"
 
 
-    func registerUser(name: String, email: String, healthFacilityName: String, healthFacilityType: String) async throws -> RegisterUserData {
-        let body = RegisterUserBody(name: name, email: email, healthFacilityName: healthFacilityName, healthFacilityType: healthFacilityType)
+    func registerUser(
+        name: String,
+        email: String,
+        healthFacilityName: String,
+        healthFacilityType: String,
+        password: String
+    ) async throws -> RegisterUserData {
+        let body = RegisterUserBody(
+            name: name,
+            email: email,
+            healthFacilityName: healthFacilityName,
+            healthFacilityType: healthFacilityType,
+            password: password
+        )
         let response: APIResponse<RegisterUserData> = try await networkService.post(
             urlString: apiAuthenticationService + "/register",
             headers: nil,
             body: body
         )
         return response.data
+    }
+
+    func requestEmailVerification(email: String) async throws -> String {
+        struct Body: Codable { let email: String }
+        struct DataPayload: Codable { let email: String? }
+
+        let response: APIResponse<DataPayload> = try await networkService.post(
+            urlString: apiAuthenticationService + "/request-email-verification",
+            headers: nil,
+            body: Body(email: email.lowercased())
+        )
+        return response.message
     }
 
     func login(email: String, password: String) async throws -> LoginResponse {
@@ -91,6 +117,22 @@ class AuthenticationInteractor: ObservableObject {
         UserDefaults.standard.set(response.data.userId, forKey: UserDefaultType.userId.rawValue)
 
         return response.data
+    }
+
+    func requestPasswordReset(email: String) async throws -> String {
+        struct ResetRequestBody: Codable {
+            let email: String
+        }
+        struct ResetRequestData: Codable {
+            let email: String?
+        }
+
+        let response: APIResponse<ResetRequestData> = try await networkService.post(
+            urlString: apiAuthenticationService + "/request-reset-password-by-email",
+            headers: nil,
+            body: ResetRequestBody(email: email.lowercased())
+        )
+        return response.message
     }
 
     func getAccountById() async throws -> User {

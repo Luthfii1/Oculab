@@ -2,7 +2,9 @@
 
 ## Overview
 
-Oculab is an iOS application developed for [briefly describe the purpose of your app]. This README outlines the setup instructions necessary for team members to get started with the project.
+**Oculab** is an iOS app for AI-assisted **tuberculosis (TB) sputum-smear microscopy**. Lab technicians capture slide video through a phone-on-microscope adapter, review AI-detected AFB/BTA bacilli, verify bounding boxes, submit expert grading, and generate PDF reports.
+
+Companion services: `Oculab-BE` (API), `OculabImageStitchingPredictionBackend` (YOLO), and `oculab.ai` (marketing + account pages such as password reset).
 
 ## Prerequisites
 

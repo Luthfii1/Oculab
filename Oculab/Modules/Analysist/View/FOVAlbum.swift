@@ -73,6 +73,28 @@ struct FOVAlbum: View {
                     Image(AppImage.back)
                 }
             }
+
+            if presenter.hasUnverifiedClearFOVs(in: fovGroup) {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        Task {
+                            await presenter.verifyAllClearFOVs(
+                                in: fovGroup,
+                                examinationId: examId
+                            )
+                        }
+                    } label: {
+                        if presenter.isVerifyingAllClear {
+                            ProgressView()
+                        } else {
+                            Text(AppTextAnalysisFOVAlbum.verifyAllClearButton)
+                                .font(AppTypography.s4)
+                        }
+                    }
+                    .disabled(presenter.isVerifyingAllClear)
+                    .accessibilityLabel(AppTextAnalysisFOVAlbum.verifyAllClearButton)
+                }
+            }
         }
         .onAppear {
             guard !usesSharedPresenter else { return }

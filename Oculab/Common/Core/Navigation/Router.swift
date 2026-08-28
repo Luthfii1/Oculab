@@ -24,6 +24,7 @@ class Router: ObservableObject {
         case userAccessPin(state: PinMode)
         case login
         case register
+        case forgotPassword
         case photoAlbum(fovGroup: FOVType, examId: String)
         case detailedPhoto(slideId: String, fovs: [FOVData], currentIndex: Int, examId: String?)
         case profile
@@ -42,7 +43,7 @@ class Router: ObservableObject {
         // MARK: - Route Properties
         var requiresAuthentication: Bool {
             switch self {
-            case .login, .register:
+            case .login, .register, .forgotPassword:
                 return false
             default:
                 return true
@@ -62,6 +63,7 @@ class Router: ObservableObject {
             case .userAccessPin: return "user-access-pin"
             case .login: return "login"
             case .register: return "register"
+            case .forgotPassword: return "forgot-password"
             case .photoAlbum: return "photo-album"
             case .detailedPhoto: return "detailed-photo"
             case .profile: return "profile"
@@ -113,6 +115,9 @@ class Router: ObservableObject {
                 .environmentObject(DependencyInjection.shared.createAuthPresenter())
         case .register:
             RegisterUserView()
+                .environmentObject(DependencyInjection.shared.createAuthPresenter())
+        case .forgotPassword:
+            ForgotPasswordView()
                 .environmentObject(DependencyInjection.shared.createAuthPresenter())
         case let .photoAlbum(fovGroup, examId):
             FOVAlbum(fovGroup: fovGroup, examId: examId)

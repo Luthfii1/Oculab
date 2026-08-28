@@ -234,6 +234,15 @@
 "auth.login.password" = "Kata Sandi";
 "auth.login.password.placeholder" = "Masukkan kata sandi anda";
 "auth.login.button" = "Login";
+"auth.login.forgot_password" = "Lupa password?";
+"auth.forgot_password.navigation_title" = "Lupa Password";
+"auth.forgot_password.title" = "Atur ulang password";
+"auth.forgot_password.subtitle" = "Masukkan email akun Anda. Kami akan mengirim tautan aman untuk membuat password baru.";
+"auth.forgot_password.submit" = "Kirim tautan reset";
+"auth.forgot_password.success" = "Jika akun dengan email tersebut ada, tautan reset password telah dikirim. Buka email, ikuti tautannya, lalu masuk kembali di sini.";
+"auth.forgot_password.back_to_login" = "Kembali ke login";
+"auth.forgot_password.try_again" = "Coba email lain";
+"auth.forgot_password.failed" = "Gagal mengirim email reset. Silakan coba lagi.";
 "auth.login.not_registered" = "Faskes belum terdaftar?";
 "auth.login.register_facility" = "Daftarkan Faskes";
 
@@ -299,10 +308,12 @@
 
 "analysist.info.navigation_title" = "Informasi Interpretasi Sistem";
 "analysist.info.assessment_standard_title" = "Standar Penilaian";
-"analysist.info.assessment_standard_description" = "Sistem ini menghitung bakteri sesuai rekomendasi WHO dan standar IUALTD";
+"analysist.info.assessment_standard_description" = "Sistem ini menghitung bakteri sesuai rekomendasi WHO dan standar IUATLD";
 
 "analysist.pdf.taken_at" = "Diambil di";
 "analysist.pdf.officer" = "Petugas";
+"analysist.pdf.graded_by" = "Dinilai oleh";
+"analysist.pdf.graded_at" = "Dinilai pada";
 "analysist.pdf.reporting_header" = "Pelaporan";
 "analysist.pdf.observation_results_header" = "Hasil Pengamatan";
 "analysist.pdf.bacteriological_examination_title" = "HASIL PEMERIKSAAN BAKTERIOLOGIS";
@@ -322,6 +333,7 @@
 "analysist.fov_detail.start_from_first" = "Mulai dari pertama";
 "analysist.fov_detail.tap_to_review_hint" = "Ketuk deteksi yang salah untuk verifikasi atau hapus";
 "analysist.fov_detail.swipe_hint" = "Geser untuk ganti gambar";
+"analysist.fov_album.verify_all_clear" = "Verifikasi semua kosong";
 
 // MARK: - Authentication Module
 // Login View
@@ -439,11 +451,12 @@
 "examination.progress.analyzing_title" = "Menginterpretasikan data";
 "examination.progress.analyzing_subtitle" = "Spesimen Anda sedang dianalisis";
 "examination.progress.loading_images_subtitle" = "Menyiapkan gambar bidang pandang";
-"examination.progress.analysis_failed_title" = "Analisis tidak dapat dimulai";
+"examination.progress.analysis_failed_title" = "Analisis gagal";
 "examination.progress.analysis_failed_default" = "Analisis gagal. Silakan coba lagi.";
-"examination.progress.analysis_failed_hint" = "Video tidak dapat dikirim ke layanan AI. Periksa koneksi Anda dan kirim ulang.";
+"examination.progress.analysis_failed_hint" = "Video tidak dapat dikirim ke layanan AI. Periksa koneksi Anda lalu kirim ulang, atau kembali ke daftar tugas.";
+"examination.progress.analysis_stalled_title" = "Analisis habis waktu";
 "examination.progress.analysis_stalled_message" = "Analisis memakan waktu lebih lama dari biasanya atau mungkin terhenti.";
-"examination.progress.analysis_stalled_hint" = "Tarik ke bawah untuk refresh, atau kirim ulang video sediaan untuk memulai analisis lagi.";
+"examination.progress.analysis_stalled_hint" = "Cek status untuk menunggu lebih lama, atau kirim ulang video sediaan untuk memulai analisis lagi.";
 "examination.progress.button_resubmit_video" = "Kirim ulang video";
 "examination.progress.button_check_status" = "Cek status";
 "examination.progress.button_try_again" = "Coba lagi";
@@ -527,6 +540,12 @@
 "home_history.new_examination_button" = "Pemeriksaan Baru";
 "home_history.no_task_message" = "Anda belum ditugaskan untuk melakukan pemeriksaan";
 "home_history.no_tasks_in_filter_message" = "Tidak ada tugas pada kategori ini. Coba filter lain.";
+"home_history.task_search_placeholder" = "Cari berdasarkan ID slide, pasien, atau PIC";
+"home_history.no_tasks_in_search_message" = "Tidak ada tugas yang cocok dengan pencarian Anda.";
+"home_history.load_error_retry" = "Coba lagi";
+"auth.profile.verify_email_title" = "Verifikasi email Anda";
+"auth.profile.verify_email_message" = "Konfirmasi email agar kami dapat menghubungi Anda untuk pemulihan password dan keamanan akun.";
+"auth.profile.verify_email_resend" = "Kirim ulang email verifikasi";
 "home_history.task_count_format" = "%d ditampilkan";
 "home_history.examination_data" = "data pemeriksaan anda";
 
@@ -564,6 +583,9 @@
 // List View
 "patient.list.navigation_title" = "Daftar Pasien";
 "patient.list.button_create_patient" = "Pasien Baru";
+"patient.list.search_placeholder" = "Cari nama, NIK, atau BPJS";
+"patient.list.empty_message" = "Belum ada pasien";
+"patient.list.empty_hint" = "Ketuk Pasien Baru di atas untuk mendaftarkan pasien pertama.";
 
 // Detail View
 "patient.detail.navigation_title" = "Riwayat Pemeriksaan";
@@ -654,6 +676,7 @@
 // New User Form View
 "user_management.new_user_form.success_description_prefix" = "Anda telah berhasil menambahkan akun baru untuk";
 "user_management.new_user_form.success_description_suffix" = "dengan role";
+"user_management.new_user_form.success_password_emailed" = "Kata sandi sementara telah dikirim ke email pengguna.";
 "user_management.new_user_form.role_lab_placeholder" = "Laboran";
 "user_management.new_user_form.role_admin_choice" = "Admin";
 "user_management.new_user_form.name_placeholder" = "Masukkan nama";
@@ -859,12 +882,16 @@
 "register.full_name.placeholder" = "Masukkan nama lengkap Anda";
 "register.email.title" = "Email";
 "register.email.placeholder" = "Masukkan alamat email Anda";
+"register.password.title" = "Password";
+"register.password.placeholder" = "Minimal 8 karakter";
+"register.confirm_password.title" = "Konfirmasi password";
+"register.confirm_password.placeholder" = "Ulangi password Anda";
 "register.health_facility_name.title" = "Nama Fasilitas Kesehatan";
 "register.health_facility_name.placeholder" = "Masukkan nama fasilitas kesehatan";
 "register.health_facility_type.title" = "Jenis Fasilitas Kesehatan";
 "register.health_facility_type.placeholder" = "Pilih jenis fasilitas";
 "register.submit_button" = "Daftar";
-"register.success_message" = "Berhasil mendaftar akun. Silakan cek email Anda untuk mendapatkan password login.";
+"register.success_message" = "Akun berhasil dibuat. Cek email untuk verifikasi, lalu masuk dengan password yang Anda buat.";
 "register.validation_error_fill_all_fields" = "Silakan lengkapi semua field yang wajib diisi dengan benar.";
 
 // MARK: - Registration Entry (B2B/B2C)

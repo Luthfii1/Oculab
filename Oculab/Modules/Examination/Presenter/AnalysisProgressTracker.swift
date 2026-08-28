@@ -118,6 +118,11 @@ final class AnalysisProgressTracker: ObservableObject {
         stopTracking()
     }
 
+    func clearFailure() {
+        hasAnalysisFailed = false
+        analysisFailureMessage = nil
+    }
+
     func evaluateHealth(
         examinationId: String,
         status: StatusType?,

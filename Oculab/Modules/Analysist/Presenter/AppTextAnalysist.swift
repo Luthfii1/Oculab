@@ -75,6 +75,8 @@ extension AppText {
             static let downloadingDataMessage = AppState.loading("analysist.data".localized)
             static let takenAtLabel = "analysist.pdf.taken_at".localized
             static let officerLabel = "analysist.pdf.officer".localized
+            static let gradedByLabel = "analysist.pdf.graded_by".localized
+            static let gradedAtLabel = "analysist.pdf.graded_at".localized
             static let noNotesDefault = AppState.noData("analysist.notes".localized) 
             static let reportingHeaderTitle = "analysist.pdf.reporting_header".localized
             static let observationResultsHeaderTitle = "analysist.pdf.observation_results_header".localized
@@ -89,6 +91,8 @@ extension AppText {
         }
         
         enum FOVAlbumView {
+            static let verifyAllClearButton = "analysist.fov_album.verify_all_clear".localized
+
             static func navigationTitleFormat(_ itemName: String) -> String {
                 return AppData.albumTitle(itemName)
             }

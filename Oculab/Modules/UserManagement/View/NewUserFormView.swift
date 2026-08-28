@@ -18,7 +18,16 @@ struct NewUserFormView: View {
                     AppPopup(
                         image: AppImage.success,
                         title: AppTextUserMgmtNewUserForm.successCreateAccount,
-                        description: AppData.makeSentence([AppTextUserMgmtNewUserForm.successDescriptionPrefix, presenter.registrationSuccess.name, AppTextUserMgmtNewUserForm.successDescriptionSuffix, presenter.registrationSuccess.role]),
+                        description: {
+                            let base = AppData.makeSentence([
+                                AppTextUserMgmtNewUserForm.successDescriptionPrefix,
+                                presenter.registrationSuccess.name,
+                                AppTextUserMgmtNewUserForm.successDescriptionSuffix,
+                                presenter.registrationSuccess.role
+                            ])
+                            guard presenter.registrationSuccess.passwordEmailed else { return base }
+                            return "\(base). \(AppTextUserMgmtNewUserForm.successPasswordEmailed)"
+                        }(),
                         buttons: [
                             AppButton(
                                 title: AppTextUserMgmtNewUserForm.createAnotherAccount,

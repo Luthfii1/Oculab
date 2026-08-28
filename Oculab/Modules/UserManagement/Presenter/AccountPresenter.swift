@@ -52,7 +52,11 @@ class AccountPresenter: ObservableObject {
     @Published var deletionError: String? = nil
     
     // MARK: - Success States
-    @Published var registrationSuccess: (name: String, role: String) = (AppValue.empty, AppValue.empty)
+    @Published var registrationSuccess: (name: String, role: String, passwordEmailed: Bool) = (
+        AppValue.empty,
+        AppValue.empty,
+        false
+    )
     @Published var editSuccess: (name: String, role: String) = (AppValue.empty, AppValue.empty)
     @Published var deletionSuccess: (userName: String, message: String)? = nil
     
@@ -235,14 +239,18 @@ extension AccountPresenter {
         do {
             let roleType = getRoleType(from: role)
             
-            _ = try await interactor.registerAccount(
+            let result = try await interactor.registerAccount(
                 roleType: roleType,
                 name: name,
                 email: email
             )
             
-            // Registration successful - result is non-nil
-            registrationSuccess = (name: name, role: roleType.rawValue)
+            // Registration successful — provisional password is emailed, never shown in-app
+            registrationSuccess = (
+                name: name,
+                role: roleType.rawValue,
+                passwordEmailed: result.passwordEmailed ?? true
+            )
             showSuccessPopup = true
 
             refetchTask?.cancel()

@@ -100,6 +100,7 @@ struct PDFPageView: View {
             )
             drawLines(context)
             drawHasilPemeriksaan(regularText)
+            drawExpertAudit(boldText, regularText)
 
             drawInterpretasi(
                 title: AppMedical.Examination.microscopicInterpretation,
@@ -115,8 +116,6 @@ struct PDFPageView: View {
                 boldText,
                 regularText
             )
-            drawLines(context)
-            drawHasilPemeriksaan(regularText)
             drawIUATLDStandard()
             drawSignatures(boldText, regularText)
         }
@@ -127,14 +126,14 @@ struct PDFPageView: View {
         UIImage(named: AppImage.logo)?.draw(at: CGPoint(x: 32, y: 32))
         NSAttributedString(string: presenter.data?.kopPDFData.desc ?? AppValue.empty, attributes: regularText).draw(at: CGPoint(x: 32, y: 72))
 
-        // Phone number with icon
+        // Phone number with icon (icon left of text, right-aligned group)
         let phoneIcon = UIImage(named: AppImage.phone)?.resizeImage(targetSize: CGSize(width: 12, height: 12))
         let phoneText = NSAttributedString(string: presenter.data?.kopPDFData.notelp ?? AppValue.empty, attributes: regularText)
         let phoneTextSize = phoneText.size()
         let phoneIconSize = phoneIcon?.size ?? .zero
-        let phoneX = 563 - phoneTextSize.width - phoneIconSize.width - 4 // 4 is padding between text and icon
-        phoneText.draw(at: CGPoint(x: phoneX, y: 54))
-        phoneIcon?.draw(at: CGPoint(x: phoneX + phoneTextSize.width + 4, y: 54))
+        let phoneX = 563 - phoneTextSize.width - phoneIconSize.width - 4 // 4 is padding between icon and text
+        phoneIcon?.draw(at: CGPoint(x: phoneX, y: 54))
+        phoneText.draw(at: CGPoint(x: phoneX + phoneIconSize.width + 4, y: 54))
         
         // Email with icon
         let emailIcon = UIImage(named: AppImage.envelope)?.resizeImage(targetSize: CGSize(width: 12, height: 12))
@@ -142,8 +141,8 @@ struct PDFPageView: View {
         let emailTextSize = emailText.size()
         let emailIconSize = emailIcon?.size ?? .zero
         let emailX = 563 - emailTextSize.width - emailIconSize.width - 4
-        emailText.draw(at: CGPoint(x: emailX, y: 70))
-        emailIcon?.draw(at: CGPoint(x: emailX + emailTextSize.width + 4, y: 70))
+        emailIcon?.draw(at: CGPoint(x: emailX, y: 70))
+        emailText.draw(at: CGPoint(x: emailX + emailIconSize.width + 4, y: 70))
         
         UIImage(named: AppImage.line)?.draw(at: CGPoint(x: 0, y: 97))
     }
@@ -316,6 +315,39 @@ struct PDFPageView: View {
 
         NSAttributedString(string: AppTextAnalysisPDF.bacteriologicalExaminationResultTitle, attributes: boldAttributes)
             .draw(at: CGPoint(x: 166, y: 274))
+    }
+
+    /// Compact audit line: expert grader identity + result timestamp when available.
+    private func drawExpertAudit(
+        _ boldText: [NSAttributedString.Key: Any],
+        _ regularText: [NSAttributedString.Key: Any]
+    ) {
+        let grader = presenter.data?.hasilPDFData.expertGrader
+            ?? presenter.data?.preparatPDFData.laborant
+            ?? AppValue.empty
+        let gradedAt = presenter.data?.hasilPDFData.tanggalHasil ?? AppValue.empty
+
+        guard !grader.isEmpty || !gradedAt.isEmpty else { return }
+
+        let yAudit: CGFloat = 368
+        var xCursor: CGFloat = 33
+
+        if !grader.isEmpty {
+            let label = NSAttributedString(string: AppTextAnalysisPDF.gradedByLabel, attributes: boldText)
+            label.draw(at: CGPoint(x: xCursor, y: yAudit))
+            xCursor += label.size().width + 6
+            let value = NSAttributedString(string: grader, attributes: regularText)
+            value.draw(at: CGPoint(x: xCursor, y: yAudit))
+            xCursor += value.size().width + 20
+        }
+
+        if !gradedAt.isEmpty {
+            let label = NSAttributedString(string: AppTextAnalysisPDF.gradedAtLabel, attributes: boldText)
+            label.draw(at: CGPoint(x: xCursor, y: yAudit))
+            xCursor += label.size().width + 6
+            NSAttributedString(string: gradedAt, attributes: regularText)
+                .draw(at: CGPoint(x: xCursor, y: yAudit))
+        }
     }
 
     // Draw lines for the table and other sections

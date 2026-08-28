@@ -104,6 +104,17 @@ struct HomeView: View {
 
             filterChips
 
+            AppSearchBar(
+                searchText: Binding(
+                    get: { presenter.taskSearchQuery },
+                    set: { presenter.updateTaskSearchQuery($0) }
+                ),
+                placeholder: AppTextHomeHistory.searchPlaceholder,
+                onSearch: {
+                    presenter.updateTaskSearchQuery(presenter.taskSearchQuery)
+                }
+            )
+
             if showsNewExaminationButton {
                 AppButton(
                     title: AppTextHomeHistory.newExaminationButton,
@@ -141,7 +152,7 @@ struct HomeView: View {
 
     @ViewBuilder
     private var taskListContent: some View {
-        if presenter.isAllExamsLoading {
+            if presenter.isAllExamsLoading {
             VStack(spacing: 12) {
                 ProgressView()
                 Text(AppTextHomeHistory.loadingState)
@@ -150,6 +161,28 @@ struct HomeView: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 32)
+
+        } else if !presenter.loadErrorMessage.isEmpty {
+            VStack(spacing: 12) {
+                Text(presenter.loadErrorMessage)
+                    .font(AppTypography.p3)
+                    .foregroundStyle(AppColors.slate600)
+                    .multilineTextAlignment(.center)
+                AppButton(
+                    title: AppTextHomeHistory.loadErrorRetry,
+                    colorType: .primary,
+                    size: .large,
+                    isEnabled: true
+                ) {
+                    loadTask?.cancel()
+                    loadTask = Task {
+                        await presenter.getStatisticData()
+                        await presenter.fetchData(userRole: authentication.user.role)
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 24)
 
         } else if presenter.filteredExamination.isEmpty {
             emptyTasksView
@@ -194,6 +227,9 @@ struct HomeView: View {
     }
 
     private var emptyStateMessage: String {
+        if !presenter.taskSearchQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return AppTextHomeHistory.noTasksInSearchMessage
+        }
         if presenter.hasAnyExaminations {
             return AppTextHomeHistory.noTasksInFilterMessage
         }

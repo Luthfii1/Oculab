@@ -73,6 +73,7 @@ class AnalysisResultPresenter: ObservableObject {
     @Published var isLeavePopUpVisible = false
     @Published var buttonTitle: String = AppTextExamProgress.buttonSaveResult
     @Published var isAllFOVsVerified: Bool = false
+    @Published var isVerifyingAllClear: Bool = false
     @Published var startTime: Date?
 
     // MARK: - Computed Properties
@@ -148,8 +149,18 @@ class AnalysisResultPresenter: ObservableObject {
         analysisFailureMessage != nil
     }
 
+    var isAnalysisStalled: Bool {
+        analysisFailureMessage == AppTextExamProgress.analysisStalledMessage
+    }
+
+    var analysisFailureTitle: String {
+        isAnalysisStalled
+            ? AppTextExamProgress.analysisStalledTitle
+            : AppTextExamProgress.analysisFailedTitle
+    }
+
     var analysisRecoveryHint: String {
-        if analysisFailureMessage == AppTextExamProgress.analysisStalledMessage {
+        if isAnalysisStalled {
             return AppTextExamProgress.analysisStalledHint
         }
         return AppTextExamProgress.analysisFailedHint
@@ -314,6 +325,7 @@ extension AnalysisResultPresenter {
 
         do {
             examinationResult = try await interactor.fetchData(examId: examinationId)
+            clearFailureIfAnalysisAdvanced(examinationId: examinationId)
 
             if examinationResult?.statusExamination != .INPROGRESS {
                 await loadFOVData(examinationId: examinationId, silent: silent)
@@ -514,15 +526,41 @@ extension AnalysisResultPresenter {
         analysisProgress = 0
         AnalysisTrackingStore.untrack(examinationId: examinationId)
         AnalysisRealtimeService.shared.unsubscribe(from: examinationId)
-        trackingTask?.cancel()
-        trackingTask = nil
-        stopRealtimeTracking()
+        stopExaminationStatusPolling()
+    }
+
+    /// Clears a false-positive timeout/failure when the exam has moved past analysis.
+    @MainActor
+    private func clearFailureIfAnalysisAdvanced(examinationId: String) {
+        guard hasAnalysisFailed else { return }
+        guard let status = examinationResult?.statusExamination else { return }
+
+        switch status {
+        case .NEEDVALIDATION, .FINISHED:
+            analysisFailureMessage = nil
+            progressTracker.clearFailure()
+            AnalysisTrackingStore.untrack(examinationId: examinationId)
+        default:
+            break
+        }
+    }
+
+    /// Re-check progress after a stall/timeout so the user can keep waiting without resubmitting.
+    @MainActor
+    func checkAnalysisStatus(examinationId: String) async {
+        analysisFailureMessage = nil
+        progressTracker.clearFailure()
+        stopExaminationStatusPolling()
+        AnalysisTrackingStore.track(examinationId: examinationId)
+        beginExaminationTracking(examinationId: examinationId)
+        await refreshExaminationStatus(examinationId: examinationId)
     }
 
     @MainActor
     func retryAnalysis(examinationId: String) async {
         let patientId = examinationResult?.patientId
         analysisFailureMessage = nil
+        progressTracker.clearFailure()
         stopExaminationStatusPolling()
         AnalysisTrackingStore.untrack(examinationId: examinationId)
         AnalysisRealtimeService.shared.unsubscribe(from: examinationId)
@@ -628,6 +666,48 @@ extension AnalysisResultPresenter {
         buttonTitle = allVerified ? AppTextExamProgress.buttonSaveResult : AppTextExamProgress.buttonVerifyAllFOVs
     }
 
+    /// FOVs with no detections that still need album-level verification.
+    func unverifiedClearFOVs(in fovGroup: FOVType) -> [FOVData] {
+        selectedFOVs(for: fovGroup).filter { !$0.verified && $0.effectiveBacteriaCount == 0 }
+    }
+
+    func hasUnverifiedClearFOVs(in fovGroup: FOVType) -> Bool {
+        !unverifiedClearFOVs(in: fovGroup).isEmpty
+    }
+
+    /// Marks empty (0-detection) FOVs in this album as verified via the existing per-FOV endpoint.
+    @MainActor
+    func verifyAllClearFOVs(in fovGroup: FOVType, examinationId: String) async {
+        let targets = unverifiedClearFOVs(in: fovGroup)
+        guard !targets.isEmpty, !isVerifyingAllClear else { return }
+
+        isVerifyingAllClear = true
+        defer { isVerifyingAllClear = false }
+
+        var verifiedAny = false
+        for fov in targets {
+            do {
+                _ = try await interactor.verifyingFOV(fovId: fov.id)
+                fov.verified = true
+                verifiedAny = true
+            } catch {
+                errorMessage = ErrorHandler.shared.handleError(error, context: .examination)
+                break
+            }
+        }
+
+        guard verifiedAny else { return }
+
+        objectWillChange.send()
+        checkIsAllFOVsVerified()
+        await loadFOVData(examinationId: examinationId, silent: true)
+        NotificationCenter.default.post(
+            name: .fovVerificationUpdated,
+            object: nil,
+            userInfo: ["examId": examinationId]
+        )
+    }
+
     func syncStaffBacteriaCountFromValidation() {
         guard hasFOVData else { return }
         let latestCount = validatedBacteriaTotalCount
@@ -662,6 +742,7 @@ extension AnalysisResultPresenter {
         isLeavePopUpVisible = false
         buttonTitle = AppTextExamProgress.buttonSaveResult
         isAllFOVsVerified = false
+        isVerifyingAllClear = false
         startTime = nil
         analysisTrackingStartedAt = nil
         lastProgressChangeAt = nil

@@ -9,7 +9,6 @@ import SwiftUI
 
 struct LoginView: View {
     @EnvironmentObject var presenter: AuthenticationPresenter
-    @StateObject private var contactPresenter = ContactPresenter(interactor: ContactInteractor())
     @FocusState private var isEmailFocused: Bool
     @FocusState private var isPasswordFocused: Bool
 
@@ -35,6 +34,7 @@ struct LoginView: View {
                             .font(AppTypography.h1)
                             .foregroundStyle(AppColors.slate900)
                             .multilineTextAlignment(.center)
+                            .accessibilityAddTraits(.isHeader)
                         VStack(spacing: 8) {
                             ValidatedTextField(
                                 title: AppLabel.email,
@@ -60,6 +60,19 @@ struct LoginView: View {
                                 validationType: .password
                             )
                             .focused($isPasswordFocused)
+
+                            HStack {
+                                Spacer()
+                                AppButton(
+                                    title: AppTextAuthLogin.forgotPassword,
+                                    colorType: .tertiary,
+                                    size: .large,
+                                    isEnabled: true
+                                ) {
+                                    Router.shared.navigateTo(.forgotPassword)
+                                }
+                                .accessibilityLabel(AppTextAuthLogin.forgotPassword)
+                            }
                         }
                         .padding(.horizontal, AppConstants.defaultPadding)
                         .padding(.top, AppConstants.loginFieldsTopPadding)
@@ -75,6 +88,7 @@ struct LoginView: View {
                                     await presenter.handleLogin()
                                 }
                             }
+                            .accessibilityLabel(AppTextAuthLogin.buttonText)
                             HStack {
                                 Spacer()
                                 Text(AppTextAuthLogin.dontHaveAccount)
@@ -90,6 +104,7 @@ struct LoginView: View {
                                         Router.shared.navigateTo(.register)
                                     }
                                 }
+                                .accessibilityLabel(AppTextAuthLogin.registerAccountButtonText)
                                 .multilineTextAlignment(.leading)
                                 Spacer()
                             }

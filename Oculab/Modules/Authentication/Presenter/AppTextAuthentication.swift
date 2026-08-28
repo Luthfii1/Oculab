@@ -16,6 +16,7 @@ typealias AppTextAuthPrivacyPolicy = AppText.Authentication.PrivacyPolicyView
 typealias AppTextAuthCompPin = AppText.Authentication.PinComponent
 typealias AppTextAuthBiometric = AppText.Authentication.Biometric
 typealias AppTextAuthRegister = AppText.Authentication.RegisterView
+typealias AppTextAuthForgotPassword = AppText.Authentication.ForgotPasswordView
 
 extension AppText {
     enum Authentication {
@@ -25,6 +26,10 @@ extension AppText {
             static let fullNamePlaceholder = "register.full_name.placeholder".localized
             static let emailTitle = "register.email.title".localized
             static let emailPlaceholder = "register.email.placeholder".localized
+            static let passwordTitle = "register.password.title".localized
+            static let passwordPlaceholder = "register.password.placeholder".localized
+            static let confirmPasswordTitle = "register.confirm_password.title".localized
+            static let confirmPasswordPlaceholder = "register.confirm_password.placeholder".localized
             static let healthFacilityNameTitle = "register.health_facility_name.title".localized
             static let healthFacilityNamePlaceholder = "register.health_facility_name.placeholder".localized
             static let healthFacilityTypeTitle = "register.health_facility_type.title".localized
@@ -64,6 +69,18 @@ extension AppText {
             static let loginFailedText = "auth.login.failed".localized
             static let dontHaveAccount = "auth.login.dont_have_account".localized
             static let registerAccountButtonText = "auth.login.register_account_button".localized
+            static let forgotPassword = "auth.login.forgot_password".localized
+        }
+
+        enum ForgotPasswordView {
+            static let navigationTitle = "auth.forgot_password.navigation_title".localized
+            static let title = "auth.forgot_password.title".localized
+            static let subtitle = "auth.forgot_password.subtitle".localized
+            static let submitButton = "auth.forgot_password.submit".localized
+            static let successMessage = "auth.forgot_password.success".localized
+            static let backToLogin = "auth.forgot_password.back_to_login".localized
+            static let tryAgain = "auth.forgot_password.try_again".localized
+            static let requestFailed = "auth.forgot_password.failed".localized
         }
         
         enum EditPasswordView {
@@ -98,6 +115,9 @@ extension AppText {
             static let editPinButton = "auth.profile.edit_pin".localized
             static let faceIdToggle = "auth.profile.face_id".localized
             static let privacyPolicyButton = "auth.profile.privacy_policy".localized
+            static let verifyEmailBannerTitle = "auth.profile.verify_email_title".localized
+            static let verifyEmailBannerMessage = "auth.profile.verify_email_message".localized
+            static let verifyEmailResendButton = "auth.profile.verify_email_resend".localized
 
             static let descFaceIdNotEnabled = "auth.profile.face_id_not_enabled".localized
             static let descFaceIdNotSupported = "auth.profile.face_id_not_supported".localized

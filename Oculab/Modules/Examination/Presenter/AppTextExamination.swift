@@ -37,6 +37,7 @@ extension AppText {
             static let analysisFailedTitle = "examination.progress.analysis_failed_title".localized
             static let analysisFailedDefault = "examination.progress.analysis_failed_default".localized
             static let analysisFailedHint = "examination.progress.analysis_failed_hint".localized
+            static let analysisStalledTitle = "examination.progress.analysis_stalled_title".localized
             static let analysisStalledMessage = "examination.progress.analysis_stalled_message".localized
             static let analysisStalledHint = "examination.progress.analysis_stalled_hint".localized
             static let buttonTryAgain = "examination.progress.button_try_again".localized

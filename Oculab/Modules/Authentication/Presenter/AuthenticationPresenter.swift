@@ -49,9 +49,19 @@ class AuthenticationPresenter: ObservableObject {
     @Published var registerEmail: String = AppValue.empty
     @Published var registerHealthFacilityName: String = AppValue.empty
     @Published var registerHealthFacilityType: HealthFacilityType? = nil
+    @Published var registerPassword: String = AppValue.empty
+    @Published var registerConfirmPassword: String = AppValue.empty
     @Published var showRegisterSuccessAlert: Bool = false
     @Published var registerSuccessMessage: String = AppValue.empty
     @Published var isChoosingRegistrationType: Bool = true
+    @Published var isEmailVerified: Bool = true
+    @Published var isResendingVerification: Bool = false
+    @Published var verificationResendMessage: String = AppValue.empty
+
+    // Forgot password
+    @Published var forgotPasswordEmail: String = AppValue.empty
+    @Published var forgotPasswordSubmitted: Bool = false
+    @Published var forgotPasswordError: String = AppValue.empty
 
     // PIN Management State
     @Published var firstPin = AppValue.empty
@@ -103,9 +113,13 @@ class AuthenticationPresenter: ObservableObject {
         !registerEmail.isEmpty &&
         !registerHealthFacilityName.isEmpty &&
         registerHealthFacilityType != nil &&
+        registerPassword.count >= 8 &&
+        registerPassword == registerConfirmPassword &&
         !formValidation.hasError(for: .registerFullName) &&
         !formValidation.hasError(for: .registerEmail) &&
-        !formValidation.hasError(for: .registerHealthFacilityName)
+        !formValidation.hasError(for: .registerHealthFacilityName) &&
+        !formValidation.hasError(for: .newPassword) &&
+        !formValidation.hasError(for: .confirmPassword)
     }
     
     var isFormValid: () -> Bool = {
@@ -147,6 +161,8 @@ extension AuthenticationPresenter {
                 .registerFullName: registerFullName,
                 .registerEmail: registerEmail,
                 .registerHealthFacilityName: registerHealthFacilityName,
+                .newPassword: registerPassword,
+                .confirmPassword: registerConfirmPassword,
             ]
         )
 
@@ -161,13 +177,15 @@ extension AuthenticationPresenter {
                 name: registerFullName,
                 email: registerEmail,
                 healthFacilityName: registerHealthFacilityName,
-                healthFacilityType: registerHealthFacilityType?.rawValue ?? AppValue.empty
+                healthFacilityType: registerHealthFacilityType?.rawValue ?? AppValue.empty,
+                password: registerPassword
             )
 
             email = registration.email
-            password = registration.currentPassword ?? AppValue.empty
+            password = registerPassword
+            isEmailVerified = registration.emailVerified ?? false
 
-            guard !password.isEmpty, await login() else {
+            guard await login() else {
                 prepareForLoginAfterRegister()
                 showRegisterSuccessAlert = true
                 registerSuccessMessage = AppTextAuthRegister.successRegisterMessage
@@ -193,6 +211,39 @@ extension AuthenticationPresenter {
     func prepareForLoginAfterRegister() {
         email = registerEmail
         clearRegistrationForm()
+    }
+
+    @MainActor
+    func clearForgotPasswordState() {
+        forgotPasswordSubmitted = false
+        forgotPasswordError = AppValue.empty
+        forgotPasswordEmail = AppValue.empty
+        isLoading = false
+    }
+
+    @MainActor
+    func requestPasswordReset() async {
+        forgotPasswordError = AppValue.empty
+        let trimmed = forgotPasswordEmail.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            forgotPasswordError = AppTextAuthForgotPassword.requestFailed
+            return
+        }
+
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            _ = try await interactor.requestPasswordReset(email: trimmed)
+            forgotPasswordSubmitted = true
+        } catch {
+            // Still show success-style path for enumeration safety when server returns 200
+            // with a generic message; only surface hard network/validation failures.
+            forgotPasswordError = ErrorHandler.shared.handleError(error, context: .login)
+            if forgotPasswordError.isEmpty {
+                forgotPasswordError = AppTextAuthForgotPassword.requestFailed
+            }
+        }
     }
     
     @MainActor
@@ -257,6 +308,7 @@ extension AuthenticationPresenter {
             )
             
             // Tokens are stored automatically in the login method
+            isEmailVerified = response.emailVerified ?? true
             isSuccess = true
             
             return true
@@ -278,6 +330,7 @@ extension AuthenticationPresenter {
 
             user = account
             user.loadAccessPinFromKeychain()
+            isEmailVerified = account.emailVerified
             isLogin = true
             
             // Clear any PIN state
@@ -885,14 +938,16 @@ extension AuthenticationPresenter {
 
     /// Check if registration form is both filled and has no validation errors
     func isRegisterFormValidAndFilled() -> Bool {
-        // Check if fields are filled
         guard !registerFullName.isEmpty && !registerEmail.isEmpty && !registerHealthFacilityName.isEmpty else { return false }
         guard registerHealthFacilityType != nil else { return false }
-        // Check if there are no validation errors for registration fields
+        guard registerPassword.count >= 8 else { return false }
+        guard registerPassword == registerConfirmPassword else { return false }
         let hasFullNameError = formValidation.hasError(for: .registerFullName)
         let hasEmailError = formValidation.hasError(for: .registerEmail)
         let hasFacilityNameError = formValidation.hasError(for: .registerHealthFacilityName)
-        return !hasFullNameError && !hasEmailError && !hasFacilityNameError
+        let hasPasswordError = formValidation.hasError(for: .newPassword)
+        let hasConfirmError = formValidation.hasError(for: .confirmPassword)
+        return !hasFullNameError && !hasEmailError && !hasFacilityNameError && !hasPasswordError && !hasConfirmError
     }
     
     /// Clear all input fields and reset validation state
@@ -911,10 +966,27 @@ extension AuthenticationPresenter {
         registerFullName = AppValue.empty
         registerHealthFacilityName = AppValue.empty
         registerHealthFacilityType = nil
+        registerPassword = AppValue.empty
+        registerConfirmPassword = AppValue.empty
         isChoosingRegistrationType = true
         let registerFields: [ValidationFieldName] = [
             .registerFullName, .registerEmail, .registerHealthFacilityName,
+            .newPassword, .confirmPassword,
         ]
         formValidation.clearErrors(for: registerFields)
+    }
+
+    @MainActor
+    func resendEmailVerification() async {
+        guard let email = user.email, !email.isEmpty else { return }
+        isResendingVerification = true
+        verificationResendMessage = AppValue.empty
+        defer { isResendingVerification = false }
+
+        do {
+            verificationResendMessage = try await interactor.requestEmailVerification(email: email)
+        } catch {
+            verificationResendMessage = ErrorHandler.shared.handleError(error, context: .login)
+        }
     }
 }

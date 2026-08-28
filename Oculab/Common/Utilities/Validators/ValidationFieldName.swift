@@ -311,6 +311,7 @@ extension ValidationFieldName {
         static let login: [ValidationFieldName] = [.loginEmail, .loginPassword]
         static let b2cRegistration: [ValidationFieldName] = [
             .registerFullName, .registerEmail, .registerHealthFacilityName,
+            .newPassword, .confirmPassword,
         ]
         
         // MARK: - User Management Forms

@@ -45,7 +45,11 @@ struct AnalyzingExaminationProgressView: View {
             }
             .refreshable {
                 Task {
-                    await presenter.refreshExaminationStatus(examinationId: examinationId)
+                    if presenter.hasAnalysisFailed {
+                        await presenter.checkAnalysisStatus(examinationId: examinationId)
+                    } else {
+                        await presenter.refreshExaminationStatus(examinationId: examinationId)
+                    }
                 }
             }
 
@@ -56,7 +60,7 @@ struct AnalyzingExaminationProgressView: View {
 
     private var failureHeroCard: some View {
         VStack(spacing: 20) {
-            Text(AppTextExamProgress.analysisFailedTitle)
+            Text(presenter.analysisFailureTitle)
                 .font(AppTypography.s4_1)
                 .foregroundStyle(AppColors.slate900)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -163,14 +167,57 @@ struct AnalyzingExaminationProgressView: View {
 
             VStack(spacing: 10) {
                 if presenter.hasAnalysisFailed {
+                    if presenter.isAnalysisStalled {
+                        AppButton(
+                            title: AppTextExamProgress.buttonCheckStatus,
+                            size: .large,
+                            isEnabled: true
+                        ) {
+                            Task {
+                                await presenter.checkAnalysisStatus(examinationId: examinationId)
+                            }
+                        }
+
+                        AppButton(
+                            title: AppTextExamProgress.buttonResubmitVideo,
+                            colorType: .secondary,
+                            size: .large,
+                            isEnabled: true
+                        ) {
+                            Task {
+                                await presenter.retryAnalysis(examinationId: examinationId)
+                            }
+                        }
+                    } else {
+                        AppButton(
+                            title: AppTextExamProgress.buttonResubmitVideo,
+                            size: .large,
+                            isEnabled: true
+                        ) {
+                            Task {
+                                await presenter.retryAnalysis(examinationId: examinationId)
+                            }
+                        }
+
+                        AppButton(
+                            title: AppTextExamProgress.buttonCheckStatus,
+                            colorType: .secondary,
+                            size: .large,
+                            isEnabled: true
+                        ) {
+                            Task {
+                                await presenter.checkAnalysisStatus(examinationId: examinationId)
+                            }
+                        }
+                    }
+
                     AppButton(
-                        title: AppTextExamProgress.buttonResubmitVideo,
+                        title: AppTextExamProgress.buttonBackToTasks,
+                        colorType: .secondary,
                         size: .large,
                         isEnabled: true
                     ) {
-                        Task {
-                            await presenter.retryAnalysis(examinationId: examinationId)
-                        }
+                        presenter.exitFromFlow(examinationId: examinationId)
                     }
                 } else {
                     AppButton(
@@ -183,15 +230,15 @@ struct AnalyzingExaminationProgressView: View {
                             await presenter.refreshExaminationStatus(examinationId: examinationId)
                         }
                     }
-                }
 
-                AppButton(
-                    title: AppTextExamProgress.buttonBackToTasks,
-                    colorType: presenter.hasAnalysisFailed ? .secondary : .primary,
-                    size: .large,
-                    isEnabled: true
-                ) {
-                    presenter.exitFromFlow(examinationId: examinationId)
+                    AppButton(
+                        title: AppTextExamProgress.buttonBackToTasks,
+                        colorType: .primary,
+                        size: .large,
+                        isEnabled: true
+                    ) {
+                        presenter.exitFromFlow(examinationId: examinationId)
+                    }
                 }
             }
             .padding(.horizontal, 20)

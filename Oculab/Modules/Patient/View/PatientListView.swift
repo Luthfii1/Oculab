@@ -25,7 +25,7 @@ struct PatientListView: View {
                 
                 AppSearchBar(
                     searchText: $presenter.searchText,
-                    placeholder: AppSearch.Patient.placeholder,
+                    placeholder: AppTextPatientList.searchPlaceholder,
                     onSearch: {
                         presenter.searchPatients()
                     }
@@ -44,39 +44,23 @@ struct PatientListView: View {
                     ProgressView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .padding(.top, AppConstants.PatientUI.topPadding)
-                } else if !presenter.searchText.isEmpty && presenter.filteredPatientNameDoB.isEmpty {
-                    VStack(spacing: AppConstants.PatientUI.searchSpacing) {
-                        Image(systemName: AppIcon.search)
-                            .font(.system(size: AppConstants.PatientUI.noResultsIconSize))
-                            .foregroundColor(AppColors.slate300)
-                        
-                        Text(AppSearch.noResults(presenter.searchText))
-                            .font(AppTypography.s3)
-                            .foregroundColor(AppColors.slate700)
-                            .multilineTextAlignment(.center)
-                        
-                        Button(action: {
-                            presenter.clearSearch()
-                        }) {
-                            Text(AppSearch.clearSearch)
-                                .font(AppTypography.p2)
-                                .foregroundColor(AppColors.purple600)
-                        }
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if presenter.isPatientListEmpty {
+                    emptyPatientListState
+                } else if !presenter.searchText.isEmpty && presenter.filteredPatients.isEmpty {
+                    emptySearchResultsState
                 } else {
                     ScrollView {
                         LazyVGrid(columns: [
                             GridItem(.flexible(), spacing: AppConstants.PatientUI.gridItemSpacing),
                             GridItem(.flexible(), spacing: AppConstants.PatientUI.gridItemSpacing)
                         ], spacing: AppConstants.PatientUI.gridSpacing) {
-                            ForEach(presenter.filteredPatientNameDoB, id: \.1) { nameWithDoB, patientId in
+                            ForEach(presenter.filteredPatients) { patient in
                                 Button {
-                                    presenter.navigateTo(.patientDetail(patientId: patientId))
+                                    presenter.navigateTo(.patientDetail(patientId: patient.id))
                                 } label: {
                                     PatientCard(
-                                        name: nameWithDoB.components(separatedBy: " (").first ?? AppConstants.PatientUI.defaultEmptyValue,
-                                        birthDate: nameWithDoB.components(separatedBy: " (").last?.replacingOccurrences(of: ")", with: AppConstants.PatientUI.defaultEmptyValue) ?? AppConstants.PatientUI.defaultEmptyValue
+                                        name: patient.name,
+                                        birthDate: patient.birthDate
                                     )
                                 }
                             }
@@ -100,6 +84,47 @@ struct PatientListView: View {
             }
         }
         .navigationBarHidden(true)
+    }
+
+    private var emptyPatientListState: some View {
+        VStack(spacing: AppConstants.PatientUI.searchSpacing) {
+            Image(systemName: AppIcon.personFill)
+                .font(.system(size: AppConstants.PatientUI.noResultsIconSize))
+                .foregroundColor(AppColors.slate300)
+
+            Text(AppTextPatientList.emptyListMessage)
+                .font(AppTypography.s3)
+                .foregroundColor(AppColors.slate700)
+                .multilineTextAlignment(.center)
+
+            Text(AppTextPatientList.emptyListHint)
+                .font(AppTypography.p3)
+                .foregroundColor(AppColors.slate400)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private var emptySearchResultsState: some View {
+        VStack(spacing: AppConstants.PatientUI.searchSpacing) {
+            Image(systemName: AppIcon.search)
+                .font(.system(size: AppConstants.PatientUI.noResultsIconSize))
+                .foregroundColor(AppColors.slate300)
+
+            Text(AppSearch.noResults(presenter.searchText))
+                .font(AppTypography.s3)
+                .foregroundColor(AppColors.slate700)
+                .multilineTextAlignment(.center)
+
+            Button(action: {
+                presenter.clearSearch()
+            }) {
+                Text(AppSearch.clearSearch)
+                    .font(AppTypography.p2)
+                    .foregroundColor(AppColors.purple600)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

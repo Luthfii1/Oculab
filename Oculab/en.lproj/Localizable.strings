@@ -223,6 +223,14 @@
 "auth.login.title" = "Revolutionizing Bacterial Detection with AI Technology";
 "auth.login.subtitle" = "Advanced microscopy analysis for healthcare professionals";
 "auth.login.forgot_password" = "Forgot password?";
+"auth.forgot_password.navigation_title" = "Forgot Password";
+"auth.forgot_password.title" = "Reset your password";
+"auth.forgot_password.subtitle" = "Enter your account email. We'll send a secure link to set a new password.";
+"auth.forgot_password.submit" = "Send reset link";
+"auth.forgot_password.success" = "If an account exists for that email, a password reset link has been sent. Open the email and follow the link, then sign in again here.";
+"auth.forgot_password.back_to_login" = "Back to login";
+"auth.forgot_password.try_again" = "Try another email";
+"auth.forgot_password.failed" = "Couldn't send reset email. Please try again.";
 "auth.login.not_registered" = "Health facility not registered?";
 "auth.login.register_facility" = "Register Health Facility";
 
@@ -234,6 +242,9 @@
 "auth.profile.edit_pin" = "Change PIN";
 "auth.profile.face_id" = "Face ID";
 "auth.profile.privacy_policy" = "Privacy Policy";
+"auth.profile.verify_email_title" = "Verify your email";
+"auth.profile.verify_email_message" = "Confirm your email so we can reach you for password recovery and account security.";
+"auth.profile.verify_email_resend" = "Resend verification email";
 "auth.profile.logout" = "Logout";
 
 // Biometric Authentication
@@ -291,10 +302,12 @@
 
 "analysist.info.navigation_title" = "System Interpretation Information";
 "analysist.info.assessment_standard_title" = "Assessment Standard";
-"analysist.info.assessment_standard_description" = "This system counts bacteria according to WHO recommendations and IUALTD standards";
+"analysist.info.assessment_standard_description" = "This system counts bacteria according to WHO recommendations and IUATLD standards";
 
 "analysist.pdf.taken_at" = "Taken at";
 "analysist.pdf.officer" = "Officer";
+"analysist.pdf.graded_by" = "Graded by";
+"analysist.pdf.graded_at" = "Graded at";
 "analysist.pdf.reporting_header" = "Reporting";
 "analysist.pdf.observation_results_header" = "Observation Results";
 "analysist.pdf.bacteriological_examination_title" = "BACTERIOLOGICAL EXAMINATION RESULTS";
@@ -314,6 +327,7 @@
 "analysist.fov_detail.start_from_first" = "Start from first";
 "analysist.fov_detail.tap_to_review_hint" = "Tap incorrect detections to verify or delete";
 "analysist.fov_detail.swipe_hint" = "Swipe to change image";
+"analysist.fov_album.verify_all_clear" = "Verify all clear";
 
 // MARK: - Authentication Module
 // Login View
@@ -423,11 +437,12 @@
 "examination.progress.analyzing_title" = "Interpreting data";
 "examination.progress.analyzing_subtitle" = "Your specimen is being analyzed";
 "examination.progress.loading_images_subtitle" = "Preparing field of view images";
-"examination.progress.analysis_failed_title" = "Analysis could not start";
+"examination.progress.analysis_failed_title" = "Analysis failed";
 "examination.progress.analysis_failed_default" = "Analysis failed. Please try again.";
-"examination.progress.analysis_failed_hint" = "The video could not be sent to the AI service. Check your connection and try submitting again.";
+"examination.progress.analysis_failed_hint" = "The video could not be sent to the AI service. Check your connection and try submitting again, or go back to your tasks.";
+"examination.progress.analysis_stalled_title" = "Analysis timed out";
 "examination.progress.analysis_stalled_message" = "Analysis is taking longer than expected or may have stopped.";
-"examination.progress.analysis_stalled_hint" = "Pull down to refresh, or resubmit the specimen video to start analysis again.";
+"examination.progress.analysis_stalled_hint" = "Check status to keep waiting, or resubmit the specimen video to start analysis again.";
 "examination.progress.button_try_again" = "Try again";
 "examination.progress.button_resubmit_video" = "Resubmit video";
 "examination.progress.button_check_status" = "Check status";
@@ -511,6 +526,9 @@
 "home_history.new_examination_button" = "New Examination";
 "home_history.no_task_message" = "You have not been assigned to perform examinations";
 "home_history.no_tasks_in_filter_message" = "No tasks in this category. Try another filter.";
+"home_history.task_search_placeholder" = "Search by slide ID, patient, or PIC";
+"home_history.no_tasks_in_search_message" = "No tasks match your search.";
+"home_history.load_error_retry" = "Try again";
 "home_history.task_count_format" = "%d shown";
 "home_history.examination_data" = "your examination data";
 
@@ -548,6 +566,9 @@
 // List View
 "patient.list.navigation_title" = "Patient List";
 "patient.list.button_create_patient" = "New Patient";
+"patient.list.search_placeholder" = "Search by name, NIK, or BPJS";
+"patient.list.empty_message" = "No patients yet";
+"patient.list.empty_hint" = "Tap New Patient above to register the first patient.";
 
 // Detail View
 "patient.detail.navigation_title" = "Examination History";
@@ -638,6 +659,7 @@
 // New User Form View
 "user_management.new_user_form.success_description_prefix" = "You have successfully added a new account for";
 "user_management.new_user_form.success_description_suffix" = "with role";
+"user_management.new_user_form.success_password_emailed" = "A provisional password has been emailed to the user.";
 "user_management.new_user_form.role_lab_placeholder" = "Laboratory Technician";
 "user_management.new_user_form.role_admin_choice" = "Admin";
 "user_management.new_user_form.name_placeholder" = "Enter name";
@@ -841,12 +863,16 @@
 "register.full_name.placeholder" = "Enter your full name";
 "register.email.title" = "Email";
 "register.email.placeholder" = "Enter your email address";
+"register.password.title" = "Password";
+"register.password.placeholder" = "At least 8 characters";
+"register.confirm_password.title" = "Confirm password";
+"register.confirm_password.placeholder" = "Repeat your password";
 "register.health_facility_name.title" = "Health Facility Name";
 "register.health_facility_name.placeholder" = "Enter health facility name";
 "register.health_facility_type.title" = "Health Facility Type";
 "register.health_facility_type.placeholder" = "Select facility type";
 "register.submit_button" = "Register";
-"register.success_message" = "Successfully registered account. Please check your email to get the password for login.";
+"register.success_message" = "Account created. Check your email to verify your address, then sign in with the password you chose.";
 "register.validation_error_fill_all_fields" = "Please fill all required fields correctly.";
 
 // MARK: - Registration Entry (B2B/B2C)

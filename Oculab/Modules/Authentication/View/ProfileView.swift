@@ -16,6 +16,39 @@ struct ProfileView: View {
         NavigationView {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .center, spacing: 20) {
+                    if !authPresenter.isEmailVerified {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text(AppTextAuthProfile.verifyEmailBannerTitle)
+                                .font(AppTypography.s4)
+                                .foregroundStyle(AppColors.slate900)
+                            Text(AppTextAuthProfile.verifyEmailBannerMessage)
+                                .font(AppTypography.p3)
+                                .foregroundStyle(AppColors.slate600)
+                            if !authPresenter.verificationResendMessage.isEmpty {
+                                Text(authPresenter.verificationResendMessage)
+                                    .font(AppTypography.p4)
+                                    .foregroundStyle(AppColors.purple600)
+                            }
+                            AppButton(
+                                title: authPresenter.isResendingVerification
+                                    ? AppState.loading
+                                    : AppTextAuthProfile.verifyEmailResendButton,
+                                colorType: .secondary,
+                                size: .large,
+                                isEnabled: !authPresenter.isResendingVerification
+                            ) {
+                                Task {
+                                    await authPresenter.resendEmailVerification()
+                                }
+                            }
+                        }
+                        .padding(AppConstants.defaultPadding)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(AppColors.purple50)
+                        .cornerRadius(AppConstants.cornerRadius)
+                        .accessibilityElement(children: .contain)
+                    }
+
                     ExtendableCard(
                         icon: AppIcon.personFill,
                         title: AppTextAuthProfile.accountInfoTitle,

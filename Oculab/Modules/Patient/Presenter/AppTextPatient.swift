@@ -24,6 +24,9 @@ extension AppText {
         enum ListView {
             static let navigationTitle = "patient.list.navigation_title".localized
             static let buttonCreatePatient = AppAction.add("patient.list.button_create_patient".localized)
+            static let searchPlaceholder = "patient.list.search_placeholder".localized
+            static let emptyListMessage = "patient.list.empty_message".localized
+            static let emptyListHint = "patient.list.empty_hint".localized
         }
         
         enum DetailView {

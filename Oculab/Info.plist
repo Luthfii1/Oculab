@@ -35,16 +35,8 @@
 	<string>public.app-category.medical</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
-		<key>NSExceptionDomains</key>
-		<dict>
-			<key>b4wgswckgks8488og484s8co.34.50.75.183.sslip.io</key>
-			<dict>
-				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
-				<key>NSIncludesSubdomains</key>
-				<true/>
-			</dict>
-		</dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>We would like to access your camera to record video</string>

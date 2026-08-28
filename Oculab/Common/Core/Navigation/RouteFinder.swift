@@ -321,8 +321,8 @@ class RouteFinder: ObservableObject {
                 Logger.info("Successfully navigated to deeplink route", category: .navigation)
                 
             case .authenticationRequired:
+                // Keep pendingDeeplink so processPendingDeeplink() can run after login/PIN.
                 self.deeplinkError = result.errorMessage
-                self.pendingDeeplink = nil
                 Router.shared.navigateTo(.login)
                 Logger.warning("Authentication required for deeplink", category: .navigation)
                 

@@ -25,9 +25,13 @@ class PatientPresenter {
 
     // MARK: - UI State
     var isPatientLoading = false
-    var patientNameDoB: [(String, String)] = []
+    var patients: [PatientListItem] = []
     var searchText: String = AppConstants.PatientUI.defaultEmptyValue
-    var filteredPatientNameDoB: [(String, String)] = []
+    var filteredPatients: [PatientListItem] = []
+
+    var isPatientListEmpty: Bool {
+        !isPatientLoading && patients.isEmpty
+    }
 
     // MARK: - Patient Data
     var patient: Patient = .init(
@@ -223,17 +227,20 @@ extension PatientPresenter {
 
         do {
             let response = try await interactor.getAllPatient()
-
-            patientNameDoB.removeAll()
-            for patient in response {
-                let formattedDoB = formatDate(patient.DoB)
-                patientNameDoB.append((patient.name + String(formattedDoB), patient.id))
+            patients = response.map { patient in
+                PatientListItem(
+                    id: patient.id,
+                    name: patient.name,
+                    nik: patient.NIK,
+                    bpjs: patient.BPJS ?? AppConstants.PatientUI.defaultEmptyValue,
+                    birthDate: formatDate(patient.DoB)
+                )
             }
             filterPatients()
             Logger.info("Successfully fetched \(response.count) patients", category: .patient)
         } catch {
             if isEmptyPatientListError(error) {
-                patientNameDoB.removeAll()
+                patients = []
                 filterPatients()
                 return
             }
@@ -336,15 +343,27 @@ extension PatientPresenter {
     }
 
     private func filterPatients() {
-        if searchText.isEmpty {
-            filteredPatientNameDoB = patientNameDoB
-        } else {
-            filteredPatientNameDoB = patientNameDoB.filter { nameWithDoB, _ in
-                let name = nameWithDoB.components(separatedBy: " (").first ?? AppConstants.PatientUI.defaultEmptyValue
-                return name.localizedCaseInsensitiveContains(searchText)
-            }
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        if query.isEmpty {
+            filteredPatients = patients
+            return
+        }
+
+        filteredPatients = patients.filter { item in
+            item.name.localizedCaseInsensitiveContains(query)
+                || item.nik.localizedCaseInsensitiveContains(query)
+                || (!item.bpjs.isEmpty && item.bpjs.localizedCaseInsensitiveContains(query))
         }
     }
+}
+
+// MARK: - Patient List Item
+struct PatientListItem: Identifiable, Equatable {
+    let id: String
+    let name: String
+    let nik: String
+    let bpjs: String
+    let birthDate: String
 }
 
 // MARK: - Examination Management

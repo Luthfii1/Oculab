@@ -40,6 +40,10 @@ struct hasilPDFData: Decodable, Equatable {
     var jenisUji: String
     var hasil: String
     var idSediaan: String
+    /// When the expert result was signed (examinationDate), formatted WIB.
+    var tanggalHasil: String?
+    /// Lab officer who submitted the expert grading.
+    var expertGrader: String?
     var descInterpretasi: String
     var descNotesPetugas: String
 }

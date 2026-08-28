@@ -19,6 +19,7 @@ class HomeHistoryPresenter: ObservableObject {
     // MARK: - Published Properties
     @Published var selectedLatestActivity: LatestActivityType = .belumDimulai
     @Published var selectedDate: Date = .init()
+    @Published var taskSearchQuery: String = ""
 
     @Published var latestExamination: [ExaminationCardData] = []
     @Published var filteredExamination: [ExaminationCardData] = []
@@ -32,6 +33,7 @@ class HomeHistoryPresenter: ObservableObject {
 
     @Published var isAllExamsLoading: Bool = false
     @Published var isStatisticLoading: Bool = false
+    @Published var loadErrorMessage: String = ""
     
     // MARK: - Constants
     private struct Constants {
@@ -82,7 +84,13 @@ extension HomeHistoryPresenter {
     @MainActor
     func filterLatestActivity(typeActivity: LatestActivityType) async {
         selectedLatestActivity = typeActivity
-        filteredExamination = getFilteredExaminations(by: typeActivity)
+        applyTaskFilters()
+    }
+
+    @MainActor
+    func updateTaskSearchQuery(_ query: String) {
+        taskSearchQuery = query
+        applyTaskFilters()
     }
     
     var hasAnyExaminations: Bool {
@@ -90,10 +98,15 @@ extension HomeHistoryPresenter {
     }
 
     func examinationCount(for type: LatestActivityType) -> Int {
-        getFilteredExaminations(by: type).count
+        // Chip counts stay status-only so searching doesn't shrink the chips.
+        statusFilteredExaminations(by: type).count
     }
 
-    private func getFilteredExaminations(by type: LatestActivityType) -> [ExaminationCardData] {
+    private func applyTaskFilters() {
+        filteredExamination = getFilteredExaminations(by: selectedLatestActivity)
+    }
+
+    private func statusFilteredExaminations(by type: LatestActivityType) -> [ExaminationCardData] {
         switch type {
         case .semua:
             return latestExamination
@@ -102,9 +115,23 @@ extension HomeHistoryPresenter {
         case .belumDimulai:
             return latestExamination.filter { $0.statusExamination == .NOTSTARTED }
         case .belumDisimpulkan:
-            return latestExamination.filter { 
-                $0.statusExamination == .NEEDVALIDATION || $0.statusExamination == .INPROGRESS 
+            return latestExamination.filter {
+                $0.statusExamination == .NEEDVALIDATION || $0.statusExamination == .INPROGRESS
             }
+        }
+    }
+
+    private func getFilteredExaminations(by type: LatestActivityType) -> [ExaminationCardData] {
+        let byStatus = statusFilteredExaminations(by: type)
+
+        let query = taskSearchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { return byStatus }
+
+        let needle = query.lowercased()
+        return byStatus.filter { exam in
+            exam.slideId.lowercased().contains(needle)
+                || exam.patientName.lowercased().contains(needle)
+                || exam.picName.lowercased().contains(needle)
         }
     }
 
@@ -133,6 +160,7 @@ extension HomeHistoryPresenter {
         
         isAllExamsLoading = true
         finishedExaminationsByDate.removeAll()
+        loadErrorMessage = ""
         
         defer { isAllExamsLoading = false }
         
@@ -143,8 +171,8 @@ extension HomeHistoryPresenter {
             
         } catch {
             finishedExaminationsByDate = []
+            loadErrorMessage = ErrorHandler.shared.handleError(error)
             Logger.error("Failed to fetch examinations for date \(dateString): \(error.localizedDescription)", category: .general)
-            _ = ErrorHandler.shared.handleError(error)
         }
     }
     
@@ -160,10 +188,13 @@ extension HomeHistoryPresenter {
 
         do {
             latestExamination = try await getExaminationData(for: userRole)
+            loadErrorMessage = ""
             await filterLatestActivity(typeActivity: selectedLatestActivity)
         } catch {
+            latestExamination = []
+            filteredExamination = []
+            loadErrorMessage = ErrorHandler.shared.handleError(error)
             Logger.error("Failed to fetch examination data for role \(userRole): \(error.localizedDescription)", category: .general)
-            _ = ErrorHandler.shared.handleError(error)
         }
     }
     
@@ -190,5 +221,6 @@ extension HomeHistoryPresenter {
         isAllExamsLoading = false
         isStatisticLoading = false
         selectedLatestActivity = .belumDimulai
+        taskSearchQuery = ""
     }
 }
