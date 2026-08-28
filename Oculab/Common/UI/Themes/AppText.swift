@@ -97,6 +97,7 @@ enum AppText {
         static let antennaRadiowaves = "antenna.radiowaves.left.and.right"
         static let cableConnector = "cable.connector"
         static let arrowClockwise = "arrow.clockwise"
+        static let cloudArrowUp = "icloud.and.arrow.up"
     }
     
     // MARK: - App Specific Icons

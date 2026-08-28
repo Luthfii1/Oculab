@@ -21,13 +21,25 @@ struct HomeActivityComponent: View {
     var patientDOB: String
     var picName: String
     var viewType: ViewType
+    var showsPendingUpload: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .top) {
                 plannedDateHeader
                 Spacer(minLength: 8)
-                StatusTagComponent(type: status)
+                VStack(alignment: .trailing, spacing: 6) {
+                    if showsPendingUpload {
+                        Text(AppTextExam.uploadPendingBadge)
+                            .font(AppTypography.p4)
+                            .foregroundStyle(AppColors.orange700)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(AppColors.orange50)
+                            .clipShape(Capsule())
+                    }
+                    StatusTagComponent(type: status)
+                }
             }
 
             HStack(alignment: .center, spacing: 12) {

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     @StateObject private var presenter = HomeHistoryPresenter()
+    @ObservedObject private var uploadQueue = VideoUploadQueueService.shared
     @EnvironmentObject private var authentication: AuthenticationPresenter
     @State private var loadTask: Task<Void, Never>?
     @State private var refreshTask: Task<Void, Never>?
@@ -115,6 +116,21 @@ struct HomeView: View {
 
             filterChips
 
+            if uploadQueue.pendingCount > 0 {
+                HStack(alignment: .top, spacing: 8) {
+                    Image(systemName: AppIcon.cloudArrowUp)
+                        .foregroundStyle(AppColors.orange500)
+                    Text(String(format: AppTextExam.uploadQueueBanner, uploadQueue.pendingCount))
+                        .font(AppTypography.p3)
+                        .foregroundStyle(AppColors.slate600)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(AppColors.orange50)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+
             AppSearchBar(
                 searchText: Binding(
                     get: { presenter.taskSearchQuery },
@@ -212,7 +228,8 @@ struct HomeView: View {
                             patientName: exam.patientName,
                             patientDOB: exam.patientDob.toFormattedDate(),
                             picName: exam.picName,
-                            viewType: authentication.user.role == .ADMIN ? .admin : .lab
+                            viewType: authentication.user.role == .ADMIN ? .admin : .lab,
+                            showsPendingUpload: uploadQueue.hasPendingUpload(for: exam.examinationId)
                         )
                     }
                     .buttonStyle(.plain)

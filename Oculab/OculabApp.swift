@@ -45,11 +45,11 @@ struct OculabApp: App {
     /// Beta: wipe local SwiftData when schema version changes instead of migrating.
     private enum SwiftDataBootstrap {
         /// Bump when `@Model` types change in a breaking way.
-        static let schemaVersion = 2
+        static let schemaVersion = 3
     }
 
     private static func makeModelContainer() throws -> ModelContainer {
-        let schema = Schema([User.self])
+        let schema = Schema([User.self, PendingUpload.self])
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         let versionKey = UserDefaultType.swiftDataSchemaVersion.rawValue
         let storedVersion = UserDefaults.standard.integer(forKey: versionKey)

@@ -27,6 +27,11 @@ extension AppText {
         static let buttonStartAnalysis = "examination.button_start_analysis".localized
         static let buttonSubmitting = "examination.button_submitting".localized
         static let tempFileCleanupWarning = "examination.temp_file_cleanup_warning".localized
+        static let uploadQueueMaxRetries = "examination.upload_queue_max_retries".localized
+        static let uploadQueueBanner = "examination.upload_queue_banner".localized
+        static let uploadPendingBadge = "examination.upload_pending_badge".localized
+        static let uploadQueueUploading = "examination.upload_queue_uploading".localized
+        static let uploadQueueFailed = "examination.upload_queue_failed".localized
 
         enum ProgressView {
             static let loadingAnimationName = "loadingPaperplane"

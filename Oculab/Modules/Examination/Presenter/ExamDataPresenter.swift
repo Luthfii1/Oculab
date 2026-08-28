@@ -121,12 +121,6 @@ class ExamDataPresenter: ObservableObject {
     var staffInterpretation: String {
         firstExamination?.expertResult ?? AppState.notAvailable
     }
-
-    @MainActor
-    func resetState() {
-        examinations = []
-        recordVideo = nil
-    }
 }
 
 // MARK: - Video Management Methods
@@ -182,16 +176,17 @@ extension ExamDataPresenter {
             return false
         }
 
+        let examinationId = examDetailData.examinationId
+
         do {
-            Logger.info("Streaming video upload from \(fileURL.lastPathComponent)", category: .examination)
+            Logger.info("Queueing video upload for \(examinationId)", category: .examination)
 
-            _ = try await interactor.submitExamination(
-                videoFileURL: fileURL,
-                examinationId: examDetailData.examinationId,
-                patientId: patientDetailData.patientId
+            try await VideoUploadQueueService.shared.enqueue(
+                examinationId: examinationId,
+                patientId: patientDetailData.patientId,
+                slideId: examDetailData.slideId,
+                sourceURL: fileURL
             )
-
-            Logger.info("Examination submitted successfully", category: .examination)
 
             recordVideo = nil
             videoPresenter.previewURL = nil
@@ -200,16 +195,16 @@ extension ExamDataPresenter {
             }
             await VideoRecordSession.replaceSession()
 
-            let examinationId = examDetailData.examinationId
             AnalysisTrackingStore.track(examinationId: examinationId)
             Task { @MainActor in
                 AnalysisRealtimeService.shared.subscribe(to: examinationId)
                 await ExaminationNotificationService.shared.requestAuthorizationIfNeeded()
+                await VideoUploadQueueService.shared.processQueue()
             }
             navigateToAnalysisResult(examinationId: examinationId)
             return true
         } catch {
-            Logger.error("Error submitting or loading video data: \(error)", category: .examination)
+            Logger.error("Error queueing video upload: \(error)", category: .examination)
             submissionError = ErrorHandler.shared.handleError(error, context: .examination)
             return false
         }

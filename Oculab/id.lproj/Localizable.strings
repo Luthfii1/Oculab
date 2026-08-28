@@ -446,6 +446,11 @@
 "examination.button_start_analysis" = "Mulai Analisis";
 "examination.button_submitting" = "Mengirimkan...";
 "examination.temp_file_cleanup_warning" = "Pemeriksaan terkirim, tapi rekaman sementara tidak dapat dihapus dari perangkat.";
+"examination.upload_queue_max_retries" = "Upload gagal setelah beberapa percobaan. Periksa koneksi dan coba lagi dari halaman pemeriksaan.";
+"examination.upload_queue_banner" = "%d video menunggu diunggah. Kami akan mencoba lagi otomatis saat Anda kembali online.";
+"examination.upload_pending_badge" = "Upload tertunda";
+"examination.upload_queue_uploading" = "Mengunggah video…";
+"examination.upload_queue_failed" = "Upload video gagal. Periksa koneksi lalu ketuk Coba lagi.";
 
 // Progress View
 "examination.progress.analyzing_title" = "Menginterpretasikan data";

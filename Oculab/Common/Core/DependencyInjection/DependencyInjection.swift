@@ -44,6 +44,11 @@ class DependencyInjection: ObservableObject {
     
     func initializer(modelContext: ModelContext) {
         self.modelContext = modelContext
+        VideoUploadQueueService.shared.configure(
+            modelContext: modelContext,
+            examInteractor: examInteractor,
+            networkRetryManager: networkRetryManager
+        )
     }
     
     // MARK: - Computed Properties

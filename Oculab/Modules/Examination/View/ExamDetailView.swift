@@ -12,6 +12,7 @@ struct ExamDetailView: View {
     var patientId: String
 
     @ObservedObject private var videoRecordPresenter = VideoRecordSession.current
+    @ObservedObject private var uploadQueue = VideoUploadQueueService.shared
     @StateObject private var presenter = ExamDataPresenter(interactor: ExamInteractor())
     @State private var showGuidelines = false
     @State private var didFinishOnboarding = false
@@ -151,6 +152,10 @@ struct ExamDetailView: View {
 
     private var detailFooter: some View {
         VStack(alignment: .leading, spacing: 10) {
+            if uploadQueue.hasPendingUpload(for: examId) {
+                uploadQueueBanner
+            }
+
             if let hint = presenter.startAnalysisHint {
                 HStack(alignment: .top, spacing: 8) {
                     Image(systemName: AppIcon.info)
@@ -183,6 +188,60 @@ struct ExamDetailView: View {
         .overlay(alignment: .top) {
             Divider()
         }
+    }
+
+    @ViewBuilder
+    private var uploadQueueBanner: some View {
+        let normalizedExamId = examId.lowercased()
+        let state = uploadQueue.uploadState(for: normalizedExamId)
+        let isFailed = state == .failed
+        let isUploading = uploadQueue.uploadingExaminationId?.lowercased() == normalizedExamId
+
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 8) {
+                if isUploading {
+                    ProgressView()
+                        .controlSize(.small)
+                } else {
+                    Image(systemName: isFailed ? AppIcon.warning : AppIcon.cloudArrowUp)
+                        .foregroundStyle(isFailed ? AppColors.orange500 : AppColors.purple600)
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(
+                        isUploading
+                            ? AppTextExam.uploadQueueUploading
+                            : (isFailed ? AppTextExam.uploadQueueFailed : AppTextExam.uploadPendingBadge)
+                    )
+                    .font(AppTypography.p3)
+                    .foregroundStyle(AppColors.slate600)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                    if isFailed, let error = uploadQueue.lastUploadError(for: normalizedExamId) {
+                        Text(error)
+                            .font(AppTypography.p4)
+                            .foregroundStyle(AppColors.slate400)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+
+            if isFailed {
+                AppButton(
+                    title: AppAction.retry,
+                    colorType: .secondary,
+                    size: .small
+                ) {
+                    Task {
+                        await uploadQueue.retry(examinationId: normalizedExamId)
+                    }
+                }
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(isFailed ? AppColors.orange50 : AppColors.purple50)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
 

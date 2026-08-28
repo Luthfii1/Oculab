@@ -435,6 +435,11 @@
 "examination.button_start_analysis" = "Start Analysis";
 "examination.button_submitting" = "Submitting...";
 "examination.temp_file_cleanup_warning" = "Examination submitted, but the temporary recording could not be removed from the device.";
+"examination.upload_queue_max_retries" = "Upload failed after several attempts. Check your connection and try again from the exam.";
+"examination.upload_queue_banner" = "%d video(s) waiting to upload. We'll retry automatically when you're back online.";
+"examination.upload_pending_badge" = "Upload pending";
+"examination.upload_queue_uploading" = "Uploading video…";
+"examination.upload_queue_failed" = "Video upload failed. Check your connection and tap Retry.";
 
 // Progress View
 "examination.progress.analyzing_title" = "Interpreting data";
