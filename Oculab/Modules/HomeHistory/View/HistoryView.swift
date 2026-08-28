@@ -13,6 +13,7 @@ struct HistoryView: View {
 
     @State private var currentlyLoadedDate: Date?
     @State private var loadTask: Task<Void, Never>?
+    @State private var showFilterSheet = false
 
     var body: some View {
         NavigationView {
@@ -20,6 +21,21 @@ struct HistoryView: View {
                 VStack(spacing: Decimal.d16) {
                     WeeklyCalendar(selectedDate: $selectedDate) { newDate in
                         selectedDate = newDate
+                    }
+
+                    if presenter.usesAdvancedHistoryFilters {
+                        HStack {
+                            Text(AppTextHomeHistory.historyFilterTitle)
+                                .font(AppTypography.p4)
+                                .foregroundStyle(AppColors.slate500)
+                            Spacer()
+                            Button(AppTextHomeHistory.historyFilterReset) {
+                                Task {
+                                    await presenter.resetHistoryFilters(around: selectedDate)
+                                }
+                            }
+                            .font(AppTypography.p4)
+                        }
                     }
 
                     if presenter.isAllExamsLoading {
@@ -81,6 +97,20 @@ struct HistoryView: View {
             }
             .padding(.horizontal, Decimal.d20)
             .navigationTitle(AppTextHomeHistory.navigationTitleHistory)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(AppTextHomeHistory.historyFilterButton) {
+                        showFilterSheet = true
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $showFilterSheet) {
+            HistoryFilterSheet(filters: $presenter.historyFilters) {
+                Task {
+                    await presenter.applyHistoryFilters(presenter.historyFilters)
+                }
+            }
         }
         .ignoresSafeArea()
         .onAppear {

@@ -496,6 +496,14 @@
 "examination.detail.analysis_queued_message" = "Video Anda telah dikirim untuk dianalisis. Anda dapat melanjutkan tugas lain di beranda. Buka pemeriksaan ini lagi ketika status siap untuk validasi.";
 "examination.detail.analysis_queued_go_home" = "Lanjut ke tugas";
 "examination.detail.analysis_queued_view_progress" = "Lihat progres";
+"examination.detail.admin_reassign_pic_title" = "Ubah petugas pemeriksaan";
+"examination.detail.admin_reassign_pic_button" = "Ubah PIC";
+"examination.detail.admin_archive_button" = "Arsipkan pemeriksaan";
+"examination.detail.admin_restore_button" = "Pulihkan pemeriksaan";
+"examination.detail.admin_export_csv_button" = "Ekspor CSV fasilitas";
+"examination.detail.admin_archived_badge" = "Diarsipkan";
+"examination.detail.admin_archive_confirm_title" = "Arsipkan pemeriksaan ini?";
+"examination.detail.admin_archive_confirm_message" = "Pemeriksaan yang diarsipkan disembunyikan dari daftar tugas. Anda bisa memulihkannya lagi dari layar ini.";
 
 // Guidelines Onboarding
 "examination.guidelines.navigation_title" = "Persiapan Pemeriksaan";
@@ -552,6 +560,19 @@
 "home_history.load_error_retry" = "Coba lagi";
 "home_history.offline_cache_banner" = "Anda sedang offline. Menampilkan tugas tersimpan dari %@.";
 "home_history.analysis_resume_banner" = "%d analisis masih berjalan. Ketuk untuk lihat progres.";
+"home_history.history_filter_title" = "Filter riwayat";
+"home_history.history_filter_apply" = "Terapkan";
+"home_history.history_filter_button" = "Filter";
+"home_history.history_filter_reset" = "Reset";
+"home_history.history_filter_date_section" = "Rentang tanggal";
+"home_history.history_filter_from" = "Dari";
+"home_history.history_filter_to" = "Sampai";
+"home_history.history_filter_status_section" = "Status";
+"home_history.history_filter_status" = "Status pemeriksaan";
+"home_history.history_filter_any_status" = "Semua status";
+"home_history.history_filter_grading_section" = "Grading";
+"home_history.history_filter_grading" = "Grading akhir";
+"home_history.history_filter_any_grading" = "Semua grading";
 "auth.profile.verify_email_title" = "Verifikasi email Anda";
 "auth.profile.verify_email_message" = "Konfirmasi email agar kami dapat menghubungi Anda untuk pemulihan password dan keamanan akun.";
 "auth.profile.verify_email_resend" = "Kirim ulang email verifikasi";

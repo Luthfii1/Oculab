@@ -44,6 +44,8 @@ class HomeHistoryPresenter: ObservableObject {
     @Published var loadErrorMessage: String = ""
     @Published var isShowingCachedData: Bool = false
     @Published var cachedAt: Date?
+    @Published var historyFilters: HistoryExamFilters = .defaultRange()
+    @Published var usesAdvancedHistoryFilters: Bool = false
     
     // MARK: - Constants
     private struct Constants {
@@ -166,6 +168,11 @@ extension HomeHistoryPresenter {
 extension HomeHistoryPresenter {
     @MainActor
     func fetchFinishedExaminationsByDate(date: Date) async {
+        if usesAdvancedHistoryFilters {
+            await fetchFilteredExaminations()
+            return
+        }
+
         let dateString = date.formattedYearMonthDay()
         
         isAllExamsLoading = true
@@ -189,6 +196,38 @@ extension HomeHistoryPresenter {
     private func handleFinishedExaminationsResponse(_ response: [FinishedExaminationCardData], for dateString: String) {
         finishedExaminationsByDate = response
         Logger.info("Loaded \(response.count) examinations", category: .general)
+    }
+
+    @MainActor
+    func fetchFilteredExaminations() async {
+        isAllExamsLoading = true
+        finishedExaminationsByDate.removeAll()
+        loadErrorMessage = ""
+        defer { isAllExamsLoading = false }
+
+        do {
+            let response = try await interactor.getFacilityExaminations(filters: historyFilters)
+            finishedExaminationsByDate = response
+            loadErrorMessage = ""
+            Logger.info("Loaded \(response.count) filtered examinations", category: .general)
+        } catch {
+            finishedExaminationsByDate = []
+            loadErrorMessage = ErrorHandler.shared.handleError(error)
+        }
+    }
+
+    @MainActor
+    func applyHistoryFilters(_ filters: HistoryExamFilters) async {
+        historyFilters = filters
+        usesAdvancedHistoryFilters = true
+        await fetchFilteredExaminations()
+    }
+
+    @MainActor
+    func resetHistoryFilters(around date: Date) async {
+        historyFilters = .defaultRange(around: date)
+        usesAdvancedHistoryFilters = false
+        await fetchFinishedExaminationsByDate(date: date)
     }
     
     @MainActor

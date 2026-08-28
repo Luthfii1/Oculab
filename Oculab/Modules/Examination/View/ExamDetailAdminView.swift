@@ -13,6 +13,10 @@ struct ExamDetailAdminView: View {
 
     @StateObject private var presenter = ExamDataPresenter(interactor: ExamInteractor())
     @StateObject private var resultPresenter = AnalysisResultPresenter()
+    @State private var showPICPicker = false
+    @State private var showArchiveConfirm = false
+    @State private var csvShareURL: URL?
+    @State private var showCsvShare = false
 
     var body: some View {
         NavigationView {
@@ -20,6 +24,16 @@ struct ExamDetailAdminView: View {
                 Spacer().frame(height: Decimal.d24)
 
                 VStack(alignment: .leading, spacing: Decimal.d24) {
+                    if presenter.isObservationArchived {
+                        Text(AppTextExamDetail.adminArchivedBadge)
+                            .font(AppTypography.p4)
+                            .foregroundStyle(AppColors.orange700)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(AppColors.orange50)
+                            .clipShape(Capsule())
+                    }
+
                     ExtendableCard(
                         icon: AppIcon.personFill,
                         title: AppTextExamDetail.titlePatientDataCard,
@@ -39,6 +53,8 @@ struct ExamDetailAdminView: View {
                         dpjp: presenter.examDetailData.dpjp
                     )
 
+                    adminActionsSection
+
                     AppCard(
                         icon: AppIcon.docTextMagnifyingglass,
                         title: AppTextExamDetail.examinationResult1Title,
@@ -48,8 +64,7 @@ struct ExamDetailAdminView: View {
                             Text(AppMedical.Examination.staffInterpretation)
                                 .font(AppTypography.s5)
                                 .foregroundColor(AppColors.slate300)
-                                
-                            // Staff interpretation component
+
                             if presenter.staffInterpretation != AppState.notAvailable {
                                 GradingCardComponent(
                                     type: GradingType(rawValue: presenter.staffInterpretation) ?? .unknown,
@@ -79,9 +94,9 @@ struct ExamDetailAdminView: View {
                             Text(AppMedical.Examination.staffInterpretation)
                                 .font(AppTypography.s5)
                                 .foregroundColor(AppColors.slate300)
-                            
+
                             let interpretasiPetugas = presenter.secondExamination?.expertResult ?? AppState.notAvailable
-                            
+
                             if interpretasiPetugas != AppState.notAvailable {
                                 GradingCardComponent(
                                     type: GradingType(rawValue: interpretasiPetugas) ?? .unknown,
@@ -101,6 +116,7 @@ struct ExamDetailAdminView: View {
                             (AppMedical.Examination.specimenType, presenter.secondExamination?.preparationType ?? AppValue.empty)
                         ], titleSize: AppTypography.s5)
                     }
+
                     VStack(spacing: Decimal.d16) {
                         AppButton(
                             title: AppTextExamDetail.buttonViewPDF,
@@ -111,14 +127,14 @@ struct ExamDetailAdminView: View {
                         ) {
                             resultPresenter.navigateToPDFView()
                         }
-                        
+
                         AppButton(
                             title: AppTextExamDetail.reportToSitbButton,
                             rightIcon: AppIcon.paperplane,
                             size: .small,
-                            isEnabled: false // Disable until functionality is implemented
+                            isEnabled: false
                         ) {
-                            Logger.debug("View PDF button tapped", category: .examination)
+                            Logger.debug("SITB report tapped", category: .examination)
                         }
                     }
                 }
@@ -149,8 +165,117 @@ struct ExamDetailAdminView: View {
                 presenter.resetState()
                 resultPresenter.resetState()
             }
-        }.navigationBarBackButtonHidden(true)
+            .sheet(isPresented: $showPICPicker) {
+                ExamAdminPICPickerSheet { user in
+                    Task {
+                        if await presenter.adminReassignPIC(
+                            observationId: examId,
+                            picId: user.id
+                        ) {
+                            await presenter.fetchData(examId: examId, patientId: patientId, userRole: .ADMIN)
+                        }
+                    }
+                }
+            }
+            .sheet(isPresented: $showCsvShare) {
+                if let csvShareURL {
+                    ShareSheetView(items: [csvShareURL])
+                }
+            }
+            .alert(
+                AppTextExamDetail.adminArchiveConfirmTitle,
+                isPresented: $showArchiveConfirm
+            ) {
+                Button(AppState.cancel, role: .cancel) {}
+                Button(AppTextExamDetail.adminArchiveButton, role: .destructive) {
+                    Task {
+                        _ = await presenter.adminSetArchived(observationId: examId, archived: true)
+                    }
+                }
+            } message: {
+                Text(AppTextExamDetail.adminArchiveConfirmMessage)
+            }
+            .alert(
+                AppState.error,
+                isPresented: Binding(
+                    get: { presenter.adminActionError != nil },
+                    set: { if !$0 { presenter.adminActionError = nil } }
+                )
+            ) {
+                Button(AppAction.ok) { presenter.adminActionError = nil }
+            } message: {
+                Text(presenter.adminActionError ?? AppValue.empty)
+            }
+        }
+        .navigationBarBackButtonHidden(true)
+        .overlay {
+            if presenter.isAdminActionLoading {
+                ProgressView()
+                    .padding()
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+        }
     }
+
+    private var adminActionsSection: some View {
+        VStack(spacing: 10) {
+            AppButton(
+                title: AppTextExamDetail.adminReassignPicButton,
+                leftIcon: AppIcon.personFill,
+                colorType: .secondary,
+                size: .small,
+                isEnabled: !presenter.isObservationArchived
+            ) {
+                showPICPicker = true
+            }
+
+            if presenter.isObservationArchived {
+                AppButton(
+                    title: AppTextExamDetail.adminRestoreButton,
+                    colorType: .secondary,
+                    size: .small
+                ) {
+                    Task {
+                        _ = await presenter.adminSetArchived(observationId: examId, archived: false)
+                    }
+                }
+            } else {
+                AppButton(
+                    title: AppTextExamDetail.adminArchiveButton,
+                    colorType: .destructive(.secondary),
+                    size: .small
+                ) {
+                    showArchiveConfirm = true
+                }
+            }
+
+            AppButton(
+                title: AppTextExamDetail.adminExportCsvButton,
+                leftIcon: AppIcon.share,
+                colorType: .secondary,
+                size: .small
+            ) {
+                Task {
+                    let filters = HistoryExamFilters.defaultRange()
+                    if let url = await presenter.exportFacilityCsv(filters: filters) {
+                        csvShareURL = url
+                        showCsvShare = true
+                    }
+                }
+            }
+        }
+    }
+}
+
+private struct ShareSheetView: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 #Preview {

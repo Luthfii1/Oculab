@@ -17,6 +17,9 @@ class ExamInteractor {
         static let getPatientById = API.BE + "/patient/get-patient-by-id/"
         static let forwardVideoToML = API.BE + "/examination/forward-video-to-ml/"
         static let getAdminExaminationDetail = API.BE + "/examination/get-examination-detail-admin/"
+        static let adminUpdateObservation = API.BE + "/examination/observation/"
+        static let facilityExaminations = API.BE + "/examination/facility-examinations"
+        static let exportCsv = API.BE + "/examination/export/csv"
     }
     
     // MARK: - Initialization
@@ -77,6 +80,60 @@ class ExamInteractor {
             fileName: videoFileURL.lastPathComponent,
             mimeType: nil
         )
+    }
+
+    func adminUpdateObservation(
+        observationId: String,
+        picId: String? = nil,
+        archived: Bool? = nil
+    ) async throws -> AdminObservationUpdateData {
+        let body = AdminObservationUpdateBody(picId: picId, archived: archived)
+        let response: APIResponse<AdminObservationUpdateData> = try await networkService.update(
+            urlString: APIEndpoints.adminUpdateObservation + observationId.lowercased() + "/admin",
+            headers: nil,
+            body: body
+        )
+        return response.data
+    }
+
+    func getFacilityExaminations(filters: HistoryExamFilters) async throws -> FacilityExaminationListData {
+        var components = URLComponents(string: APIEndpoints.facilityExaminations)
+        components?.queryItems = filters.queryItems()
+        guard let urlString = components?.url?.absoluteString else {
+            throw URLError(.badURL)
+        }
+
+        let response: APIResponse<FacilityExaminationListData> = try await networkService.get(
+            urlString: urlString,
+            headers: nil
+        )
+        return response.data
+    }
+
+    func downloadFacilityExaminationsCsv(filters: HistoryExamFilters) async throws -> URL {
+        guard let token = KeychainHelper.string(for: .accessToken) else {
+            throw URLError(.userAuthenticationRequired)
+        }
+
+        var components = URLComponents(string: APIEndpoints.exportCsv)
+        components?.queryItems = filters.queryItems()
+        guard let url = components?.url else {
+            throw URLError(.badURL)
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
+            throw URLError(.badServerResponse)
+        }
+
+        let fileURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("facility-examinations-\(UUID().uuidString).csv")
+        try data.write(to: fileURL, options: .atomic)
+        return fileURL
     }
 }
 

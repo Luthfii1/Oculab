@@ -86,6 +86,14 @@ extension AppText {
             static let analysisQueuedMessage = "examination.detail.analysis_queued_message".localized
             static let analysisQueuedGoHome = "examination.detail.analysis_queued_go_home".localized
             static let analysisQueuedViewProgress = "examination.detail.analysis_queued_view_progress".localized
+            static let adminReassignPicTitle = "examination.detail.admin_reassign_pic_title".localized
+            static let adminReassignPicButton = "examination.detail.admin_reassign_pic_button".localized
+            static let adminArchiveButton = "examination.detail.admin_archive_button".localized
+            static let adminRestoreButton = "examination.detail.admin_restore_button".localized
+            static let adminExportCsvButton = "examination.detail.admin_export_csv_button".localized
+            static let adminArchivedBadge = "examination.detail.admin_archived_badge".localized
+            static let adminArchiveConfirmTitle = "examination.detail.admin_archive_confirm_title".localized
+            static let adminArchiveConfirmMessage = "examination.detail.admin_archive_confirm_message".localized
             static let buttonViewPDF = AppAction.view("PDF")
         }
         

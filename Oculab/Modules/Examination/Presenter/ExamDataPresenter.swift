@@ -39,6 +39,9 @@ class ExamDataPresenter: ObservableObject {
     @Published var examinations: [AdminExaminationData] = []
     @Published var submissionError: String?
     @Published var cleanupWarning: String?
+    @Published var isAdminActionLoading: Bool = false
+    @Published var adminActionError: String?
+    @Published var isObservationArchived: Bool = false
 
     // MARK: - Initialization
     init(interactor: ExamInteractor) {
@@ -276,6 +279,7 @@ extension ExamDataPresenter {
                 type: examinationResponse.examinations.first?.preparationType ?? AppValue.empty,
                 dpjp: examinationResponse.dpjpName
             )
+            isObservationArchived = examinationResponse.isArchived
         } catch {
             Logger.error("Failed to fetch admin examination data: \(error)", category: .examination)
             _ = ErrorHandler.shared.handleError(error, context: .examination)
@@ -291,6 +295,68 @@ extension ExamDataPresenter {
         } catch {
             Logger.error("Failed to fetch regular examination data: \(error)", category: .examination)
             _ = ErrorHandler.shared.handleError(error, context: .examination)
+        }
+    }
+}
+
+// MARK: - Admin lifecycle
+extension ExamDataPresenter {
+    @MainActor
+    func adminReassignPIC(observationId: String, picId: String) async -> Bool {
+        isAdminActionLoading = true
+        adminActionError = nil
+        defer { isAdminActionLoading = false }
+
+        do {
+            let result = try await interactor.adminUpdateObservation(
+                observationId: observationId,
+                picId: picId
+            )
+            examDetailData = ExaminationDetailData(
+                examinationId: examDetailData.examinationId,
+                pic: result.picName ?? examDetailData.pic,
+                slideId: examDetailData.slideId,
+                examinationGoal: examDetailData.examinationGoal,
+                type: examDetailData.type,
+                dpjp: examDetailData.dpjp
+            )
+            return true
+        } catch {
+            adminActionError = ErrorHandler.shared.handleError(error, context: .examination)
+            return false
+        }
+    }
+
+    @MainActor
+    func adminSetArchived(observationId: String, archived: Bool) async -> Bool {
+        isAdminActionLoading = true
+        adminActionError = nil
+        defer { isAdminActionLoading = false }
+
+        do {
+            _ = try await interactor.adminUpdateObservation(
+                observationId: observationId,
+                archived: archived
+            )
+            isObservationArchived = archived
+            return true
+        } catch {
+            adminActionError = ErrorHandler.shared.handleError(error, context: .examination)
+            return false
+        }
+    }
+
+    @MainActor
+    func exportFacilityCsv(filters: HistoryExamFilters) async -> URL? {
+        isAdminActionLoading = true
+        adminActionError = nil
+        defer { isAdminActionLoading = false }
+
+        do {
+            return try await interactor.downloadFacilityExaminationsCsv(filters: filters)
+        } catch {
+            adminActionError = ErrorHandler.shared.handleError(error, context: .examination)
+            return nil
         }
     }
 }

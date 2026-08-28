@@ -20,6 +20,7 @@ class HomeInteractor {
         static let adminExaminations = examination + "/get-examination-card-data-admin/"
         static let finishedExaminations = examination + "/get-finished-examination-card-data/"
         static let unfinishedExaminations = examination + "/get-unfinished-examination-card-data/"
+        static let facilityExaminations = examination + "/facility-examinations"
     }
 
     // MARK: - Initialization
@@ -109,6 +110,21 @@ class HomeInteractor {
             )
         }
         return finishedExaminationResponse
+    }
+
+    func getFacilityExaminations(filters: HistoryExamFilters) async throws -> [FinishedExaminationCardData] {
+        var components = URLComponents(string: APIEndpoints.facilityExaminations)
+        components?.queryItems = filters.queryItems()
+        guard let urlString = components?.url?.absoluteString else {
+            throw URLError(.badURL)
+        }
+
+        let response: APIResponse<FacilityExaminationListData> = try await networkService.get(
+            urlString: urlString,
+            headers: nil
+        )
+
+        return response.data.items.map { $0.asFinishedCard() }
     }
 }
 

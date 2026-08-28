@@ -34,6 +34,19 @@ extension AppText {
         static let loadingState = AppState.loading("home_history.examination_data".localized)
         static let offlineCacheBanner = "home_history.offline_cache_banner".localized
         static let analysisResumeBanner = "home_history.analysis_resume_banner".localized
+        static let historyFilterTitle = "home_history.history_filter_title".localized
+        static let historyFilterApply = "home_history.history_filter_apply".localized
+        static let historyFilterButton = "home_history.history_filter_button".localized
+        static let historyFilterReset = "home_history.history_filter_reset".localized
+        static let historyFilterDateSection = "home_history.history_filter_date_section".localized
+        static let historyFilterFrom = "home_history.history_filter_from".localized
+        static let historyFilterTo = "home_history.history_filter_to".localized
+        static let historyFilterStatusSection = "home_history.history_filter_status_section".localized
+        static let historyFilterStatus = "home_history.history_filter_status".localized
+        static let historyFilterAnyStatus = "home_history.history_filter_any_status".localized
+        static let historyFilterGradingSection = "home_history.history_filter_grading_section".localized
+        static let historyFilterGrading = "home_history.history_filter_grading".localized
+        static let historyFilterAnyGrading = "home_history.history_filter_any_grading".localized
 
         enum FinishedExaminationCardComponent {
             static let dpjpLabel = "home_history.finished_card.dpjp_label".localized

@@ -13,7 +13,12 @@ struct AdminExaminationDetailData: Decodable {
     let examinationPlanDate: String
     let picName: String
     let dpjpName: String
+    let archivedAt: String?
     let examinations: [AdminExaminationData]
+
+    var isArchived: Bool {
+        archivedAt != nil
+    }
 }
 
 struct AdminExaminationData: Decodable, Identifiable {

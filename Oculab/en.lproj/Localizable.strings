@@ -485,6 +485,14 @@
 "examination.detail.analysis_queued_message" = "Your video was sent for analysis. You can continue other tasks on the home screen. Open this examination again when the status shows ready for validation.";
 "examination.detail.analysis_queued_go_home" = "Continue to tasks";
 "examination.detail.analysis_queued_view_progress" = "View progress";
+"examination.detail.admin_reassign_pic_title" = "Reassign examination officer";
+"examination.detail.admin_reassign_pic_button" = "Reassign PIC";
+"examination.detail.admin_archive_button" = "Archive examination";
+"examination.detail.admin_restore_button" = "Restore examination";
+"examination.detail.admin_export_csv_button" = "Export facility CSV";
+"examination.detail.admin_archived_badge" = "Archived";
+"examination.detail.admin_archive_confirm_title" = "Archive this examination?";
+"examination.detail.admin_archive_confirm_message" = "Archived examinations are hidden from task lists. You can restore them later from this screen.";
 
 // Guidelines Onboarding
 "examination.guidelines.navigation_title" = "Examination Preparation";
@@ -541,6 +549,19 @@
 "home_history.load_error_retry" = "Try again";
 "home_history.offline_cache_banner" = "You're offline. Showing saved tasks from %@.";
 "home_history.analysis_resume_banner" = "%d analysis still running. Tap to view progress.";
+"home_history.history_filter_title" = "History filters";
+"home_history.history_filter_apply" = "Apply";
+"home_history.history_filter_button" = "Filters";
+"home_history.history_filter_reset" = "Reset";
+"home_history.history_filter_date_section" = "Date range";
+"home_history.history_filter_from" = "From";
+"home_history.history_filter_to" = "To";
+"home_history.history_filter_status_section" = "Status";
+"home_history.history_filter_status" = "Examination status";
+"home_history.history_filter_any_status" = "Any status";
+"home_history.history_filter_grading_section" = "Grading";
+"home_history.history_filter_grading" = "Final grading";
+"home_history.history_filter_any_grading" = "Any grading";
 "home_history.task_count_format" = "%d shown";
 "home_history.examination_data" = "your examination data";
 
