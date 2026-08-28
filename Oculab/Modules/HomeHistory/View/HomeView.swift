@@ -45,6 +45,17 @@ struct HomeView: View {
             }
         }
         .background(AppColors.slate0)
+        .alert(
+            AppTextAuthProfile.clinicalActionBlockedTitle,
+            isPresented: $authentication.showEmailVerificationAlert
+        ) {
+            Button(AppTextAuthProfile.clinicalActionBlockedButton) {
+                Router.shared.navigateTo(.profile)
+            }
+            Button(AppState.cancel, role: .cancel) {}
+        } message: {
+            Text(AppTextAuthProfile.clinicalActionBlockedMessage)
+        }
         .onAppear {
             loadTask?.cancel()
             loadTask = Task {
@@ -121,6 +132,7 @@ struct HomeView: View {
                     leftIcon: AppIcon.docBadgePlus,
                     size: .large
                 ) {
+                    guard authentication.requireEmailVerificationForClinicalAction() else { return }
                     Router.shared.navigateTo(.inputPatientData())
                 }
             }

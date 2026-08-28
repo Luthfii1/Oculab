@@ -54,7 +54,8 @@ class AuthenticationPresenter: ObservableObject {
     @Published var showRegisterSuccessAlert: Bool = false
     @Published var registerSuccessMessage: String = AppValue.empty
     @Published var isChoosingRegistrationType: Bool = true
-    @Published var isEmailVerified: Bool = true
+    @Published var isEmailVerified: Bool = false
+    @Published var showEmailVerificationAlert: Bool = false
     @Published var isResendingVerification: Bool = false
     @Published var verificationResendMessage: String = AppValue.empty
 
@@ -136,6 +137,22 @@ class AuthenticationPresenter: ObservableObject {
     
     var isDropdownOfficerDisabled: Bool {
         return user.role == .LAB && user.businessModel == .B2C
+    }
+
+    /// B2B accounts are exempt; B2C must verify email before clinical actions.
+    var canPerformClinicalActions: Bool {
+        if user.businessModel == .B2B {
+            return true
+        }
+        return isEmailVerified
+    }
+
+    func requireEmailVerificationForClinicalAction() -> Bool {
+        guard canPerformClinicalActions else {
+            showEmailVerificationAlert = true
+            return false
+        }
+        return true
     }
 
     // MARK: - Initialization
@@ -308,7 +325,7 @@ extension AuthenticationPresenter {
             )
             
             // Tokens are stored automatically in the login method
-            isEmailVerified = response.emailVerified ?? true
+            isEmailVerified = response.emailVerified ?? false
             isSuccess = true
             
             return true

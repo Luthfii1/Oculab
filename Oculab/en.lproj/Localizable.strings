@@ -245,6 +245,9 @@
 "auth.profile.verify_email_title" = "Verify your email";
 "auth.profile.verify_email_message" = "Confirm your email so we can reach you for password recovery and account security.";
 "auth.profile.verify_email_resend" = "Resend verification email";
+"auth.profile.clinical_blocked_title" = "Verify your email first";
+"auth.profile.clinical_blocked_message" = "Confirm your email before creating a new examination. Open Profile to resend the verification link.";
+"auth.profile.clinical_blocked_button" = "Open Profile";
 "auth.profile.logout" = "Logout";
 
 // Biometric Authentication

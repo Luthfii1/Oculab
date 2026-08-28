@@ -25,7 +25,7 @@ class User: Codable, Identifiable {
     var previousPassword: String?
     var isFaceIdEnabled: Bool = false
     var businessModel: BusinessModelType?
-    @Transient var emailVerified: Bool = true
+    @Transient var emailVerified: Bool = false
 
     init(
         id: String = AppValue.empty,
@@ -39,7 +39,7 @@ class User: Codable, Identifiable {
         accessPin: String? = nil,
         isFaceIdEnabled: Bool = false,
         businessModel: BusinessModelType? = nil,
-        emailVerified: Bool = true
+        emailVerified: Bool = false
     ) {
         self.id = id
         self.name = name
@@ -94,7 +94,7 @@ class User: Codable, Identifiable {
         }
         self.businessModel = try container.decodeIfPresent(BusinessModelType.self, forKey: .businessModel)
         self.isFaceIdEnabled = false
-        self.emailVerified = try container.decodeIfPresent(Bool.self, forKey: .emailVerified) ?? true
+        self.emailVerified = try container.decodeIfPresent(Bool.self, forKey: .emailVerified) ?? false
     }
 
     func encode(to encoder: Encoder) throws {

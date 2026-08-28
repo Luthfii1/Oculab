@@ -118,6 +118,9 @@ extension AppText {
             static let verifyEmailBannerTitle = "auth.profile.verify_email_title".localized
             static let verifyEmailBannerMessage = "auth.profile.verify_email_message".localized
             static let verifyEmailResendButton = "auth.profile.verify_email_resend".localized
+            static let clinicalActionBlockedTitle = "auth.profile.clinical_blocked_title".localized
+            static let clinicalActionBlockedMessage = "auth.profile.clinical_blocked_message".localized
+            static let clinicalActionBlockedButton = "auth.profile.clinical_blocked_button".localized
 
             static let descFaceIdNotEnabled = "auth.profile.face_id_not_enabled".localized
             static let descFaceIdNotSupported = "auth.profile.face_id_not_supported".localized

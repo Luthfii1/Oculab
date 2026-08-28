@@ -546,6 +546,9 @@
 "auth.profile.verify_email_title" = "Verifikasi email Anda";
 "auth.profile.verify_email_message" = "Konfirmasi email agar kami dapat menghubungi Anda untuk pemulihan password dan keamanan akun.";
 "auth.profile.verify_email_resend" = "Kirim ulang email verifikasi";
+"auth.profile.clinical_blocked_title" = "Verifikasi email terlebih dahulu";
+"auth.profile.clinical_blocked_message" = "Konfirmasi email Anda sebelum membuat pemeriksaan baru. Buka Profil untuk mengirim ulang tautan verifikasi.";
+"auth.profile.clinical_blocked_button" = "Buka Profil";
 "home_history.task_count_format" = "%d ditampilkan";
 "home_history.examination_data" = "data pemeriksaan anda";
 
