@@ -676,7 +676,7 @@
 // New User Form View
 "user_management.new_user_form.success_description_prefix" = "Anda telah berhasil menambahkan akun baru untuk";
 "user_management.new_user_form.success_description_suffix" = "dengan role";
-"user_management.new_user_form.success_password_emailed" = "Kata sandi sementara telah dikirim ke email pengguna.";
+"user_management.new_user_form.success_invite_emailed" = "Tautan undangan telah dikirim ke email pengguna.";
 "user_management.new_user_form.role_lab_placeholder" = "Laboran";
 "user_management.new_user_form.role_admin_choice" = "Admin";
 "user_management.new_user_form.name_placeholder" = "Masukkan nama";

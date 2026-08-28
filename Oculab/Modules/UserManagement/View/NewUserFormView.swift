@@ -25,8 +25,8 @@ struct NewUserFormView: View {
                                 AppTextUserMgmtNewUserForm.successDescriptionSuffix,
                                 presenter.registrationSuccess.role
                             ])
-                            guard presenter.registrationSuccess.passwordEmailed else { return base }
-                            return "\(base). \(AppTextUserMgmtNewUserForm.successPasswordEmailed)"
+                            guard presenter.registrationSuccess.inviteEmailed else { return base }
+                            return "\(base). \(AppTextUserMgmtNewUserForm.successInviteEmailed)"
                         }(),
                         buttons: [
                             AppButton(

@@ -37,7 +37,7 @@ extension AppText {
         enum NewUserFormView {
             static let successDescriptionPrefix = "user_management.new_user_form.success_description_prefix".localized
             static let successDescriptionSuffix = "user_management.new_user_form.success_description_suffix".localized
-            static let successPasswordEmailed = "user_management.new_user_form.success_password_emailed".localized
+            static let successInviteEmailed = "user_management.new_user_form.success_invite_emailed".localized
             static let roleLabPlaceholder = "user_management.new_user_form.role_lab_placeholder".localized
             static let roleAdminChoice = "user_management.new_user_form.role_admin_choice".localized
             static let namePlaceholder = "user_management.new_user_form.name_placeholder".localized

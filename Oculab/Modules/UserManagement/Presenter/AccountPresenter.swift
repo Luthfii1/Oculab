@@ -52,7 +52,7 @@ class AccountPresenter: ObservableObject {
     @Published var deletionError: String? = nil
     
     // MARK: - Success States
-    @Published var registrationSuccess: (name: String, role: String, passwordEmailed: Bool) = (
+    @Published var registrationSuccess: (name: String, role: String, inviteEmailed: Bool) = (
         AppValue.empty,
         AppValue.empty,
         false
@@ -245,11 +245,11 @@ extension AccountPresenter {
                 email: email
             )
             
-            // Registration successful — provisional password is emailed, never shown in-app
+            // Registration successful — invite link is emailed, never shown in-app
             registrationSuccess = (
                 name: name,
                 role: roleType.rawValue,
-                passwordEmailed: result.passwordEmailed ?? true
+                inviteEmailed: result.accountInviteSent
             )
             showSuccessPopup = true
 
