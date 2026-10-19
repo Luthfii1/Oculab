@@ -41,6 +41,7 @@ final class AnalysisResumeService {
         guard !tracked.isEmpty else { return }
 
         for examId in tracked {
+            guard !VideoUploadQueueService.shared.hasPendingUpload(for: examId) else { continue }
             AnalysisRealtimeService.shared.subscribe(to: examId)
             if let progress = await progressInteractor.fetchProgress(examinationId: examId) {
                 NotificationCenter.default.post(
@@ -54,10 +55,12 @@ final class AnalysisResumeService {
 
     private func pruneCompletedTracks() async {
         for examId in AnalysisTrackingStore.trackedIds {
+            guard !VideoUploadQueueService.shared.hasPendingUpload(for: examId) else { continue }
             guard let progress = await progressInteractor.fetchProgress(examinationId: examId) else {
                 continue
             }
 
+            guard !VideoUploadQueueService.shared.hasPendingUpload(for: examId) else { continue }
             let isTerminal = progress.isReadyForValidation
                 || progress.status == "completed"
                 || progress.isFailed

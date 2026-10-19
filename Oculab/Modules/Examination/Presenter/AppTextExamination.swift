@@ -35,6 +35,11 @@ extension AppText {
         static let uploadQueueFailed = "examination.upload_queue_failed".localized
 
         enum ProgressView {
+            static let chooseVideoAgain = "examination.progress.choose_video_again".localized
+            static let uploadWaitingTitle = "examination.progress.upload_waiting_title".localized
+            static let uploadNeedsAttentionTitle = "examination.progress.upload_needs_attention_title".localized
+            static let uploadSavedHint = "examination.progress.upload_saved_hint".localized
+            static let uploadRetryHint = "examination.progress.upload_retry_hint".localized
             static let loadingAnimationName = "loadingPaperplane"
             static let analyzingTitle = "examination.progress.analyzing_title".localized
             static let analyzingSubtitle = "examination.progress.analyzing_subtitle".localized

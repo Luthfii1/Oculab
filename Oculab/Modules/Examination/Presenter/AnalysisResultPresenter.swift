@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 import SwiftUI
 
 @MainActor
@@ -13,7 +14,13 @@ class AnalysisResultPresenter: ObservableObject {
     // MARK: - Dependencies
     private let interactor: AnalysisResultInteractor
     private let progressInteractor = AnalysisProgressInteractor()
-    private let progressTracker = AnalysisProgressTracker()
+    private lazy var progressTracker = AnalysisProgressTracker(hasPendingUpload: { [weak self] id in
+        guard let self else { return false }
+        return self.isAwaitingAdmissionStatus || self.uploadQueue.hasPendingUpload(for: id)
+    })
+    private let uploadQueue: VideoUploadQueueService
+    private var uploadQueueObserver: AnyCancellable?
+    private var uploadPhaseRevision = UUID()
 
     // MARK: - Task Handles
     private var fetchTask: Task<Void, Never>?
@@ -27,8 +34,20 @@ class AnalysisResultPresenter: ObservableObject {
     private let analysisMaxDuration: TimeInterval = 30 * 60
     private let fovLoadStallTimeout: TimeInterval = 5 * 60
 
-    init(interactor: AnalysisResultInteractor = AnalysisResultInteractor()) {
+    init(
+        interactor: AnalysisResultInteractor = AnalysisResultInteractor(),
+        uploadQueue: VideoUploadQueueService? = nil
+    ) {
         self.interactor = interactor
+        let queue = uploadQueue ?? .shared
+        self.uploadQueue = queue
+        uploadQueueObserver = queue.objectWillChange
+            .receive(on: RunLoop.main)
+            .sink { [weak self] in
+                guard let self,
+                      let id = self.trackedExaminationId ?? self.examinationResult?.examinationId else { return }
+                self.refreshLocalUploadState(examinationId: id)
+            }
         progressTracker.onReadyForValidation = { [weak self] examinationId in
             guard let self else { return }
             await self.refreshExaminationStatus(examinationId: examinationId)
@@ -59,6 +78,10 @@ class AnalysisResultPresenter: ObservableObject {
     @Published var analysisStatusMessage: String = AppTextExamProgress.analyzingTitle
     @Published var analysisFailureMessage: String?
     @Published var isAnalysisQueued: Bool = false
+    @Published private(set) var isAwaitingAdmissionStatus = false
+    @Published private(set) var localUploadState: PendingUploadState?
+    @Published private(set) var localUploadError: String?
+    @Published private(set) var localUploadNeedsVideo = false
 
     // MARK: - UI State Properties
     @Published var selectedTBGrade: String = AppValue.empty {
@@ -177,6 +200,8 @@ class AnalysisResultPresenter: ObservableObject {
     }
 
     var shouldShowAnalyzingUI: Bool {
+        if localUploadState != nil || isAwaitingAdmissionStatus { return true }
+
         if hasAnalysisFailed {
             return true
         }
@@ -198,6 +223,8 @@ class AnalysisResultPresenter: ObservableObject {
     }
 
     private var shouldKeepPolling: Bool {
+        if localUploadState != nil || isAwaitingAdmissionStatus { return true }
+
         if hasAnalysisFailed {
             return false
         }
@@ -321,8 +348,40 @@ extension AnalysisResultPresenter {
 
 // MARK: - Data Management Methods
 extension AnalysisResultPresenter {
+    /// Upload admission and server analysis are separate phases. A saved local
+    /// video is not evidence that the server has started (or failed) analysis.
+    func refreshLocalUploadState(examinationId: String) {
+        let status = examinationResult?.statusExamination
+        let hasResults = status == .NEEDVALIDATION || status == .FINISHED
+        let previousState = localUploadState
+        localUploadState = hasResults ? nil : uploadQueue.uploadState(for: examinationId)
+        localUploadError = localUploadState == nil ? nil : uploadQueue.lastUploadError(for: examinationId)
+        localUploadNeedsVideo = localUploadState == .failed && !uploadQueue.hasSavedVideo(for: examinationId)
+        if (previousState == nil) != (localUploadState == nil) {
+            uploadPhaseRevision = UUID()
+            if previousState != nil, localUploadState == nil, !hasResults {
+                isAwaitingAdmissionStatus = true
+                isAnalysisQueued = true
+            }
+        }
+        if localUploadState != nil || previousState != nil {
+            // Time spent offline/uploading must not consume the analysis timeout.
+            analysisTrackingStartedAt = Date()
+            lastProgressChangeAt = Date()
+            analysisFailureMessage = nil
+            progressTracker.clearFailure()
+        }
+    }
+
+    func retrySavedUpload(examinationId: String) async {
+        await uploadQueue.retry(examinationId: examinationId)
+        refreshLocalUploadState(examinationId: examinationId)
+    }
+
     @MainActor
     func fetchData(examinationId: String, silent: Bool = false) async {
+        refreshLocalUploadState(examinationId: examinationId)
+        let requestPhase = uploadPhaseRevision
         if !silent {
             isLoading = true
         }
@@ -331,10 +390,25 @@ extension AnalysisResultPresenter {
         }
 
         do {
-            examinationResult = try await interactor.fetchData(examId: examinationId)
+            let result = try await interactor.fetchData(examId: examinationId)
+            guard !Task.isCancelled else { return }
+            refreshLocalUploadState(examinationId: examinationId)
+            guard requestPhase == uploadPhaseRevision else {
+                // This GET began before admission and may still say NOTSTARTED.
+                // Fetch after the receipt rather than failing the newly admitted job.
+                await fetchData(examinationId: examinationId, silent: true)
+                return
+            }
+            examinationResult = result
+            if localUploadState == nil, isAwaitingAdmissionStatus {
+                isAwaitingAdmissionStatus = false
+                isAnalysisQueued = false
+                progressTracker.clearFailure()
+            }
+            refreshLocalUploadState(examinationId: examinationId)
             clearFailureIfAnalysisAdvanced(examinationId: examinationId)
 
-            if examinationResult?.statusExamination != .INPROGRESS {
+            if result.statusExamination == .NEEDVALIDATION || result.statusExamination == .FINISHED {
                 await loadFOVData(examinationId: examinationId, silent: silent)
             }
 
@@ -396,6 +470,7 @@ extension AnalysisResultPresenter {
 
         stopExaminationStatusPolling()
         trackedExaminationId = examinationId
+        refreshLocalUploadState(examinationId: examinationId)
         AnalysisTrackingStore.markPendingResume(examinationId: examinationId)
         let now = Date()
         analysisTrackingStartedAt = now
@@ -408,8 +483,16 @@ extension AnalysisResultPresenter {
             while !Task.isCancelled {
                 if shouldKeepPolling {
                     await refreshExaminationStatus(examinationId: examinationId)
+                    guard !Task.isCancelled else { return }
+                    let progressPhase = uploadPhaseRevision
                     if let cached = await progressInteractor.fetchProgress(examinationId: examinationId) {
-                        applyProgressUpdate(cached, examinationId: examinationId)
+                        guard !Task.isCancelled else { return }
+                        refreshLocalUploadState(examinationId: examinationId)
+                        if progressPhase == uploadPhaseRevision {
+                            applyProgressUpdate(cached, examinationId: examinationId)
+                        } else if localUploadState == nil {
+                            await refreshExaminationStatus(examinationId: examinationId)
+                        }
                     }
                     evaluateAnalysisHealth(examinationId: examinationId)
                 } else if !shouldShowAnalyzingUI {
@@ -468,6 +551,7 @@ extension AnalysisResultPresenter {
 
     @MainActor
     private func syncProgressUI(from tracker: AnalysisProgressTracker) {
+        guard localUploadState == nil, !isAwaitingAdmissionStatus else { return }
         analysisProgress = tracker.analysisProgress
         analysisStatusMessage = tracker.analysisStatusMessage
         isAnalysisQueued = tracker.isAnalysisQueued
@@ -478,6 +562,8 @@ extension AnalysisResultPresenter {
 
     @MainActor
     private func applyProgressUpdate(_ update: AnalysisProgressUpdate, examinationId: String) {
+        refreshLocalUploadState(examinationId: examinationId)
+        guard localUploadState == nil, !isAwaitingAdmissionStatus else { return }
         progressTracker.applyProgressUpdate(update, examinationId: examinationId)
         syncProgressUI(from: progressTracker)
         if update.isFailed {
@@ -493,6 +579,8 @@ extension AnalysisResultPresenter {
 
     @MainActor
     private func evaluateAnalysisHealth(examinationId: String) {
+        refreshLocalUploadState(examinationId: examinationId)
+        guard localUploadState == nil, !isAwaitingAdmissionStatus else { return }
         guard !hasAnalysisFailed, let examination = examinationResult else { return }
 
         if AnalysisTrackingStore.isTracked(examinationId),
@@ -524,6 +612,8 @@ extension AnalysisResultPresenter {
 
     @MainActor
     func markAnalysisFailed(message: String?, examinationId: String) {
+        refreshLocalUploadState(examinationId: examinationId)
+        guard localUploadState == nil, !isAwaitingAdmissionStatus else { return }
         if let message, !message.isEmpty {
             analysisFailureMessage = message
         } else if let statusMessage = analysisStatusMessage.isEmpty ? nil : analysisStatusMessage,
@@ -573,7 +663,7 @@ extension AnalysisResultPresenter {
 
     @MainActor
     func retryAnalysis(examinationId: String) async {
-        let patientId = examinationResult?.patientId
+        let patientId = examinationResult?.patientId ?? uploadQueue.patientId(for: examinationId)
         analysisFailureMessage = nil
         progressTracker.clearFailure()
         stopExaminationStatusPolling()
@@ -744,6 +834,11 @@ extension AnalysisResultPresenter {
         analysisProgress = 0
         analysisStatusMessage = AppTextExamProgress.analyzingTitle
         analysisFailureMessage = nil
+        isAwaitingAdmissionStatus = false
+        localUploadState = nil
+        localUploadError = nil
+        localUploadNeedsVideo = false
+        uploadPhaseRevision = UUID()
         examinationResult = nil
         errorMessage = nil
         confidenceLevel = .unpredicted

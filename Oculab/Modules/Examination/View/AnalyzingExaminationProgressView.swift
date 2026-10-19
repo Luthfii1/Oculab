@@ -35,7 +35,9 @@ struct AnalyzingExaminationProgressView: View {
         VStack(spacing: 0) {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 16) {
-                    if presenter.hasAnalysisFailed {
+                    if let state = presenter.localUploadState {
+                        LocalUploadProgressCard(state: state, errorMessage: presenter.localUploadError, needsVideo: presenter.localUploadNeedsVideo)
+                    } else if presenter.hasAnalysisFailed {
                         failureHeroCard
                         failureInstructionsCard
                     } else if presenter.isAnalysisQueued {
@@ -223,7 +225,29 @@ struct AnalyzingExaminationProgressView: View {
             Divider()
 
             VStack(spacing: 10) {
-                if presenter.hasAnalysisFailed {
+                if let state = presenter.localUploadState {
+                    if state == .failed {
+                        AppButton(
+                            title: presenter.localUploadNeedsVideo ? AppTextExamProgress.chooseVideoAgain : AppAction.retry,
+                            size: .large
+                        ) {
+                            Task {
+                                if presenter.localUploadNeedsVideo {
+                                    await presenter.retryAnalysis(examinationId: examinationId)
+                                } else {
+                                    await presenter.retrySavedUpload(examinationId: examinationId)
+                                }
+                            }
+                        }
+                    }
+                    AppButton(
+                        title: AppTextExamProgress.buttonBackToTasks,
+                        colorType: .secondary,
+                        size: .large
+                    ) {
+                        presenter.exitFromFlow(examinationId: examinationId)
+                    }
+                } else if presenter.hasAnalysisFailed {
                     if presenter.isAnalysisStalled {
                         AppButton(
                             title: AppTextExamProgress.buttonCheckStatus,

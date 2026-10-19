@@ -839,7 +839,10 @@ extension AuthenticationPresenter {
         }
     }
     
+    @MainActor
     private func clearLoginState() {
+        AuthSessionManager.beginSessionChange()
+        defer { AuthSessionManager.completeSessionChange() }
         UserDefaults.standard.removeObject(forKey: UserDefaultType.isUserLoggedIn.rawValue)
         UserDefaults.standard.removeObject(forKey: UserDefaultType.firstTimeLogin.rawValue)
         UserDefaults.standard.removeObject(forKey: UserDefaultType.userId.rawValue)
@@ -848,12 +851,19 @@ extension AuthenticationPresenter {
     }
 
     @MainActor
-    func performLogout() async {
-        await interactor.clearLocalUserData()
+    func performLogout(ifGeneration expectedGeneration: UUID? = nil) async {
+        if let expectedGeneration,
+           expectedGeneration != AuthSessionManager.authenticationSessionGeneration { return }
+        AuthSessionManager.beginSessionChange()
+        defer { AuthSessionManager.completeSessionChange() }
+        // Local-only cleanup stays synchronous so a new login cannot interleave.
+        interactor.clearLocalUserData()
         ExamListCacheService.shared.clearAll()
         AnalysisTrackingStore.clearAll()
 
-        for item in UserDefaultType.allCases where item != .hasSeenOnboarding {
+        // Schema metadata belongs to the store, not the signed-in user. Removing it
+        // makes the next launch wipe persisted videos as an apparent schema change.
+        for item in UserDefaultType.allCases where item != .hasSeenOnboarding && item != .swiftDataSchemaVersion {
             UserDefaults.standard.removeObject(forKey: item.rawValue)
         }
 

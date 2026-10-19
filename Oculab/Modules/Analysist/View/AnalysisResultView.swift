@@ -29,11 +29,11 @@ struct AnalysisResultView: View {
                 )
                 .padding(.vertical, Decimal.d16)
 
-                if let examination = presenter.examinationResult {
-                    if presenter.shouldShowAnalyzingUI {
-                        AnalyzingExaminationProgressView(examinationId: examinationId)
-                            .environmentObject(presenter)
-                    } else if presenter.shouldShowResultsUI {
+                if presenter.localUploadState != nil || presenter.isAwaitingAdmissionStatus || (presenter.examinationResult != nil && presenter.shouldShowAnalyzingUI) {
+                    AnalyzingExaminationProgressView(examinationId: examinationId)
+                        .environmentObject(presenter)
+                } else if let examination = presenter.examinationResult {
+                    if presenter.shouldShowResultsUI {
                         ScrollView(showsIndicators: false) {
                             VStack(alignment: .leading, spacing: Decimal.d24) {
                                 if let errorMessage = presenter.errorMessage {

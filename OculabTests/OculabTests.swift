@@ -118,7 +118,10 @@ final class AlamofireNetworkServiceTests: XCTestCase {
     private let authKeys: [UserDefaultType] = [.userId, .isUserLoggedIn, .isPinSessionAuthorized]
     private let endpoint = API.BE + "/review-test"
 
-    override func setUpWithError() throws {
+    @MainActor
+    override func setUp() async throws {
+        AuthSessionManager.beginSessionChange()
+        defer { AuthSessionManager.completeSessionChange() }
         for key in [KeychainKey.accessToken, .refreshToken, .accessPin] {
             savedTokens[key] = KeychainHelper.string(for: key)
         }
@@ -135,7 +138,10 @@ final class AlamofireNetworkServiceTests: XCTestCase {
         service = AlamofireNetworkService(session: session)
     }
 
-    override func tearDownWithError() throws {
+    @MainActor
+    override func tearDown() async throws {
+        AuthSessionManager.beginSessionChange()
+        defer { AuthSessionManager.completeSessionChange() }
         session.session.invalidateAndCancel()
         service = nil
         session = nil
@@ -305,6 +311,8 @@ final class AnalysisResultPresenterTests: XCTestCase {
 }
 
 final class VideoUploadQueueTests: XCTestCase {
+    private static let session = UploadQueueSession(ownerUserId: "queue-test-owner", generation: UUID())
+
     @MainActor
     private func makeContext() throws -> ModelContext {
         let schema = Schema([PendingUpload.self])
@@ -315,7 +323,7 @@ final class VideoUploadQueueTests: XCTestCase {
 
     @MainActor
     private func configure(_ queue: VideoUploadQueueService, context: ModelContext, connected: Bool = false) {
-        let manager = NetworkRetryManager()
+        let manager = NetworkRetryManager(monitorsConnectivity: false)
         manager.isConnected = connected
         queue.configure(
             modelContext: context,
@@ -329,11 +337,11 @@ final class VideoUploadQueueTests: XCTestCase {
         let context = try makeContext()
         let upload = PendingUpload(
             examinationId: UUID().uuidString.lowercased(), patientId: "patient", localFilePath: "/unused",
-            slideId: "slide", state: .uploading, retryCount: 2
+            slideId: "slide", ownerUserId: Self.session.ownerUserId, state: .uploading, retryCount: 2
         )
         context.insert(upload)
         try context.save()
-        let queue = VideoUploadQueueService()
+        let queue = VideoUploadQueueService(sessionProvider: { Self.session })
         configure(queue, context: context)
         XCTAssertEqual(upload.state, .pending)
         XCTAssertEqual(upload.retryCount, 2)
@@ -345,11 +353,11 @@ final class VideoUploadQueueTests: XCTestCase {
         let context = try makeContext()
         let upload = PendingUpload(
             examinationId: UUID().uuidString.lowercased(), patientId: "patient", localFilePath: "/unused",
-            slideId: "slide", state: .failed, retryCount: 5, lastError: "Previous failure"
+            slideId: "slide", ownerUserId: Self.session.ownerUserId, state: .failed, retryCount: 5, lastError: "Previous failure"
         )
         context.insert(upload)
         try context.save()
-        let queue = VideoUploadQueueService()
+        let queue = VideoUploadQueueService(sessionProvider: { Self.session })
         configure(queue, context: context)
         await queue.retry(examinationId: upload.examinationId)
         XCTAssertEqual(upload.retryCount, 0)
@@ -360,7 +368,7 @@ final class VideoUploadQueueTests: XCTestCase {
     @MainActor
     func testEnqueuePreservesVideoFormat() async throws {
         let context = try makeContext()
-        let queue = VideoUploadQueueService()
+        let queue = VideoUploadQueueService(sessionProvider: { Self.session })
         configure(queue, context: context)
         let source = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".mp4")
         try Data("video".utf8).write(to: source)
@@ -376,7 +384,7 @@ final class VideoUploadQueueTests: XCTestCase {
     @MainActor
     func testFailedReplacementKeepsOriginalVideo() async throws {
         let context = try makeContext()
-        let queue = VideoUploadQueueService()
+        let queue = VideoUploadQueueService(sessionProvider: { Self.session })
         configure(queue, context: context)
         let source = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".mov")
         try Data("original".utf8).write(to: source)
@@ -400,11 +408,11 @@ final class VideoUploadQueueTests: XCTestCase {
     func testRetryDoesNotResetAnActiveUpload() async throws {
         let context = try makeContext()
         let upload = PendingUpload(
-            examinationId: "active", patientId: "patient", localFilePath: "/unused", slideId: "slide"
+            examinationId: "active", patientId: "patient", localFilePath: "/unused", slideId: "slide", ownerUserId: Self.session.ownerUserId
         )
         context.insert(upload)
         try context.save()
-        let queue = VideoUploadQueueService()
+        let queue = VideoUploadQueueService(sessionProvider: { Self.session })
         configure(queue, context: context)
         upload.state = .uploading
         await queue.retry(examinationId: "active")
@@ -426,15 +434,15 @@ final class VideoUploadQueueTests: XCTestCase {
         defer { try? FileManager.default.removeItem(at: source) }
         let upload = PendingUpload(
             examinationId: "cancelled", patientId: "patient", localFilePath: source.path,
-            slideId: "slide", retryCount: 2
+            slideId: "slide", ownerUserId: Self.session.ownerUserId, retryCount: 2
         )
         context.insert(upload)
         try context.save()
-        let queue = VideoUploadQueueService()
+        let queue = VideoUploadQueueService(sessionProvider: { Self.session })
         queue.configure(
             modelContext: context,
             examInteractor: CancelledExamInteractor(networkService: MockNetworkService()),
-            networkRetryManager: NetworkRetryManager()
+            networkRetryManager: NetworkRetryManager(monitorsConnectivity: false)
         )
         await queue.processQueue()
         XCTAssertEqual(upload.state, .pending)
@@ -448,11 +456,11 @@ final class VideoUploadQueueTests: XCTestCase {
     func testMissingVideoRemainsVisibleAsFailure() async throws {
         let context = try makeContext()
         let upload = PendingUpload(
-            examinationId: "missing", patientId: "patient", localFilePath: "/missing-\(UUID())", slideId: "slide"
+            examinationId: "missing", patientId: "patient", localFilePath: "/missing-\(UUID())", slideId: "slide", ownerUserId: Self.session.ownerUserId
         )
         context.insert(upload)
         try context.save()
-        let queue = VideoUploadQueueService()
+        let queue = VideoUploadQueueService(sessionProvider: { Self.session })
         configure(queue, context: context, connected: true)
         await queue.processQueue()
         XCTAssertEqual(try context.fetchCount(FetchDescriptor<PendingUpload>()), 1)

@@ -45,9 +45,10 @@ struct AccountCheckerView: View {
                 appStateManager.setUnauthenticated()
             }
         }
-        .onReceive(NotificationCenter.default.publisher(for: AuthSessionManager.sessionDidInvalidateNotification)) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: AuthSessionManager.sessionDidInvalidateNotification)) { notification in
+            guard let generation = notification.userInfo?[AuthSessionManager.invalidatedSessionGenerationKey] as? UUID else { return }
             Task { @MainActor in
-                await authPresenter.performLogout()
+                await authPresenter.performLogout(ifGeneration: generation)
             }
         }
     }

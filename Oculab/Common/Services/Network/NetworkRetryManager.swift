@@ -40,7 +40,8 @@ class NetworkRetryManager: ObservableObject {
     
     // MARK: - Initialization
     
-    nonisolated init() {
+    nonisolated init(monitorsConnectivity: Bool = true) {
+        guard monitorsConnectivity else { return }
         Task { @MainActor in
             startNetworkMonitoring()
         }

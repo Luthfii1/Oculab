@@ -42,6 +42,7 @@ final class AnalysisRealtimeService {
             .forceWebsockets(true),
         ]
 
+        let generation = AuthSessionManager.authenticationSessionGeneration
         let token = KeychainHelper.string(for: .accessToken)
         if let token {
             config.insert(.extraHeaders(["Authorization": "Bearer \(token)"]))
@@ -56,7 +57,7 @@ final class AnalysisRealtimeService {
 
         client?.on(clientEvent: .connect) { [weak self] _, _ in
             Task { @MainActor in
-                guard let self else { return }
+                guard let self, generation == AuthSessionManager.authenticationSessionGeneration else { return }
                 self.isConnecting = false
                 Logger.info("Analysis socket connected", category: .examination)
                 for examId in self.subscribedExaminationIds {
@@ -76,11 +77,17 @@ final class AnalysisRealtimeService {
         client?.on("analysis:update") { [weak self] data, _ in
             guard let self, let update = Self.parseUpdate(from: data) else { return }
             Task { @MainActor in
+                guard generation == AuthSessionManager.authenticationSessionGeneration else { return }
                 self.handle(update: update)
             }
         }
 
         client?.connect(withPayload: token.map { ["token": $0] })
+    }
+
+    func resetSession() {
+        subscribedExaminationIds.removeAll()
+        disconnect()
     }
 
     func disconnect() {
@@ -91,6 +98,7 @@ final class AnalysisRealtimeService {
     }
 
     private func handle(update: AnalysisProgressUpdate) {
+        guard !VideoUploadQueueService.shared.hasPendingUpload(for: update.examId) else { return }
         NotificationCenter.default.post(
             name: .examinationAnalysisProgress,
             object: nil,
