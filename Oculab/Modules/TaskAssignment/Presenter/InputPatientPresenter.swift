@@ -15,6 +15,9 @@ final class TaskAssignmentFlowCoordinator: ObservableObject {
     private let repository: TaskAssignmentRepository
     let validationManager: ValidationManager
     private var validationCancellable: AnyCancellable?
+    private var patientLookupID: UUID?
+    private var picLookupID: UUID?
+    private var patientSaveTask: Task<Void, Never>?
 
     // MARK: - Published Properties
     @Published var selectedPIC: String = AppValue.empty {
@@ -197,6 +200,7 @@ final class TaskAssignmentFlowCoordinator: ObservableObject {
     
     /// Read-only check for enabling the proceed button (no error mutation, safe in SwiftUI `body`).
     var isPatientStepReady: Bool {
+        guard !isPatientLoading, hasResolvedPatientSelection else { return false }
         let validPIC = validationManager.meetsRequired(selectedPIC)
         let validPatientSelection = validationManager.meetsRequired(
             patientSelection?.valueForBinding ?? AppValue.empty
@@ -218,6 +222,7 @@ final class TaskAssignmentFlowCoordinator: ObservableObject {
     /// Run on submit only — surfaces field errors and logs once per attempt.
     @discardableResult
     func validatePatientStepBeforeProceed() -> Bool {
+        guard !isPatientLoading, hasResolvedPatientSelection else { return false }
         validationManager.clearAllErrors()
 
         let validPIC = validationManager.validateRequired(
@@ -260,6 +265,18 @@ final class TaskAssignmentFlowCoordinator: ObservableObject {
     }
     
     // MARK: - Helper Methods
+    private var hasResolvedPatientSelection: Bool {
+        switch patientSelection {
+        case .existing(let id):
+            return patientFound && patient.id.lowercased() == id.lowercased()
+                && savedPatientId.lowercased() == id.lowercased()
+        case .new(let name):
+            return isAddingNewPatient && patient.id.isEmpty && patient.name == name
+        case nil:
+            return false
+        }
+    }
+
     private func updatePatientForm() {
         Logger.info("Patient record loaded", category: .taskAssignment)
         selectedDoB = patient.DoB ?? Date()
@@ -342,11 +359,18 @@ extension TaskAssignmentFlowCoordinator {
         let trimmedId = id.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedId.isEmpty else { return }
 
+        let lookupID = UUID()
+        patientLookupID = lookupID
+        let requestedSelection = patientSelection
         isPatientLoading = true
-        defer { isPatientLoading = false }
+        defer {
+            if patientLookupID == lookupID { isPatientLoading = false }
+        }
 
         do {
             let loaded = try await repository.fetchPatient(id: trimmedId)
+            guard !Task.isCancelled, patientLookupID == lookupID,
+                  patientSelection == requestedSelection else { return }
             patient = loaded
             patientFound = true
             isAddingNewPatient = false
@@ -354,6 +378,10 @@ extension TaskAssignmentFlowCoordinator {
             savedPatientId = loaded.id
             examinationPatientId = loaded.id
         } catch {
+            guard !Task.isCancelled, !(error is CancellationError),
+                  (error as? URLError)?.code != .cancelled,
+                  patientLookupID == lookupID,
+                  patientSelection == requestedSelection else { return }
             if preserveIdentityOnFailure {
                 Logger.warning(
                     "Could not load patient \(trimmedId); keeping examination context",
@@ -372,6 +400,8 @@ extension TaskAssignmentFlowCoordinator {
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedName.isEmpty else { return }
 
+        patientLookupID = nil
+        isPatientLoading = false
         patientFound = false
         isAddingNewPatient = true
         patientSelection = .new(displayName: trimmedName)
@@ -392,20 +422,32 @@ extension TaskAssignmentFlowCoordinator {
 
     @MainActor
     func getUserById(userId: String) async {
+        let lookupID = UUID()
+        picLookupID = lookupID
+        let requestedPIC = selectedPIC
         isUserLoading = true
-        defer { isUserLoading = false }
+        defer {
+            if picLookupID == lookupID { isUserLoading = false }
+        }
         
         do {
             let user = try await repository.fetchUser(id: userId)
+            guard !Task.isCancelled, picLookupID == lookupID,
+                  selectedPIC == requestedPIC else { return }
             self.pic = user
         } catch {
-            _ = ErrorHandler.shared.handleError(error, context: .generic)
+            guard !Task.isCancelled, !(error is CancellationError),
+                  (error as? URLError)?.code != .cancelled,
+                  picLookupID == lookupID,
+                  selectedPIC == requestedPIC else { return }
+            errorMessage = ErrorHandler.shared.handleError(error, context: .generic)
             isError = true
         }
     }
     
     private func applyPersistedPatient(_ persisted: Patient) {
         patient = persisted
+        patientSelection = .existing(patientId: persisted.id)
         savedPatientId = persisted.id
         examinationPatientId = persisted.id
         patientFound = true
@@ -416,6 +458,8 @@ extension TaskAssignmentFlowCoordinator {
 // MARK: - Patient Management
 extension TaskAssignmentFlowCoordinator {
     func clearForm() {
+        patientLookupID = nil
+        isPatientLoading = false
         patientFound = false
         isAddingNewPatient = false
         patientSelection = nil
@@ -429,10 +473,21 @@ extension TaskAssignmentFlowCoordinator {
     }
     
     @MainActor
-    func newExam() {
-        Task {
-            await proceedToSpecimenStep()
+    @discardableResult
+    func newExam() -> Task<Void, Never> {
+        if let patientSaveTask { return patientSaveTask }
+        let task = Task { [weak self] in
+            guard let self else { return }
+            defer { self.patientSaveTask = nil }
+            await self.proceedToSpecimenStep()
         }
+        patientSaveTask = task
+        return task
+    }
+
+    @MainActor
+    func cancelPendingPatientSave() {
+        patientSaveTask?.cancel()
     }
 
     /// Single persistence point before leaving step 1.
@@ -441,15 +496,15 @@ extension TaskAssignmentFlowCoordinator {
         guard !isSavingPatient else { return }
         guard validatePatientStepBeforeProceed() else { return }
 
+        let requestedSelection = patientSelection
+        let requestedPIC = selectedPIC
         isSavingPatient = true
         defer { isSavingPatient = false }
 
         do {
             syncPatientNameFromSelection()
 
-            let picId = pic.id.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                ? selectedPIC.trimmingCharacters(in: .whitespacesAndNewlines)
-                : pic.id.trimmingCharacters(in: .whitespacesAndNewlines)
+            let picId = selectedPIC.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !picId.isEmpty else { throw TaskAssignmentFlowError.missingPic }
 
             let preferredId = savedPatientId.isEmpty ? patient.id : savedPatientId
@@ -457,14 +512,21 @@ extension TaskAssignmentFlowCoordinator {
                 draft: patient,
                 preferredId: preferredId
             )
+            guard !Task.isCancelled, patientSelection == requestedSelection,
+                  selectedPIC == requestedPIC else { return }
             applyPersistedPatient(persisted)
 
             examinationPICId = picId
             Router.shared.navigateTo(.newExam(patientId: persisted.id, picId: picId))
         } catch let flowError as TaskAssignmentFlowError {
+            guard !Task.isCancelled, patientSelection == requestedSelection,
+                  selectedPIC == requestedPIC else { return }
             errorMessage = flowError.localizedDescription
             isError = true
         } catch {
+            guard !Task.isCancelled, !(error is CancellationError),
+                  (error as? URLError)?.code != .cancelled,
+                  patientSelection == requestedSelection, selectedPIC == requestedPIC else { return }
             errorMessage = ErrorHandler.shared.handleError(error, context: .patientManagement)
             isError = true
         }
@@ -585,7 +647,7 @@ extension TaskAssignmentFlowCoordinator {
     }
     
     private func createExaminationRequest(from exam: Examination, DPJPId: String, useFirstExamGoal: Bool = false) -> ExaminationRequest {
-        let picId = pic.id.isEmpty ? examinationPICId : pic.id
+        let picId = examinationPICId.isEmpty ? selectedPIC : examinationPICId
         return ExaminationRequest(
             goal: useFirstExamGoal ? examination.goal : exam.goal,
             preparationType: exam.preparationType,
