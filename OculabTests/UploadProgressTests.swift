@@ -88,8 +88,9 @@ final class UploadProgressTests: XCTestCase {
         let (finishedQueue, _, retainedUpload) = try fixture(state: .failed)
         let finished = AnalysisResultPresenter(interactor: StatusResultInteractor(status: .FINISHED), uploadQueue: finishedQueue)
         await finished.fetchData(examinationId: retainedUpload.examinationId)
-        XCTAssertNil(finished.localUploadState)
+        XCTAssertEqual(finished.localUploadState, .failed, "Finished status cannot acknowledge a different saved submission")
         XCTAssertTrue(finished.shouldShowResultsUI)
+        XCTAssertFalse(finished.shouldShowAnalyzingUI, "Retained video must not block viewing clinical results")
     }
 
     @MainActor

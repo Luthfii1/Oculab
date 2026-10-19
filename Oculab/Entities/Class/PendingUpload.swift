@@ -17,6 +17,13 @@ final class PendingUpload {
     @Attribute(.unique) var examinationId: String
     /// Nil on existing installs: never infer an owner from the next login.
     var ownerUserId: String? = nil
+    var submissionId: String? = nil
+    var videoSHA256: String? = nil
+    var needsReconciliation: Bool = false
+    var nextAttemptAt: Date? = nil
+    var transientRetryCount: Int = 0
+    var stopReasonRaw: String? = nil
+    var hasSubmissionConflict: Bool = false
     var patientId: String
     var localFilePath: String
     var slideId: String
@@ -47,8 +54,21 @@ final class PendingUpload {
         self.createdAt = createdAt
     }
 
+    var stopReason: PendingUploadStopReason? {
+        get { stopReasonRaw.flatMap(PendingUploadStopReason.init(rawValue:)) }
+        set { stopReasonRaw = newValue?.rawValue }
+    }
+
     var state: PendingUploadState {
         get { PendingUploadState(rawValue: stateRaw) ?? .pending }
         set { stateRaw = newValue.rawValue }
     }
+}
+
+enum PendingUploadStopReason: String {
+    case authentication
+    case permanent
+    case replaceVideo
+    case exhausted
+    case serviceUpdate
 }

@@ -147,6 +147,8 @@ class NetworkRetryManager: ObservableObject {
     }
     
     private func shouldRetry(error: Error) -> Bool {
+        // The persisted upload queue owns retry deadlines for receipt requests.
+        if error is UploadHTTPFailure || error is UploadProtocolFailure { return false }
         guard !(error is CancellationError) else { return false }
         // Don't retry if there's no network connection
         guard isConnected else { return false }

@@ -5,10 +5,11 @@ struct LocalUploadProgressCard: View {
     let state: PendingUploadState
     let errorMessage: String?
     var needsVideo = false
+    var retryAt: Date? = nil
 
     private var title: String {
         switch state {
-        case .pending: return AppTextExamProgress.uploadWaitingTitle
+        case .pending: return retryAt == nil ? AppTextExamProgress.uploadWaitingTitle : "examination.upload_retry_scheduled_title".localized
         case .uploading: return AppTextExam.uploadQueueUploading
         case .failed: return AppTextExamProgress.uploadNeedsAttentionTitle
         }
@@ -33,14 +34,20 @@ struct LocalUploadProgressCard: View {
                     .accessibilityHidden(true)
             }
 
-            Text(needsVideo ? AppTextExam.uploadQueueMissingFile : (state == .failed ? AppTextExamProgress.uploadRetryHint : AppTextExamProgress.uploadSavedHint))
+            Text(needsVideo ? (errorMessage ?? AppTextExam.uploadQueueMissingFile) : (state == .failed ? AppTextExamProgress.uploadRetryHint : AppTextExamProgress.uploadSavedHint))
                 .font(AppTypography.p2)
                 .foregroundStyle(AppColors.slate600)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
 
-            if state == .failed, !needsVideo, let errorMessage, !errorMessage.isEmpty {
+            if !needsVideo, let errorMessage, !errorMessage.isEmpty {
                 Text(errorMessage)
+                    .font(AppTypography.p3)
+                    .foregroundStyle(AppColors.slate600)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            if let retryAt {
+                Text(String(format: "examination.upload_retry_at".localized, retryAt.formatted(date: .omitted, time: .shortened)))
                     .font(AppTypography.p3)
                     .foregroundStyle(AppColors.slate600)
                     .fixedSize(horizontal: false, vertical: true)

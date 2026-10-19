@@ -12,6 +12,9 @@ struct APIResponse<T: Decodable>: Decodable, Error {
     let code: Int
     let message: String
     let data: T
+    /// Transport-only metadata; never decoded from an API JSON field.
+    var retryAfter: Date? = nil
+    var httpStatusCode: Int? = nil
 
     enum CodingKeys: String, CodingKey {
         case status
