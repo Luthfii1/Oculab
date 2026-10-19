@@ -42,6 +42,7 @@ class DependencyInjection: ObservableObject {
         ExamInteractor(networkService: networkService)
     }()
     
+    @MainActor
     func initializer(modelContext: ModelContext) {
         self.modelContext = modelContext
         VideoUploadQueueService.shared.configure(

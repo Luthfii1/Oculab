@@ -71,13 +71,12 @@ class ShareHelper {
     ///   - patientId: The patient ID
     ///   - patientName: The patient's name
     func shareExamination(examId: String, patientId: String, patientName: String) {
-        guard let shareText = DeeplinkGenerator.shared.generateExaminationShareText(
+        guard let url = DeeplinkGenerator.shared.generateExaminationURL(
             examId: examId,
-            patientId: patientId,
-            patientName: patientName
+            patientId: patientId
         ) else { return }
-        
-        shareContent(items: [shareText])
+
+        shareDeeplink(url: url, title: patientName)
     }
     
     /// Share analysis result
@@ -85,12 +84,11 @@ class ShareHelper {
     ///   - examinationId: The examination ID
     ///   - patientName: The patient's name
     func shareAnalysisResult(examinationId: String, patientName: String) {
-        guard let shareText = DeeplinkGenerator.shared.generateAnalysisResultShareText(
-            examinationId: examinationId,
-            patientName: patientName
+        guard let url = DeeplinkGenerator.shared.generateAnalysisResultURL(
+            examinationId: examinationId
         ) else { return }
-        
-        shareContent(items: [shareText])
+
+        shareDeeplink(url: url, title: patientName)
     }
     
     /// Share patient profile
@@ -98,12 +96,11 @@ class ShareHelper {
     ///   - patientId: The patient ID
     ///   - patientName: The patient's name
     func sharePatient(patientId: String, patientName: String) {
-        guard let shareText = DeeplinkGenerator.shared.generatePatientShareText(
-            patientId: patientId,
-            patientName: patientName
+        guard let url = DeeplinkGenerator.shared.generatePatientURL(
+            patientId: patientId
         ) else { return }
-        
-        shareContent(items: [shareText])
+
+        shareDeeplink(url: url, title: patientName)
     }
     
     /// Copy text to clipboard

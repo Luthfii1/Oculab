@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 
+@MainActor
 class AnalysisResultPresenter: ObservableObject {
     // MARK: - Dependencies
     private let interactor: AnalysisResultInteractor
@@ -323,8 +324,10 @@ extension AnalysisResultPresenter {
     @MainActor
     func fetchData(examinationId: String, silent: Bool = false) async {
         if !silent {
-            defer { isLoading = false }
             isLoading = true
+        }
+        defer {
+            if !silent { isLoading = false }
         }
 
         do {

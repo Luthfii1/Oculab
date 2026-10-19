@@ -36,15 +36,7 @@ class NetworkRetryManager: ObservableObject {
     
     // MARK: - Retry State
     
-    private var activeRetries: [String: RetryOperation] = [:]
-    
-    private struct RetryOperation {
-        let id: String
-        var currentAttempt: Int
-        var lastAttemptTime: Date
-        let maxAttempts: Int
-        let operation: () async throws -> Void
-    }
+    private var activeRetries: Set<String> = []
     
     // MARK: - Initialization
     
@@ -74,26 +66,33 @@ class NetworkRetryManager: ObservableObject {
     ) async throws -> T {
         
         // Check if we already have an active retry for this operation
-        if activeRetries[id] != nil {
+        guard maxAttempts > 0 else {
+            throw NetworkError.unknownError
+        }
+        try Task.checkCancellation()
+
+        guard activeRetries.insert(id).inserted else {
             throw NetworkError.operationInProgress
         }
+        // Reserve the ID before the first suspension, and release it on every exit,
+        // including cancellation during backoff.
+        defer { activeRetries.remove(id) }
         
         var lastError: Error?
         
         for attempt in 1...maxAttempts {
+            try Task.checkCancellation()
             do {
                 let result = try await performOperationWithTimeout(operation)
-                
-                // Success - clean up and return
-                activeRetries.removeValue(forKey: id)
+                try Task.checkCancellation()
                 return result
                 
             } catch {
+                try Task.checkCancellation()
                 lastError = error
                 
                 // Don't retry for certain types of errors
                 if !shouldRetry(error: error) {
-                    activeRetries.removeValue(forKey: id)
                     throw error
                 }
                 
@@ -107,22 +106,11 @@ class NetworkRetryManager: ObservableObject {
                 
                 print("🔄 Network retry \(attempt)/\(maxAttempts) for operation '\(id)' after \(delay)s delay")
                 
-                // Track retry operation
-                activeRetries[id] = RetryOperation(
-                    id: id,
-                    currentAttempt: attempt,
-                    lastAttemptTime: Date(),
-                    maxAttempts: maxAttempts,
-                    operation: {}
-                )
-                
                 try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
             }
         }
         
         // All retries failed
-        activeRetries.removeValue(forKey: id)
-        
         if let lastError = lastError {
             throw NetworkError.allRetriesFailed(
                 attempts: maxAttempts,
@@ -139,6 +127,7 @@ class NetworkRetryManager: ObservableObject {
         _ operation: @escaping () async throws -> T
     ) async throws -> T {
         return try await withThrowingTaskGroup(of: T.self) { group in
+            defer { group.cancelAll() }
             // Add the main operation
             group.addTask {
                 try await operation()
@@ -152,12 +141,12 @@ class NetworkRetryManager: ObservableObject {
             
             // Return the first result (either success or timeout)
             let result = try await group.next()!
-            group.cancelAll()
             return result
         }
     }
     
     private func shouldRetry(error: Error) -> Bool {
+        guard !(error is CancellationError) else { return false }
         // Don't retry if there's no network connection
         guard isConnected else { return false }
         
@@ -179,7 +168,7 @@ class NetworkRetryManager: ObservableObject {
             switch urlError.code {
             case .timedOut, .cannotConnectToHost, .networkConnectionLost, .notConnectedToInternet:
                 return true
-            case .badURL, .unsupportedURL, .userAuthenticationRequired, .userCancelledAuthentication:
+            case .cancelled, .badURL, .unsupportedURL, .userAuthenticationRequired, .userCancelledAuthentication:
                 return false
             default:
                 return true // Retry unknown URL errors

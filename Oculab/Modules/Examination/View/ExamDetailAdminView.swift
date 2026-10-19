@@ -186,7 +186,7 @@ struct ExamDetailAdminView: View {
                 AppTextExamDetail.adminArchiveConfirmTitle,
                 isPresented: $showArchiveConfirm
             ) {
-                Button(AppState.cancel, role: .cancel) {}
+                Button(AppCommon.cancel, role: .cancel) {}
                 Button(AppTextExamDetail.adminArchiveButton, role: .destructive) {
                     Task {
                         _ = await presenter.adminSetArchived(observationId: examId, archived: true)

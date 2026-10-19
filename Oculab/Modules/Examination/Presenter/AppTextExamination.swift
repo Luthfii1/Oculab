@@ -28,6 +28,7 @@ extension AppText {
         static let buttonSubmitting = "examination.button_submitting".localized
         static let tempFileCleanupWarning = "examination.temp_file_cleanup_warning".localized
         static let uploadQueueMaxRetries = "examination.upload_queue_max_retries".localized
+        static let uploadQueueMissingFile = "examination.upload_queue_missing_file".localized
         static let uploadQueueBanner = "examination.upload_queue_banner".localized
         static let uploadPendingBadge = "examination.upload_pending_badge".localized
         static let uploadQueueUploading = "examination.upload_queue_uploading".localized
@@ -51,8 +52,6 @@ extension AppText {
             static let progressLabel = "examination.progress.progress_label".localized
             static let refreshInstruction = "examination.progress.refresh_instruction".localized
             static let backgroundInstruction = "examination.progress.background_instruction".localized
-            static let analysisQueuedTitle = "examination.progress.analysis_queued_title".localized
-            static let analysisQueuedSubtitle = "examination.progress.analysis_queued_subtitle".localized
             static let analysisQueuedTitle = "examination.progress.analysis_queued_title".localized
             static let analysisQueuedSubtitle = "examination.progress.analysis_queued_subtitle".localized
 

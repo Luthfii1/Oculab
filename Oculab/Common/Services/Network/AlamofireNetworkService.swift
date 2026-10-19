@@ -9,7 +9,11 @@ import Foundation
 import Alamofire
 
 class AlamofireNetworkService: NetworkServiceProtocol {
-    private static let decoder = JSONDecoder()
+    private let session: Session
+
+    init(session: Session = .default) {
+        self.session = session
+    }
 
     /// Video uploads chain through the API into ML processing; default ~60s timeouts are too short.
     private static let uploadSession: Session = {
@@ -22,7 +26,7 @@ class AlamofireNetworkService: NetworkServiceProtocol {
     func get<T: Decodable>(urlString: String, headers: [String: String]?) async throws -> APIResponse<T> {
         try await executeWithAuthRetry(endpoint: urlString, headers: headers) { headers in
             let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
-            let request = AF.request(urlString, method: .get, headers: afHeaders)
+            let request = self.session.request(urlString, method: .get, headers: afHeaders)
             return try await self.handleRequest(request, endpoint: urlString)
         }
     }
@@ -30,7 +34,7 @@ class AlamofireNetworkService: NetworkServiceProtocol {
     func post<T: Decodable, B: Encodable>(urlString: String, headers: [String: String]?, body: B) async throws -> APIResponse<T> {
         try await executeWithAuthRetry(endpoint: urlString, headers: headers) { headers in
             let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
-            let request = AF.request(
+            let request = self.session.request(
                 urlString,
                 method: .post,
                 parameters: body,
@@ -44,7 +48,7 @@ class AlamofireNetworkService: NetworkServiceProtocol {
     func update<T: Decodable, B: Encodable>(urlString: String, headers: [String: String]?, body: B) async throws -> APIResponse<T> {
         try await executeWithAuthRetry(endpoint: urlString, headers: headers) { headers in
             let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
-            let request = AF.request(
+            let request = self.session.request(
                 urlString,
                 method: .put,
                 parameters: body,
@@ -58,7 +62,7 @@ class AlamofireNetworkService: NetworkServiceProtocol {
     func delete<T: Decodable, B: Encodable>(urlString: String, headers: [String: String]?, body: B?) async throws -> APIResponse<T> {
         try await executeWithAuthRetry(endpoint: urlString, headers: headers) { headers in
             let afHeaders = headers != nil ? HTTPHeaders(headers!) : nil
-            let request = AF.request(
+            let request = self.session.request(
                 urlString,
                 method: .delete,
                 parameters: body,
@@ -141,6 +145,11 @@ class AlamofireNetworkService: NetworkServiceProtocol {
         do {
             return try await perform(initialHeaders)
         } catch NetworkError.unauthorized {
+            // A rejected login or refresh request must not invalidate the session here.
+            // The caller of the refresh handles its authentication failure once.
+            guard AuthSessionManager.requiresAuthentication(for: endpoint) else {
+                throw NetworkError.unauthorized(endpoint: endpoint)
+            }
             guard AuthSessionManager.shouldAttemptTokenRefresh(for: endpoint) else {
                 await MainActor.run { AuthSessionManager.invalidateSession() }
                 throw NetworkError.unauthorized(endpoint: endpoint)
@@ -148,9 +157,15 @@ class AlamofireNetworkService: NetworkServiceProtocol {
 
             do {
                 try await AuthTokenRefresher.shared.refreshAccessToken(using: self)
-                let refreshedHeaders = try AuthSessionManager.headersByReplacingAuthorization(headers)
+            } catch NetworkError.unauthorized {
+                await MainActor.run { AuthSessionManager.invalidateSession() }
+                throw NetworkError.unauthorized(endpoint: endpoint)
+            }
+
+            let refreshedHeaders = try AuthSessionManager.headersByReplacingAuthorization(headers)
+            do {
                 return try await perform(refreshedHeaders)
-            } catch {
+            } catch NetworkError.unauthorized {
                 await MainActor.run { AuthSessionManager.invalidateSession() }
                 throw NetworkError.unauthorized(endpoint: endpoint)
             }
@@ -167,11 +182,15 @@ class AlamofireNetworkService: NetworkServiceProtocol {
 
     private func handleRequest<T: Decodable>(_ request: DataRequest, endpoint: String) async throws -> APIResponse<T> {
         let dataResponse = await request.serializingData().response
+        try Task.checkCancellation()
+
+        if let error = dataResponse.error {
+            if error.isExplicitlyCancelledError { throw CancellationError() }
+            if let underlying = error.underlyingError { throw underlying }
+            throw NetworkError.networkError(error.localizedDescription, endpoint: endpoint)
+        }
 
         guard let data = dataResponse.data else {
-            if let error = dataResponse.error, isRequestTimedOut(error) {
-                throw URLError(.timedOut)
-            }
             throw NetworkError.networkError("No data received from server", endpoint: endpoint)
         }
 
@@ -182,27 +201,27 @@ class AlamofireNetworkService: NetworkServiceProtocol {
             print("DEBUG: API Endpoint: \(endpoint)")
             print("DEBUG: HTTP Status Code: \(statusCode)")
         }
-
-        if let rawString = String(data: data, encoding: .utf8) {
-            print("DEBUG: Raw Response: \(rawString)")
-        }
         #endif
 
         try validateHTTPResponse(data: data, statusCode: statusCode, endpoint: endpoint)
 
-        if let errorResponse = try? Self.decoder.decode(APIResponse<ApiErrorData>.self, from: data) {
+        let decoder = JSONDecoder()
+        if let errorResponse = try? decoder.decode(APIResponse<ApiErrorData>.self, from: data),
+           errorResponse.status == StatusResponseType.ERROR.rawValue {
             #if DEBUG
             print("DEBUG: Successfully decoded as APIResponse<ApiErrorData>")
             #endif
             throw NetworkError.apiError(errorResponse, endpoint: endpoint)
         }
 
+        guard let statusCode, (200...299).contains(statusCode) else {
+            throw NetworkError.networkError("Request failed (\(statusCode ?? 0))", endpoint: endpoint)
+        }
+
         do {
-            let decodedResponse = try Self.decoder.decode(APIResponse<T>.self, from: data)
+            let decodedResponse = try decoder.decode(APIResponse<T>.self, from: data)
             if decodedResponse.status == StatusResponseType.ERROR.rawValue {
-                if let errorResponse = try? Self.decoder.decode(APIResponse<ApiErrorData>.self, from: data) {
-                    throw NetworkError.apiError(errorResponse, endpoint: endpoint)
-                }
+                throw NetworkError.networkError(decodedResponse.message, endpoint: endpoint)
             }
             return decodedResponse
         } catch let decodingError as NetworkError {
@@ -211,9 +230,6 @@ class AlamofireNetworkService: NetworkServiceProtocol {
             #if DEBUG
             print("DEBUG: Failed to decode as success response: \(error)")
             #endif
-            if let originalError = dataResponse.error {
-                throw NetworkError.networkError(originalError.localizedDescription, endpoint: endpoint)
-            }
             throw NetworkError.networkError("Server error", endpoint: endpoint)
         }
     }
@@ -230,19 +246,6 @@ class AlamofireNetworkService: NetworkServiceProtocol {
         if isNonJSONResponse(data) {
             throw NetworkError.networkError("Server error", endpoint: endpoint)
         }
-    }
-
-    private func isRequestTimedOut(_ error: Error) -> Bool {
-        let nsError = error as NSError
-        if nsError.domain == NSURLErrorDomain, nsError.code == NSURLErrorTimedOut {
-            return true
-        }
-        if let underlying = nsError.userInfo[NSUnderlyingErrorKey] as? NSError,
-           underlying.domain == NSURLErrorDomain,
-           underlying.code == NSURLErrorTimedOut {
-            return true
-        }
-        return false
     }
 
     private func isNonJSONResponse(_ data: Data) -> Bool {

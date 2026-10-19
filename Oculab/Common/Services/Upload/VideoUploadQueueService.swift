@@ -23,7 +23,11 @@ final class VideoUploadQueueService: ObservableObject {
     private let maxRetryCount = 5
     private let pendingDirectoryName = "PendingUploads"
 
-    private init() {}
+    init() {}
+
+    deinit {
+        connectivityTask?.cancel()
+    }
 
     func configure(
         modelContext: ModelContext,
@@ -34,11 +38,25 @@ final class VideoUploadQueueService: ObservableObject {
         self.examInteractor = examInteractor
         self.networkRetryManager = networkRetryManager
 
+        // A process killed during upload leaves a persisted `.uploading` row.
+        // Only recover when no upload is currently running in this service.
+        if !isProcessing {
+            let uploads = (try? modelContext.fetch(FetchDescriptor<PendingUpload>())) ?? []
+            for upload in uploads where upload.state == .uploading {
+                upload.state = .pending
+            }
+            try? modelContext.save()
+        }
+
         connectivityTask?.cancel()
         connectivityTask = Task { [weak self] in
-            guard let self else { return }
             while !Task.isCancelled {
-                try? await Task.sleep(nanoseconds: 2_000_000_000)
+                do {
+                    try await Task.sleep(nanoseconds: 2_000_000_000)
+                } catch {
+                    return
+                }
+                guard let self, !Task.isCancelled else { return }
                 guard networkRetryManager.isConnected else { continue }
                 await self.processQueue()
             }
@@ -78,15 +96,18 @@ final class VideoUploadQueueService: ObservableObject {
         }
 
         let normalizedExamId = examinationId.lowercased()
-        let destinationURL = try persistentFileURL(for: normalizedExamId)
+        let existing = try fetchUpload(examinationId: normalizedExamId, context: modelContext)
+        guard existing?.state != .uploading else {
+            throw VideoUploadQueueError.uploadInProgress
+        }
+        let previousFilePath = existing?.localFilePath
+        let destinationURL = try persistentFileURL(sourceURL: sourceURL)
         let fileManager = FileManager.default
 
-        if fileManager.fileExists(atPath: destinationURL.path) {
-            try fileManager.removeItem(at: destinationURL)
-        }
+        // Copy to a new file first so a failed replacement keeps the original video.
         try fileManager.copyItem(at: sourceURL, to: destinationURL)
 
-        if let existing = try fetchUpload(examinationId: normalizedExamId, context: modelContext) {
+        if let existing {
             existing.patientId = patientId
             existing.localFilePath = destinationURL.path
             existing.slideId = slideId
@@ -106,6 +127,9 @@ final class VideoUploadQueueService: ObservableObject {
         }
 
         try modelContext.save()
+        if let previousFilePath, previousFilePath != destinationURL.path {
+            try? fileManager.removeItem(atPath: previousFilePath)
+        }
         await refreshPublishedState()
     }
 
@@ -114,7 +138,10 @@ final class VideoUploadQueueService: ObservableObject {
               let upload = try? fetchUpload(examinationId: examinationId.lowercased(), context: modelContext)
         else { return }
 
+        guard upload.state != .uploading else { return }
+
         upload.state = .pending
+        upload.retryCount = 0
         upload.lastError = nil
         try? modelContext.save()
         await refreshPublishedState()
@@ -141,16 +168,21 @@ final class VideoUploadQueueService: ObservableObject {
         guard let uploads = try? modelContext.fetch(descriptor) else { return }
 
         for upload in uploads where upload.state == .pending || upload.state == .failed {
+            guard !Task.isCancelled, networkRetryManager?.isConnected != false else { return }
             if upload.retryCount >= maxRetryCount {
                 upload.state = .failed
-                upload.lastError = AppTextExam.uploadQueueMaxRetries
+                if upload.lastError == nil {
+                    upload.lastError = AppTextExam.uploadQueueMaxRetries
+                }
                 try? modelContext.save()
                 continue
             }
 
             let fileURL = URL(fileURLWithPath: upload.localFilePath)
             guard FileManager.default.fileExists(atPath: fileURL.path) else {
-                modelContext.delete(upload)
+                upload.state = .failed
+                upload.retryCount = maxRetryCount
+                upload.lastError = AppTextExam.uploadQueueMissingFile
                 try? modelContext.save()
                 continue
             }
@@ -167,16 +199,23 @@ final class VideoUploadQueueService: ObservableObject {
                     patientId: upload.patientId
                 )
 
-                try? FileManager.default.removeItem(at: fileURL)
+                let examinationId = upload.examinationId
                 modelContext.delete(upload)
                 try modelContext.save()
+                try? FileManager.default.removeItem(at: fileURL)
 
-                AnalysisTrackingStore.track(examinationId: upload.examinationId)
-                AnalysisRealtimeService.shared.subscribe(to: upload.examinationId)
+                AnalysisTrackingStore.track(examinationId: examinationId)
+                AnalysisRealtimeService.shared.subscribe(to: examinationId)
                 await ExaminationNotificationService.shared.requestAuthorizationIfNeeded()
 
                 uploadingExaminationId = nil
             } catch {
+                if Task.isCancelled || error is CancellationError || (error as? URLError)?.code == .cancelled {
+                    upload.state = .pending
+                    uploadingExaminationId = nil
+                    try? modelContext.save()
+                    return
+                }
                 upload.state = .failed
                 upload.retryCount += 1
                 upload.lastError = ErrorHandler.shared.handleError(error, context: .examination)
@@ -184,7 +223,11 @@ final class VideoUploadQueueService: ObservableObject {
                 try? modelContext.save()
 
                 let delay = min(pow(2.0, Double(upload.retryCount)), 16.0)
-                try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+                do {
+                    try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+                } catch {
+                    return
+                }
             }
         }
     }
@@ -223,7 +266,7 @@ final class VideoUploadQueueService: ObservableObject {
         return try context.fetch(descriptor).first
     }
 
-    private func persistentFileURL(for examinationId: String) throws -> URL {
+    private func persistentFileURL(sourceURL: URL) throws -> URL {
         let support = try FileManager.default.url(
             for: .applicationSupportDirectory,
             in: .userDomainMask,
@@ -234,17 +277,21 @@ final class VideoUploadQueueService: ObservableObject {
         if !FileManager.default.fileExists(atPath: directory.path) {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         }
-        return directory.appendingPathComponent("\(examinationId).mov")
+        let fileExtension = sourceURL.pathExtension.isEmpty ? "mov" : sourceURL.pathExtension.lowercased()
+        return directory.appendingPathComponent(UUID().uuidString).appendingPathExtension(fileExtension)
     }
 }
 
 enum VideoUploadQueueError: LocalizedError {
     case notConfigured
+    case uploadInProgress
 
     var errorDescription: String? {
         switch self {
         case .notConfigured:
             return "Upload queue is not configured."
+        case .uploadInProgress:
+            return "This examination is already uploading."
         }
     }
 }
