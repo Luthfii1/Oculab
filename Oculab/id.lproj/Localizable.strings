@@ -447,6 +447,7 @@
 "examination.button_submitting" = "Mengirimkan...";
 "examination.temp_file_cleanup_warning" = "Pemeriksaan terkirim, tapi rekaman sementara tidak dapat dihapus dari perangkat.";
 "examination.upload_queue_max_retries" = "Upload gagal setelah beberapa percobaan. Periksa koneksi dan coba lagi dari halaman pemeriksaan.";
+"examination.upload_queue_missing_file" = "Video tersimpan tidak ditemukan. Silakan rekam atau pilih video kembali.";
 "examination.upload_queue_banner" = "%d video menunggu diunggah. Kami akan mencoba lagi otomatis saat Anda kembali online.";
 "examination.upload_pending_badge" = "Upload tertunda";
 "examination.upload_queue_uploading" = "Mengunggah video…";

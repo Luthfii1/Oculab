@@ -48,7 +48,7 @@ struct ExamAdminPICPickerSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(AppState.cancel) { dismiss() }
+                    Button(AppCommon.cancel) { dismiss() }
                 }
             }
             .task {

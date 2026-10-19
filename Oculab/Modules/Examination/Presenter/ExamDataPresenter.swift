@@ -10,7 +10,7 @@ import SwiftUI
 class ExamDataPresenter: ObservableObject {
     // MARK: - Dependencies
     private let interactor: ExamInteractor
-    var videoPresenter: VideoRecordPresenter { VideoRecordSession.current }
+    @MainActor var videoPresenter: VideoRecordPresenter { VideoRecordSession.current }
     
     // MARK: - Published Properties
     @Published var isLoading: Bool = false

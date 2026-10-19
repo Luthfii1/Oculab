@@ -410,10 +410,14 @@ extension AuthenticationPresenter {
             }
         } else {
             // Normal authentication - check against Keychain PIN
-            let storedPin = KeychainHelper.string(for: .accessPin)
-                ?? await interactor.getUserLocalData()?.accessPin
-                ?? AppValue.empty
-            if !Self.constantTimeEquals(storedPin, inputPin) {
+            let storedPin: String?
+            if let keychainPin = KeychainHelper.string(for: .accessPin) {
+                storedPin = keychainPin
+            } else {
+                storedPin = await interactor.getUserLocalData()?.accessPin
+            }
+            guard let storedPin, !storedPin.isEmpty,
+                  Self.constantTimeEquals(storedPin, inputPin) else {
                 description = AppTextAuthCompPin.invalidPinText
                 isError = true
                 return false

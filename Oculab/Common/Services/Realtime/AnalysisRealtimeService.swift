@@ -42,8 +42,8 @@ final class AnalysisRealtimeService {
             .forceWebsockets(true),
         ]
 
-        if let token = KeychainHelper.string(for: .accessToken) {
-            config.insert(.auth(["token": token]))
+        let token = KeychainHelper.string(for: .accessToken)
+        if let token {
             config.insert(.extraHeaders(["Authorization": "Bearer \(token)"]))
         }
 
@@ -80,7 +80,7 @@ final class AnalysisRealtimeService {
             }
         }
 
-        client?.connect()
+        client?.connect(withPayload: token.map { ["token": $0] })
     }
 
     func disconnect() {

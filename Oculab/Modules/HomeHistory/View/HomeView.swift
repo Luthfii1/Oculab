@@ -55,7 +55,7 @@ struct HomeView: View {
             Button(AppTextAuthProfile.clinicalActionBlockedButton) {
                 Router.shared.navigateTo(.profile)
             }
-            Button(AppState.cancel, role: .cancel) {}
+            Button(AppCommon.cancel, role: .cancel) {}
         } message: {
             Text(AppTextAuthProfile.clinicalActionBlockedMessage)
         }
