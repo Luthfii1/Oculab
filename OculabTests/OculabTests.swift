@@ -922,3 +922,126 @@ private final class TaskAssignmentStubInteractor: InputPatientInteractor {
         try await self.examinations(patientId, examinations)
     }
 }
+
+final class GuidedExaminationUXTests: XCTestCase {
+    @MainActor
+    func testReviewShowsInlineErrorsForIncompleteSpecimen() async {
+        let flow = TaskAssignmentFlowCoordinator(repository: TaskAssignmentRepository(interactor: TaskAssignmentStubInteractor()))
+        flow.showSubmitPopup()
+        await flushValidationUpdates()
+        XCTAssertFalse(flow.isSubmitPopUpVisible)
+        XCTAssertTrue(flow.specimenValidationAttempted)
+        XCTAssertNotNil(flow.validationManager.getError(for: ValidationFieldName.examinationGoal.fieldName))
+        XCTAssertNotNil(flow.validationManager.getError(for: ValidationFieldName.slideId1.fieldName))
+        XCTAssertNotNil(flow.validationManager.getError(for: ValidationFieldName.slideType1.fieldName))
+    }
+
+    @MainActor
+    func testDuplicateSlideIDsAreExplainedBeforeReview() async {
+        let flow = makeSpecimenFlow()
+        flow.isSlide2Visible = true
+        flow.typeString2 = AppTextTaskAssignInputExam.anytimeChoice
+        flow.examination2.slideId = "  SLIDE-001  "
+        flow.showSubmitPopup()
+        await flushValidationUpdates()
+        XCTAssertTrue(flow.hasDuplicateSlideIDs)
+        XCTAssertFalse(flow.isSpecimenStepReady)
+        XCTAssertFalse(flow.isSubmitPopUpVisible)
+        XCTAssertEqual(
+            flow.validationManager.getError(for: ValidationFieldName.slideId2.fieldName),
+            AppTextTaskAssignInputExam.warningSlideIDsMustBeDifferent
+        )
+    }
+
+    @MainActor
+    func testCorrectingDuplicateSlideIDAllowsReview() async {
+        let flow = makeSpecimenFlow()
+        flow.isSlide2Visible = true
+        flow.typeString2 = AppTextTaskAssignInputExam.anytimeChoice
+        flow.examination2.slideId = "SLIDE-001"
+        flow.showSubmitPopup()
+        await flushValidationUpdates()
+        flow.examination2.slideId = "SLIDE-002"
+        flow.showSubmitPopup()
+        await flushValidationUpdates()
+        XCTAssertTrue(flow.isSpecimenStepReady)
+        XCTAssertTrue(flow.isSubmitPopUpVisible)
+        XCTAssertNil(flow.validationManager.getError(for: ValidationFieldName.slideId2.fieldName))
+    }
+
+    @MainActor
+    func testRemovingSecondSlideClearsItsFieldsAndErrors() async {
+        let flow = makeSpecimenFlow()
+        flow.isSlide2Visible = true
+        flow.typeString2 = AppTextTaskAssignInputExam.anytimeChoice
+        flow.examination2.slideId = "SLIDE-001"
+        flow.showSubmitPopup()
+        await flushValidationUpdates()
+        flow.toggleSlide2()
+        await flushValidationUpdates()
+        XCTAssertFalse(flow.isSlide2Visible)
+        XCTAssertFalse(flow.hasDuplicateSlideIDs)
+        XCTAssertTrue(flow.examination2.slideId.isEmpty)
+        XCTAssertTrue(flow.typeString2.isEmpty)
+        XCTAssertNil(flow.validationManager.getError(for: ValidationFieldName.slideId2.fieldName))
+        XCTAssertTrue(flow.isSpecimenStepReady)
+    }
+
+    @MainActor
+    func testReturningToEditClearsHandledSubmissionError() async {
+        let flow = makeSpecimenFlow()
+        flow.showSubmitPopup()
+        await flushValidationUpdates()
+        flow.isError = true
+        flow.errorMessage = "Submission failed"
+        flow.hideSubmitPopup()
+        XCTAssertFalse(flow.isSubmitPopUpVisible)
+        XCTAssertFalse(flow.isError)
+        XCTAssertTrue(flow.errorMessage.isEmpty)
+    }
+
+    @MainActor
+    func testExistingPatientKeepsMissingDemographicsAndShowsValidationErrors() async {
+        let patient = TaskAssignmentRepositoryTests.patient(id: UUID().uuidString.lowercased())
+        patient.DoB = nil
+        patient.sex = .UNKNOWN
+        patient.BPJS = nil
+        let interactor = TaskAssignmentStubInteractor(lookup: { _ in patient })
+        let flow = TaskAssignmentFlowCoordinator(repository: TaskAssignmentRepository(interactor: interactor))
+        flow.patientSelection = .existing(patientId: patient.id)
+        await flow.handlePatientChoiceChange()
+        await flushValidationUpdates()
+        XCTAssertNil(flow.patient.DoB)
+        XCTAssertEqual(flow.patient.sex, .UNKNOWN)
+        XCTAssertNil(flow.patient.BPJS)
+        XCTAssertNotNil(flow.validationManager.getError(for: ValidationFieldName.patientDateOfBirth.fieldName))
+        XCTAssertNotNil(flow.validationManager.getError(for: ValidationFieldName.patientGender.fieldName))
+        XCTAssertFalse(flow.isPatientStepReady)
+
+        patient.DoB = Date(timeIntervalSince1970: 0)
+        patient.sex = .FEMALE
+        flow.selectedPIC = "selected-pic"
+        await flow.handlePatientChoiceChange()
+        await flushValidationUpdates()
+        XCTAssertNil(flow.validationManager.getError(for: ValidationFieldName.patientDateOfBirth.fieldName))
+        XCTAssertNil(flow.validationManager.getError(for: ValidationFieldName.patientGender.fieldName))
+        XCTAssertTrue(flow.isPatientStepReady)
+    }
+
+    @MainActor
+    private func flushValidationUpdates() async {
+        // ValidationManager publishes its error changes on the next main-queue turn.
+        await withCheckedContinuation { continuation in
+            DispatchQueue.main.async { continuation.resume() }
+        }
+    }
+
+    @MainActor
+    private func makeSpecimenFlow() -> TaskAssignmentFlowCoordinator {
+        let flow = TaskAssignmentFlowCoordinator(repository: TaskAssignmentRepository(interactor: TaskAssignmentStubInteractor()))
+        flow.goalString = AppTextTaskAssignInputExam.screeningChoice
+        flow.typeString = AppTextTaskAssignInputExam.morningChoice
+        flow.examination.slideId = "SLIDE-001"
+        return flow
+    }
+}

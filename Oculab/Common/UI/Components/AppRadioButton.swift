@@ -29,27 +29,34 @@ struct AppRadioButton: View {
             }
 
             ForEach(choices, id: \.self) { choice in
-                HStack(spacing: Decimal.d4) {
-                    Image(systemName: selectedChoice == choice ? AppIcon.largecircleFillCircle : AppIcon.circle)
-                        .resizable()
-                        .frame(width: 16, height: 16)
-                        .foregroundColor(selectedChoice == choice ? AppColors.purple600 : .gray)
-                        .onTapGesture {
-                            if !isDisabled {
-                                selectedChoice = choice
-                            }
-                        }
-                        .padding(2)
-
-                    Text(choice)
-                        .font(AppTypography.p2)
-                        .foregroundColor(isDisabled ? .gray : AppColors.slate900)
-                        .onTapGesture {
-                            if !isDisabled {
-                                selectedChoice = choice
-                            }
-                        }
+                Button {
+                    selectedChoice = choice
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: selectedChoice == choice ? AppIcon.largecircleFillCircle : AppIcon.circle)
+                            .font(.system(size: 20))
+                            .foregroundColor(selectedChoice == choice ? AppColors.purple600 : AppColors.slate400)
+                            .accessibilityHidden(true)
+                        Text(choice)
+                            .font(AppTypography.p2)
+                            .foregroundColor(AppColors.slate900)
+                            .fixedSize(horizontal: false, vertical: true)
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 12)
+                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                    .background(selectedChoice == choice ? AppColors.purple50 : AppColors.slate0)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(selectedChoice == choice ? AppColors.purple300 : AppColors.slate200, lineWidth: 1)
+                    }
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
+                .disabled(isDisabled)
+                .accessibilityAddTraits(selectedChoice == choice ? .isSelected : [])
             }
         }
         .opacity(isDisabled ? 0.6 : 1.0) // Optional: dim appearance when disabled

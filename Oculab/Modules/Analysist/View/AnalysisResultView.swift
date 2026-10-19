@@ -11,6 +11,7 @@ struct AnalysisResultView: View {
     var examinationId: String
 
     @StateObject private var presenter = AnalysisResultPresenter()
+    @State private var loadAttempt = 0
 
     var body: some View {
         ZStack {
@@ -56,18 +57,39 @@ struct AnalysisResultView: View {
                     }
                 } else {
                     Spacer()
-                    Text(AppTextAnalysisResult.loadingExaminationMessage)
-                        .foregroundColor(.gray)
-                        .padding()
+                    if !presenter.isLoading, let errorMessage = presenter.errorMessage {
+                        VStack(spacing: 16) {
+                            Image(systemName: AppIcon.warning)
+                                .font(.largeTitle)
+                                .foregroundStyle(AppColors.orange500)
+                                .accessibilityHidden(true)
+                            Text("examination.result.load_error_title".localized)
+                                .font(AppTypography.s4_1)
+                                .foregroundStyle(AppColors.slate900)
+                            Text(errorMessage)
+                                .font(AppTypography.p3)
+                                .foregroundStyle(AppColors.slate600)
+                                .multilineTextAlignment(.center)
+                            AppButton(title: AppAction.retry, size: .large) {
+                                loadAttempt += 1
+                            }
+                        }
+                        .padding(24)
+                    } else {
+                        ProgressView(AppTextAnalysisResult.loadingExaminationMessage)
+                            .padding()
+                    }
                     Spacer()
                 }
             }
             .onAppear {
                 AnalysisResultSessionStore.shared.register(presenter, for: examinationId)
                 presenter.beginExaminationTracking(examinationId: examinationId)
-                Task {
-                    await presenter.fetchData(examinationId: examinationId)
-                }
+            }
+            .task(id: loadAttempt) {
+                guard !Task.isCancelled else { return }
+                presenter.errorMessage = nil
+                await presenter.fetchData(examinationId: examinationId)
             }
             .onReceive(
                 NotificationCenter.default.publisher(for: .fovVerificationUpdated)

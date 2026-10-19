@@ -17,8 +17,7 @@ extension AppText {
     enum TaskAssignment {
         enum InputPatientDataView {
             static let stepTitles = ["task_assignment.input_patient.step_title_patient".localized, 
-                                   "task_assignment.input_patient.step_title_specimen".localized, 
-                                   "task_assignment.input_patient.step_title_results".localized]
+                                   "task_assignment.input_patient.step_title_specimen".localized]
             static let currentStepIndex = 0
             static let picTitle = "task_assignment.input_patient.pic_title".localized
             static let patientNamePlaceholderAutoSelected = "task_assignment.input_patient.patient_name_placeholder_auto_selected".localized
@@ -39,8 +38,7 @@ extension AppText {
         
         enum InputExaminationDataView {
             static let stepTitles = ["task_assignment.input_exam.step_title_patient".localized, 
-                                   "task_assignment.input_exam.step_title_specimen".localized, 
-                                   "task_assignment.input_exam.step_title_results".localized]
+                                   "task_assignment.input_exam.step_title_specimen".localized]
             static let currentStepIndex = 1
             static let confirmPopupTitle = "task_assignment.input_exam.confirm_popup_title".localized
             static let createTaskButton = "task_assignment.input_exam.create_task_button".localized

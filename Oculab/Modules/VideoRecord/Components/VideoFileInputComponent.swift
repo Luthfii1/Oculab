@@ -264,6 +264,7 @@ struct VideoInput: View {
     }
 
     private func handleOnboardingCompletion() {
+        UserDefaults.standard.set(true, forKey: UserDefaultType.hasSeenOnboarding.rawValue)
         selectFile()
         clearVideoState()
         examPresenter.newVideoRecord()
@@ -281,8 +282,8 @@ struct VideoInput: View {
 
     private func handleCreateVideoTap() {
         if !UserDefaults.standard.bool(forKey: UserDefaultType.hasSeenOnboarding.rawValue) {
+            didFinishOnboarding = false
             showOnboardingGuidelines = true
-            UserDefaults.standard.set(true, forKey: UserDefaultType.hasSeenOnboarding.rawValue)
         } else {
             clearVideoState()
             examPresenter.newVideoRecord()

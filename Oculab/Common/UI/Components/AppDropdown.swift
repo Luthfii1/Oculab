@@ -104,6 +104,8 @@ struct AppDropdown: View {
                             .disabled(isDisabled)
                             .padding(.horizontal, Decimal.d8)
                             .multilineTextAlignment(.leading)
+                            .autocorrectionDisabled()
+                            .accessibilityLabel(Text(title))
                         } else {
                             Text(selectedChoice.isEmpty ? placeholder : choices.first(where: { $0.value == selectedChoice })?.display ?? selectedChoice)
                                 .foregroundColor(textColor)
@@ -202,6 +204,12 @@ struct AppDropdown: View {
             }
         }
         .padding(.vertical, 4)
+        .onAppear {
+            if isSearchEnabled { syncSearchTextWithSelection() }
+        }
+        .onChange(of: choices.map { [$0.display, $0.value] }) { _, _ in
+            if isSearchEnabled && !isDropdownOpen { syncSearchTextWithSelection() }
+        }
     }
 
     private var trimmedSearchText: String {

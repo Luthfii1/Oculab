@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct GuidelinesOnboardingView: View {
+    var onComplete: () -> Void = {}
     @Environment(\.dismiss) var dismiss
     @State private var currentPage = 0
 
@@ -63,6 +64,7 @@ struct GuidelinesOnboardingView: View {
                         if currentPage < pages.count - 1 {
                             withAnimation { currentPage += 1 }
                         } else {
+                            onComplete()
                             dismiss()
                         }
                     }

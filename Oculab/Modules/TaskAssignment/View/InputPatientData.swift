@@ -26,6 +26,7 @@ struct InputPatientData: View {
                 VStack {
                     Spacer().frame(height: AppConstants.TaskAssignmentUI.verticalSpacing)
                     AppStepper(stepTitles: AppTextTaskAssignInputPatient.stepTitles, currentStep: AppTextTaskAssignInputPatient.currentStepIndex)
+                        .padding(.horizontal, AppConstants.TaskAssignmentUI.horizontalPadding)
                     Spacer().frame(height: AppConstants.TaskAssignmentUI.verticalSpacing)
                     
                     VStack(alignment: .leading, spacing: AppConstants.TaskAssignmentUI.verticalSpacing) {
@@ -37,6 +38,12 @@ struct InputPatientData: View {
                             choices: presenter.picName,
                             isSearchEnabled: false,
                             selectedChoice: $presenter.selectedPIC
+                        )
+
+                        ValidationFieldErrorView(
+                            fieldName: ValidationFieldName.userRole.fieldName,
+                            showsErrors: true,
+                            validationManager: presenter.validationManager
                         )
 
                         if presenter.isPatientListEmpty && patientId == nil {
@@ -63,14 +70,7 @@ struct InputPatientData: View {
                             PatientDisplayField()
                                 .environmentObject(presenter)
                             
-                            AppButton(
-                                title: proceedButtonTitle,
-                                rightIcon: presenter.isSavingPatient ? nil : AppIcon.arrowForward,
-                                isEnabled: presenter.isPatientStepReady && !presenter.isSavingPatient
-                            ) {
-                                presenter.newExam()
-                            }
-                            
+
                             Spacer()
                         }
                     }
@@ -94,6 +94,10 @@ struct InputPatientData: View {
                     }
                 }
             }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                patientFooterBar
+            }
+            .scrollDismissesKeyboard(.interactively)
             .loadingOverlay(presenter.isInitialLoading, message: AppTextTaskAssignInputPatient.loadingDataMessage)
             .onAppear {
                 loadTask?.cancel()
@@ -113,6 +117,8 @@ struct InputPatientData: View {
                     if let patientId = patientId, !patientId.isEmpty {
                         presenter.patientSelection = .existing(patientId: patientId)
                         await presenter.getPatientById(patientId: patientId)
+                    } else if presenter.patientSelection?.existingPatientId != nil {
+                        await presenter.handlePatientChoiceChange()
                     }
                 }
             }
@@ -180,10 +186,41 @@ struct InputPatientData: View {
         return AppTextTaskAssignInputPatient.patientNameDescription
     }
 
+    private var patientFooterBar: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(patientFooterHint)
+                .font(AppTypography.p3)
+                .foregroundStyle(AppColors.slate600)
+                .fixedSize(horizontal: false, vertical: true)
+            AppButton(
+                title: proceedButtonTitle,
+                rightIcon: AppIcon.arrowForward,
+                isEnabled: presenter.hasPatientChoice && !presenter.isPatientLoading && !presenter.isInitialLoading,
+                isLoading: presenter.isSavingPatient
+            ) {
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                presenter.newExam()
+            }
+            .accessibilityIdentifier("taskAssignment.continue")
+        }
+        .padding(.horizontal, AppConstants.TaskAssignmentUI.horizontalPadding)
+        .padding(.vertical, 12)
+        .background(AppColors.slate0)
+        .overlay(alignment: .top) { Divider() }
+    }
+
+    private var patientFooterHint: String {
+        if !presenter.hasPatientChoice { return "task_assignment.ux.choose_patient_hint".localized }
+        if presenter.isPatientLoading { return AppTextTaskAssignInputPatient.loadingDataMessage }
+        return presenter.isPatientStepReady
+            ? "task_assignment.ux.patient_ready_hint".localized
+            : "task_assignment.ux.required_fields_hint".localized
+    }
+
     private var proceedButtonTitle: String {
         presenter.isSavingPatient
             ? AppTextTaskAssignInputPatient.savingPatientButtonTitle
-            : AppTextTaskAssignInputPatient.fillSpecimenDetailsButton
+            : "task_assignment.ux.continue_specimen".localized
     }
 
 }

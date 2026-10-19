@@ -51,9 +51,7 @@ struct DateField: View {
     }
 
     private var displayDateText: String {
-        let isPlaceholderDay = Calendar.current.isDate(date, equalTo: Date(), toGranularity: .month)
-            && Calendar.current.isDate(date, equalTo: Date(), toGranularity: .day)
-        return isPlaceholderDay ? placeholder : date.formattedDDMMYYYY()
+        date.formattedDDMMYYYY()
     }
 
     var body: some View {

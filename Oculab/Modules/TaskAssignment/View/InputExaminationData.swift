@@ -19,40 +19,6 @@ struct InputExaminationData: View {
     var body: some View {
         NavigationView {
             ZStack {
-                AppPopup(
-                    image: AppImage.confirm,
-                    title: AppTextTaskAssignInputExam.confirmPopupTitle,
-                    description: AppTextTaskAssignInputExam.examinationDescription(
-                        patientName: presenter.patient.name,
-                        picName: presenter.pic.name
-                    ),
-                    isError: presenter.isError,
-                    errorMessage: presenter.errorMessage,
-                    buttons: [
-                        AppButton(
-                            title: AppTextTaskAssignInputExam.createTaskButton,
-                            colorType: .primary,
-                            size: .large,
-                            isEnabled: !presenter.isSubmittingExamination
-                        ) {
-                            submitTask?.cancel()
-                            submitTask = Task {
-                                await presenter.submitExamination()
-                            }
-                        },
-
-                        AppButton(
-                            title: AppTextTaskAssignInputExam.reviewAgainButton,
-                            colorType: .tertiary,
-                            isEnabled: true
-                        ) {
-                            presenter.hideSubmitPopup()
-                            Logger.info("User returned to examination review", category: .taskAssignment)
-                        }
-                    ],
-                    isVisible: $presenter.isSubmitPopUpVisible
-                )
-
                 VStack(spacing: 0) {
                     ScrollView(showsIndicators: false) {
                         VStack(alignment: .leading, spacing: AppConstants.TaskAssignmentUI.verticalSpacing) {
@@ -92,7 +58,7 @@ struct InputExaminationData: View {
                             }
                             .frame(maxWidth: .infinity)
 
-                            Spacer().frame(height: 88)
+                            Spacer().frame(height: 16)
                         }
                         .padding(.horizontal, AppConstants.TaskAssignmentUI.horizontalPadding)
                     }
@@ -125,10 +91,16 @@ struct InputExaminationData: View {
             .background(AppColors.slate0)
         }
         .navigationBarBackButtonHidden(true)
+        .sheet(isPresented: reviewPresentation) {
+            submissionReview
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+                .interactiveDismissDisabled(presenter.isSubmittingExamination)
+        }
         .alert(
             AppState.error,
             isPresented: Binding(
-                get: { presenter.isError && !presenter.errorMessage.isEmpty },
+                get: { presenter.isError && !presenter.errorMessage.isEmpty && !presenter.isSubmitPopUpVisible },
                 set: { if !$0 {
                     presenter.isError = false
                     presenter.errorMessage = AppValue.empty
@@ -144,6 +116,100 @@ struct InputExaminationData: View {
                 Text(presenter.errorMessage)
             }
         )
+    }
+
+    private var submissionReview: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("task_assignment.ux.review_hint".localized)
+                        .font(AppTypography.p2)
+                        .foregroundStyle(AppColors.slate600)
+                    SpecimenContextSummaryCard(patientName: presenter.patient.name, picName: presenter.pic.name)
+                    reviewRow(AppMedical.Examination.purpose, value: presenter.goalString)
+                    reviewSlide(
+                        title: AppTextTaskAssignInputExam.slide1SectionTitle,
+                        slideID: presenter.examination.slideId,
+                        specimenType: presenter.typeString
+                    )
+                    if presenter.isSlide2Visible {
+                        reviewSlide(
+                            title: AppTextTaskAssignInputExam.slide2SectionTitle,
+                            slideID: presenter.examination2.slideId,
+                            specimenType: presenter.typeString2
+                        )
+                    }
+                    Label("task_assignment.ux.after_create_hint".localized, systemImage: "video")
+                        .font(AppTypography.p3)
+                        .foregroundStyle(AppColors.slate600)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if presenter.isError && !presenter.errorMessage.isEmpty {
+                        Label(presenter.errorMessage, systemImage: "exclamationmark.circle")
+                            .font(AppTypography.p3)
+                            .foregroundStyle(AppColors.red700)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(14)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(AppColors.red50, in: RoundedRectangle(cornerRadius: 12))
+                    }
+                }
+                .padding(20)
+            }
+            .navigationTitle("task_assignment.ux.review_tasks".localized)
+            .navigationBarTitleDisplayMode(.inline)
+            .safeAreaInset(edge: .bottom) {
+                VStack(spacing: 4) {
+                    AppButton(
+                        title: presenter.isSubmittingExamination
+                            ? "task_assignment.ux.creating_tasks".localized
+                            : AppTextTaskAssignInputExam.createTaskButton,
+                        isLoading: presenter.isSubmittingExamination
+                    ) {
+                        submitTask = Task { await presenter.submitExamination() }
+                    }
+                    .accessibilityIdentifier("taskAssignment.confirm")
+                    AppButton(
+                        title: AppTextTaskAssignInputExam.reviewAgainButton,
+                        colorType: .tertiary,
+                        isEnabled: !presenter.isSubmittingExamination
+                    ) {
+                        presenter.hideSubmitPopup()
+                    }
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 12)
+                .background(AppColors.slate0)
+                .overlay(alignment: .top) { Divider() }
+            }
+        }
+    }
+
+    private var reviewPresentation: Binding<Bool> {
+        Binding(
+            get: { presenter.isSubmitPopUpVisible },
+            set: { isPresented in
+                if isPresented {
+                    presenter.isSubmitPopUpVisible = true
+                } else {
+                    presenter.hideSubmitPopup()
+                }
+            }
+        )
+    }
+
+    private func reviewRow(_ title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title).font(AppTypography.p3).foregroundStyle(AppColors.slate600)
+            Text(value).font(AppTypography.s4_1).foregroundStyle(AppColors.slate900)
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    private func reviewSlide(title: String, slideID: String, specimenType: String) -> some View {
+        SpecimenFormSection(title: title) {
+            reviewRow(AppMedical.Examination.slideId, value: slideID.trimmingCharacters(in: .whitespacesAndNewlines))
+            reviewRow(AppMedical.Examination.specimenType, value: specimenType)
+        }
     }
 
     // MARK: - Sections
@@ -249,27 +315,35 @@ struct InputExaminationData: View {
     }
 
     private var specimenFooterBar: some View {
-        HStack(spacing: 12) {
-            AppButton(
-                title: AppAction.back,
-                leftIcon: AppIcon.back,
-                colorType: .tertiary,
-                size: .small,
-                isEnabled: true
-            ) {
-                Router.shared.navigateBack()
+        VStack(alignment: .leading, spacing: 10) {
+            if presenter.hasDuplicateSlideIDs {
+                Label(AppTextTaskAssignInputExam.warningSlideIDsMustBeDifferent, systemImage: "exclamationmark.circle")
+                    .font(AppTypography.p3)
+                    .foregroundStyle(AppColors.red700)
+                    .fixedSize(horizontal: false, vertical: true)
             }
+            HStack(spacing: 12) {
+                AppButton(
+                    title: AppAction.back,
+                    leftIcon: AppIcon.back,
+                    colorType: .tertiary,
+                    size: .small,
+                    isEnabled: true
+                ) {
+                    Router.shared.navigateBack()
+                }
 
-            AppButton(
-                title: AppTextTaskAssignInputExam.createTaskFinalButton,
-                rightIcon: AppIcon.arrowRight,
-                colorType: .primary,
-                size: .large,
-                isEnabled: presenter.isSpecimenStepReady
-            ) {
-                presenter.showSubmitPopup()
+                AppButton(
+                    title: "task_assignment.ux.review_tasks".localized,
+                    rightIcon: AppIcon.arrowRight,
+                    colorType: .primary,
+                    size: .large,
+                    isEnabled: !presenter.isSubmittingExamination && !presenter.isPatientLoading && !presenter.isUserLoading
+                ) {
+                    presenter.showSubmitPopup()
+                }
+                .frame(maxWidth: .infinity)
             }
-            .frame(maxWidth: .infinity)
         }
         .padding(.horizontal, AppConstants.TaskAssignmentUI.horizontalPadding)
         .padding(.vertical, 12)
@@ -328,7 +402,7 @@ private struct SpecimenContextSummaryCard: View {
             Text(value)
                 .font(AppTypography.s4_1)
                 .foregroundColor(AppColors.slate900)
-                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
