@@ -15,6 +15,8 @@ enum PendingUploadState: String, Codable {
 @Model
 final class PendingUpload {
     @Attribute(.unique) var examinationId: String
+    /// Nil on existing installs: never infer an owner from the next login.
+    var ownerUserId: String? = nil
     var patientId: String
     var localFilePath: String
     var slideId: String
@@ -28,6 +30,7 @@ final class PendingUpload {
         patientId: String,
         localFilePath: String,
         slideId: String,
+        ownerUserId: String? = nil,
         state: PendingUploadState = .pending,
         retryCount: Int = 0,
         lastError: String? = nil,
@@ -37,6 +40,7 @@ final class PendingUpload {
         self.patientId = patientId
         self.localFilePath = localFilePath
         self.slideId = slideId
+        self.ownerUserId = ownerUserId?.lowercased()
         self.stateRaw = state.rawValue
         self.retryCount = retryCount
         self.lastError = lastError

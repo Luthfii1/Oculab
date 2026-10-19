@@ -109,12 +109,16 @@ class AuthenticationInteractor: ObservableObject {
             body: UserBody(email: email, password: password)
         )
 
-        // Store credentials in Keychain; non-secret state in UserDefaults.
-        KeychainHelper.set(response.data.accessToken, for: .accessToken)
-        KeychainHelper.set(response.data.refreshToken, for: .refreshToken)
-        UserDefaults.standard.set(true, forKey: UserDefaultType.isUserLoggedIn.rawValue)
-        UserDefaults.standard.set(false, forKey: UserDefaultType.isPinSessionAuthorized.rawValue)
-        UserDefaults.standard.set(response.data.userId, forKey: UserDefaultType.userId.rawValue)
+        // Update the session atomically with respect to queued work on the main actor.
+        await MainActor.run {
+            AuthSessionManager.beginSessionChange()
+            defer { AuthSessionManager.completeSessionChange() }
+            KeychainHelper.set(response.data.accessToken, for: .accessToken)
+            KeychainHelper.set(response.data.refreshToken, for: .refreshToken)
+            UserDefaults.standard.set(true, forKey: UserDefaultType.isUserLoggedIn.rawValue)
+            UserDefaults.standard.set(false, forKey: UserDefaultType.isPinSessionAuthorized.rawValue)
+            UserDefaults.standard.set(response.data.userId, forKey: UserDefaultType.userId.rawValue)
+        }
 
         return response.data
     }
@@ -185,8 +189,9 @@ class AuthenticationInteractor: ObservableObject {
         await updateUserSwiftData(data: user)
     }
 
-    func clearLocalUserData() async {
-        await removeUserSwiftData()
+    @MainActor
+    func clearLocalUserData() {
+        removeUserSwiftData()
     }
 
     private func authorizationHeaders() throws -> [String: String] {
@@ -269,21 +274,17 @@ class AuthenticationInteractor: ObservableObject {
         }
     }
 
-    private func removeUserSwiftData() async {
-        await MainActor.run {
-            let fetchDescriptor = FetchDescriptor<User>()
-
-            do {
-                let allUsers = try modelContext.fetch(fetchDescriptor)
-
-                for user in allUsers {
-                    modelContext.delete(user)
-                }
-
-                try modelContext.save()
-            } catch {
-                Logger.error("Failed to delete all users: \(error.localizedDescription)", category: .authentication)
+    @MainActor
+    private func removeUserSwiftData() {
+        let fetchDescriptor = FetchDescriptor<User>()
+        do {
+            let allUsers = try modelContext.fetch(fetchDescriptor)
+            for user in allUsers {
+                modelContext.delete(user)
             }
+            try modelContext.save()
+        } catch {
+            Logger.error("Failed to delete all users: \(error.localizedDescription)", category: .authentication)
         }
     }
     

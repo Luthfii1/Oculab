@@ -951,3 +951,13 @@
 "common.step_progress" = "Step %d of %d";
 "task_assignment.ux.correct_patient_hint" = "The saved patient details need attention. Correct them before continuing.";
 "task_assignment.ux.edit_patient" = "Correct patient details";
+
+// Local video upload before analysis admission
+"examination.progress.upload_waiting_title" = "Waiting to upload";
+"examination.progress.upload_needs_attention_title" = "Video not yet sent";
+"examination.progress.upload_saved_hint" = "Video saved on this device. Keep Oculab open and signed in. We’ll upload when connected, then start analysis.";
+"examination.progress.upload_retry_hint" = "Video saved on this device. Check your connection, then retry the upload.";
+"examination.progress.choose_video_again" = "Choose video again";
+"examination.upload_queue_sign_in_required" = "Please sign in before saving a video for upload.";
+"examination.upload_queue_different_owner" = "This examination has a video saved by another account. Sign in with that account to continue its upload.";
+"examination.upload_queue_legacy_owner" = "An older saved video has no recorded account owner. It has been kept on this device without uploading. Contact support to recover it.";

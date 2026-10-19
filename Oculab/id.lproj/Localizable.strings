@@ -970,3 +970,13 @@
 "common.step_progress" = "Langkah %d dari %d";
 "task_assignment.ux.correct_patient_hint" = "Data pasien tersimpan perlu diperiksa. Perbaiki data sebelum melanjutkan.";
 "task_assignment.ux.edit_patient" = "Perbaiki data pasien";
+
+// Local video upload before analysis admission
+"examination.progress.upload_waiting_title" = "Menunggu upload";
+"examination.progress.upload_needs_attention_title" = "Video belum terkirim";
+"examination.progress.upload_saved_hint" = "Video tersimpan di perangkat ini. Tetap buka Oculab dan masuk dengan akun ini. Upload dilanjutkan saat terhubung, lalu analisis dimulai.";
+"examination.progress.upload_retry_hint" = "Video masih tersimpan di perangkat ini. Periksa koneksi, lalu coba unggah kembali.";
+"examination.progress.choose_video_again" = "Pilih video kembali";
+"examination.upload_queue_sign_in_required" = "Silakan masuk sebelum menyimpan video untuk diunggah.";
+"examination.upload_queue_different_owner" = "Pemeriksaan ini memiliki video yang disimpan oleh akun lain. Masuk dengan akun tersebut untuk melanjutkan upload.";
+"examination.upload_queue_legacy_owner" = "Video lama belum memiliki informasi akun pemilik. Video tetap tersimpan di perangkat ini dan tidak diunggah. Hubungi dukungan untuk memulihkannya.";

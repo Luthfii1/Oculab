@@ -18,6 +18,7 @@ final class AnalysisProgressTracker: ObservableObject {
     @Published var isAnalysisQueued: Bool = false
 
     private let progressInteractor: AnalysisProgressInteractor
+    private let hasPendingUpload: @MainActor (String) -> Bool
     private var progressObserver: NSObjectProtocol?
     private var trackingTask: Task<Void, Never>?
     private var trackedExaminationId: String?
@@ -32,8 +33,12 @@ final class AnalysisProgressTracker: ObservableObject {
     var onFailed: ((String, String) -> Void)?
     var onProgressChange: (() -> Void)?
 
-    init(progressInteractor: AnalysisProgressInteractor = AnalysisProgressInteractor()) {
+    init(
+        progressInteractor: AnalysisProgressInteractor = AnalysisProgressInteractor(),
+        hasPendingUpload: @escaping @MainActor (String) -> Bool = { VideoUploadQueueService.shared.hasPendingUpload(for: $0) }
+    ) {
         self.progressInteractor = progressInteractor
+        self.hasPendingUpload = hasPendingUpload
     }
 
     func beginTracking(examinationId: String) {
@@ -93,6 +98,9 @@ final class AnalysisProgressTracker: ObservableObject {
     }
 
     func applyProgressUpdate(_ update: AnalysisProgressUpdate, examinationId: String) {
+        // A cached/socket failure can belong to the previous analysis attempt.
+        // Reconcile authoritative exam status while the new video awaits admission.
+        guard !hasPendingUpload(examinationId) else { return }
         if update.isFailed {
             markFailed(message: update.message, examinationId: examinationId)
             return
@@ -135,6 +143,11 @@ final class AnalysisProgressTracker: ObservableObject {
         isTracked: Bool
     ) {
         guard !hasAnalysisFailed else { return }
+        if hasPendingUpload(examinationId), status != .NEEDVALIDATION, status != .FINISHED {
+            analysisTrackingStartedAt = Date()
+            lastProgressChangeAt = Date()
+            return
+        }
 
         if isTracked, status == .NOTSTARTED {
             markFailed(message: AppTextExamProgress.analysisFailedDefault, examinationId: examinationId)
@@ -161,9 +174,11 @@ final class AnalysisProgressTracker: ObservableObject {
     }
 
     private func loadCachedProgress(examinationId: String) async {
+        let beganBeforeAdmission = hasPendingUpload(examinationId)
         guard let cached = await progressInteractor.fetchProgress(examinationId: examinationId) else {
             return
         }
+        guard !beganBeforeAdmission else { return }
         applyProgressUpdate(cached, examinationId: examinationId)
     }
 

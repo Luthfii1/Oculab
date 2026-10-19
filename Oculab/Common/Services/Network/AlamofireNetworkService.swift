@@ -140,33 +140,44 @@ class AlamofireNetworkService: NetworkServiceProtocol {
         headers: [String: String]?,
         perform: ([String: String]?) async throws -> APIResponse<T>
     ) async throws -> APIResponse<T> {
-        let initialHeaders = try resolveHeaders(for: endpoint, headers: headers)
+        let (initialHeaders, generation) = try await MainActor.run {
+            (try resolveHeaders(for: endpoint, headers: headers), AuthSessionManager.authenticationSessionGeneration)
+        }
+        try Task.checkCancellation()
 
         do {
             return try await perform(initialHeaders)
         } catch NetworkError.unauthorized {
+            try Task.checkCancellation()
+            guard await MainActor.run(body: { generation == AuthSessionManager.authenticationSessionGeneration }) else {
+                throw CancellationError()
+            }
             // A rejected login or refresh request must not invalidate the session here.
             // The caller of the refresh handles its authentication failure once.
             guard AuthSessionManager.requiresAuthentication(for: endpoint) else {
                 throw NetworkError.unauthorized(endpoint: endpoint)
             }
             guard AuthSessionManager.shouldAttemptTokenRefresh(for: endpoint) else {
-                await MainActor.run { AuthSessionManager.invalidateSession() }
+                try await MainActor.run { try AuthSessionManager.invalidateSession(ifGeneration: generation) }
                 throw NetworkError.unauthorized(endpoint: endpoint)
             }
 
             do {
-                try await AuthTokenRefresher.shared.refreshAccessToken(using: self)
+                try await AuthTokenRefresher.shared.refreshAccessToken(using: self, expectedGeneration: generation)
             } catch NetworkError.unauthorized {
-                await MainActor.run { AuthSessionManager.invalidateSession() }
+                try await MainActor.run { try AuthSessionManager.invalidateSession(ifGeneration: generation) }
                 throw NetworkError.unauthorized(endpoint: endpoint)
             }
 
-            let refreshedHeaders = try AuthSessionManager.headersByReplacingAuthorization(headers)
+            try Task.checkCancellation()
+            let refreshedHeaders = try await MainActor.run {
+                guard generation == AuthSessionManager.authenticationSessionGeneration else { throw CancellationError() }
+                return try AuthSessionManager.headersByReplacingAuthorization(headers)
+            }
             do {
                 return try await perform(refreshedHeaders)
             } catch NetworkError.unauthorized {
-                await MainActor.run { AuthSessionManager.invalidateSession() }
+                try await MainActor.run { try AuthSessionManager.invalidateSession(ifGeneration: generation) }
                 throw NetworkError.unauthorized(endpoint: endpoint)
             }
         }
