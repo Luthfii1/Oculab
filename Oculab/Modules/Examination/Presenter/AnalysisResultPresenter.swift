@@ -82,6 +82,7 @@ class AnalysisResultPresenter: ObservableObject {
     @Published private(set) var localUploadState: PendingUploadState?
     @Published private(set) var localUploadError: String?
     @Published private(set) var localUploadNeedsVideo = false
+    @Published private(set) var localUploadRetryAt: Date?
 
     // MARK: - UI State Properties
     @Published var selectedTBGrade: String = AppValue.empty {
@@ -200,6 +201,7 @@ class AnalysisResultPresenter: ObservableObject {
     }
 
     var shouldShowAnalyzingUI: Bool {
+        if shouldShowResultsUI { return false }
         if localUploadState != nil || isAwaitingAdmissionStatus { return true }
 
         if hasAnalysisFailed {
@@ -354,9 +356,12 @@ extension AnalysisResultPresenter {
         let status = examinationResult?.statusExamination
         let hasResults = status == .NEEDVALIDATION || status == .FINISHED
         let previousState = localUploadState
-        localUploadState = hasResults ? nil : uploadQueue.uploadState(for: examinationId)
+        // A completed examination may belong to another submission. Only the
+        // queue's exact receipt reconciliation can release this saved video.
+        localUploadState = uploadQueue.uploadState(for: examinationId)
         localUploadError = localUploadState == nil ? nil : uploadQueue.lastUploadError(for: examinationId)
-        localUploadNeedsVideo = localUploadState == .failed && !uploadQueue.hasSavedVideo(for: examinationId)
+        localUploadNeedsVideo = localUploadState == .failed && (!uploadQueue.hasSavedVideo(for: examinationId) || uploadQueue.requiresReplacementVideo(for: examinationId))
+        localUploadRetryAt = localUploadState == nil ? nil : uploadQueue.nextAttemptAt(for: examinationId)
         if (previousState == nil) != (localUploadState == nil) {
             uploadPhaseRevision = UUID()
             if previousState != nil, localUploadState == nil, !hasResults {
@@ -838,6 +843,7 @@ extension AnalysisResultPresenter {
         localUploadState = nil
         localUploadError = nil
         localUploadNeedsVideo = false
+        localUploadRetryAt = nil
         uploadPhaseRevision = UUID()
         examinationResult = nil
         errorMessage = nil

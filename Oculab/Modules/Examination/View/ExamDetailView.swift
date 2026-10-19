@@ -223,16 +223,21 @@ struct ExamDetailView: View {
                     .foregroundStyle(AppColors.slate600)
                     .fixedSize(horizontal: false, vertical: true)
 
-                    if isFailed, let error = uploadQueue.lastUploadError(for: normalizedExamId) {
+                    if let error = uploadQueue.lastUploadError(for: normalizedExamId) {
                         Text(error)
                             .font(AppTypography.p4)
                             .foregroundStyle(AppColors.slate400)
                             .fixedSize(horizontal: false, vertical: true)
                     }
+                    if let retryAt = uploadQueue.nextAttemptAt(for: normalizedExamId) {
+                        Text(String(format: "examination.upload_retry_at".localized, retryAt.formatted(date: .omitted, time: .shortened)))
+                            .font(AppTypography.p4)
+                            .foregroundStyle(AppColors.slate400)
+                    }
                 }
             }
 
-            if isFailed {
+            if isFailed && !uploadQueue.requiresReplacementVideo(for: normalizedExamId) {
                 AppButton(
                     title: AppAction.retry,
                     colorType: .secondary,

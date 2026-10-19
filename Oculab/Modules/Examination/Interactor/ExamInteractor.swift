@@ -16,6 +16,7 @@ class ExamInteractor {
         static let getExaminationById = API.BE + "/examination/get-examination-by-id/"
         static let getPatientById = API.BE + "/patient/get-patient-by-id/"
         static let forwardVideoToML = API.BE + "/examination/forward-video-to-ml/"
+        static let analysisSubmissions = API.BE + "/examination/analysis-submissions/"
         static let getAdminExaminationDetail = API.BE + "/examination/get-examination-detail-admin/"
         static let adminUpdateObservation = API.BE + "/examination/observation/"
         static let facilityExaminations = API.BE + "/examination/facility-examinations"
@@ -74,12 +75,41 @@ class ExamInteractor {
 
         return try await networkService.multipartFile(
             urlString: urlString,
-            headers: nil,
+            headers: UploadRequestContext.submissionId.map { id in
+                ["Idempotency-Key": id, "X-Video-SHA256": UploadRequestContext.videoSHA256 ?? ""]
+            },
             fileURL: videoFileURL,
             fieldName: "video",
             fileName: videoFileURL.lastPathComponent,
             mimeType: nil
         )
+    }
+
+    /// Calls the original entrypoint so existing interactor overrides keep working.
+    func submitQueuedExamination(
+        videoFileURL: URL, examinationId: String, patientId: String,
+        submissionId: String, videoSHA256: String
+    ) async throws -> APIResponse<ForwardVideoToMLData> {
+        try await UploadRequestContext.$preservesHTTPMetadata.withValue(true) {
+            try await UploadRequestContext.$submissionId.withValue(submissionId) {
+                try await UploadRequestContext.$videoSHA256.withValue(videoSHA256) {
+                    try await self.submitExamination(videoFileURL: videoFileURL, examinationId: examinationId, patientId: patientId)
+                }
+            }
+        }
+    }
+
+    func fetchSubmissionReceipt(examinationId: String, submissionId: String) async throws -> AnalysisSubmissionReceipt {
+        try await UploadRequestContext.$preservesHTTPMetadata.withValue(true) {
+            let response: APIResponse<AnalysisSubmissionReceipt> = try await networkService.get(
+                urlString: APIEndpoints.analysisSubmissions + examinationId.lowercased() + "/" + submissionId.lowercased(),
+                headers: nil
+            )
+            guard (response.httpStatusCode ?? response.code) == 200 else { throw UploadProtocolFailure() }
+            var receipt = response.data
+            receipt.retryAfter = response.retryAfter
+            return receipt
+        }
     }
 
     func adminUpdateObservation(
@@ -160,4 +190,25 @@ struct ForwardVideoToMLData: Decodable {
     let examinationId: String?
     let statusExamination: StatusType?
     let statusML: String?
+    var submissionId: String?
+    var attemptId: String?
+    var state: String?
+    var submissionReceiptVersion: Int?
+}
+
+struct AnalysisSubmissionReceipt: Decodable {
+    let submissionId: String
+    let examinationId: String
+    let state: String
+    let attemptId: String?
+    let submissionReceiptVersion: Int
+    var retryAfter: Date? = nil
+
+    func matches(examinationId: String, submissionId: String) -> Bool {
+        self.examinationId.lowercased() == examinationId.lowercased()
+            && self.submissionId.lowercased() == submissionId.lowercased()
+            && submissionReceiptVersion == 1
+            && ["not_found", "pending", "accepted", "retryable"].contains(state)
+            && (state == "not_found" || attemptId.flatMap(UUID.init(uuidString:)) != nil)
+    }
 }

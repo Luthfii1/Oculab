@@ -961,3 +961,12 @@
 "examination.upload_queue_sign_in_required" = "Please sign in before saving a video for upload.";
 "examination.upload_queue_different_owner" = "This examination has a video saved by another account. Sign in with that account to continue its upload.";
 "examination.upload_queue_legacy_owner" = "An older saved video has no recorded account owner. It has been kept on this device without uploading. Contact support to recover it.";
+"examination.upload_receipt_unavailable" = "We cannot confirm delivery with this server version. Your video is saved. Contact support before sending it again.";
+"examination.upload_confirming_receipt" = "Your video is saved. We’re checking whether the service received it before sending it again.";
+"examination.upload_service_busy" = "The analysis service is busy or restarting. Your video is saved; we’ll try again automatically.";
+"examination.upload_conflict" = "This video cannot replace an existing analysis. Your saved video has been kept. Check the examination or contact support.";
+"examination.upload_video_rejected" = "This video could not be accepted. Choose a supported video and try again; the original stays saved until you replace it.";
+"examination.upload_permission_rejected" = "This upload could not be accepted. Check your access and examination details before trying again.";
+"examination.upload_retry_scheduled_title" = "Video saved — retry scheduled";
+"examination.upload_retry_at" = "Next delivery check: %@. Keep Oculab open and signed in.";
+"examination.upload_retained_with_results" = "A video is still saved on this device without a confirmed delivery receipt. The current examination results are shown below; they do not confirm delivery of that video.";

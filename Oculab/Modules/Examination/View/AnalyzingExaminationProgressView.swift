@@ -36,7 +36,7 @@ struct AnalyzingExaminationProgressView: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 16) {
                     if let state = presenter.localUploadState {
-                        LocalUploadProgressCard(state: state, errorMessage: presenter.localUploadError, needsVideo: presenter.localUploadNeedsVideo)
+                        LocalUploadProgressCard(state: state, errorMessage: presenter.localUploadError, needsVideo: presenter.localUploadNeedsVideo, retryAt: presenter.localUploadRetryAt)
                     } else if presenter.hasAnalysisFailed {
                         failureHeroCard
                         failureInstructionsCard

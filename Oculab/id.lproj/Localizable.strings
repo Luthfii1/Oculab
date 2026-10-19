@@ -980,3 +980,12 @@
 "examination.upload_queue_sign_in_required" = "Silakan masuk sebelum menyimpan video untuk diunggah.";
 "examination.upload_queue_different_owner" = "Pemeriksaan ini memiliki video yang disimpan oleh akun lain. Masuk dengan akun tersebut untuk melanjutkan upload.";
 "examination.upload_queue_legacy_owner" = "Video lama belum memiliki informasi akun pemilik. Video tetap tersimpan di perangkat ini dan tidak diunggah. Hubungi dukungan untuk memulihkannya.";
+"examination.upload_receipt_unavailable" = "Penerimaan video belum dapat dikonfirmasi pada versi server ini. Video tetap tersimpan. Hubungi dukungan sebelum mengirim ulang.";
+"examination.upload_confirming_receipt" = "Video tetap tersimpan. Kami memeriksa apakah layanan sudah menerimanya sebelum mengirim ulang.";
+"examination.upload_service_busy" = "Layanan analisis sedang sibuk atau dimulai ulang. Video tetap tersimpan dan akan dicoba lagi otomatis.";
+"examination.upload_conflict" = "Video ini tidak dapat menggantikan analisis yang sudah ada. Video tetap tersimpan. Periksa pemeriksaan atau hubungi dukungan.";
+"examination.upload_video_rejected" = "Video belum dapat diterima. Pilih video dengan format yang didukung, lalu coba lagi. Video asli tetap tersimpan hingga diganti.";
+"examination.upload_permission_rejected" = "Upload belum dapat diterima. Periksa hak akses dan data pemeriksaan sebelum mencoba kembali.";
+"examination.upload_retry_scheduled_title" = "Video tersimpan — percobaan terjadwal";
+"examination.upload_retry_at" = "Pemeriksaan pengiriman berikutnya: %@. Tetap buka Oculab dan masuk dengan akun ini.";
+"examination.upload_retained_with_results" = "Ada video yang masih tersimpan di perangkat tanpa konfirmasi penerimaan. Hasil pemeriksaan saat ini ditampilkan di bawah; hasil tersebut bukan konfirmasi bahwa video ini sudah diterima.";

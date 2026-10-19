@@ -195,8 +195,31 @@ class AlamofireNetworkService: NetworkServiceProtocol {
         let dataResponse = await request.serializingData().response
         try Task.checkCancellation()
 
+        let statusCode = dataResponse.response?.statusCode
+        // DataResponseSerializer rejects empty bodies outside 204/205. A complete
+        // HTTP rejection still carries policy even when there is no JSON body.
+        // Genuine connection/task failures remain ambiguous transport failures.
         if let error = dataResponse.error {
             if error.isExplicitlyCancelledError { throw CancellationError() }
+            if !error.isResponseSerializationError {
+                if let underlying = error.underlyingError { throw underlying }
+                throw NetworkError.networkError(error.localizedDescription, endpoint: endpoint)
+            }
+        }
+        if UploadRequestContext.preservesHTTPMetadata, let statusCode, !(200...299).contains(statusCode) {
+            if statusCode == 401 { throw NetworkError.unauthorized(endpoint: endpoint) }
+            let envelope = try? JSONDecoder().decode(APIResponse<ApiErrorData>.self, from: dataResponse.data ?? Data())
+            let underlying: NetworkError = envelope.map { .apiError($0, endpoint: endpoint) }
+                ?? .networkError("Request failed (\(statusCode))", endpoint: endpoint)
+            throw UploadHTTPFailure(
+                statusCode: statusCode,
+                retryAfter: UploadHTTPFailure.retryDate(dataResponse.response?.value(forHTTPHeaderField: "Retry-After")),
+                underlying: underlying
+            )
+        }
+
+        if let error = dataResponse.error {
+            if UploadRequestContext.preservesHTTPMetadata { throw UploadProtocolFailure() }
             if let underlying = error.underlyingError { throw underlying }
             throw NetworkError.networkError(error.localizedDescription, endpoint: endpoint)
         }
@@ -205,8 +228,6 @@ class AlamofireNetworkService: NetworkServiceProtocol {
             throw NetworkError.networkError("No data received from server", endpoint: endpoint)
         }
 
-        let statusCode = dataResponse.response?.statusCode
-
         #if DEBUG
         if let statusCode {
             print("DEBUG: API Endpoint: \(endpoint)")
@@ -214,6 +235,10 @@ class AlamofireNetworkService: NetworkServiceProtocol {
         }
         #endif
 
+        if UploadRequestContext.preservesHTTPMetadata,
+           let statusCode, (200...299).contains(statusCode), isNonJSONResponse(data) {
+            throw UploadProtocolFailure()
+        }
         try validateHTTPResponse(data: data, statusCode: statusCode, endpoint: endpoint)
 
         let decoder = JSONDecoder()
@@ -230,7 +255,11 @@ class AlamofireNetworkService: NetworkServiceProtocol {
         }
 
         do {
-            let decodedResponse = try decoder.decode(APIResponse<T>.self, from: data)
+            var decodedResponse = try decoder.decode(APIResponse<T>.self, from: data)
+            if UploadRequestContext.preservesHTTPMetadata {
+                decodedResponse.retryAfter = UploadHTTPFailure.retryDate(dataResponse.response?.value(forHTTPHeaderField: "Retry-After"))
+                decodedResponse.httpStatusCode = statusCode
+            }
             if decodedResponse.status == StatusResponseType.ERROR.rawValue {
                 throw NetworkError.networkError(decodedResponse.message, endpoint: endpoint)
             }
@@ -238,6 +267,7 @@ class AlamofireNetworkService: NetworkServiceProtocol {
         } catch let decodingError as NetworkError {
             throw decodingError
         } catch {
+            if UploadRequestContext.preservesHTTPMetadata { throw UploadProtocolFailure() }
             #if DEBUG
             print("DEBUG: Failed to decode as success response: \(error)")
             #endif

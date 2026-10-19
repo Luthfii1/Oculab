@@ -29,13 +29,28 @@ struct AnalysisResultView: View {
                 )
                 .padding(.vertical, Decimal.d16)
 
-                if presenter.localUploadState != nil || presenter.isAwaitingAdmissionStatus || (presenter.examinationResult != nil && presenter.shouldShowAnalyzingUI) {
+                if !presenter.shouldShowResultsUI && (presenter.localUploadState != nil || presenter.isAwaitingAdmissionStatus || (presenter.examinationResult != nil && presenter.shouldShowAnalyzingUI)) {
                     AnalyzingExaminationProgressView(examinationId: examinationId)
                         .environmentObject(presenter)
                 } else if let examination = presenter.examinationResult {
                     if presenter.shouldShowResultsUI {
                         ScrollView(showsIndicators: false) {
                             VStack(alignment: .leading, spacing: Decimal.d24) {
+                                if presenter.localUploadState != nil {
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        Text("examination.upload_retained_with_results".localized)
+                                            .font(AppTypography.p3)
+                                            .foregroundStyle(AppColors.slate600)
+                                        if let message = presenter.localUploadError {
+                                            Text(message).font(AppTypography.p4).foregroundStyle(AppColors.slate500)
+                                        }
+                                    }
+                                    .padding(12)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .background(AppColors.purple50)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .padding(.horizontal, Decimal.d20)
+                                }
                                 if let errorMessage = presenter.errorMessage {
                                     Text(errorMessage)
                                         .font(AppTypography.p3)

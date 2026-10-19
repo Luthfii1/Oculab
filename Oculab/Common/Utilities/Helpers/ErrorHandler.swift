@@ -23,6 +23,7 @@ class ErrorHandler: ErrorHandlerProtocol {
     private init() {}
     
     func handleError(_ error: Error) -> String {
+        if let failure = error as? UploadHTTPFailure { return handleError(failure.underlying) }
         let errorMessage = mapErrorToUserMessage(error)
         logError(error, context: "User Error")
         return errorMessage
@@ -66,6 +67,9 @@ class ErrorHandler: ErrorHandlerProtocol {
     }
     
     func shouldShowRetryOption(for error: Error) -> Bool {
+        if let failure = error as? UploadHTTPFailure {
+            return failure.statusCode == 429 || failure.statusCode >= 500
+        }
         switch error {
         case let NetworkError.networkError(message, _):
             // Show retry for network issues but not for retry exhaustion
@@ -91,6 +95,9 @@ class ErrorHandler: ErrorHandlerProtocol {
     }
     
     func getRetryDelay(for error: Error) -> TimeInterval? {
+        if let failure = error as? UploadHTTPFailure {
+            return failure.retryAfter.map { max(0, $0.timeIntervalSinceNow) } ?? 15
+        }
         switch error {
         case let NetworkError.networkError(message, _):
             if message.contains("Server error") {
@@ -110,6 +117,7 @@ class ErrorHandler: ErrorHandlerProtocol {
     }
     
     private func mapErrorToUserMessage(_ error: Error) -> String {
+        if let failure = error as? UploadHTTPFailure { return mapErrorToUserMessage(failure.underlying) }
         switch error {
         case let NetworkError.apiError(apiResponse, _):
             return apiResponse.data.description.isEmpty ? 
