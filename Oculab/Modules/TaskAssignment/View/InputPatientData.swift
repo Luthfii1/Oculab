@@ -75,6 +75,7 @@ struct InputPatientData: View {
                         }
                     }
                     .padding(.horizontal, AppConstants.TaskAssignmentUI.horizontalPadding)
+                    .disabled(presenter.isSavingPatient)
                 }
                 .navigationTitle(AppTextTaskAssignInputPatient.navigationTitle)
                 .navigationBarTitleDisplayMode(.inline)
@@ -82,6 +83,7 @@ struct InputPatientData: View {
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: {
+                            presenter.cancelPendingPatientSave()
                             Router.shared.endTaskAssignmentFlow()
                             Router.shared.navigateBack()
                         }) {
@@ -115,6 +117,7 @@ struct InputPatientData: View {
                 }
             }
             .onDisappear {
+                presenter.cancelPendingPatientSave()
                 loadTask?.cancel()
                 patientChangeTask?.cancel()
                 picChangeTask?.cancel()

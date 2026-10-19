@@ -562,3 +562,363 @@ private final class StubURLProtocol: URLProtocol {
 
     override func stopLoading() {}
 }
+
+final class TaskAssignmentRepositoryTests: XCTestCase {
+    func testExistingLookupFailureNeverCreatesAnotherPatient() async throws {
+        let patientID = UUID().uuidString.lowercased()
+        let errors: [Error] = [
+            URLError(.timedOut), URLError(.cancelled), CancellationError(), NetworkError.unauthorized(),
+            NetworkError.apiError(APIResponse(
+                status: "error", code: 404, message: "Missing",
+                data: ApiErrorData(errorType: "RESOURCE_NOT_FOUND", description: "Missing patient")
+            )),
+        ]
+        for error in errors {
+            let creates = RequestLog()
+            let interactor = TaskAssignmentStubInteractor(
+                lookup: { _ in throw error },
+                create: { patient in creates.append("created"); return patient }
+            )
+            let repository = TaskAssignmentRepository(interactor: interactor)
+            do {
+                _ = try await repository.ensurePatientOnServer(draft: Self.patient(), preferredId: patientID)
+                XCTFail("Existing-patient lookup errors must propagate")
+            } catch {}
+            XCTAssertTrue(creates.values.isEmpty)
+        }
+    }
+
+    func testExistingPatientReturnsCanonicalRecordWithoutCreation() async throws {
+        let patientID = UUID().uuidString.lowercased()
+        let canonical = Self.patient(id: patientID, name: "Canonical")
+        let creates = RequestLog()
+        let interactor = TaskAssignmentStubInteractor(
+            lookup: { id in XCTAssertEqual(id, patientID); return canonical },
+            create: { patient in creates.append("created"); return patient }
+        )
+        let result = try await TaskAssignmentRepository(interactor: interactor).ensurePatientOnServer(
+            draft: Self.patient(), preferredId: " \(patientID) "
+        )
+        XCTAssertTrue(result === canonical)
+        XCTAssertTrue(creates.values.isEmpty)
+    }
+
+    func testNewPatientIsCreatedOnce() async throws {
+        let creates = RequestLog()
+        let draft = Self.patient()
+        let interactor = TaskAssignmentStubInteractor(create: { patient in
+            creates.append(patient.name)
+            return patient
+        })
+        let result = try await TaskAssignmentRepository(interactor: interactor).ensurePatientOnServer(
+            draft: draft, preferredId: nil
+        )
+        XCTAssertTrue(result === draft)
+        XCTAssertEqual(creates.values, [draft.name])
+    }
+
+    func testExistingLegacyIDIsLookedUpWithoutCreatingReplacement() async throws {
+        let legacyID = "507f1f77bcf86cd799439011"
+        let creates = RequestLog()
+        let lookups = RequestLog()
+        let interactor = TaskAssignmentStubInteractor(
+            lookup: { id in lookups.append(id); return Self.patient(id: id) },
+            create: { patient in creates.append("created"); return patient }
+        )
+        let result = try await TaskAssignmentRepository(interactor: interactor).ensurePatientOnServer(
+            draft: Self.patient(), preferredId: legacyID
+        )
+        XCTAssertEqual(result.id, legacyID)
+        XCTAssertEqual(lookups.values, [legacyID])
+        XCTAssertTrue(creates.values.isEmpty)
+    }
+
+    func testInvalidNewPatientDoesNotMutateDraftOrSendRequest() async throws {
+        for name in ["", "   ", UUID().uuidString] {
+            let creates = RequestLog()
+            let draft = Self.patient(name: name)
+            let interactor = TaskAssignmentStubInteractor(create: { patient in
+                creates.append(patient.name)
+                return patient
+            })
+            do {
+                _ = try await TaskAssignmentRepository(interactor: interactor).ensurePatientOnServer(
+                    draft: draft, preferredId: nil
+                )
+                XCTFail("Invalid draft should be rejected")
+            } catch TaskAssignmentFlowError.patientDataIncomplete {}
+            XCTAssertEqual(draft.name, name)
+            XCTAssertTrue(creates.values.isEmpty)
+        }
+    }
+
+    fileprivate static func patient(id: String = "", name: String = "Test patient") -> Patient {
+        Patient(id: id, name: name, NIK: "1234567890123456", DoB: Date(timeIntervalSince1970: 0), sex: .MALE)
+    }
+}
+
+final class TaskAssignmentSelectionTests: XCTestCase {
+    @MainActor
+    func testLatePatientResponseCannotOverwriteNewSelection() async throws {
+        await assertStaleLookupIsIgnored(fails: false)
+    }
+
+    @MainActor
+    func testLatePatientFailureCannotClearNewSelection() async throws {
+        await assertStaleLookupIsIgnored(fails: true)
+    }
+
+    @MainActor
+    private func assertStaleLookupIsIgnored(fails: Bool) async {
+        let oldID = UUID().uuidString.lowercased()
+        let newID = UUID().uuidString.lowercased()
+        let started = expectation(description: "Old lookup started")
+        let gate = AsyncGate()
+        let interactor = TaskAssignmentStubInteractor(lookup: { id in
+            if id == oldID {
+                started.fulfill()
+                await gate.wait()
+                if fails { throw URLError(.timedOut) }
+            }
+            return TaskAssignmentRepositoryTests.patient(id: id, name: id == oldID ? "Old" : "New")
+        })
+        let coordinator = TaskAssignmentFlowCoordinator(repository: TaskAssignmentRepository(interactor: interactor))
+        coordinator.patientSelection = .existing(patientId: oldID)
+        let oldLookup = Task { await coordinator.handlePatientChoiceChange() }
+        await fulfillment(of: [started], timeout: 2)
+        coordinator.patientSelection = .existing(patientId: newID)
+        await coordinator.handlePatientChoiceChange()
+        await gate.open()
+        await oldLookup.value
+        XCTAssertEqual(coordinator.patient.id, newID)
+        XCTAssertEqual(coordinator.savedPatientId, newID)
+        XCTAssertEqual(coordinator.patientSelection, .existing(patientId: newID))
+        XCTAssertFalse(coordinator.isError)
+        XCTAssertFalse(coordinator.isPatientLoading)
+    }
+
+    @MainActor
+    func testClearingSelectionInvalidatesPendingLookupAndDraft() async throws {
+        let id = UUID().uuidString.lowercased()
+        let started = expectation(description: "Lookup started")
+        let gate = AsyncGate()
+        let interactor = TaskAssignmentStubInteractor(lookup: { id in
+            started.fulfill()
+            await gate.wait()
+            return TaskAssignmentRepositoryTests.patient(id: id)
+        })
+        let coordinator = TaskAssignmentFlowCoordinator(repository: TaskAssignmentRepository(interactor: interactor))
+        coordinator.patientSelection = .existing(patientId: id)
+        let lookup = Task { await coordinator.handlePatientChoiceChange() }
+        await fulfillment(of: [started], timeout: 2)
+        coordinator.updatePatientChoice("")
+        XCTAssertFalse(coordinator.isPatientLoading)
+        await gate.open()
+        await lookup.value
+        XCTAssertNil(coordinator.patientSelection)
+        XCTAssertTrue(coordinator.patient.id.isEmpty)
+        XCTAssertTrue(coordinator.patient.name.isEmpty)
+        XCTAssertTrue(coordinator.savedPatientId.isEmpty)
+        XCTAssertFalse(coordinator.patientFound)
+    }
+
+    @MainActor
+    func testCancelledLookupDoesNotPopulatePatient() async throws {
+        let started = expectation(description: "Lookup started")
+        let gate = AsyncGate()
+        let interactor = TaskAssignmentStubInteractor(lookup: { id in
+            started.fulfill()
+            await gate.wait()
+            return TaskAssignmentRepositoryTests.patient(id: id)
+        })
+        let coordinator = TaskAssignmentFlowCoordinator(repository: TaskAssignmentRepository(interactor: interactor))
+        coordinator.patientSelection = .existing(patientId: UUID().uuidString.lowercased())
+        let lookup = Task { await coordinator.handlePatientChoiceChange() }
+        await fulfillment(of: [started], timeout: 2)
+        lookup.cancel()
+        await gate.open()
+        await lookup.value
+        XCTAssertTrue(coordinator.patient.id.isEmpty)
+        XCTAssertFalse(coordinator.patientFound)
+        XCTAssertFalse(coordinator.isPatientLoading)
+        XCTAssertFalse(coordinator.isError)
+    }
+
+    @MainActor
+    func testChangedPatientCannotProceedWithPreviousPatientData() async throws {
+        let oldID = UUID().uuidString.lowercased()
+        let interactor = TaskAssignmentStubInteractor(lookup: { id in
+            TaskAssignmentRepositoryTests.patient(id: id)
+        })
+        let coordinator = TaskAssignmentFlowCoordinator(repository: TaskAssignmentRepository(interactor: interactor))
+        coordinator.selectedPIC = "selected-pic"
+        coordinator.patientSelection = .existing(patientId: oldID)
+        await coordinator.handlePatientChoiceChange()
+        XCTAssertTrue(coordinator.isPatientStepReady)
+        coordinator.patientSelection = .existing(patientId: UUID().uuidString.lowercased())
+        XCTAssertFalse(coordinator.isPatientStepReady)
+        XCTAssertFalse(coordinator.validatePatientStepBeforeProceed())
+    }
+
+    @MainActor
+    func testLatePICResponseCannotOverwriteNewChoice() async throws {
+        let started = expectation(description: "Old PIC lookup started")
+        let gate = AsyncGate()
+        let interactor = TaskAssignmentStubInteractor(userLookup: { id in
+            if id == "old-pic" {
+                started.fulfill()
+                await gate.wait()
+            }
+            return User(id: id, name: id, role: .LAB)
+        })
+        let coordinator = TaskAssignmentFlowCoordinator(repository: TaskAssignmentRepository(interactor: interactor))
+        coordinator.selectedPIC = "old-pic"
+        let oldLookup = Task { await coordinator.getUserById(userId: "old-pic") }
+        await fulfillment(of: [started], timeout: 2)
+        coordinator.selectedPIC = "new-pic"
+        await coordinator.getUserById(userId: "new-pic")
+        await gate.open()
+        await oldLookup.value
+        XCTAssertEqual(coordinator.pic.id, "new-pic")
+        XCTAssertFalse(coordinator.isUserLoading)
+    }
+
+    @MainActor
+    func testSpecimenSubmissionUsesRoutePICInsteadOfStaleUserRecord() async throws {
+        let defaults = UserDefaults.standard
+        let key = UserDefaultType.userId.rawValue
+        let savedID = defaults.object(forKey: key)
+        defaults.set("dpjp", forKey: key)
+        defer {
+            if let savedID { defaults.set(savedID, forKey: key) } else { defaults.removeObject(forKey: key) }
+        }
+        let submissions = RequestLog()
+        let interactor = TaskAssignmentStubInteractor(
+            lookup: { id in TaskAssignmentRepositoryTests.patient(id: id) },
+            examinations: { _, requests in
+                submissions.append(requests.first?.PIC ?? "")
+                let data = Data(#"{"id":"created","goal":"SCREENING","preparationType":"SP","slideId":"slide","statusExamination":"NOTSTARTED"}"#.utf8)
+                return try JSONDecoder().decode(ExaminationDataResponse.self, from: data)
+            }
+        )
+        let coordinator = TaskAssignmentFlowCoordinator(repository: TaskAssignmentRepository(interactor: interactor))
+        coordinator.attachSpecimenRouteContext(patientId: UUID().uuidString.lowercased(), picId: "route-pic")
+        coordinator.pic = User(id: "stale-pic", name: "Stale", role: .LAB)
+        coordinator.examination.goal = .SCREENING
+        coordinator.examination.preparationType = .SP
+        coordinator.examination.slideId = "slide"
+        await coordinator.submitExamination()
+        XCTAssertEqual(submissions.values, ["route-pic"])
+        XCTAssertFalse(coordinator.isError)
+    }
+
+    @MainActor
+    func testSavingNewPatientCanonicalizesSelection() async throws {
+        let id = UUID().uuidString.lowercased()
+        let interactor = TaskAssignmentStubInteractor(create: { patient in
+            TaskAssignmentRepositoryTests.patient(id: id, name: patient.name)
+        })
+        let coordinator = TaskAssignmentFlowCoordinator(repository: TaskAssignmentRepository(interactor: interactor))
+        coordinator.prepareNewPatientSelection(name: "New patient")
+        coordinator.patient = TaskAssignmentRepositoryTests.patient(name: "New patient")
+        coordinator.selectedSex = AppPatient.Gender.male
+        coordinator.selectedPIC = "selected-pic"
+        coordinator.pic = User(id: "stale-pic", name: "Stale", role: .LAB)
+        await coordinator.proceedToSpecimenStep()
+        defer { Router.shared.popToRoot() }
+        XCTAssertEqual(coordinator.patientSelection, .existing(patientId: id))
+        XCTAssertEqual(coordinator.savedPatientId, id)
+        XCTAssertEqual(coordinator.examinationPICId, "selected-pic")
+        XCTAssertTrue(coordinator.isPatientStepReady)
+        XCTAssertFalse(coordinator.isError)
+    }
+
+    @MainActor
+    func testLateSaveCannotRestorePreviousPatientChoice() async throws {
+        let id = UUID().uuidString.lowercased()
+        let started = expectation(description: "Save lookup started")
+        let gate = AsyncGate()
+        let calls = RequestLog()
+        let interactor = TaskAssignmentStubInteractor(lookup: { id in
+            calls.append(id)
+            if calls.values.count == 2 {
+                started.fulfill()
+                await gate.wait()
+            }
+            return TaskAssignmentRepositoryTests.patient(id: id)
+        })
+        let coordinator = TaskAssignmentFlowCoordinator(repository: TaskAssignmentRepository(interactor: interactor))
+        coordinator.patientSelection = .existing(patientId: id)
+        coordinator.selectedPIC = "old-pic"
+        await coordinator.handlePatientChoiceChange()
+        let save = Task { await coordinator.proceedToSpecimenStep() }
+        await fulfillment(of: [started], timeout: 2)
+        coordinator.prepareNewPatientSelection(name: "New choice")
+        coordinator.selectedPIC = "new-pic"
+        await gate.open()
+        await save.value
+        XCTAssertEqual(coordinator.patientSelection, .new(displayName: "New choice"))
+        XCTAssertEqual(coordinator.patient.name, "New choice")
+        XCTAssertTrue(coordinator.savedPatientId.isEmpty)
+        XCTAssertTrue(coordinator.examinationPICId.isEmpty)
+        XCTAssertFalse(coordinator.isSavingPatient)
+        XCTAssertFalse(coordinator.isError)
+    }
+
+    @MainActor
+    func testLeavingPatientStepCancelsSaveBeforeNavigation() async throws {
+        let id = UUID().uuidString.lowercased()
+        let started = expectation(description: "Save lookup started")
+        let gate = AsyncGate()
+        let calls = RequestLog()
+        let interactor = TaskAssignmentStubInteractor(lookup: { id in
+            calls.append(id)
+            if calls.values.count == 2 {
+                started.fulfill()
+                await gate.wait()
+            }
+            return TaskAssignmentRepositoryTests.patient(id: id)
+        })
+        let coordinator = TaskAssignmentFlowCoordinator(repository: TaskAssignmentRepository(interactor: interactor))
+        coordinator.patientSelection = .existing(patientId: id)
+        coordinator.selectedPIC = "selected-pic"
+        await coordinator.handlePatientChoiceChange()
+        let save = coordinator.newExam()
+        await fulfillment(of: [started], timeout: 2)
+        coordinator.cancelPendingPatientSave()
+        await gate.open()
+        await save.value
+        XCTAssertTrue(coordinator.examinationPICId.isEmpty)
+        XCTAssertFalse(coordinator.isSavingPatient)
+        XCTAssertFalse(coordinator.isError)
+    }
+}
+
+private final class TaskAssignmentStubInteractor: InputPatientInteractor {
+    private let lookup: (String) async throws -> Patient
+    private let create: (Patient) async throws -> Patient
+    private let userLookup: (String) async throws -> User
+    private let examinations: (String, [ExaminationRequest]) async throws -> ExaminationDataResponse
+
+    init(
+        lookup: @escaping (String) async throws -> Patient = { _ in throw URLError(.unsupportedURL) },
+        create: @escaping (Patient) async throws -> Patient = { _ in throw URLError(.unsupportedURL) },
+        userLookup: @escaping (String) async throws -> User = { _ in throw URLError(.unsupportedURL) },
+        examinations: @escaping (String, [ExaminationRequest]) async throws -> ExaminationDataResponse = { _, _ in
+            throw URLError(.unsupportedURL)
+        }
+    ) {
+        self.lookup = lookup
+        self.create = create
+        self.userLookup = userLookup
+        self.examinations = examinations
+        super.init(networkService: MockNetworkService())
+    }
+
+    override func getPatientById(patientId: String) async throws -> Patient { try await lookup(patientId) }
+    override func addNewPatient(patient: Patient) async throws -> Patient { try await create(patient) }
+    override func getUserById(userId: String) async throws -> User { try await userLookup(userId) }
+    override func addNewExamination(patientId: String, examinations: [ExaminationRequest]) async throws -> ExaminationDataResponse {
+        try await self.examinations(patientId, examinations)
+    }
+}

@@ -23,7 +23,7 @@ extension TaskAssignmentFlowCoordinator {
     func updatePatientChoice(_ rawValue: String) {
         let trimmed = rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.isEmpty {
-            patientSelection = nil
+            clearForm()
         } else {
             patientSelection = PatientSelection.from(
                 bindingValue: trimmed,

@@ -51,29 +51,22 @@ final class TaskAssignmentRepository {
         draft patient: Patient,
         preferredId: String?
     ) async throws -> Patient {
+        try Task.checkCancellation()
         let trimmedPreferred = preferredId?.trimmingCharacters(in: .whitespacesAndNewlines) ?? AppValue.empty
 
-        if TaskAssignmentIdentifiers.isPatientId(trimmedPreferred) {
-            do {
-                return try await fetchPatient(id: trimmedPreferred)
-            } catch {
-                Logger.warning(
-                    "Preferred patient id not found (\(trimmedPreferred)); will create if draft is complete",
-                    category: .taskAssignment
-                )
-            }
+        if !trimmedPreferred.isEmpty {
+            // Choosing an existing patient never authorizes creating a replacement.
+            // Propagate missing records, timeouts, authentication and cancellation.
+            return try await fetchPatient(id: trimmedPreferred)
         }
 
-        guard !patient.NIK.isEmpty else {
+        guard !patient.NIK.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+              !patient.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+              !TaskAssignmentIdentifiers.isPatientId(patient.name) else {
             throw TaskAssignmentFlowError.patientDataIncomplete
         }
 
-        var payload = patient
-        if TaskAssignmentIdentifiers.isPatientId(payload.name) {
-            payload.name = AppValue.empty
-        }
-
-        return try await createPatient(payload)
+        return try await createPatient(patient)
     }
 }
 
