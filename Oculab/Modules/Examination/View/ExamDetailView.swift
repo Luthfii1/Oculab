@@ -16,6 +16,7 @@ struct ExamDetailView: View {
     @StateObject private var presenter = ExamDataPresenter(interactor: ExamInteractor())
     @State private var showGuidelines = false
     @State private var didFinishOnboarding = false
+    @State private var completedGuidelines = false
 
     var body: some View {
         NavigationView {
@@ -101,9 +102,14 @@ struct ExamDetailView: View {
             }
         }
         .sheet(isPresented: $showGuidelines, onDismiss: {
-            didFinishOnboarding = true
+            if completedGuidelines {
+                didFinishOnboarding = true
+            }
+            completedGuidelines = false
         }) {
-            GuidelinesOnboardingView()
+            GuidelinesOnboardingView {
+                completedGuidelines = true
+            }
         }
         .navigationBarBackButtonHidden(true)
         .onAppear {

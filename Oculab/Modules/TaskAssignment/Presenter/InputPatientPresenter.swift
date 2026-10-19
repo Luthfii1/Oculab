@@ -152,9 +152,15 @@ final class TaskAssignmentFlowCoordinator: ObservableObject {
         if isSlide2Visible {
             let validType2 = validationManager.meetsRequired(typeString2)
             let validSlideId2 = validationManager.meetsRequired(examination2.slideId)
-            return validGoal && validType1 && validSlideId1 && validType2 && validSlideId2
+            return validGoal && validType1 && validSlideId1 && validType2 && validSlideId2 && !hasDuplicateSlideIDs
         }
         return validGoal && validType1 && validSlideId1
+    }
+
+    var hasDuplicateSlideIDs: Bool {
+        let first = examination.slideId.trimmingCharacters(in: .whitespacesAndNewlines)
+        let second = examination2.slideId.trimmingCharacters(in: .whitespacesAndNewlines)
+        return isSlide2Visible && !first.isEmpty && first == second
     }
 
     @discardableResult
@@ -183,7 +189,13 @@ final class TaskAssignmentFlowCoordinator: ObservableObject {
                 examination2.slideId,
                 fieldName: ValidationFieldName.slideId2.fieldName
             )
-            return validGoal && validType1 && validSlideId1 && validType2 && validSlideId2
+            if hasDuplicateSlideIDs {
+                validationManager.setError(
+                    AppTextTaskAssignInputExam.warningSlideIDsMustBeDifferent,
+                    for: ValidationFieldName.slideId2.fieldName
+                )
+            }
+            return validGoal && validType1 && validSlideId1 && validType2 && validSlideId2 && !hasDuplicateSlideIDs
         }
         return validGoal && validType1 && validSlideId1
     }
@@ -284,11 +296,24 @@ final class TaskAssignmentFlowCoordinator: ObservableObject {
                      patient.sex == .FEMALE ? AppPatient.Gender.female : AppValue.empty
         BPJSnumber = patient.BPJS ?? AppValue.empty
         
-        // Trigger validation for all loaded fields
-        handleDateOfBirthChange()
-        handleGenderChange()
-        handleBPJSNumberChange()
-        handleNIKChange()
+        // Validate the stored record without filling missing demographics with UI defaults.
+        _ = validationManager.validateNIK(patient.NIK, fieldName: ValidationFieldName.patientNIK.fieldName)
+        _ = validationManager.validateDate(
+            patient.DoB,
+            fieldName: ValidationFieldName.patientDateOfBirth.fieldName,
+            allowFuture: false,
+            allowPast: true
+        )
+        _ = validationManager.validateRequired(selectedSex, fieldName: ValidationFieldName.patientGender.fieldName)
+        if BPJSnumber.isEmpty {
+            validationManager.clearError(for: ValidationFieldName.patientBPJS.fieldName)
+        } else {
+            _ = validationManager.validateWithRules(
+                BPJSnumber,
+                fieldName: ValidationFieldName.patientBPJS.fieldName,
+                rules: [.numbersOnly(), .minLength(11), .maxLength(13)]
+            )
+        }
     }
     
     private func resetErrorState() {
@@ -628,7 +653,8 @@ extension TaskAssignmentFlowCoordinator {
             throw ExaminationError.secondExamIncomplete
         }
         
-        guard examination.slideId != examination2.slideId else {
+        guard examination.slideId.trimmingCharacters(in: .whitespacesAndNewlines)
+            != examination2.slideId.trimmingCharacters(in: .whitespacesAndNewlines) else {
             throw ExaminationError.duplicateSlideIds
         }
         
@@ -651,7 +677,7 @@ extension TaskAssignmentFlowCoordinator {
         return ExaminationRequest(
             goal: useFirstExamGoal ? examination.goal : exam.goal,
             preparationType: exam.preparationType,
-            slideId: exam.slideId,
+            slideId: exam.slideId.trimmingCharacters(in: .whitespacesAndNewlines),
             examinationDate: exam.examinationDate,
             PIC: picId,
             DPJP: DPJPId,
@@ -757,6 +783,7 @@ extension TaskAssignmentFlowCoordinator {
     }
     
     func hideSubmitPopup() {
+        resetErrorState()
         isSubmitPopUpVisible = false
         Logger.info("Submit popup hidden - returning to examination", category: .taskAssignment)
     }

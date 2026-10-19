@@ -781,7 +781,7 @@
 "video_record.video_input_component.video_error_alert_message" = "Video tidak dapat diputar. Silakan rekam ulang sampel.";
 "video_record.video_input_component.video_error_alert_title" = "Kesalahan video";
 "video_record.video_input_component.record_video_button" = "Rekam video";
-"video_record.video_input_component.create_video_button" = "Gambar";
+"video_record.video_input_component.create_video_button" = "Rekam video";
 "video_record.video_input_component.view_video_button" = "Video";
 "video_record.video_input_component.video_playback_error_title" = "Memutar Video";
 "video_record.video_input_component.empty_title" = "Belum ada video sediaan";
@@ -953,3 +953,20 @@
 "analysist.fov_detail.processing_in_progress" = "Sedang Diproses";
 "analysist.fov_detail.bounding_box_not_available" = "Gambar masih diproses. Data bounding box belum tersedia.";
 "analysist.fov_detail.error_loading_data" = "Gagal Memuat Data";
+
+// Guided examination flow
+"task_assignment.ux.new_patient_hint" = "Lengkapi identitas yang wajib diisi. Nomor BPJS boleh dikosongkan.";
+"task_assignment.ux.existing_patient_hint" = "Identitas pasien tersimpan. Pastikan pasien sudah sesuai sebelum melanjutkan.";
+"task_assignment.ux.choose_patient_hint" = "Pilih pasien terdaftar atau tambahkan pasien baru untuk melanjutkan.";
+"task_assignment.ux.patient_ready_hint" = "Berikutnya: isi jenis dan ID sediaan.";
+"task_assignment.ux.required_fields_hint" = "Lengkapi kolom bertanda *. Ketuk Lanjut untuk melihat kolom yang perlu diperiksa.";
+"task_assignment.ux.review_tasks" = "Tinjau pemeriksaan";
+"task_assignment.ux.review_hint" = "Periksa pasien, petugas, dan ID slide sebelum membuat pemeriksaan.";
+"task_assignment.ux.after_create_hint" = "Pemeriksaan akan muncul di Beranda. Rekam atau pilih video dari halaman pemeriksaan.";
+"task_assignment.ux.creating_tasks" = "Membuat pemeriksaan…";
+"examination.result.load_error_title" = "Pemeriksaan belum dapat dimuat";
+"examination.result.load_error_message" = "Sebagian data pemeriksaan belum dapat dimuat. Silakan coba lagi.";
+"task_assignment.ux.continue_specimen" = "Lanjut ke sediaan";
+"common.step_progress" = "Langkah %d dari %d";
+"task_assignment.ux.correct_patient_hint" = "Data pasien tersimpan perlu diperiksa. Perbaiki data sebelum melanjutkan.";
+"task_assignment.ux.edit_patient" = "Perbaiki data pasien";

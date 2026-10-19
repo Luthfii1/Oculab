@@ -9,69 +9,67 @@ import SwiftUI
 
 struct AppStepper: View {
     var stepTitles: [String]
-    @State var currentStep: Int = 0
+    var currentStep: Int = 0
+
+    private var resolvedStep: Int { min(max(currentStep, 0), max(stepTitles.count - 1, 0)) }
+    private var currentTitle: String { stepTitles.indices.contains(resolvedStep) ? stepTitles[resolvedStep] : "" }
+    private var progressDescription: String {
+        String(format: "common.step_progress".localized, resolvedStep + 1, stepTitles.count)
+    }
 
     var body: some View {
-//        GeometryReader { geometry in
-        VStack {
-            HStack(spacing: Decimal.d4) {
-                ForEach(0..<stepTitles.count, id: \.self) { step in
-                    HStack(spacing: Decimal.d4) {
-                        if step < currentStep {
-                            ZStack {
-                                Circle()
-                                    .fill(AppColors.purple500)
-                                    .frame(width: 20, height: 20)
+        if !stepTitles.isEmpty {
+            ViewThatFits(in: .horizontal) {
+                horizontalSteps
+                    .fixedSize(horizontal: true, vertical: false)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(progressDescription)
+                        .font(AppTypography.p3)
+                        .foregroundStyle(AppColors.slate600)
+                    Text(currentTitle)
+                        .font(AppTypography.s4_1)
+                        .foregroundStyle(AppColors.purple700)
+                        .fixedSize(horizontal: false, vertical: true)
+                    ProgressView(value: Double(resolvedStep + 1), total: Double(stepTitles.count))
+                        .tint(AppColors.purple500)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text(currentTitle))
+            .accessibilityValue(Text(progressDescription))
+        }
+    }
 
-                                Image(systemName: AppIcon.checkmark)
-                                    .resizable()
-                                    .frame(width: 10, height: 10)
-                                    .foregroundColor(AppColors.slate0)
-                            }
-                        }
-
-                        else if step == currentStep {
+    private var horizontalSteps: some View {
+        HStack(spacing: 8) {
+            ForEach(stepTitles.indices, id: \.self) { step in
+                HStack(spacing: 6) {
+                    ZStack {
+                        Circle()
+                            .fill(step < resolvedStep ? AppColors.purple500 : AppColors.slate0)
+                        Circle()
+                            .stroke(step <= resolvedStep ? AppColors.purple500 : AppColors.slate300, lineWidth: 1)
+                        if step < resolvedStep {
+                            Image(systemName: AppIcon.checkmark)
+                                .font(.system(size: 10, weight: .semibold))
+                                .foregroundStyle(AppColors.slate0)
+                        } else {
                             Text(String(step + 1))
                                 .font(AppTypography.s6)
-                                .foregroundColor(AppColors.purple500)
-                                .frame(width: 20, height: 20)
-                                .overlay(
-                                    Circle()
-                                        .stroke(AppColors.purple500, lineWidth: 1)
-                                )
+                                .foregroundStyle(step == resolvedStep ? AppColors.purple700 : AppColors.slate600)
                         }
-
-                        else {
-                            Text(String(step + 1))
-                                .font(AppTypography.s6)
-                                .foregroundColor(AppColors.slate100)
-                                .frame(width: 20, height: 20)
-                                .overlay(
-                                    Circle()
-                                        .stroke(AppColors.slate100, lineWidth: 1)
-                                )
-                        }
-
-                        Text(stepTitles[step])
-                            .font(AppTypography.s4_1)
-                            .foregroundColor(
-                                step == currentStep ? AppColors
-                                    .purple500 : (step < currentStep ? AppColors.slate900 : AppColors.slate100)
-                            )
-
-                        if step < stepTitles.count - 1 {
-                            Rectangle()
-                                .fill(AppColors.slate100)
-//                                    .frame(width: geometry.size.width * 0.06, height: 2)
-                                .frame(width: 18, height: 2)
-                                .cornerRadius(Decimal.d12)
-                        }
+                    }
+                    .frame(width: 22, height: 22)
+                    Text(stepTitles[step])
+                        .font(AppTypography.s5)
+                        .foregroundStyle(step == resolvedStep ? AppColors.purple700 : AppColors.slate600)
+                    if step < stepTitles.count - 1 {
+                        Rectangle().fill(AppColors.slate300).frame(width: 16, height: 1)
                     }
                 }
             }
-//            }
         }
-//        .frame(maxHeight: 40)
     }
 }
 

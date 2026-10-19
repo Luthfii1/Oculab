@@ -26,8 +26,6 @@ struct AppButton: View, Identifiable {
         }
     }
 
-    @State private var isPressed: Bool = false
-
     var id = UUID()
     var title: String
     var leftIcon: String? = nil
@@ -36,57 +34,25 @@ struct AppButton: View, Identifiable {
     var size: ButtonSize = .large
     var cornerRadius: CGFloat = 8
     var isEnabled: Bool = true
+    var isLoading: Bool = false
     var titleColor: Color? = nil
     var action: () -> Void
 
     // Button background and foreground color based on color type, enabled state, and pressed state
     private var backgroundColor: Color {
-        if isPressed {
-            switch colorType {
-            case .primary:
-                return AppColors.purple700
-            case .secondary:
-                return AppColors.purple100
-            case .tertiary:
-                return AppColors.slate0
-            case let .destructive(type):
-                switch type {
-                case .primary:
-                    return AppColors.red700
-                case .secondary:
-                    return AppColors.red100
-                }
-            case let .neutral(type):
-                switch type {
-                case .primary:
-                    return AppColors.slate50
-                case .secondary:
-                    return .clear
-                }
-            }
-        } else {
-            switch colorType {
-            case .primary:
-                return isEnabled ? AppColors.purple500 : AppColors.slate50
-            case .secondary:
-                return isEnabled ? AppColors.purple50 : .clear
-            case .tertiary:
-                return .clear
-            case let .destructive(type):
-                switch type {
-                case .primary:
-                    return isEnabled ? AppColors.red500 : AppColors.slate50
-                case .secondary:
-                    return isEnabled ? AppColors.red50 : AppColors.slate50
-                }
-            case let .neutral(type):
-                switch type {
-                case .primary:
-                    return isEnabled ? AppColors.slate0 : AppColors.slate50
-                case .secondary:
-                    return .clear
-                }
-            }
+        switch colorType {
+        case .primary:
+            return isEnabled ? AppColors.purple500 : AppColors.slate50
+        case .secondary:
+            return isEnabled ? AppColors.purple50 : .clear
+        case .tertiary:
+            return .clear
+        case let .destructive(type):
+            return type == .primary
+                ? (isEnabled ? AppColors.red500 : AppColors.slate50)
+                : (isEnabled ? AppColors.red50 : AppColors.slate50)
+        case let .neutral(type):
+            return type == .primary ? (isEnabled ? AppColors.slate0 : AppColors.slate50) : .clear
         }
     }
 
@@ -128,13 +94,13 @@ struct AppButton: View, Identifiable {
     private var buttonHeight: CGFloat {
         switch colorType {
         case .tertiary:
-            return 0 // No padding for tertiary buttons
+            return 44
         default:
             switch size {
             case .large:
                 return 50
             case .small:
-                return 40
+                return 44
             }
         }
     }
@@ -152,7 +118,7 @@ struct AppButton: View, Identifiable {
     private var vPadding: CGFloat {
         switch colorType {
         case .tertiary:
-            return 0 // No padding for tertiary buttons
+            return 8
         default:
             switch size {
             case .large:
@@ -169,55 +135,48 @@ struct AppButton: View, Identifiable {
     }
 
     var body: some View {
-        Button(action: {
-            if isEnabled {
-                action()
-            }
-        }) {
-            HStack {
-                if let leftIcon = leftIcon {
+        Button(action: action) {
+            HStack(spacing: 8) {
+                if isLoading {
+                    ProgressView()
+                        .tint(foregroundColor)
+                        .accessibilityHidden(true)
+                } else if let leftIcon {
                     Image(systemName: leftIcon)
-                        .foregroundColor(foregroundColor)
+                        .accessibilityHidden(true)
                 }
 
                 Text(title)
-                    .foregroundColor(titleColor ?? foregroundColor)
                     .font(buttonFont)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
 
-                if leftIcon != nil && rightIcon != nil {
-                    Spacer()
-                }
-
-                if let rightIcon = rightIcon {
+                if let rightIcon, !isLoading {
                     Image(systemName: rightIcon)
-                        .foregroundColor(foregroundColor)
+                        .accessibilityHidden(true)
                 }
             }
+            .foregroundColor(titleColor ?? foregroundColor)
             .padding(.horizontal, 16)
-            .padding(.vertical, vPadding) // Use dynamic vertical padding
+            .padding(.vertical, vPadding)
             .frame(maxWidth: frameWidth, minHeight: buttonHeight)
             .background(backgroundColor)
-            .cornerRadius(cornerRadius)
-            .opacity(isEnabled ? 1 : 0.5) // Dims the button when disabled
-            .overlay(
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+            .overlay {
                 RoundedRectangle(cornerRadius: cornerRadius)
-                    .stroke(borderColor, lineWidth: 1) // Adds a border when disabled
-            )
-            .onTapGesture {
-                if isEnabled {
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        isPressed = true
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            isPressed = false
-                        }
-                        action()
-                    }
-                }
+                    .stroke(borderColor, lineWidth: 1)
             }
+            .contentShape(RoundedRectangle(cornerRadius: cornerRadius))
         }
-        .disabled(!isEnabled) // Disables button interaction when false
+        .buttonStyle(AppPressButtonStyle())
+        .disabled(!isEnabled || isLoading)
+    }
+}
+
+private struct AppPressButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .opacity(configuration.isPressed ? 0.8 : 1)
     }
 }
 

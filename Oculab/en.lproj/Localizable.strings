@@ -764,7 +764,7 @@
 "video_record.video_input_component.video_error_alert_message" = "Video cannot be played. Please re-record the sample.";
 "video_record.video_input_component.video_error_alert_title" = "Video error";
 "video_record.video_input_component.record_video_button" = "Record video";
-"video_record.video_input_component.create_video_button" = "Image";
+"video_record.video_input_component.create_video_button" = "Record video";
 "video_record.video_input_component.view_video_button" = "Video";
 "video_record.video_input_component.video_playback_error_title" = "Playing Video";
 "video_record.video_input_component.empty_title" = "No specimen video yet";
@@ -934,3 +934,20 @@
 "analysist.fov_detail.processing_in_progress" = "Processing in Progress";
 "analysist.fov_detail.bounding_box_not_available" = "This image is still being processed. Bounding box data is not available yet.";
 "analysist.fov_detail.error_loading_data" = "Error Loading Data";
+
+// Guided examination flow
+"task_assignment.ux.new_patient_hint" = "Complete the required identity details. BPJS is optional.";
+"task_assignment.ux.existing_patient_hint" = "Saved patient details. Check that this is the correct patient before continuing.";
+"task_assignment.ux.choose_patient_hint" = "Select an existing patient or add a new patient to continue.";
+"task_assignment.ux.patient_ready_hint" = "Next: enter the specimen and slide details.";
+"task_assignment.ux.required_fields_hint" = "Complete the fields marked *. Continue to see any fields that need attention.";
+"task_assignment.ux.review_tasks" = "Review examination";
+"task_assignment.ux.review_hint" = "Check the patient, assigned officer and slide IDs before creating the examination.";
+"task_assignment.ux.after_create_hint" = "The examination will appear in Home. You can record or select its video from there.";
+"task_assignment.ux.creating_tasks" = "Creating examination…";
+"examination.result.load_error_title" = "Unable to load examination";
+"examination.result.load_error_message" = "Some examination details could not be loaded. Please try again.";
+"task_assignment.ux.continue_specimen" = "Continue to specimens";
+"common.step_progress" = "Step %d of %d";
+"task_assignment.ux.correct_patient_hint" = "The saved patient details need attention. Correct them before continuing.";
+"task_assignment.ux.edit_patient" = "Correct patient details";
