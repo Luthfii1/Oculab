@@ -21,92 +21,105 @@ class InputPatientInteractor {
     let urlCreatePatient = API.BE + "/patient/create-new-patient/"
     let urlCreateExam = API.BE + "/examination/create-examination/"
 
+    @MainActor
     func getAllUser() async throws -> [User] {
-        guard let adminUserId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
-            throw NSError(
-                domain: "UserIdNotFound",
-                code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "User ID not found"]
-            )
-        }
-        
-        guard let token = KeychainHelper.string(for: .accessToken) else {
-            throw URLError(.userAuthenticationRequired)
+        let session = try sessionSnapshot()
+        let headers = try AuthSessionManager.authorizationHeaders()
+        let response: APIResponse<[User]> = try await ClinicalRequestContext.withSession(session) {
+            try await networkService.get(
+                urlString: apiGetAllUser + session.ownerUserId, headers: headers)
         }
 
-        let headers = [
-            "Authorization": "Bearer \(token)"
-        ]
-        
-        let response: APIResponse<[User]> = try await networkService
-            .get(urlString: apiGetAllUser + adminUserId.lowercased(),
-                 headers: headers)
-
+        try requireCurrentSession(session)
         return response.data
     }
 
+    @MainActor
     func getAllPatient() async throws -> [Patient] {
-        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
-            throw NSError(domain: "UserIdNotFound", code: -1, userInfo: [:])
+        let session = try sessionSnapshot()
+        let headers = try AuthSessionManager.authorizationHeaders()
+        let response: APIResponse<[Patient]> = try await ClinicalRequestContext.withSession(session) {
+            try await networkService.get(
+                urlString: apiGetAllPatient + session.ownerUserId, headers: headers)
         }
-        
-        let response: APIResponse<[Patient]> = try await networkService
-            .get(urlString: apiGetAllPatient + userId.lowercased(), headers: nil)
 
+        try requireCurrentSession(session)
         return response.data
     }
 
-    func getPatientById(
-        patientId: String
-    ) async throws -> Patient {
-        let response: APIResponse<Patient> = try await networkService
-            .get(urlString: urlGetDataPatient + patientId.lowercased(), headers: nil)
-
-        return response.data
-    }
-
-    func getUserById(
-        userId: String
-    ) async throws -> User {
-        let response: APIResponse<User> = try await networkService
-            .get(urlString: urlGetDataUser + userId.lowercased(), headers: nil)
-
-        return response.data
-    }
-
-    func addNewPatient(
-        patient: Patient
-    ) async throws -> Patient {
-        guard let adminUserId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
-            throw NSError(domain: "UserIdNotFound", code: -1, userInfo: [:])
+    @MainActor
+    func getPatientById(patientId: String) async throws -> Patient {
+        let session = try sessionSnapshot()
+        let headers = try AuthSessionManager.authorizationHeaders()
+        let requestedID = patientId.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !requestedID.isEmpty else { throw URLError(.badURL) }
+        let response: APIResponse<Patient> = try await ClinicalRequestContext.withSession(session) {
+            try await networkService.get(
+                urlString: urlGetDataPatient + requestedID, headers: headers)
         }
-        
-        let response: APIResponse<Patient> = try await networkService.post(
-            urlString: urlCreatePatient + adminUserId.lowercased(),
-            headers: nil,
-            body: patient
-        )
 
+        try requireCurrentSession(session)
+        guard response.data.id.lowercased() == requestedID else { throw URLError(.cannotParseResponse) }
         return response.data
     }
 
-    func addNewExamination(
-        patientId: String,
-        examinations: [ExaminationRequest]
-    ) async throws -> ExaminationDataResponse {
-        let response: APIResponse<ExaminationDataResponse> = try await networkService.post(
-            urlString: urlCreateExam + patientId.lowercased(),
-            headers: nil,
-            body: examinations
-        )
-        
-        let createdExams = response.data.examinations
-        Logger.info("Successfully created \(createdExams.count) examination(s)", category: .taskAssignment)
-        for exam in createdExams {
-            Logger.debug("Created exam - ID: \(exam.id), Slide: \(exam.slideId), Type: \(exam.preparationType)", category: .taskAssignment)
+    @MainActor
+    func getUserById(userId: String) async throws -> User {
+        let session = try sessionSnapshot()
+        let headers = try AuthSessionManager.authorizationHeaders()
+        let requestedID = userId.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !requestedID.isEmpty else { throw URLError(.badURL) }
+        let response: APIResponse<User> = try await ClinicalRequestContext.withSession(session) {
+            try await networkService.get(
+                urlString: urlGetDataUser + requestedID, headers: headers)
         }
-        
+
+        try requireCurrentSession(session)
+        guard response.data.id.lowercased() == requestedID else { throw URLError(.cannotParseResponse) }
         return response.data
+    }
+
+    @MainActor
+    func addNewPatient(patient: Patient) async throws -> Patient {
+        let session = try sessionSnapshot()
+        let headers = try AuthSessionManager.authorizationHeaders()
+        let response: APIResponse<Patient> = try await ClinicalRequestContext.withSession(session) {
+            try await networkService.post(
+                urlString: urlCreatePatient + session.ownerUserId, headers: headers, body: patient)
+        }
+
+        try requireCurrentSession(session)
+        guard !response.data.id.isEmpty else { throw URLError(.cannotParseResponse) }
+        return response.data
+    }
+
+    @MainActor
+    func addNewExamination(patientId: String, examinations: [ExaminationRequest]) async throws -> ExaminationDataResponse {
+        let session = try sessionSnapshot()
+        let headers = try AuthSessionManager.authorizationHeaders()
+        let requestedID = patientId.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !requestedID.isEmpty else { throw URLError(.badURL) }
+        let response: APIResponse<ExaminationDataResponse> = try await ClinicalRequestContext.withSession(session) {
+            try await networkService.post(
+                urlString: urlCreateExam + requestedID, headers: headers, body: examinations)
+        }
+
+        try requireCurrentSession(session)
+        Logger.info("Successfully created examination task(s)", category: .taskAssignment)
+        return response.data
+    }
+
+    @MainActor
+    private func sessionSnapshot() throws -> UploadQueueSession {
+        try Task.checkCancellation()
+        guard let session = AuthSessionManager.uploadQueueSession else { throw URLError(.userAuthenticationRequired) }
+        return session
+    }
+
+    @MainActor
+    private func requireCurrentSession(_ expected: UploadQueueSession) throws {
+        try Task.checkCancellation()
+        guard expected == AuthSessionManager.uploadQueueSession else { throw CancellationError() }
     }
 }
 

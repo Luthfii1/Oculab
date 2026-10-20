@@ -46,6 +46,12 @@ struct InputPatientData: View {
                             validationManager: presenter.validationManager
                         )
 
+                        if let error = presenter.patientDirectoryErrorMessage, patientId == nil {
+                            PatientLoadErrorView(title: AppTextPatientIntake.patientsLoadFailed, message: error) {
+                                Task { await presenter.getAllPatient() }
+                            }
+                        }
+
                         if presenter.isPatientListEmpty && patientId == nil {
                             InputPatientEmptyListHint()
                         }
@@ -102,8 +108,11 @@ struct InputPatientData: View {
             .onAppear {
                 loadTask?.cancel()
                 loadTask = Task {
+                    let generation = AuthSessionManager.authenticationSessionGeneration
                     await presenter.getAllUser()
+                    guard !Task.isCancelled, generation == AuthSessionManager.authenticationSessionGeneration else { return }
                     await presenter.getAllPatient()
+                    guard !Task.isCancelled, generation == AuthSessionManager.authenticationSessionGeneration else { return }
                     await MainActor.run {
                         presenter.markInitialLoadComplete()
                     }
@@ -113,6 +122,7 @@ struct InputPatientData: View {
                         presenter.selectedPIC = picId
                         await presenter.getUserById(userId: picId)
                     }
+                    guard !Task.isCancelled, generation == AuthSessionManager.authenticationSessionGeneration else { return }
 
                     if let patientId = patientId, !patientId.isEmpty {
                         presenter.patientSelection = .existing(patientId: patientId)

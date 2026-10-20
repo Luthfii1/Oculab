@@ -1,82 +1,74 @@
-//
-//  PatientFormView.swift
-//  Oculab
-//
-//  Created by Alifiyah Ariandri on 08/11/24.
-//
-
 import SwiftUI
 
 struct PatientFormView: View {
     let patientId: String?
     @State private var presenter = PatientPresenter()
-
-    init(patientId: String? = nil) {
-        self.patientId = patientId
-    }
+    init(patientId: String? = nil) { self.patientId = patientId }
 
     var body: some View {
         NavigationView {
-            VStack {
-                if presenter.isPatientLoading {
-                    ProgressView()
+            Group {
+                if presenter.isPatientLoading && !presenter.hasLoadedEditingPatient {
+                    ProgressView(AppTextPatientIntake.loadingPatient)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if let error = presenter.patientLoadErrorMessage {
+                    PatientLoadErrorView(title: AppTextPatientIntake.patientLoadFailed, message: error) {
+                        Task { await presenter.retryPatientLoad() }
+                    }
                 } else {
                     ScrollView {
-                        VStack(alignment: .leading, spacing: AppConstants.PatientUI.fieldSpacing) {
-                            PatientFormField(presenter: presenter)
-                        }
+                        PatientFormField(presenter: presenter)
+                            .padding(.horizontal, 20).padding(.vertical, 24)
                     }
-
-                    Spacer()
-
-                    AppButton(
-                        title: presenter.buttonTitle,
-                        leftIcon: presenter.buttonIcon,
-                        isEnabled: presenter.isFormValid
-                    ) {
-                        Task {
-                            await presenter.handleFormSubmission()
+                    .scrollDismissesKeyboard(.interactively)
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        VStack(alignment: .leading, spacing: 10) {
+                            if let error = presenter.errorMessage {
+                                Label(error, systemImage: "exclamationmark.circle")
+                                    .font(.subheadline).foregroundStyle(AppColors.red700)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            AppButton(title: presenter.isSavingPatient ? AppTextPatientIntake.savingPatient : presenter.buttonTitle,
+                                      leftIcon: presenter.buttonIcon, isEnabled: presenter.canSubmit,
+                                      isLoading: presenter.isSavingPatient) {
+                                presenter.dismissKeyboard()
+                                Task { await presenter.handleFormSubmission() }
+                            }
+                            .accessibilityIdentifier("patient.save")
                         }
+                        .padding(16).background(.regularMaterial)
+                        .overlay(alignment: .top) { Divider() }
                     }
                 }
             }
-            .padding(.horizontal, AppConstants.PatientUI.horizontalPadding)
-            .padding(.vertical, AppConstants.PatientUI.fieldSpacing)
             .navigationTitle(presenter.navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        Router.shared.navigateBack()
-                    }) {
-                        HStack {
-                            Image(AppImage.back)
-                        }
-                    }
+                    Button { Router.shared.navigateBack() } label: { Image(AppImage.back) }
                 }
             }
-            .onAppear {
-                presenter.setupForm(patientId: patientId)
-            }
-            .onDisappear {
-                presenter.resetState()
-            }
-            .alert(AppValue.unknownError, isPresented: Binding(
-                get: { presenter.errorMessage != nil },
-                set: { _ in presenter.errorMessage = nil }
-            )) {
-                Button(AppAction.ok) { }
-            } message: {
-                if let errorMessage = presenter.errorMessage {
-                    Text(errorMessage)
-                }
-            }
+            .onAppear { presenter.setupForm(patientId: patientId) }
+            .onDisappear { presenter.resetState() }
         }
         .navigationBarBackButtonHidden(true)
     }
 }
 
-#Preview("Edit Patient") {
-    PatientFormView(patientId: "d0c1a2b3-4f5e-6789-91ab-cdef12345678")
+/// Explicit recovery for request failures. Empty success states remain separate.
+struct PatientLoadErrorView: View {
+    let title: String
+    let message: String
+    var retry: () -> Void
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label(title, systemImage: "exclamationmark.triangle").font(.headline)
+            Text(message).font(.subheadline).foregroundStyle(.secondary)
+            Button(AppAction.retry, action: retry).buttonStyle(.bordered)
+        }
+        .fixedSize(horizontal: false, vertical: true)
+        .padding(20).frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppColors.slate50).clipShape(RoundedRectangle(cornerRadius: 12))
+        .padding(.vertical, 12)
+    }
 }

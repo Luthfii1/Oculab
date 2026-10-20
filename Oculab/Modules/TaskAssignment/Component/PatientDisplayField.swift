@@ -39,6 +39,10 @@ struct PatientDisplayField: View {
 
     private var existingPatientSummary: some View {
         VStack(alignment: .leading, spacing: 14) {
+            if let recordNumber = presenter.patient.medicalRecordNumber, !recordNumber.isEmpty {
+                summaryRow(AppTextPatientIntake.medicalRecordNumber, value: recordNumber)
+            }
+            intakeFieldError(.medicalRecordNumber)
             summaryRow(AppPatient.nik, value: presenter.patient.NIK)
             storedFieldError(.patientNIK)
             summaryRow(AppPatient.dateOfBirth, value: presenter.patient.DoB?.formattedDDMMYYYY() ?? AppValue.defaultStrike)
@@ -71,8 +75,7 @@ struct PatientDisplayField: View {
     }
 
     private var hasStoredFieldErrors: Bool {
-        [ValidationFieldName.patientNIK, .patientDateOfBirth, .patientGender, .patientBPJS]
-            .contains { presenter.validationManager.getError(for: $0.fieldName) != nil }
+        PatientIntakeField.allCases.contains { presenter.validationManager.getError(for: $0.validationKey) != nil }
     }
 
     private func storedFieldError(_ field: ValidationFieldName) -> some View {
@@ -101,65 +104,63 @@ struct PatientDisplayField: View {
 
     private var newPatientFields: some View {
         VStack(alignment: .leading, spacing: 20) {
-            ValidatedTextField(
-                title: AppPatient.nik,
-                isRequired: true,
-                placeholder: AppPatient.Placeholder.nik,
-                isDisabled: false,
-                isNumberOnly: true,
-                length: 16,
-                text: $presenter.patient.NIK,
-                fieldName: .patientNIK,
-                validationType: .nik,
-                validationManager: presenter.validationManager
-            )
-            .onChange(of: presenter.patient.NIK) { _, _ in
-                presenter.handleNIKChange()
-            }
+            Text(AppTextPatientIntake.requiredHint).font(.subheadline).foregroundStyle(.secondary)
+            PatientBirthDateField(date: $presenter.selectedDoB)
+                .onChange(of: presenter.selectedDoB) {
+                    guard !presenter.patientFound else { return }
+                    presenter.handleDateOfBirthChange()
+                }
+            intakeFieldError(.dateOfBirth)
+            AppRadioButton(title: AppPatient.gender, isRequired: true,
+                           choices: [AppPatient.Gender.female, AppPatient.Gender.male],
+                           isDisabled: false, selectedChoice: $presenter.selectedSex)
+                .onChange(of: presenter.selectedSex) { presenter.handleGenderChange() }
+            intakeFieldError(.sex)
+            Divider()
+            Text(AppTextPatientIntake.identifiersTitle).font(.headline)
+            Text(AppTextPatientIntake.identifiersHint).font(.subheadline).foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            optionalIdentifier(AppTextPatientIntake.medicalRecordNumber, placeholder: AppTextPatientIntake.medicalRecordPlaceholder,
+                               text: Binding(get: { presenter.patient.medicalRecordNumber ?? "" }, set: {
+                                   presenter.patient.medicalRecordNumber = $0
+                                   presenter.handleMedicalRecordNumberChange()
+                               }), field: .medicalRecordNumber)
+            optionalIdentifier(AppPatient.nik, placeholder: AppPatient.Placeholder.nik,
+                               text: Binding(get: { presenter.patient.NIK }, set: {
+                                   presenter.patient.NIK = $0
+                                   presenter.handleNIKChange()
+                               }), field: .nik, numeric: true)
+            optionalIdentifier(AppPatient.bpjsNumber, placeholder: AppPatient.Placeholder.bpjs,
+                               text: Binding(get: { presenter.BPJSnumber }, set: {
+                                   presenter.BPJSnumber = $0
+                                   presenter.handleBPJSNumberChange()
+                               }), field: .bpjs, numeric: true)
+        }
+    }
 
-            DateField(
-                title: AppPatient.dateOfBirth,
-                isRequired: true,
-                placeholder: AppPatient.Placeholder.selectDate,
-                rightIcon: AppIcon.calendar,
-                isDisabled: false,
-                date: $presenter.selectedDoB
-            )
-            .onChange(of: presenter.selectedDoB) {
-                guard !presenter.patientFound else { return }
-                presenter.handleDateOfBirthChange()
+    private func optionalIdentifier(_ title: String, placeholder: String, text: Binding<String>, field: PatientIntakeField, numeric: Bool = false) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Text(title).font(.subheadline.weight(.semibold))
+                Text(AppForm.optional).font(.caption).foregroundStyle(.secondary)
             }
+            TextField(placeholder, text: text)
+                .keyboardType(numeric ? .numberPad : .default)
+                .textInputAutocapitalization(.never).autocorrectionDisabled()
+                .padding(12).background(AppColors.slate0)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .overlay { RoundedRectangle(cornerRadius: 8).stroke(AppColors.slate300) }
+                .accessibilityLabel(title)
+            intakeFieldError(field)
+        }
+    }
 
-            AppRadioButton(
-                title: AppPatient.gender,
-                isRequired: true,
-                choices: [AppPatient.Gender.female, AppPatient.Gender.male],
-                isDisabled: false,
-                selectedChoice: $presenter.selectedSex
-            )
-            .onChange(of: presenter.selectedSex) {
-                presenter.handleGenderChange()
-            }
-
-            ValidationFieldErrorView(
-                fieldName: ValidationFieldName.patientGender.fieldName,
-                showsErrors: true,
-                validationManager: presenter.validationManager
-            )
-
-            ValidatedTextField(
-                title: AppPatient.bpjsNumber + " " + AppForm.optional,
-                placeholder: AppPatient.Placeholder.bpjs,
-                isDisabled: false,
-                length: 13,
-                text: $presenter.BPJSnumber,
-                fieldName: .patientBPJS,
-                validationType: .bpjs,
-                validationManager: presenter.validationManager
-            )
-            .onChange(of: presenter.BPJSnumber) {
-                presenter.handleBPJSNumberChange()
-            }
+    @ViewBuilder
+    private func intakeFieldError(_ field: PatientIntakeField) -> some View {
+        if let message = presenter.validationManager.getError(for: field.validationKey) {
+            Label(message, systemImage: "exclamationmark.circle")
+                .font(.caption).foregroundStyle(AppColors.red700)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 

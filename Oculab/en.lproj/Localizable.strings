@@ -100,8 +100,8 @@
 "patient.gender.female" = "Female";
 "patient.gender.other" = "Other";
 "patient.placeholder.name" = "Enter patient name";
-"patient.placeholder.nik" = "e.g., 167012039484700";
-"patient.placeholder.bpjs" = "e.g., 1240630077675";
+"patient.placeholder.nik" = "16-digit NIK, if available";
+"patient.placeholder.bpjs" = "13-digit BPJS card number";
 "patient.placeholder.select_date" = "Select date";
 
 // MARK: - Medical Terms
@@ -605,7 +605,7 @@
 // List View
 "patient.list.navigation_title" = "Patient List";
 "patient.list.button_create_patient" = "New Patient";
-"patient.list.search_placeholder" = "Search by name, NIK, or BPJS";
+"patient.list.search_placeholder" = "Name, record no., NIK or BPJS";
 "patient.list.empty_message" = "No patients yet";
 "patient.list.empty_hint" = "Tap New Patient above to register the first patient.";
 
@@ -941,7 +941,7 @@
 "analysist.fov_detail.error_loading_data" = "Error Loading Data";
 
 // Guided examination flow
-"task_assignment.ux.new_patient_hint" = "Complete the required identity details. BPJS is optional.";
+"task_assignment.ux.new_patient_hint" = "Complete the required identity details. NIK and BPJS are optional.";
 "task_assignment.ux.existing_patient_hint" = "Saved patient details. Check that this is the correct patient before continuing.";
 "task_assignment.ux.choose_patient_hint" = "Select an existing patient or add a new patient to continue.";
 "task_assignment.ux.patient_ready_hint" = "Next: enter the specimen and slide details.";
@@ -975,3 +975,28 @@
 "examination.upload_retry_scheduled_title" = "Video saved — retry scheduled";
 "examination.upload_retry_at" = "Next delivery check: %@. Keep Oculab open and signed in.";
 "examination.upload_retained_with_results" = "A video is still saved on this device without a confirmed delivery receipt. The current examination results are shown below; they do not confirm delivery of that video.";
+
+// Patient intake
+"patient.intake.required_hint" = "Complete the required patient details. Add identifiers if available.";
+"patient.intake.identifiers_title" = "Identifiers (optional)";
+"patient.intake.identifiers_hint" = "NIK and BPJS may be left empty. Use the facility’s medical record number when available; it is separate from NIK and SATUSEHAT ID.";
+"patient.intake.medical_record_number" = "Medical record number";
+"patient.intake.medical_record_placeholder" = "Example: RM-001234";
+"patient.intake.missing_value" = "Not recorded";
+"patient.intake.load_failed" = "Could not load patient data. Retry before editing.";
+"patient.intake.save_failed" = "Could not save the patient. Your entries are still here.";
+"patient.intake.retry_load" = "Try again";
+"patient.intake.loading_patient" = "Loading patient…";
+"patient.intake.saving_patient" = "Saving patient…";
+"patient.intake.patient_load_failed" = "Could not load this patient.";
+"patient.intake.examinations_load_failed" = "Could not load examinations. Try again.";
+"patient.intake.patients_load_failed" = "Could not load patients. Try again.";
+"patient.intake.demographics_title" = "Patient details";
+"patient.intake.birth_date_hint" = "Select the patient’s actual birth date. It is not filled automatically.";
+"patient.intake.validation.name_required" = "Enter the patient’s name.";
+"patient.intake.validation.nik_invalid" = "Enter 16 digits, or leave NIK empty.";
+"patient.intake.validation.bpjs_invalid" = "Enter 13 digits, or leave BPJS empty.";
+"patient.intake.validation.birth_date_future" = "Birth date cannot be in the future.";
+"patient.intake.validation.birth_date_required" = "Select the patient’s birth date.";
+"patient.intake.validation.sex_required" = "Select the patient’s sex.";
+"patient.intake.validation.medical_record_too_long" = "Medical record number must be 64 characters or fewer.";

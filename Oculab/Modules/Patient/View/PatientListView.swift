@@ -1,133 +1,83 @@
-//
-//  PatientListView.swift
-//  Oculab
-//
-//  Created by Risa on 30/05/25.
-//
-
 import SwiftUI
 
 struct PatientListView: View {
     @State private var presenter = PatientPresenter()
-    
+
     var body: some View {
         NavigationView {
-            VStack(alignment: .leading, spacing: AppConstants.PatientUI.viewSpacing) {
+            VStack(alignment: .leading, spacing: 16) {
                 HStack {
-                    Text(AppTextPatientList.navigationTitle)
-                        .font(AppTypography.h1)
-                        .foregroundColor(AppColors.slate900)
-                    
+                    Text(AppTextPatientList.navigationTitle).font(.largeTitle.bold())
                     Spacer()
-                    
                     CompactNetworkStatusView()
                 }
-                
-                AppSearchBar(
-                    searchText: $presenter.searchText,
-                    placeholder: AppTextPatientList.searchPlaceholder,
-                    onSearch: {
-                        presenter.searchPatients()
-                    }
-                )
-
-                AppButton(
-                    title: AppTextPatientList.buttonCreatePatient,
-                    leftIcon: AppIcon.add,
-                    colorType: .secondary,
-                    action: {
-                        presenter.navigateTo(.patientForm())
-                    }
-                )
-                
-                if presenter.isPatientLoading {
-                    ProgressView()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .padding(.top, AppConstants.PatientUI.topPadding)
-                } else if presenter.isPatientListEmpty {
-                    emptyPatientListState
-                } else if !presenter.searchText.isEmpty && presenter.filteredPatients.isEmpty {
-                    emptySearchResultsState
-                } else {
-                    ScrollView {
-                        LazyVGrid(columns: [
-                            GridItem(.flexible(), spacing: AppConstants.PatientUI.gridItemSpacing),
-                            GridItem(.flexible(), spacing: AppConstants.PatientUI.gridItemSpacing)
-                        ], spacing: AppConstants.PatientUI.gridSpacing) {
+                AppSearchBar(searchText: $presenter.searchText, placeholder: AppTextPatientList.searchPlaceholder,
+                             onSearch: { presenter.searchPatients() })
+                AppButton(title: AppTextPatientList.buttonCreatePatient, leftIcon: AppIcon.add, colorType: .secondary) {
+                    presenter.navigateTo(.patientForm())
+                }
+                ScrollView {
+                    LazyVStack(spacing: 12) {
+                        if let error = presenter.listErrorMessage {
+                            PatientLoadErrorView(title: AppTextPatientIntake.patientsLoadFailed, message: error) {
+                                Task { await presenter.getAllPatient() }
+                            }
+                        }
+                        if presenter.isPatientLoading && presenter.patients.isEmpty {
+                            ProgressView().frame(maxWidth: .infinity, minHeight: 180)
+                        } else if presenter.isPatientListEmpty {
+                            emptyState(AppTextPatientList.emptyListMessage, hint: AppTextPatientList.emptyListHint)
+                        } else if !presenter.searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && presenter.filteredPatients.isEmpty && !presenter.patients.isEmpty {
+                            VStack(spacing: 12) {
+                                emptyState(AppSearch.noResults(presenter.searchText))
+                                Button(AppSearch.clearSearch) { presenter.clearSearch() }
+                            }
+                        } else {
                             ForEach(presenter.filteredPatients) { patient in
-                                Button {
-                                    presenter.navigateTo(.patientDetail(patientId: patient.id))
-                                } label: {
-                                    PatientCard(
-                                        name: patient.name,
-                                        birthDate: patient.birthDate
-                                    )
+                                Button { presenter.navigateTo(.patientDetail(patientId: patient.id)) } label: {
+                                    HStack(alignment: .top, spacing: 12) {
+                                        Image(systemName: AppIcon.personFill).foregroundStyle(AppColors.purple700)
+                                        VStack(alignment: .leading, spacing: 6) {
+                                            Text(patient.name).font(.headline).foregroundStyle(AppColors.slate900)
+                                            Text(AppPatient.dateOfBirth + ": " + patient.birthDate)
+                                                .font(.subheadline).foregroundStyle(.secondary)
+                                            if !patient.medicalRecordNumber.isEmpty {
+                                                Text(AppTextPatientIntake.medicalRecordNumber + ": " + patient.medicalRecordNumber)
+                                                    .font(.caption).foregroundStyle(.secondary)
+                                            }
+                                        }
+                                        Spacer(minLength: 0)
+                                        Image(systemName: "chevron.right").foregroundStyle(.secondary)
+                                    }
+                                    .frame(maxWidth: .infinity, alignment: .leading).padding(16)
+                                    .background(AppColors.slate50).clipShape(RoundedRectangle(cornerRadius: 12))
+                                    .accessibilityElement(children: .combine)
                                 }
+                                .buttonStyle(.plain)
                             }
                         }
                     }
                 }
-                
-            }
-            .padding(.horizontal, AppConstants.PatientUI.horizontalPadding)
-            .background(Color(.systemBackground))
-            .onAppear {
-                Task {
-                    await presenter.getAllPatient()
+                .refreshable { await presenter.getAllPatient() }
+                .scrollDismissesKeyboard(.interactively)
+                .overlay(alignment: .topTrailing) {
+                    if presenter.isPatientLoading && !presenter.patients.isEmpty { ProgressView().padding(8) }
                 }
             }
-            .onDisappear {
-                presenter.resetState()
-            }
-            .onChange(of: presenter.searchText) { _, _ in
-                presenter.searchPatients()
-            }
+            .padding(.horizontal, 20)
+            .task { await presenter.getAllPatient() }
+            .onDisappear { presenter.resetState() }
+            .onChange(of: presenter.searchText) { _, _ in presenter.searchPatients() }
         }
         .navigationBarHidden(true)
     }
 
-    private var emptyPatientListState: some View {
-        VStack(spacing: AppConstants.PatientUI.searchSpacing) {
-            Image(systemName: AppIcon.personFill)
-                .font(.system(size: AppConstants.PatientUI.noResultsIconSize))
-                .foregroundColor(AppColors.slate300)
-
-            Text(AppTextPatientList.emptyListMessage)
-                .font(AppTypography.s3)
-                .foregroundColor(AppColors.slate700)
-                .multilineTextAlignment(.center)
-
-            Text(AppTextPatientList.emptyListHint)
-                .font(AppTypography.p3)
-                .foregroundColor(AppColors.slate400)
-                .multilineTextAlignment(.center)
+    private func emptyState(_ message: String, hint: String? = nil) -> some View {
+        VStack(spacing: 12) {
+            Image(systemName: AppIcon.personFill).font(.largeTitle).foregroundStyle(.secondary)
+            Text(message).font(.headline)
+            if let hint { Text(hint).font(.subheadline).foregroundStyle(.secondary) }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .multilineTextAlignment(.center).frame(maxWidth: .infinity, minHeight: 200)
     }
-
-    private var emptySearchResultsState: some View {
-        VStack(spacing: AppConstants.PatientUI.searchSpacing) {
-            Image(systemName: AppIcon.search)
-                .font(.system(size: AppConstants.PatientUI.noResultsIconSize))
-                .foregroundColor(AppColors.slate300)
-
-            Text(AppSearch.noResults(presenter.searchText))
-                .font(AppTypography.s3)
-                .foregroundColor(AppColors.slate700)
-                .multilineTextAlignment(.center)
-
-            Button(action: {
-                presenter.clearSearch()
-            }) {
-                Text(AppSearch.clearSearch)
-                    .font(AppTypography.p2)
-                    .foregroundColor(AppColors.purple600)
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-}
-
-#Preview {
-    PatientListView()
 }

@@ -1,430 +1,286 @@
-//
-//  PatientPresenter.swift
-//  Oculab
-//
-//  Created by Risa on 30/05/25.
-//
-
 import Foundation
 import SwiftUI
 import Observation
 
+/// Owns the visible patient record, its independent loading states, and an explicit edit identity.
+@MainActor
 @Observable
 class PatientPresenter {
-    // MARK: - Dependencies
     private let interactor: PatientInteractor
-
-    // MARK: - Form Validation
-    var formValidation: FormValidationViewModel
-
-    // MARK: - Initialization
-    init(interactor: PatientInteractor = PatientInteractor()) {
-        self.interactor = interactor
-        self.formValidation = FormValidationViewModel()
-    }
-
-    // MARK: - UI State
-    var isPatientLoading = false
-    var patients: [PatientListItem] = []
-    var searchText: String = AppConstants.PatientUI.defaultEmptyValue
-    var filteredPatients: [PatientListItem] = []
-
-    var isPatientListEmpty: Bool {
-        !isPatientLoading && patients.isEmpty
-    }
-
-    // MARK: - Patient Data
-    var patient: Patient = .init(
-        name: AppConstants.PatientUI.defaultEmptyValue,
-        NIK: AppConstants.PatientUI.defaultEmptyValue,
-        DoB: Date(),
-        sex: .UNKNOWN
-    )
-
-    var selectedSex: String = AppConstants.PatientUI.defaultEmptyValue
-    var BPJSnumber: String = AppConstants.PatientUI.defaultEmptyValue
-    var selectedDoB: Date = Date()
-
-    // MARK: - Validation Error States
-    var nameError: String = AppConstants.PatientUI.defaultEmptyValue
-    var nikError: String = AppConstants.PatientUI.defaultEmptyValue
-    var bpjsError: String = AppConstants.PatientUI.defaultEmptyValue
-
-    // MARK: - Other States
-    var examinationList: [ExaminationResultCardData] = []
-    var isLoadingExaminations: Bool = false
-    var errorMessage: String?
-
-    // Explicit edit-mode flag, set when an existing patient has been loaded.
-    private var isEditMode: Bool = false
-
-    // MARK: - Task Handles (for cancellation on view disappear)
+    var formValidation = FormValidationViewModel()
+    @ObservationIgnored nonisolated(unsafe) private var sessionObserver: NSObjectProtocol?
+    private var listRequestID: UUID?
+    private var patientRequestID: UUID?
+    private var examinationsRequestID: UUID?
+    private var saveRequestID: UUID?
+    private var formID = UUID()
     private var fetchTask: Task<Void, Never>?
-    private var examinationsTask: Task<Void, Never>?
+    private(set) var editingPatientID: String?
+    private(set) var hasLoadedEditingPatient = false
+    private(set) var hasLoadedPatients = false
+    private(set) var hasLoadedExaminations = false
+    var isPatientLoading = false
+    var isSavingPatient = false
+    var isLoadingExaminations = false
+    var patients: [PatientListItem] = []
+    var filteredPatients: [PatientListItem] = []
+    var searchText = ""
+    var patient = Patient(name: "", NIK: "", DoB: nil, sex: .UNKNOWN)
+    var selectedSex = ""
+    var BPJSnumber = ""
+    var selectedDoB: Date?
+    var nameError = ""
+    var nikError = ""
+    var bpjsError = ""
+    var fieldErrors: [PatientIntakeField: String] = [:]
+    var hasAttemptedSubmission = false
+    var examinationList: [ExaminationResultCardData] = []
+    var errorMessage: String?
+    var listErrorMessage: String?
+    var patientLoadErrorMessage: String?
+    var examinationsErrorMessage: String?
 
-    // MARK: - Computed Properties
-    var isFormValid: Bool {
-        return validatePatientForm() && !isPatientLoading
+    init(interactor: PatientInteractor? = nil) {
+        self.interactor = interactor ?? PatientInteractor()
+        sessionObserver = NotificationCenter.default.addObserver(
+            forName: AuthSessionManager.sessionDidChangeNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.clearSessionData() }
+        }
     }
 
-    // MARK: - Form View Properties
-    var buttonTitle: String {
-        isAddingNewPatient ? AppTextPatientCompCard.buttonCreatePatient : AppTextPatientCompCard.buttonSavePatient
+    deinit {
+        if let sessionObserver { NotificationCenter.default.removeObserver(sessionObserver) }
     }
 
-    var buttonIcon: String {
-        isAddingNewPatient ? AppIcon.add : AppIcon.checkmark
+    var isPatientListEmpty: Bool { hasLoadedPatients && !isPatientLoading && patients.isEmpty && listErrorMessage == nil }
+    var canSubmit: Bool { !isPatientLoading && !isSavingPatient && (editingPatientID == nil || hasLoadedEditingPatient) }
+    /// Pure checks only: SwiftUI may evaluate this repeatedly while rendering.
+    var isFormValid: Bool { canSubmit && PatientIntakeValidation.isReady(patient: formPatient()) }
+    var buttonTitle: String { editingPatientID == nil ? AppTextPatientCompCard.buttonCreatePatient : AppTextPatientCompCard.buttonSavePatient }
+    var buttonIcon: String { editingPatientID == nil ? AppIcon.add : AppIcon.checkmark }
+    var navigationTitle: String { editingPatientID == nil ? AppTextPatientForm.newPatientNavigationTitle : AppTextPatientForm.editPatientNavigationTitle }
+
+    func setupForm(patientId: String?) {
+        let requestedID = patientId?.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let requestedID, !requestedID.isEmpty {
+            // Set the mode before making a request. A failed GET must never become a POST.
+            editingPatientID = requestedID
+            hasLoadedEditingPatient = false
+            formID = UUID()
+            fetchTask?.cancel()
+            fetchTask = Task { [weak self] in await self?.getPatientById(patientId: requestedID) }
+        }
     }
 
-    var navigationTitle: String {
-        isAddingNewPatient ? AppTextPatientForm.newPatientNavigationTitle : AppTextPatientForm.editPatientNavigationTitle
+    func retryPatientLoad() async {
+        guard let editingPatientID else { return }
+        await getPatientById(patientId: editingPatientID)
     }
 
-    private var isAddingNewPatient: Bool {
-        return !isEditMode
-    }
-
-    // MARK: - Lifecycle
-    @MainActor
     func resetState() {
         fetchTask?.cancel()
         fetchTask = nil
-        examinationsTask?.cancel()
-        examinationsTask = nil
+        formID = UUID()
+        listRequestID = nil
+        patientRequestID = nil
+        examinationsRequestID = nil
+        saveRequestID = nil
+        isPatientLoading = false
+        isLoadingExaminations = false
+        isSavingPatient = false
+    }
+
+    private func clearSessionData() {
+        resetState()
+        patient = Patient(name: "", NIK: "", DoB: nil, sex: .UNKNOWN)
+        selectedSex = ""
+        selectedDoB = nil
+        BPJSnumber = ""
+        patients = []
+        filteredPatients = []
+        examinationList = []
+        searchText = ""
+        editingPatientID = nil
+        hasLoadedEditingPatient = false
+        hasLoadedPatients = false
+        hasLoadedExaminations = false
         errorMessage = nil
-    }
-}
-
-// MARK: - Form Management
-extension PatientPresenter {
-    func setupForm(patientId: String?) {
-        guard let patientId = patientId else { return }
-        fetchTask?.cancel()
-        fetchTask = Task { [weak self] in
-            await self?.getPatientById(patientId: patientId)
-        }
+        listErrorMessage = nil
+        patientLoadErrorMessage = nil
+        examinationsErrorMessage = nil
+        fieldErrors = [:]
+        hasAttemptedSubmission = false
+        nameError = ""
+        nikError = ""
+        bpjsError = ""
     }
 
-    func handleFormSubmission() async {
-        if isAddingNewPatient {
-            await addNewPatientWithValidation()
-        } else {
-            await updatePatientWithValidation()
-        }
-    }
-
-    // MARK: - Field Change Handlers
-    func handleNameChange() {
-        validateNameField()
-    }
-
-    func handleNIKChange() {
-        validateNIKField()
-    }
-
-    func handleDateOfBirthChange() {
-        patient.DoB = selectedDoB
-        Logger.debug("Date of birth updated", category: .patient)
-    }
-
+    func handleNameChange() { refreshFieldError(.name) }
+    func handleNIKChange() { refreshFieldError(.nik) }
+    func handleMedicalRecordChange() { refreshFieldError(.medicalRecordNumber) }
+    func handleDateOfBirthChange() { patient.DoB = selectedDoB; refreshFieldError(.dateOfBirth) }
     func handleGenderChange() {
-        switch selectedSex {
-        case AppPatient.Gender.female:
-            patient.sex = .FEMALE
-        case AppPatient.Gender.male:
-            patient.sex = .MALE
-        default:
-            patient.sex = .UNKNOWN
-        }
-        Logger.debug("Gender updated", category: .patient)
+        patient.sex = selectedSex == AppPatient.Gender.female ? .FEMALE : selectedSex == AppPatient.Gender.male ? .MALE : .UNKNOWN
+        refreshFieldError(.sex)
     }
-
-    func handleBPJSChange() {
-        patient.BPJS = BPJSnumber.isEmpty ? nil : BPJSnumber
-        validateBPJSField()
+    func handleBPJSChange() { patient.BPJS = BPJSnumber.isEmpty ? nil : BPJSnumber; refreshFieldError(.bpjs) }
+    private func refreshFieldError(_ field: PatientIntakeField) {
+        guard hasAttemptedSubmission || fieldErrors[field] != nil else { return }
+        fieldErrors[field] = PatientIntakeValidation.errors(for: formPatient())[field]
     }
-
     func dismissKeyboard() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
-}
-
-// MARK: - Form Validation
-extension PatientPresenter {
+    private func formPatient() -> Patient {
+        let recordNumber = patient.medicalRecordNumber?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let snapshot = Patient(id: patient.id, name: patient.name.trimmingCharacters(in: .whitespacesAndNewlines),
+                       NIK: patient.NIK.trimmingCharacters(in: .whitespacesAndNewlines), DoB: selectedDoB,
+                       sex: selectedSex == AppPatient.Gender.female ? .FEMALE : selectedSex == AppPatient.Gender.male ? .MALE : .UNKNOWN,
+                       BPJS: BPJSnumber.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
+                       medicalRecordNumber: recordNumber?.nilIfEmpty)
+        snapshot.preserveBirthDateEncoding(from: patient)
+        return snapshot
+    }
+    @discardableResult
     func validatePatientForm() -> Bool {
-        return formValidation.validatePatientForm(
-            name: patient.name,
-            nik: patient.NIK,
-            bpjs: BPJSnumber.isEmpty ? nil : BPJSnumber
-        )
+        hasAttemptedSubmission = true
+        fieldErrors = PatientIntakeValidation.errors(for: formPatient())
+        return fieldErrors.isEmpty
     }
+    func handleFormSubmission() async {
+        guard canSubmit, validatePatientForm() else { return }
+        await savePatient()
+    }
+    func addNewPatientWithValidation() async { await handleFormSubmission() }
+    func updatePatientWithValidation() async { await handleFormSubmission() }
+    func addNewPatient() async { guard editingPatientID == nil else { return }; await handleFormSubmission() }
+    func updatePatient() async { guard editingPatientID != nil else { return }; await handleFormSubmission() }
 
-    private func validateNameField() {
-        if !patient.name.isEmpty {
-            let isValid = ValidationManager.shared.validateName(patient.name, fieldName: ValidationFieldName.patientName.rawValue)
-            nameError = isValid ? AppConstants.PatientUI.defaultEmptyValue : (ValidationManager.shared.getError(for: ValidationFieldName.patientName.rawValue) ?? AppConstants.PatientUI.defaultEmptyValue)
-        } else {
-            nameError = AppConstants.PatientUI.defaultEmptyValue
-            ValidationManager.shared.clearError(for: ValidationFieldName.patientName.rawValue)
+    private func savePatient() async {
+        guard let session = AuthSessionManager.uploadQueueSession, canSubmit else { return }
+        let requestID = UUID()
+        let requestedForm = formID
+        let intendedID = editingPatientID
+        let submitted = formPatient()
+        saveRequestID = requestID
+        isSavingPatient = true
+        errorMessage = nil
+        defer { if saveRequestID == requestID { isSavingPatient = false; saveRequestID = nil } }
+        do {
+            let saved: Patient
+            if let intendedID {
+                saved = try await interactor.updatePatient(patient: submitted, patientId: intendedID)
+            } else {
+                saved = try await interactor.addNewPatient(patient: submitted)
+            }
+            guard isCurrent(session), formID == requestedForm, saveRequestID == requestID else { return }
+            if let intendedID, saved.id.lowercased() != intendedID.lowercased() { throw URLError(.badServerResponse) }
+            patient = saved
+            // Keep navigation within the same checked session; Router.navigateBack dispatches asynchronously.
+            if !Router.shared.path.isEmpty { Router.shared.path.removeLast() }
+        } catch {
+            guard isCurrent(session), formID == requestedForm, saveRequestID == requestID, !isCancellation(error) else { return }
+            errorMessage = ErrorHandler.shared.handleError(error, context: .patientManagement)
         }
     }
 
-    private func validateNIKField() {
-        if !patient.NIK.isEmpty {
-            let isValid = ValidationManager.shared.validateNIK(patient.NIK, fieldName: ValidationFieldName.patientNIK.rawValue)
-            nikError = isValid ? AppConstants.PatientUI.defaultEmptyValue : (ValidationManager.shared.getError(for: ValidationFieldName.patientNIK.rawValue) ?? AppConstants.PatientUI.defaultEmptyValue)
-        } else {
-            nikError = AppConstants.PatientUI.defaultEmptyValue
-            ValidationManager.shared.clearError(for: ValidationFieldName.patientNIK.rawValue)
-        }
-    }
-
-    private func validateBPJSField() {
-        if !BPJSnumber.isEmpty {
-            let isValid = ValidationManager.shared.validateWithRules(BPJSnumber, fieldName: ValidationFieldName.patientBPJS.rawValue, rules: [
-                .numbersOnly(),
-                .minLength(AppConstants.PatientUI.bpjsMinLength),
-                .maxLength(AppConstants.PatientUI.bpjsMaxLength)
-            ])
-            bpjsError = isValid ? AppConstants.PatientUI.defaultEmptyValue : (ValidationManager.shared.getError(for: ValidationFieldName.patientBPJS.rawValue) ?? AppConstants.PatientUI.defaultEmptyValue)
-        } else {
-            bpjsError = AppConstants.PatientUI.defaultEmptyValue
-            ValidationManager.shared.clearError(for: ValidationFieldName.patientBPJS.rawValue)
-        }
-    }
-}
-
-// MARK: - Patient Data Management
-extension PatientPresenter {
-    @MainActor
-    func addNewPatientWithValidation() async {
-        guard validatePatientForm() else {
-            Logger.warning("Patient form validation failed", category: .patient)
-            return
-        }
-
-        formValidation.clearAllErrors()
-        await addNewPatient()
-    }
-
-    @MainActor
-    func updatePatientWithValidation() async {
-        guard validatePatientForm() else {
-            Logger.warning("Patient form validation failed", category: .patient)
-            return
-        }
-
-        formValidation.clearAllErrors()
-        await updatePatient()
-    }
-
-    @MainActor
     func getAllPatient() async {
+        guard let session = AuthSessionManager.uploadQueueSession else { return }
+        let requestID = UUID()
+        listRequestID = requestID
         isPatientLoading = true
-        defer {
-            isPatientLoading = false
-        }
-
+        listErrorMessage = nil
+        defer { if listRequestID == requestID { isPatientLoading = false } }
         do {
             let response = try await interactor.getAllPatient()
-            patients = response.map { patient in
-                PatientListItem(
-                    id: patient.id,
-                    name: patient.name,
-                    nik: patient.NIK,
-                    bpjs: patient.BPJS ?? AppConstants.PatientUI.defaultEmptyValue,
-                    birthDate: formatDate(patient.DoB)
-                )
-            }
+            guard isCurrent(session), listRequestID == requestID else { return }
+            patients = response.map { PatientListItem(id: $0.id, name: $0.name, nik: $0.NIK, bpjs: $0.BPJS ?? "", birthDate: formatDate($0.DoB), medicalRecordNumber: $0.medicalRecordNumber ?? "") }
+            hasLoadedPatients = true
             filterPatients()
-            Logger.info("Successfully fetched \(response.count) patients", category: .patient)
         } catch {
-            if isEmptyPatientListError(error) {
-                patients = []
-                filterPatients()
-                return
-            }
-            errorMessage = ErrorHandler.shared.handleError(error)
-            Logger.error("Failed to fetch patients: \(error.localizedDescription)", category: .patient)
+            guard isCurrent(session), listRequestID == requestID, !isCancellation(error) else { return }
+            if isEmptyPatientListError(error) { patients = []; hasLoadedPatients = true; filterPatients() }
+            else { listErrorMessage = ErrorHandler.shared.handleError(error, context: .patientManagement) }
         }
     }
 
-    @MainActor
     func getPatientById(patientId: String) async {
+        guard let session = AuthSessionManager.uploadQueueSession else { return }
+        let requestedID = patientId.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !requestedID.isEmpty else { return }
+        if editingPatientID?.lowercased() != requestedID.lowercased() { hasLoadedEditingPatient = false }
+        editingPatientID = requestedID
+        let requestID = UUID()
+        patientRequestID = requestID
         isPatientLoading = true
-        defer {
-            isPatientLoading = false
-        }
-
+        patientLoadErrorMessage = nil
+        defer { if patientRequestID == requestID { isPatientLoading = false } }
         do {
-            let fetchedPatient = try await interactor.getPatientById(patientId: patientId)
-
-            self.patient = fetchedPatient
-            self.BPJSnumber = fetchedPatient.BPJS ?? AppConstants.PatientUI.defaultEmptyValue
-            self.selectedDoB = fetchedPatient.DoB ?? Date()
-            self.isEditMode = true
-
-            switch fetchedPatient.sex {
-            case .FEMALE:
-                self.selectedSex = AppPatient.Gender.female
-            case .MALE:
-                self.selectedSex = AppPatient.Gender.male
-            default:
-                self.selectedSex = AppConstants.PatientUI.defaultEmptyValue
-            }
-            Logger.info("Successfully fetched patient", category: .patient)
+            let fetched = try await interactor.getPatientById(patientId: requestedID)
+            guard isCurrent(session), patientRequestID == requestID else { return }
+            guard fetched.id.lowercased() == requestedID.lowercased() else { throw URLError(.badServerResponse) }
+            patient = fetched
+            BPJSnumber = fetched.BPJS ?? ""
+            selectedDoB = fetched.DoB
+            selectedSex = fetched.sex == .FEMALE ? AppPatient.Gender.female : fetched.sex == .MALE ? AppPatient.Gender.male : ""
+            hasLoadedEditingPatient = true
+            fieldErrors = [:]
+            hasAttemptedSubmission = false
         } catch {
-            errorMessage = ErrorHandler.shared.handleError(error)
-            Logger.error("Failed to fetch patient: \(error.localizedDescription)", category: .patient)
+            guard isCurrent(session), patientRequestID == requestID, !isCancellation(error) else { return }
+            hasLoadedEditingPatient = false
+            patientLoadErrorMessage = ErrorHandler.shared.handleError(error, context: .patientManagement)
         }
     }
 
-    @MainActor
-    func addNewPatient() async {
-        isPatientLoading = true
-        defer {
-            isPatientLoading = false
-        }
-
-        patient.DoB = selectedDoB
-        patient.BPJS = BPJSnumber.isEmpty ? nil : BPJSnumber
-
+    func getExaminationsByPatientId(patientId: String) async {
+        guard let session = AuthSessionManager.uploadQueueSession else { return }
+        let requestID = UUID()
+        examinationsRequestID = requestID
+        isLoadingExaminations = true
+        examinationsErrorMessage = nil
+        defer { if examinationsRequestID == requestID { isLoadingExaminations = false } }
         do {
-            _ = try await interactor.addNewPatient(patient: patient)
-            Logger.info("Successfully added new patient", category: .patient)
-            Router.shared.navigateBack()
+            let response = try await interactor.getAllExamByPatientId(patientId: patientId)
+            guard isCurrent(session), examinationsRequestID == requestID else { return }
+            examinationList = response
+            hasLoadedExaminations = true
         } catch {
-            errorMessage = ErrorHandler.shared.handleError(error)
-            Logger.error("Failed to add new patient: \(error.localizedDescription)", category: .patient)
+            guard isCurrent(session), examinationsRequestID == requestID, !isCancellation(error) else { return }
+            examinationsErrorMessage = ErrorHandler.shared.handleError(error, context: .patientManagement)
         }
     }
-
-    @MainActor
-    func updatePatient() async {
-        isPatientLoading = true
-        defer {
-            isPatientLoading = false
-        }
-
-        patient.DoB = selectedDoB
-        patient.BPJS = BPJSnumber.isEmpty ? nil : BPJSnumber
-
-        switch selectedSex {
-        case AppPatient.Gender.female:
-            patient.sex = .FEMALE
-        case AppPatient.Gender.male:
-            patient.sex = .MALE
-        default:
-            patient.sex = .UNKNOWN
-        }
-
-        do {
-            let updatedPatient = try await interactor.updatePatient(patient: patient, patientId: String(describing: patient.id))
-
-            self.patient = updatedPatient
-            Logger.info("Successfully updated patient", category: .patient)
-            Router.shared.navigateBack()
-        } catch {
-            errorMessage = ErrorHandler.shared.handleError(error)
-            Logger.error("Failed to update patient: \(error.localizedDescription)", category: .patient)
-        }
-    }
-}
-
-// MARK: - Search and Filter Operations
-extension PatientPresenter {
-    func searchPatients() {
-        filterPatients()
-    }
-
-    func clearSearch() {
-        searchText = AppConstants.PatientUI.defaultEmptyValue
-        filterPatients()
-    }
-
+    private func isCurrent(_ session: UploadQueueSession) -> Bool { !Task.isCancelled && session == AuthSessionManager.uploadQueueSession }
+    private func isCancellation(_ error: Error) -> Bool { error is CancellationError || (error as? URLError)?.code == .cancelled }
+    func searchPatients() { filterPatients() }
+    func clearSearch() { searchText = ""; filterPatients() }
     private func filterPatients() {
         let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        if query.isEmpty {
-            filteredPatients = patients
-            return
+        filteredPatients = query.isEmpty ? patients : patients.filter {
+            $0.name.localizedCaseInsensitiveContains(query) || $0.nik.localizedCaseInsensitiveContains(query)
+                || $0.bpjs.localizedCaseInsensitiveContains(query) || $0.medicalRecordNumber.localizedCaseInsensitiveContains(query)
         }
-
-        filteredPatients = patients.filter { item in
-            item.name.localizedCaseInsensitiveContains(query)
-                || item.nik.localizedCaseInsensitiveContains(query)
-                || (!item.bpjs.isEmpty && item.bpjs.localizedCaseInsensitiveContains(query))
-        }
+    }
+    func navigateTo(_ destination: Router.Route) { Router.shared.navigateTo(destination) }
+    func navigateBack() { Router.shared.navigateBack() }
+    func formatDate(_ date: Date?) -> String { date?.formatted(date: .numeric, time: .omitted) ?? AppTextPatientIntake.missingValue }
+    func formatDateTime(_ date: Date) -> String { date.formatted(date: .numeric, time: .shortened) }
+    private func isEmptyPatientListError(_ error: Error) -> Bool {
+        guard case let NetworkError.apiError(response, _) = error else { return false }
+        return response.data.errorType == "RESOURCE_NOT_FOUND" && response.data.description == "No patients found"
     }
 }
 
-// MARK: - Patient List Item
 struct PatientListItem: Identifiable, Equatable {
     let id: String
     let name: String
     let nik: String
     let bpjs: String
     let birthDate: String
+    var medicalRecordNumber: String = ""
 }
 
-// MARK: - Examination Management
-extension PatientPresenter {
-    @MainActor
-    func getExaminationsByPatientId(patientId: String) async {
-        isLoadingExaminations = true
-        defer { isLoadingExaminations = false }
-
-        do {
-            Logger.info("Fetching examinations for patient", category: .patient)
-            let examinations = try await interactor.getAllExamByPatientId(patientId: patientId)
-
-            Logger.info("Successfully received \(examinations.count) examinations", category: .patient)
-            self.examinationList = examinations
-        } catch {
-            errorMessage = ErrorHandler.shared.handleError(error)
-            Logger.error("Failed to fetch examinations: \(error.localizedDescription)", category: .patient)
-        }
-    }
-}
-
-// MARK: - Navigation
-extension PatientPresenter {
-    func navigateTo(_ destination: Router.Route) {
-        Router.shared.navigateTo(destination)
-    }
-
-    func navigateBack() {
-        Router.shared.navigateBack()
-    }
-}
-
-// MARK: - Helper Methods
-extension PatientPresenter {
-    private static let dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.locale = Locale.current
-        formatter.dateFormat = AppConstants.PatientUI.dateFormat
-        return formatter
-    }()
-
-    private static let dateTimeFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.locale = Locale.current
-        formatter.dateFormat = AppConstants.PatientUI.dateTimeFormat
-        return formatter
-    }()
-
-    func formatDate(_ date: Date?) -> String {
-        guard let date = date else { return AppConstants.PatientUI.defaultEmptyValue }
-        return Self.dateFormatter.string(from: date)
-    }
-
-    func formatDateTime(_ date: Date) -> String {
-        return Self.dateTimeFormatter.string(from: date)
-    }
-
-    private func isEmptyPatientListError(_ error: Error) -> Bool {
-        guard case let NetworkError.apiError(apiResponse, _) = error else { return false }
-        return apiResponse.data.errorType == "RESOURCE_NOT_FOUND"
-            && apiResponse.data.description == "No patients found"
-    }
+private extension String {
+    var nilIfEmpty: String? { isEmpty ? nil : self }
 }

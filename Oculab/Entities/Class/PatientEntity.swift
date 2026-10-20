@@ -14,16 +14,20 @@ class Patient: Encodable, Decodable, Identifiable {
     var DoB: Date?
     var sex: SexType
     var BPJS: String?
+    var medicalRecordNumber: String?
     var resultExamination: [String]?
+    private var originalBirthDate: Date?
+    private var originalBirthDateWireValue: String?
 
     init(
         id: String = AppValue.empty,
         name: String,
-        NIK: String,
-        DoB: Date,
+        NIK: String = AppValue.empty,
+        DoB: Date? = nil,
         sex: SexType,
         BPJS: String? = nil,
-        resultExamination: [String]? = nil
+        resultExamination: [String]? = nil,
+        medicalRecordNumber: String? = nil
     ) {
         self.id = id
         self.name = name
@@ -31,6 +35,7 @@ class Patient: Encodable, Decodable, Identifiable {
         self.DoB = DoB
         self.sex = sex
         self.BPJS = BPJS
+        self.medicalRecordNumber = medicalRecordNumber
         self.resultExamination = resultExamination
     }
 
@@ -42,6 +47,7 @@ class Patient: Encodable, Decodable, Identifiable {
         case DoB
         case sex
         case BPJS
+        case medicalRecordNumber
         case resultExamination
         case patientId
     }
@@ -59,26 +65,30 @@ class Patient: Encodable, Decodable, Identifiable {
             self.id = AppValue.empty
         }
         self.name = try container.decode(String.self, forKey: .name)
-        self.NIK = try container.decode(String.self, forKey: .NIK)
-
-        let dateFormatter = ISO8601DateFormatter()
-        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        let dateString = try container.decodeIfPresent(String.self, forKey: .DoB) ?? AppValue.empty
-
-        if dateString != AppValue.empty {
-            guard let date = dateFormatter.date(from: dateString) else {
-                throw DecodingError.dataCorruptedError(
-                    forKey: .DoB,
-                    in: container,
-                    debugDescription: "Date string does not match format expected by formatter."
-                )
+        self.NIK = try container.decodeIfPresent(String.self, forKey: .NIK) ?? AppValue.empty
+        if let rawDate = try container.decodeIfPresent(String.self, forKey: .DoB), !rawDate.isEmpty {
+            guard let date = PatientBirthDateCoding.decode(rawDate) else {
+                throw DecodingError.dataCorruptedError(forKey: .DoB, in: container, debugDescription: "Invalid patient birth date")
             }
             self.DoB = date
+            originalBirthDate = date
+            originalBirthDateWireValue = rawDate
+        } else {
+            self.DoB = nil
         }
 
         self.sex = try container.decode(SexType.self, forKey: .sex)
         self.BPJS = try container.decodeIfPresent(String.self, forKey: .BPJS)
+        self.medicalRecordNumber = try container.decodeIfPresent(String.self, forKey: .medicalRecordNumber)
         self.resultExamination = try container.decodeIfPresent([String].self, forKey: .resultExamination)
+    }
+
+    /// Carry the original wire value into a detached edit snapshot. Historical
+    /// timestamps must not change merely because another field was edited.
+    func preserveBirthDateEncoding(from original: Patient) {
+        guard DoB == original.DoB else { return }
+        originalBirthDate = original.originalBirthDate
+        originalBirthDateWireValue = original.originalBirthDateWireValue
     }
 
     func encode(to encoder: any Encoder) throws {
@@ -90,15 +100,13 @@ class Patient: Encodable, Decodable, Identifiable {
         try container.encode(name, forKey: .name)
         try container.encode(NIK, forKey: .NIK)
 
-        if let DoB = DoB {
-            let dateFormatter = ISO8601DateFormatter()
-            dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-            let dateString = dateFormatter.string(from: DoB)
-            try container.encode(dateString, forKey: .DoB)
+        if let DoB {
+            try container.encode(DoB == originalBirthDate ? (originalBirthDateWireValue ?? PatientBirthDateCoding.encode(DoB)) : PatientBirthDateCoding.encode(DoB), forKey: .DoB)
         }
 
         try container.encode(sex, forKey: .sex)
         try container.encodeIfPresent(BPJS, forKey: .BPJS)
+        try container.encodeIfPresent(medicalRecordNumber, forKey: .medicalRecordNumber)
         try container.encodeIfPresent(resultExamination, forKey: .resultExamination)
     }
 }
