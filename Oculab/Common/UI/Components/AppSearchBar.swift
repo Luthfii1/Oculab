@@ -6,71 +6,86 @@
 //
 
 import SwiftUI
-import UIKit
 
 struct AppSearchBar: View {
     @Binding var searchText: String
     var placeholder: String = AppSearch.placeholder
     var onSearch: () -> Void
     
-    // Add this to observe changes in search text
-    @State private var localSearchText: String = AppValue.empty
-    
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @FocusState private var isSearchFocused: Bool
+
     var body: some View {
-        HStack(spacing: 12) {
-            HStack(spacing: 10) {
-                Image(systemName: AppIcon.search)
-                    .foregroundColor(AppColors.slate400)
-
-                // Use a local state binding first to avoid excessive presenter updates
-                TextField(placeholder, text: $localSearchText)
-                    .font(AppTypography.p2)
-                    .foregroundColor(AppColors.slate900)
-                    .onChange(of: localSearchText) { _, newValue in
-                        // Update the actual binding
-                        searchText = newValue
-                    }
-                
-                // Add a clear button when text is not empty
-                if !localSearchText.isEmpty {
-                    Button(action: {
-                        localSearchText = AppValue.empty
-                        searchText = AppValue.empty
-                        UIApplication.shared.endEditing()
-                    }) {
-                        Image(systemName: AppIcon.error)
-                            .foregroundColor(AppColors.slate400)
-                    }
+        if dynamicTypeSize.isAccessibilitySize {
+            stackedContent
+        } else {
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 12) {
+                    searchField
+                        .frame(minWidth: 160, idealWidth: 160, maxWidth: .infinity)
+                    searchButton
+                        .fixedSize(horizontal: true, vertical: false)
                 }
+                stackedContent
             }
-            .frame(minWidth: 250, minHeight: 32)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-            .background(AppColors.slate0)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(AppColors.slate200, lineWidth: 1)
-            )
-            .cornerRadius(12)
-            // Update localSearchText when searchText changes externally
-            .onAppear {
-                localSearchText = searchText
-            }
-            .onChange(of: searchText) { _, newValue in
-                if localSearchText != newValue {
-                    localSearchText = newValue
-                }
-            }
-
-            AppButton(
-                title: AppAction.search,
-                cornerRadius: 12,
-                action: {
-                    UIApplication.shared.endEditing()
-                    onSearch()
-                }
-            )
         }
+    }
+
+    private var stackedContent: some View {
+        VStack(spacing: 12) {
+            searchField
+            searchButton
+        }
+    }
+
+    private var searchField: some View {
+        HStack(spacing: 10) {
+            Image(systemName: AppIcon.search)
+                .foregroundColor(AppColors.slate400)
+                .accessibilityHidden(true)
+
+            TextField(placeholder, text: $searchText)
+                .font(AppTypography.p2)
+                .foregroundColor(AppColors.slate900)
+                .focused($isSearchFocused)
+                .submitLabel(.search)
+                .onSubmit(submitSearch)
+                .accessibilityLabel(placeholder)
+
+            if !searchText.isEmpty {
+                Button {
+                    searchText = AppValue.empty
+                    isSearchFocused = true
+                } label: {
+                    Image(systemName: AppIcon.error)
+                        .foregroundColor(AppColors.slate400)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(AppSearch.clearSearch)
+            }
+        }
+        .padding(.horizontal, 12)
+        .frame(maxWidth: .infinity, minHeight: 50)
+        .background(AppColors.slate0, in: RoundedRectangle(cornerRadius: 12))
+        .overlay {
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(AppColors.slate200, lineWidth: 1)
+        }
+    }
+
+    private var searchButton: some View {
+        AppButton(
+            title: AppAction.search,
+            cornerRadius: 12,
+            action: submitSearch
+        )
+    }
+
+    private func submitSearch() {
+        isSearchFocused = false
+        onSearch()
     }
 }
 
@@ -79,4 +94,17 @@ struct AppSearchBar: View {
         searchText: .constant("Search"),
         onSearch: {}
     )
+}
+
+#Preview("Narrow layout") {
+    AppSearchBar(searchText: .constant("Rizky"), onSearch: {})
+        .padding(24)
+        .frame(width: 280)
+}
+
+#Preview("Accessibility text size") {
+    AppSearchBar(searchText: .constant("Rizky"), onSearch: {})
+        .environment(\.dynamicTypeSize, .accessibility3)
+        .padding(24)
+        .frame(width: 320)
 }

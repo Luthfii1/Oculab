@@ -23,7 +23,7 @@ struct HomeView: View {
             ScrollView(showsIndicators: false) {
                 Spacer().frame(height: Decimal.d16)
 
-                VStack(alignment: .leading, spacing: 20) {
+                LazyVStack(alignment: .leading, spacing: 20) {
                     StatisticComponent(isLab: authentication.user.role == .LAB)
                         .environmentObject(presenter)
 
@@ -32,11 +32,11 @@ struct HomeView: View {
                 .padding(.horizontal, 20)
                 .padding(.bottom, tabBarScrollInset)
             }
+            .scrollDismissesKeyboard(.interactively)
             .refreshable {
                 refreshTask?.cancel()
                 refreshTask = Task {
-                    await presenter.getStatisticData()
-                    await presenter.fetchData(userRole: authentication.user.role)
+                    await presenter.refreshHome(userRole: authentication.user.role)
                 }
                 await refreshTask?.value
             }
@@ -63,8 +63,7 @@ struct HomeView: View {
             refreshTrackedAnalysisIds()
             loadTask?.cancel()
             loadTask = Task {
-                await presenter.getStatisticData()
-                await presenter.fetchData(userRole: authentication.user.role)
+                await presenter.refreshHome(userRole: authentication.user.role)
             }
         }
         .onDisappear {
@@ -75,15 +74,13 @@ struct HomeView: View {
             guard isConnected else { return }
             loadTask?.cancel()
             loadTask = Task {
-                await presenter.getStatisticData()
-                await presenter.fetchData(userRole: authentication.user.role)
+                await presenter.refreshHome(userRole: authentication.user.role)
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .examinationAnalysisReady)) { _ in
             refreshTask?.cancel()
             refreshTask = Task {
-                await presenter.getStatisticData()
-                await presenter.fetchData(userRole: authentication.user.role)
+                await presenter.refreshHome(userRole: authentication.user.role)
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .examinationAnalysisProgress)) { _ in
@@ -110,7 +107,10 @@ struct HomeView: View {
 
                 Spacer()
 
-                if !presenter.isAllExamsLoading && presenter.hasAnyExaminations {
+                if presenter.isAllExamsLoading && presenter.hasLoadedExaminations {
+                    ProgressView().accessibilityLabel(AppTextHomeHistory.refreshingLabel)
+                }
+                if presenter.hasLoadedExaminations && presenter.hasAnyExaminations {
                     Text(
                         String(
                             format: AppTextHomeHistory.taskCountFormat,
@@ -207,6 +207,21 @@ struct HomeView: View {
                 }
             }
 
+            if presenter.hasLoadedExaminations && !presenter.loadErrorMessage.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(presenter.loadErrorMessage)
+                        .font(AppTypography.p3)
+                        .foregroundStyle(AppColors.slate600)
+                    Button(AppTextHomeHistory.loadErrorRetry) {
+                        loadTask?.cancel()
+                        loadTask = Task { await presenter.refreshHome(userRole: authentication.user.role) }
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(12)
+                .background(AppColors.orange50, in: RoundedRectangle(cornerRadius: 10))
+            }
+
             taskListContent
         }
     }
@@ -234,7 +249,7 @@ struct HomeView: View {
 
     @ViewBuilder
     private var taskListContent: some View {
-            if presenter.isAllExamsLoading {
+        if presenter.isAllExamsLoading && !presenter.hasLoadedExaminations {
             VStack(spacing: 12) {
                 ProgressView()
                 Text(AppTextHomeHistory.loadingState)
@@ -244,7 +259,7 @@ struct HomeView: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, 32)
 
-        } else if !presenter.loadErrorMessage.isEmpty {
+        } else if !presenter.loadErrorMessage.isEmpty && !presenter.hasLoadedExaminations {
             VStack(spacing: 12) {
                 Text(presenter.loadErrorMessage)
                     .font(AppTypography.p3)
@@ -258,8 +273,7 @@ struct HomeView: View {
                 ) {
                     loadTask?.cancel()
                     loadTask = Task {
-                        await presenter.getStatisticData()
-                        await presenter.fetchData(userRole: authentication.user.role)
+                        await presenter.refreshHome(userRole: authentication.user.role)
                     }
                 }
             }
@@ -270,7 +284,7 @@ struct HomeView: View {
             emptyTasksView
 
         } else {
-            VStack(spacing: 12) {
+            LazyVStack(spacing: 12) {
                 ForEach(presenter.filteredExamination) { exam in
                     Button {
                         openExamination(exam)

@@ -32,6 +32,12 @@ extension AppText {
         static let noTasksInSearchMessage = "home_history.no_tasks_in_search_message".localized
         static let loadErrorRetry = "home_history.load_error_retry".localized
         static let loadingState = AppState.loading("home_history.examination_data".localized)
+        static let refreshingLabel = "home_history.refreshing_label".localized
+        static let historyFilteredEmpty = "home_history.history_filtered_empty".localized
+
+        static func historyDateRange(from: String, to: String) -> String {
+            String(format: "home_history.history_date_range".localized, from, to)
+        }
         static let offlineCacheBanner = "home_history.offline_cache_banner".localized
         static let analysisResumeBanner = "home_history.analysis_resume_banner".localized
         static let historyFilterTitle = "home_history.history_filter_title".localized
