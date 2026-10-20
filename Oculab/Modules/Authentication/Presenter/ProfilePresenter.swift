@@ -12,6 +12,10 @@ class ProfilePresenter: ObservableObject {
     // MARK: - Dependencies
     private var interactor: ProfileInteractorProtocol
     private var authInteractor: AuthenticationInteractor
+    private var passwordRequestID: UUID?
+    private var passwordSuccessSession: UploadQueueSession?
+    private var passwordFormRevision = UUID()
+    private var sessionObserver: NSObjectProtocol?
 
     // MARK: - Form Validation
     @Published var formValidation: FormValidationViewModel
@@ -64,12 +68,27 @@ class ProfilePresenter: ObservableObject {
         self.formValidation = FormValidationViewModel()
         self.interactor = interactor
         self.authInteractor = authInteractor
+        sessionObserver = NotificationCenter.default.addObserver(
+            forName: AuthSessionManager.sessionDidChangeNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.resetEditPassword() }
+        }
+    }
+
+    deinit {
+        if let sessionObserver { NotificationCenter.default.removeObserver(sessionObserver) }
     }
 }
 
 // MARK: - Form Validation
 extension ProfilePresenter {
+    @MainActor
     func preparePasswordEditForm() {
+        passwordFormRevision = UUID()
+        passwordRequestID = nil
+        passwordSuccessSession = nil
+        isLoading = false
+        showSuccessPopup = false
         hasAttemptedPasswordSubmit = false
         generalFormError = AppValue.empty
         confirmPasswordHint = AppTextAuthProfile.descConfirmPassword
@@ -195,6 +214,7 @@ extension ProfilePresenter {
 extension ProfilePresenter {
     @MainActor
     func postEditPasswordWithValidation(authPresenter: AuthenticationPresenter) async {
+        guard !isLoading, passwordRequestID == nil else { return }
         hasAttemptedPasswordSubmit = true
         generalFormError = AppValue.empty
 
@@ -209,18 +229,38 @@ extension ProfilePresenter {
 
     @MainActor
     func postEditPassword(authPresenter: AuthenticationPresenter) async {
+        guard !isLoading, passwordRequestID == nil else { return }
+        guard let session = AuthSessionManager.uploadQueueSession else {
+            generalFormError = ErrorHandler.shared.handleError(URLError(.userAuthenticationRequired), context: .profile)
+            return
+        }
+        let requestID = UUID()
+        let revision = passwordFormRevision
+        passwordRequestID = requestID
+        passwordSuccessSession = nil
+        showSuccessPopup = false
         isLoading = true
-        defer { isLoading = false }
+        defer {
+            if passwordRequestID == requestID {
+                passwordRequestID = nil
+                isLoading = false
+            }
+        }
         
         do {
-            _ = try await interactor.editNewPassword(
+            let response = try await interactor.editNewPassword(
                 newPassword: inputPassword,
                 previousPassword: oldPassword
             )
-            
-            showSuccessPopup = true
+            guard !Task.isCancelled, session == AuthSessionManager.uploadQueueSession,
+                  passwordRequestID == requestID, passwordFormRevision == revision,
+                  response.userId.lowercased() == session.ownerUserId else { return }
             resetEditPassword()
+            passwordSuccessSession = session
+            showSuccessPopup = true
         } catch {
+            guard !Task.isCancelled, !(error is CancellationError), session == AuthSessionManager.uploadQueueSession,
+                  passwordRequestID == requestID, passwordFormRevision == revision else { return }
             handlePasswordChangeError(error)
         }
     }
@@ -268,7 +308,13 @@ extension ProfilePresenter {
         generalFormError = description.isEmpty ? AppTextAuthEditPassword.updateFailed : description
     }
     
+    @MainActor
     func resetEditPassword() {
+        passwordFormRevision = UUID()
+        passwordRequestID = nil
+        passwordSuccessSession = nil
+        isLoading = false
+        showSuccessPopup = false
         oldPassword = AppValue.empty
         inputPassword = AppValue.empty
         confirmPassword = AppValue.empty
@@ -299,8 +345,17 @@ extension ProfilePresenter {
         Router.shared.navigateTo(destination)
     }
     
+    @MainActor
     func backToProfilePage() {
+        let successSession = passwordSuccessSession
         showSuccessPopup = false
-        Router.shared.popToRoot()
+        passwordSuccessSession = nil
+        guard let successSession, successSession == AuthSessionManager.uploadQueueSession else { return }
+        // Keep the session check and navigation mutation in the same main-actor
+        // turn; Router.popToRoot queues a block that could otherwise run after login.
+        let router = Router.shared
+        if !router.path.isEmpty { router.path.removeLast(router.path.count) }
+        router.currentRoute = nil
+        router.endTaskAssignmentFlow()
     }
 }

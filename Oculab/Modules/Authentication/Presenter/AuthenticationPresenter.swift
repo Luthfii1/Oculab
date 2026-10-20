@@ -104,7 +104,8 @@ class AuthenticationPresenter: ObservableObject {
     // MARK: - Constants & Dependencies
     let numbers = AppConstants.pinNumbers
     private var interactor: AuthenticationInteractor
-    private var isPinSubmissionInProgress = false
+    private var pinMutationID: UUID?
+    private var accessPinSuccessSession: UploadQueueSession?
     weak var appStateManager: AppStateManager?
 
     // MARK: - Computed Properties
@@ -360,7 +361,7 @@ extension AuthenticationPresenter {
             newAccessPin = AppValue.empty
             isAccessPinChangeInProgress = false
 
-            let hasPin = KeychainHelper.string(for: .accessPin) != nil || account.accessPin != nil
+            let hasPin = account.hasAccessPin || KeychainHelper.string(for: .accessPin) != nil || account.accessPin != nil
             if !hasPin {
                 // User needs to create PIN
                 state = .create
@@ -459,20 +460,20 @@ extension AuthenticationPresenter {
                     newAccessPin = secondPin
                     await editAccessPin()
                 } else {
-                    guard !isPinSubmissionInProgress else { return }
-                    isPinSubmissionInProgress = true
-                    defer { isPinSubmissionInProgress = false }
-
-                    await createAccessPin()
-                    guard !isError else {
-                        inputPin = AppValue.empty
+                    let session = AuthSessionManager.uploadQueueSession
+                    let didCreate = await createAccessPin()
+                    guard session == AuthSessionManager.uploadQueueSession else { return }
+                    guard didCreate else {
+                        if isError { inputPin = AppValue.empty }
                         return
                     }
+                    guard !Task.isCancelled else { return }
 
                     UserDefaults.standard.set(true, forKey: UserDefaultType.firstTimeLogin.rawValue)
                     await refreshUserFromSwiftData()
+                    guard session == AuthSessionManager.uploadQueueSession else { return }
                     appStateManager?.initializationState = .createFaceId
-                    Router.shared.popToRoot()
+                    resetAccountNavigation()
                 }
             } else {
                 inputPin = AppValue.empty
@@ -519,69 +520,106 @@ extension AuthenticationPresenter {
     
     @MainActor
     func editAccessPin() async {
-        defer { isLoading = false }
+        guard pinMutationID == nil,
+              let session = AuthSessionManager.uploadQueueSession else { return }
+        let operationID = UUID()
+        pinMutationID = operationID
+        defer {
+            if pinMutationID == operationID { pinMutationID = nil; isLoading = false }
+        }
         isLoading = true
+        let submittedPin = newAccessPin
+        let previousPin = oldAccessPin
         
-        guard let user = await interactor.getUserLocalData() else {
-            isError = true
+        let localUser = await interactor.getUserLocalData()
+        guard session == AuthSessionManager.uploadQueueSession else { return }
+        guard let user = localUser else {
             description = "User not found"
+            isError = true
             return
         }
+        guard session == AuthSessionManager.uploadQueueSession,
+              user.id.lowercased() == session.ownerUserId else { return }
         
         do {
             _ = try await interactor.editNewPIN(
-                newAccessPin: newAccessPin,
-                previousAccessPin: oldAccessPin
+                newAccessPin: submittedPin,
+                previousAccessPin: previousPin
             )
             
             // Update local user data — PIN stored in Keychain
-            user.setAccessPinSecurely(newAccessPin)
-            await interactor.updateUserLocalData(user: user)
+            guard session == AuthSessionManager.uploadQueueSession else { return }
+            user.setAccessPinSecurely(submittedPin)
+            user.hasAccessPin = true
+            await interactor.updateUserLocalData(user: user, expectedSession: session)
+            guard session == AuthSessionManager.uploadQueueSession else { return }
             
             // Show success and reset
+            accessPinSuccessSession = session
             showAccessPinSuccessPopup = true
             resetPinChangeFlow()
             
         } catch {
+            guard session == AuthSessionManager.uploadQueueSession else { return }
             errorMessage = ErrorHandler.shared.handleError(error, context: .profile)
+            description = errorMessage
+            isError = true
         }
     }
     
     @MainActor
-    func createAccessPin() async {
-        guard !firstPin.isEmpty, !secondPin.isEmpty else {
+    @discardableResult
+    func createAccessPin() async -> Bool {
+        guard pinMutationID == nil,
+              let session = AuthSessionManager.uploadQueueSession else { return false }
+        guard ValidationHelpers.isValidPIN(firstPin), ValidationHelpers.isValidPIN(secondPin) else {
             isError = true
-            return
+            return false
         }
         
         guard Self.constantTimeEquals(firstPin, secondPin) else {
             description = AppTextAuthCompPin.invalidPinMatchText
             isError = true
-            return
+            return false
         }
+        let submittedPin = firstPin
+        isError = false
+        let operationID = UUID()
+        pinMutationID = operationID
+        defer {
+            if pinMutationID == operationID { pinMutationID = nil; isLoading = false }
+        }
+        isLoading = true
         
         do {
-            guard var localUser = await interactor.getUserLocalData() else {
-                isError = true
+            let cachedUser = await interactor.getUserLocalData()
+            guard session == AuthSessionManager.uploadQueueSession else { return false }
+            guard let localUser = cachedUser else {
                 description = "User not found"
-                return
+                isError = true
+                return false
             }
+            guard session == AuthSessionManager.uploadQueueSession,
+                  localUser.id.lowercased() == session.ownerUserId else { return false }
             
-            _ = try await interactor.createAccessPin(accessPin: firstPin)
-            localUser.setAccessPinSecurely(firstPin)
-            await interactor.updateUserLocalData(user: localUser)
+            _ = try await interactor.createAccessPin(accessPin: submittedPin)
+            guard session == AuthSessionManager.uploadQueueSession else { return false }
+            localUser.setAccessPinSecurely(submittedPin)
+            localUser.hasAccessPin = true
+            await interactor.updateUserLocalData(user: localUser, expectedSession: session)
+            guard session == AuthSessionManager.uploadQueueSession else { return false }
             await refreshUserFromSwiftData()
+            return session == AuthSessionManager.uploadQueueSession
         } catch {
+            guard session == AuthSessionManager.uploadQueueSession else { return false }
             if case let NetworkError.apiError(apiResponse, _) = error, apiResponse.code == 409 {
-                if var localUser = await interactor.getUserLocalData() {
-                    localUser.setAccessPinSecurely(firstPin)
-                    await interactor.updateUserLocalData(user: localUser)
-                    await refreshUserFromSwiftData()
-                }
-                return
+                // A conflict proves no acceptance of the PIN entered on this device.
+                self.user.hasAccessPin = true
+                description = AppTextAuthCompPin.pinUnavailableOnDevice
+                isError = true
+                return false
             }
 
-            isError = true
             switch error {
             case let NetworkError.apiError(apiResponse, _):
                 description = apiResponse.data.description
@@ -590,6 +628,8 @@ extension AuthenticationPresenter {
             default:
                 description = error.localizedDescription
             }
+            isError = true
+            return false
         }
     }
     
@@ -624,7 +664,9 @@ extension AuthenticationPresenter {
                     descriptionPIN = AppTextAuthCompPin.revalidatePinTitle
                 }
             case .authenticate:
-                descriptionPIN = AppTextAuthCompPin.titleAuthenticatePin
+                descriptionPIN = user.hasAccessPin && KeychainHelper.string(for: .accessPin) == nil
+                    ? AppTextAuthCompPin.pinUnavailableOnDevice
+                    : AppTextAuthCompPin.titleAuthenticatePin
             case .changePIN:
                 descriptionPIN = AppTextAuthCompPin.changePinTitle
             case .forgetPin:
@@ -655,35 +697,67 @@ extension AuthenticationPresenter {
     
     @MainActor
     func handleForgetPin() async {
+        guard pinMutationID == nil,
+              let session = AuthSessionManager.uploadQueueSession else { return }
+        let operationID = UUID()
+        pinMutationID = operationID
+        defer {
+            if pinMutationID == operationID { pinMutationID = nil; isLoading = false }
+        }
+        isLoading = true
         // Hide the popup first
         showForgetPinPopup = false
         
         // Call backend API to delete access PIN
         do {
             _ = try await interactor.deleteAccessPin()
+            guard session == AuthSessionManager.uploadQueueSession else { return }
             Logger.info("Access PIN successfully deleted from backend", category: .authentication)
             
             // Update local user data to remove PIN
             if var localUser = await interactor.getUserLocalData() {
+                guard session == AuthSessionManager.uploadQueueSession else { return }
                 localUser.setAccessPinSecurely(nil)
-                await interactor.updateUserLocalData(user: localUser)
+                localUser.hasAccessPin = false
+                await interactor.updateUserLocalData(user: localUser, expectedSession: session)
             }
             
         } catch {
+            guard session == AuthSessionManager.uploadQueueSession else { return }
             Logger.error("Failed to delete access PIN from backend: \(error)", category: .authentication)
-            isError = true
             errorMessage = ErrorHandler.shared.handleError(error, context: .login)
+            description = errorMessage
+            isError = true
             return
         }
 
-        await performLogout()
-        Router.shared.popToRoot()
+        guard session == AuthSessionManager.uploadQueueSession else { return }
+        await performLogout(ifGeneration: session.generation)
+        guard AuthSessionManager.uploadQueueSession == nil else { return }
+        resetAccountNavigation()
 
         Logger.info("User successfully logged out via forget PIN", category: .authentication)
     }
     
     func cancelForgetPin() {
         showForgetPinPopup = false
+    }
+
+    @MainActor
+    func dismissAccessPinSuccess() {
+        let session = accessPinSuccessSession
+        accessPinSuccessSession = nil
+        showAccessPinSuccessPopup = false
+        guard let session, session == AuthSessionManager.uploadQueueSession else { return }
+        resetAccountNavigation()
+    }
+
+    @MainActor
+    private func resetAccountNavigation() {
+        let router = Router.shared
+        if !router.path.isEmpty { router.path.removeLast(router.path.count) }
+        router.currentRoute = nil
+        router.endTaskAssignmentFlow()
     }
 }
 
@@ -823,24 +897,30 @@ extension AuthenticationPresenter {
     
     @MainActor
     func updateAccount(updateUser: User) async {
-        defer { isLoading = false }
+        guard !isLoading, let session = AuthSessionManager.uploadQueueSession else { return }
+        defer {
+            if session == AuthSessionManager.uploadQueueSession { isLoading = false }
+        }
         isLoading = true
         
         do {
             let response = try await interactor.updateUserById(user: updateUser)
-
+            guard !Task.isCancelled, session == AuthSessionManager.uploadQueueSession else { return }
             user = response
-            Router.shared.popToRoot()
+            resetAccountNavigation()
         } catch {
+            guard !(error is CancellationError), session == AuthSessionManager.uploadQueueSession else { return }
             errorMessage = ErrorHandler.shared.handleError(error, context: .profile)
         }
     }
     
     @MainActor
     func refreshUserFromSwiftData() async {
-        if let userData = await interactor.getUserLocalData() {
-            user = userData
-        }
+        let session = AuthSessionManager.uploadQueueSession
+        guard let userData = await interactor.getUserLocalData(),
+              session == AuthSessionManager.uploadQueueSession,
+              session?.ownerUserId == userData.id.lowercased() else { return }
+        user = userData
     }
     
     @MainActor
@@ -894,6 +974,8 @@ extension AuthenticationPresenter {
         
         // Clear user data
         user = User()
+        pinMutationID = nil
+        accessPinSuccessSession = nil
         isEmailVerified = false
         showEmailVerificationAlert = false
         verificationResendMessage = AppValue.empty

@@ -164,14 +164,10 @@ class AuthenticationInteractor: ObservableObject {
         return response.data
     }
 
+    @MainActor
     func updateUserById(user: User) async throws -> User {
-        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
-            throw NSError(
-                domain: "UserIdNotFound",
-                code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "User ID not found"]
-            )
-        }
+        let session = try authenticatedSession()
+        let userId = session.ownerUserId
 
         let response: APIResponse<User> = try await networkService.update(
             urlString: apiAuthenticationService + "/update-user/\(userId)",
@@ -179,7 +175,8 @@ class AuthenticationInteractor: ObservableObject {
             body: user
         )
 
-        await updateUserSwiftData(data: response.data)
+        try requireCurrentSession(session, returnedUserId: response.data.id)
+        updateUserSwiftData(data: response.data)
 
         return response.data
     }
@@ -188,8 +185,12 @@ class AuthenticationInteractor: ObservableObject {
         return await getUserSwiftData()
     }
 
-    func updateUserLocalData(user: User) async {
-        await updateUserSwiftData(data: user)
+    func updateUserLocalData(user: User, expectedSession: UploadQueueSession? = nil) async {
+        await MainActor.run {
+            if let expectedSession,
+               expectedSession != AuthSessionManager.uploadQueueSession { return }
+            updateUserSwiftData(data: user)
+        }
     }
 
     @MainActor
@@ -199,6 +200,22 @@ class AuthenticationInteractor: ObservableObject {
 
     private func authorizationHeaders() throws -> [String: String] {
         try AuthSessionManager.authorizationHeaders()
+    }
+
+    @MainActor
+    private func authenticatedSession() throws -> UploadQueueSession {
+        guard let session = AuthSessionManager.uploadQueueSession else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        return session
+    }
+
+    @MainActor
+    private func requireCurrentSession(_ expected: UploadQueueSession, returnedUserId: String? = nil) throws {
+        guard expected == AuthSessionManager.uploadQueueSession,
+              returnedUserId.map({ $0.lowercased() == expected.ownerUserId }) ?? true else {
+            throw CancellationError()
+        }
     }
 
     private func copyUser(from source: User) -> User {
@@ -211,7 +228,8 @@ class AuthenticationInteractor: ObservableObject {
             accessPin: source.accessPin ?? KeychainHelper.string(for: .accessPin),
             isFaceIdEnabled: source.isFaceIdEnabled,
             businessModel: source.businessModel,
-            emailVerified: source.emailVerified
+            emailVerified: source.emailVerified,
+            hasAccessPin: source.hasAccessPin
         )
         return user
     }
@@ -225,6 +243,7 @@ class AuthenticationInteractor: ObservableObject {
         target.isFaceIdEnabled = source.isFaceIdEnabled
         target.businessModel = source.businessModel
         target.emailVerified = source.emailVerified
+        target.hasAccessPin = source.hasAccessPin
         // Secrets: keep Keychain PIN; never write password/token to SwiftData.
         if let pin = source.accessPin, !pin.isEmpty {
             KeychainHelper.set(pin, for: .accessPin)
@@ -292,10 +311,10 @@ class AuthenticationInteractor: ObservableObject {
         }
     }
     
+    @MainActor
     func editNewPIN(newAccessPin: String, previousAccessPin: String) async throws -> UserUpdateAccessPinResponse {
-        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
-            throw URLError(.userAuthenticationRequired)
-        }
+        let session = try authenticatedSession()
+        let userId = session.ownerUserId
 
         let response: APIResponse<UserUpdateAccessPinResponse> = try await networkService.update(
             urlString: apiAuthenticationService + "/update-user-accessPin/\(userId)",
@@ -306,45 +325,45 @@ class AuthenticationInteractor: ObservableObject {
             )
         )
 
+        try requireCurrentSession(session, returnedUserId: response.data.userId)
+        guard response.data.hasAccessPin == true else { throw URLError(.cannotParseResponse) }
         KeychainHelper.set(newAccessPin, for: .accessPin)
-
-        return UserUpdateAccessPinResponse(
-            userId: response.data.userId ?? userId,
-            email: response.data.email,
-            hasAccessPin: true,
-            newAccessPin: newAccessPin
-        )
+        return response.data
     }
 
+    @MainActor
     func createAccessPin(accessPin: String) async throws -> CreateAccessPinResponse {
-        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
-            throw URLError(.userAuthenticationRequired)
-        }
+        let session = try authenticatedSession()
+        let userId = session.ownerUserId
 
-        let _: APIResponse<CreateAccessPinResponse> = try await networkService.post(
+        let response: APIResponse<CreateAccessPinResponse> = try await networkService.post(
             urlString: apiAuthenticationService + "/create-user-accessPin/\(userId)",
             headers: try authorizationHeaders(),
             body: CreateAccessPinResponse(accessPin: accessPin, hasAccessPin: true)
         )
 
+        try requireCurrentSession(session)
+        guard response.data.hasAccessPin == true else { throw URLError(.cannotParseResponse) }
         KeychainHelper.set(accessPin, for: .accessPin)
-        return CreateAccessPinResponse(accessPin: accessPin, hasAccessPin: true)
+        return response.data
     }
 
+    @MainActor
     func deleteAccessPin() async throws -> DeleteAccessPinResponse {
-        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
-            throw URLError(.userAuthenticationRequired)
-        }
+        let session = try authenticatedSession()
+        let userId = session.ownerUserId
 
         struct EmptyBody: Codable {}
 
-        let _: APIResponse<DeleteAccessPinResponse> = try await networkService.delete(
+        let response: APIResponse<DeleteAccessPinResponse> = try await networkService.delete(
             urlString: apiAuthenticationService + "/delete-user-accessPin/\(userId)",
             headers: try authorizationHeaders(),
             body: EmptyBody()
         )
 
+        try requireCurrentSession(session)
+        guard response.data.hasAccessPin == false else { throw URLError(.cannotParseResponse) }
         KeychainHelper.remove(.accessPin)
-        return DeleteAccessPinResponse(accessPin: nil, hasAccessPin: false)
+        return response.data
     }
 }

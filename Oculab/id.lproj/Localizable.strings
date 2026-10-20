@@ -578,6 +578,7 @@
 "auth.profile.verify_email_message" = "Konfirmasi email agar kami dapat menghubungi Anda untuk pemulihan password dan keamanan akun.";
 "auth.profile.verify_email_resend" = "Kirim ulang email verifikasi";
 "auth.profile.verify_email_refresh" = "Saya sudah verifikasi email";
+"auth.pin.unavailable_on_device" = "Akun Anda sudah memiliki PIN. Gunakan Lupa PIN untuk mengaturnya ulang di perangkat ini.";
 "auth.profile.clinical_blocked_title" = "Verifikasi email terlebih dahulu";
 "auth.profile.clinical_blocked_message" = "Konfirmasi email Anda sebelum membuat pemeriksaan baru. Buka Profil untuk mengirim ulang tautan verifikasi.";
 "auth.profile.clinical_blocked_button" = "Buka Profil";

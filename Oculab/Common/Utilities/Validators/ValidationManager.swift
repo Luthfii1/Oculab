@@ -417,22 +417,32 @@ class ValidationManager: ObservableObject {
     
     /// Sets an error for a field
     func setError(_ message: String, for fieldName: String) {
-        DispatchQueue.main.async {
+        updateErrors {
             self.errors[fieldName] = message
         }
     }
     
     /// Clears the error for a field
     func clearError(for fieldName: String) {
-        DispatchQueue.main.async {
+        updateErrors {
             self.errors.removeValue(forKey: fieldName)
         }
     }
     
     /// Clears all errors
     func clearAllErrors() {
-        DispatchQueue.main.async {
+        updateErrors {
             self.errors.removeAll()
+        }
+    }
+
+    /// Preserve ordering with session/form resets on the main thread. Background
+    /// callers still publish on main, matching the existing API's behavior.
+    private func updateErrors(_ update: @escaping () -> Void) {
+        if Thread.isMainThread {
+            update()
+        } else {
+            DispatchQueue.main.async(execute: update)
         }
     }
     

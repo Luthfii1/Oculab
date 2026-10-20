@@ -12,7 +12,8 @@ struct ForgetPinComponent: View {
     var state: PinMode
     
     var body: some View {
-        if state == .authenticate {
+        if state == .authenticate ||
+            (authPresenter.user.hasAccessPin && KeychainHelper.string(for: .accessPin) == nil) {
             HStack(alignment: .center, spacing: 8) {
                 Text(AppTextAuthCompPin.forgotPinText)
                     .font(AppTypography.p3)
