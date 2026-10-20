@@ -118,6 +118,7 @@ struct PatientDisplayField: View {
             intakeFieldError(.sex)
             Divider()
             Text(AppTextPatientIntake.identifiersTitle).font(.headline)
+                .fixedSize(horizontal: false, vertical: true)
             Text(AppTextPatientIntake.identifiersHint).font(.subheadline).foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
             optionalIdentifier(AppTextPatientIntake.medicalRecordNumber, placeholder: AppTextPatientIntake.medicalRecordPlaceholder,

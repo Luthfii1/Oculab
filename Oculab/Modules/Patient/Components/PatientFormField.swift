@@ -7,6 +7,7 @@ struct PatientFormField: View {
         VStack(alignment: .leading, spacing: 24) {
             VStack(alignment: .leading, spacing: 8) {
                 Text(AppTextPatientIntake.demographicsTitle).font(.headline)
+                    .fixedSize(horizontal: false, vertical: true)
                 Text(AppTextPatientIntake.requiredHint).font(.subheadline).foregroundStyle(.secondary)
             }
             input(AppPatient.name, required: true, placeholder: AppTextPatientCompFormField.namePlaceholder,
@@ -16,6 +17,7 @@ struct PatientFormField: View {
                 PatientBirthDateField(date: $presenter.selectedDoB)
                     .onChange(of: presenter.selectedDoB) { presenter.handleDateOfBirthChange() }
                 Text(AppTextPatientIntake.birthDateHint).font(.caption).foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
                 fieldError(.dateOfBirth)
             }
 
@@ -30,6 +32,7 @@ struct PatientFormField: View {
             Divider()
             VStack(alignment: .leading, spacing: 8) {
                 Text(AppTextPatientIntake.identifiersTitle).font(.headline)
+                    .fixedSize(horizontal: false, vertical: true)
                 Text(AppTextPatientIntake.identifiersHint).font(.subheadline).foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
