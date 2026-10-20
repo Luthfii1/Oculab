@@ -28,16 +28,14 @@ struct UserAccessPinView: View {
                                 size: .large,
                                 isEnabled: true
                             ) {
-                                securityPresenter.showAccessPinSuccessPopup = false
-                                Router.shared.popToRoot()
+                                securityPresenter.dismissAccessPinSuccess()
                             },
                         ],
                         isVisible: Binding(
                             get: { securityPresenter.showAccessPinSuccessPopup },
                             set: { newValue in
                                 if !newValue {
-                                    securityPresenter.showAccessPinSuccessPopup = false
-                                    Router.shared.popToRoot()
+                                    securityPresenter.dismissAccessPinSuccess()
                                 }
                             }
                         )
@@ -100,6 +98,7 @@ struct UserAccessPinView: View {
                             state: state
                         )
                         .environmentObject(securityPresenter)
+                        .disabled(securityPresenter.isLoading)
                         
                         Spacer()
                         

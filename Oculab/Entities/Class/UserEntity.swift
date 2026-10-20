@@ -26,6 +26,7 @@ class User: Codable, Identifiable {
     var isFaceIdEnabled: Bool = false
     var businessModel: BusinessModelType?
     @Transient var emailVerified: Bool = false
+    @Transient var hasAccessPin: Bool = false
 
     init(
         id: String = AppValue.empty,
@@ -39,7 +40,8 @@ class User: Codable, Identifiable {
         accessPin: String? = nil,
         isFaceIdEnabled: Bool = false,
         businessModel: BusinessModelType? = nil,
-        emailVerified: Bool = false
+        emailVerified: Bool = false,
+        hasAccessPin: Bool? = nil
     ) {
         self.id = id
         self.name = name
@@ -53,6 +55,7 @@ class User: Codable, Identifiable {
         self.isFaceIdEnabled = isFaceIdEnabled
         self.businessModel = businessModel
         self.emailVerified = emailVerified
+        self.hasAccessPin = hasAccessPin ?? (accessPin?.isEmpty == false)
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -95,6 +98,8 @@ class User: Codable, Identifiable {
         self.businessModel = try container.decodeIfPresent(BusinessModelType.self, forKey: .businessModel)
         self.isFaceIdEnabled = false
         self.emailVerified = try container.decodeIfPresent(Bool.self, forKey: .emailVerified) ?? false
+        self.hasAccessPin = try container.decodeIfPresent(Bool.self, forKey: .hasAccessPin)
+            ?? (self.accessPin?.isEmpty == false)
     }
 
     func encode(to encoder: Encoder) throws {

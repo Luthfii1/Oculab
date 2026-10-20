@@ -183,6 +183,7 @@ extension AppText {
             static let forgotPinText = "auth.pin.forgot_pin".localized
             static let usePasswordButton = "auth.pin.use_password".localized
             static let invalidPinText = "auth.pin.invalid_pin".localized
+            static let pinUnavailableOnDevice = "auth.pin.unavailable_on_device".localized
             static let createChangePinTitle = "auth.pin.create_change_title".localized
             static let revalidateChangePinTitle = "auth.pin.revalidate_change_title".localized
             static let createPinTitle = "auth.pin.create_title".localized

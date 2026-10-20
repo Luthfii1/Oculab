@@ -10,7 +10,6 @@ import Foundation
 struct UserUpdatePasswordResponse: Codable {
     var userId: String
     var email: String
-    var newPassword: String
 }
 
 struct UserUpdatePasswordBody: Codable {
@@ -33,14 +32,15 @@ class ProfileInteractor: ProfileInteractorProtocol {
     
     private let apiAuthenticationService = API.BE + "/user"
 
+    @MainActor
     func editNewPassword(newPassword: String, previousPassword: String) async throws -> UserUpdatePasswordResponse {
-        guard let token = KeychainHelper.string(for: .accessToken) else {
+        guard let session = AuthSessionManager.uploadQueueSession,
+              let token = KeychainHelper.string(for: .accessToken),
+              let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue),
+              userId.lowercased() == session.ownerUserId else {
             throw URLError(.userAuthenticationRequired)
         }
-        
-        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
-                throw URLError(.userAuthenticationRequired)
-            }
+        try Task.checkCancellation()
         let headers = [
             "Authorization": "Bearer \(token)",
             "Content-Type": "application/json"
@@ -55,11 +55,10 @@ class ProfileInteractor: ProfileInteractorProtocol {
             )
         )
 
-        return UserUpdatePasswordResponse(
-            userId: response.data.userId,
-            email: response.data.email,
-            newPassword: response.data.newPassword
-        )
+        try Task.checkCancellation()
+        guard session == AuthSessionManager.uploadQueueSession,
+              response.data.userId.lowercased() == session.ownerUserId else { throw CancellationError() }
+        return response.data
     }
 
     func activateFaceID() async throws {}
