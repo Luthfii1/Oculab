@@ -58,6 +58,9 @@ class AuthenticationPresenter: ObservableObject {
     @Published var showEmailVerificationAlert: Bool = false
     @Published var isResendingVerification: Bool = false
     @Published var verificationResendMessage: String = AppValue.empty
+    @Published private(set) var isRefreshingEmailVerification = false
+    @Published private(set) var emailVerificationRefreshError = AppValue.empty
+    private var emailVerificationRefreshID: UUID?
 
     // Forgot password
     @Published var forgotPasswordEmail: String = AppValue.empty
@@ -339,11 +342,10 @@ extension AuthenticationPresenter {
     
     @MainActor
     func getAccountById() async {
+        let session = AuthSessionManager.uploadQueueSession
         do {
             let account = try await interactor.getAccountById()
-            
-            // Store the user data locally
-            await interactor.updateUserLocalData(user: account)
+            guard session == AuthSessionManager.uploadQueueSession else { return }
 
             user = account
             user.loadAccessPinFromKeychain()
@@ -372,6 +374,8 @@ extension AuthenticationPresenter {
             }
             
         } catch {
+            guard session == AuthSessionManager.uploadQueueSession,
+                  !(error is CancellationError) else { return }
             errorMessage = ErrorHandler.shared.handleError(error, context: .login)
             description = errorMessage
             
@@ -890,6 +894,12 @@ extension AuthenticationPresenter {
         
         // Clear user data
         user = User()
+        isEmailVerified = false
+        showEmailVerificationAlert = false
+        verificationResendMessage = AppValue.empty
+        emailVerificationRefreshError = AppValue.empty
+        emailVerificationRefreshID = nil
+        isRefreshingEmailVerification = false
         
         // Clear PIN state
         firstPin = AppValue.empty
@@ -1007,6 +1017,40 @@ extension AuthenticationPresenter {
             .newPassword, .confirmPassword,
         ]
         formValidation.clearErrors(for: registerFields)
+    }
+
+    @MainActor
+    func refreshEmailVerificationStatus() async {
+        guard !isRefreshingEmailVerification,
+              let session = AuthSessionManager.uploadQueueSession,
+              user.id.lowercased() == session.ownerUserId else { return }
+        let requestID = UUID()
+        emailVerificationRefreshID = requestID
+        isRefreshingEmailVerification = true
+        emailVerificationRefreshError = AppValue.empty
+        defer {
+            if emailVerificationRefreshID == requestID {
+                emailVerificationRefreshID = nil
+                isRefreshingEmailVerification = false
+            }
+        }
+        do {
+            let account = try await interactor.getAccountById()
+            guard session == AuthSessionManager.uploadQueueSession,
+                  user.id.lowercased() == session.ownerUserId else { return }
+            user.emailVerified = account.emailVerified
+            user.businessModel = account.businessModel
+            isEmailVerified = account.emailVerified
+            if canPerformClinicalActions {
+                showEmailVerificationAlert = false
+                verificationResendMessage = AppValue.empty
+            }
+        } catch {
+            guard session == AuthSessionManager.uploadQueueSession,
+                  !(error is CancellationError) else { return }
+            // An unavailable server must not turn a verified account into an unverified one.
+            emailVerificationRefreshError = ErrorHandler.shared.handleError(error, context: .profile)
+        }
     }
 
     @MainActor

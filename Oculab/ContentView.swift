@@ -20,10 +20,16 @@ struct ContentView: View {
         .tint(AppColors.purple500)
         .navigationBarBackButtonHidden(true)
         .task {
+            await authPresenter.refreshEmailVerificationStatus()
+        }
+        .task {
             await AnalysisResumeService.shared.restoreOnLaunch()
         }
         .onChange(of: scenePhase) { _, phase in
             guard phase == .active else { return }
+            Task {
+                await authPresenter.refreshEmailVerificationStatus()
+            }
             Task {
                 await AnalysisResumeService.shared.reconnectOnForeground()
             }

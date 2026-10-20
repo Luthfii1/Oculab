@@ -199,7 +199,8 @@ struct HomeView: View {
                 AppButton(
                     title: AppTextHomeHistory.newExaminationButton,
                     leftIcon: AppIcon.docBadgePlus,
-                    size: .large
+                    size: .large,
+                    isEnabled: !authentication.isRefreshingEmailVerification
                 ) {
                     guard authentication.requireEmailVerificationForClinicalAction() else { return }
                     Router.shared.navigateTo(.inputPatientData())
