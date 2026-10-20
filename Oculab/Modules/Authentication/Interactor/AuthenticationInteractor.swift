@@ -139,8 +139,10 @@ class AuthenticationInteractor: ObservableObject {
         return response.message
     }
 
+    @MainActor
     func getAccountById() async throws -> User {
-        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
+        guard let session = AuthSessionManager.uploadQueueSession,
+              let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
             throw NSError(
                 domain: "AuthenticationError",
                 code: -1,
@@ -153,11 +155,12 @@ class AuthenticationInteractor: ObservableObject {
             headers: try authorizationHeaders()
         )
 
-        await updateUserSwiftData(data: response.data)
-
-        if let localUser = await getUserSwiftData() {
-            return localUser
+        guard session == AuthSessionManager.uploadQueueSession,
+              response.data.id.lowercased() == session.ownerUserId else {
+            throw CancellationError()
         }
+        updateUserSwiftData(data: response.data)
+        // Verification is transient in SwiftData; the server response is authoritative.
         return response.data
     }
 
@@ -207,7 +210,8 @@ class AuthenticationInteractor: ObservableObject {
             email: source.email,
             accessPin: source.accessPin ?? KeychainHelper.string(for: .accessPin),
             isFaceIdEnabled: source.isFaceIdEnabled,
-            businessModel: source.businessModel
+            businessModel: source.businessModel,
+            emailVerified: source.emailVerified
         )
         return user
     }
@@ -220,6 +224,7 @@ class AuthenticationInteractor: ObservableObject {
         target.email = source.email
         target.isFaceIdEnabled = source.isFaceIdEnabled
         target.businessModel = source.businessModel
+        target.emailVerified = source.emailVerified
         // Secrets: keep Keychain PIN; never write password/token to SwiftData.
         if let pin = source.accessPin, !pin.isEmpty {
             KeychainHelper.set(pin, for: .accessPin)
@@ -252,25 +257,24 @@ class AuthenticationInteractor: ObservableObject {
         }
     }
 
-    private func updateUserSwiftData(data: User) async {
-        await MainActor.run {
-            let fetchDescriptor = FetchDescriptor<User>()
-            do {
-                let existing = try modelContext.fetch(fetchDescriptor)
-                if let pin = data.accessPin, !pin.isEmpty {
-                    KeychainHelper.set(pin, for: .accessPin)
-                }
-                if let current = existing.first {
-                    applyUser(data, to: current)
-                } else {
-                    let copy = copyUser(from: data)
-                    copy.scrubSecretsForPersistence()
-                    modelContext.insert(copy)
-                }
-                try modelContext.save()
-            } catch {
-                Logger.error("Failed to update user in SwiftData: \(error.localizedDescription)", category: .authentication)
+    @MainActor
+    private func updateUserSwiftData(data: User) {
+        let fetchDescriptor = FetchDescriptor<User>()
+        do {
+            let existing = try modelContext.fetch(fetchDescriptor)
+            if let pin = data.accessPin, !pin.isEmpty {
+                KeychainHelper.set(pin, for: .accessPin)
             }
+            if let current = existing.first {
+                applyUser(data, to: current)
+            } else {
+                let copy = copyUser(from: data)
+                copy.scrubSecretsForPersistence()
+                modelContext.insert(copy)
+            }
+            try modelContext.save()
+        } catch {
+            Logger.error("Failed to update user in SwiftData: \(error.localizedDescription)", category: .authentication)
         }
     }
 

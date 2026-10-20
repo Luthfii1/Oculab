@@ -16,7 +16,7 @@ struct ProfileView: View {
         NavigationView {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .center, spacing: 20) {
-                    if !authPresenter.isEmailVerified {
+                    if !authPresenter.canPerformClinicalActions {
                         VStack(alignment: .leading, spacing: 10) {
                             Text(AppTextAuthProfile.verifyEmailBannerTitle)
                                 .font(AppTypography.s4)
@@ -28,6 +28,21 @@ struct ProfileView: View {
                                 Text(authPresenter.verificationResendMessage)
                                     .font(AppTypography.p4)
                                     .foregroundStyle(AppColors.purple600)
+                            }
+                            if !authPresenter.emailVerificationRefreshError.isEmpty {
+                                Text(authPresenter.emailVerificationRefreshError)
+                                    .font(AppTypography.p4)
+                                    .foregroundStyle(AppColors.slate600)
+                            }
+                            AppButton(
+                                title: authPresenter.isRefreshingEmailVerification
+                                    ? AppState.loading
+                                    : AppTextAuthProfile.verifyEmailRefreshButton,
+                                colorType: .secondary,
+                                size: .large,
+                                isEnabled: !authPresenter.isRefreshingEmailVerification
+                            ) {
+                                Task { await authPresenter.refreshEmailVerificationStatus() }
                             }
                             AppButton(
                                 title: authPresenter.isResendingVerification
@@ -199,6 +214,8 @@ struct ProfileView: View {
             }
             .navigationTitle(AppNav.profile)
         }
+        .task { await authPresenter.refreshEmailVerificationStatus() }
+        .refreshable { await authPresenter.refreshEmailVerificationStatus() }
     }
 }
 
