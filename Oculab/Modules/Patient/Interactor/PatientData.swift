@@ -31,14 +31,15 @@ struct ExaminationResultCardData: Codable, Identifiable {
         dpjpName = try container.decodeIfPresent(String.self, forKey: .dpjpName)
         finalGradingResult = try container.decodeIfPresent(String.self, forKey: .finalGradingResult)
         
-        // Date parsing
-        let dateFormatter = ISO8601DateFormatter()
-        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        
         let dobString = try container.decode(String.self, forKey: .patientDob)
-        patientDob = dateFormatter.date(from: dobString) ?? Date()
-        
+        guard let birthDate = PatientBirthDateCoding.decode(dobString) else {
+            throw DecodingError.dataCorruptedError(forKey: .patientDob, in: container, debugDescription: "Invalid patient birth date")
+        }
+        patientDob = birthDate
         let examDateString = try container.decode(String.self, forKey: .examinationDate)
-        examinationDate = dateFormatter.date(from: examDateString) ?? Date()
+        guard let examDate = PatientBirthDateCoding.decodeInstant(examDateString) else {
+            throw DecodingError.dataCorruptedError(forKey: .examinationDate, in: container, debugDescription: "Invalid examination timestamp")
+        }
+        examinationDate = examDate
     }
 }

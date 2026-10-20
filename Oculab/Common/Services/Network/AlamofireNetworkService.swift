@@ -140,17 +140,22 @@ class AlamofireNetworkService: NetworkServiceProtocol {
         headers: [String: String]?,
         perform: ([String: String]?) async throws -> APIResponse<T>
     ) async throws -> APIResponse<T> {
+        let expectedSession = ClinicalRequestContext.expectedSession
         let (initialHeaders, generation) = try await MainActor.run {
-            (try resolveHeaders(for: endpoint, headers: headers), AuthSessionManager.authenticationSessionGeneration)
+            try ClinicalRequestContext.requireCurrentSession(expectedSession)
+            return (try resolveHeaders(for: endpoint, headers: headers), AuthSessionManager.authenticationSessionGeneration)
         }
         try Task.checkCancellation()
 
         do {
-            return try await perform(initialHeaders)
+            let response = try await perform(initialHeaders)
+            try await MainActor.run { try ClinicalRequestContext.requireCurrentSession(expectedSession) }
+            return response
         } catch NetworkError.unauthorized {
             try Task.checkCancellation()
-            guard await MainActor.run(body: { generation == AuthSessionManager.authenticationSessionGeneration }) else {
-                throw CancellationError()
+            try await MainActor.run {
+                try ClinicalRequestContext.requireCurrentSession(expectedSession)
+                guard generation == AuthSessionManager.authenticationSessionGeneration else { throw CancellationError() }
             }
             // A rejected login or refresh request must not invalidate the session here.
             // The caller of the refresh handles its authentication failure once.
@@ -171,11 +176,14 @@ class AlamofireNetworkService: NetworkServiceProtocol {
 
             try Task.checkCancellation()
             let refreshedHeaders = try await MainActor.run {
+                try ClinicalRequestContext.requireCurrentSession(expectedSession)
                 guard generation == AuthSessionManager.authenticationSessionGeneration else { throw CancellationError() }
                 return try AuthSessionManager.headersByReplacingAuthorization(headers)
             }
             do {
-                return try await perform(refreshedHeaders)
+                let response = try await perform(refreshedHeaders)
+                try await MainActor.run { try ClinicalRequestContext.requireCurrentSession(expectedSession) }
+                return response
             } catch NetworkError.unauthorized {
                 try await MainActor.run { try AuthSessionManager.invalidateSession(ifGeneration: generation) }
                 throw NetworkError.unauthorized(endpoint: endpoint)

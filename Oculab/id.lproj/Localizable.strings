@@ -107,8 +107,8 @@
 "patient.gender.female" = "Perempuan";
 "patient.gender.other" = "Lainnya";
 "patient.placeholder.name" = "Masukkan nama pasien";
-"patient.placeholder.nik" = "Contoh: 167012039484700";
-"patient.placeholder.bpjs" = "Contoh: 1240630077675";
+"patient.placeholder.nik" = "16 digit NIK, jika tersedia";
+"patient.placeholder.bpjs" = "13 digit nomor kartu BPJS";
 "patient.placeholder.select_date" = "Pilih Tanggal";
 
 // MARK: - Medical Terms
@@ -622,7 +622,7 @@
 // List View
 "patient.list.navigation_title" = "Daftar Pasien";
 "patient.list.button_create_patient" = "Pasien Baru";
-"patient.list.search_placeholder" = "Cari nama, NIK, atau BPJS";
+"patient.list.search_placeholder" = "Nama, no. RM, NIK, atau BPJS";
 "patient.list.empty_message" = "Belum ada pasien";
 "patient.list.empty_hint" = "Ketuk Pasien Baru di atas untuk mendaftarkan pasien pertama.";
 
@@ -960,7 +960,7 @@
 "analysist.fov_detail.error_loading_data" = "Gagal Memuat Data";
 
 // Guided examination flow
-"task_assignment.ux.new_patient_hint" = "Lengkapi identitas yang wajib diisi. Nomor BPJS boleh dikosongkan.";
+"task_assignment.ux.new_patient_hint" = "Lengkapi identitas yang wajib diisi. NIK dan BPJS boleh dikosongkan.";
 "task_assignment.ux.existing_patient_hint" = "Identitas pasien tersimpan. Pastikan pasien sudah sesuai sebelum melanjutkan.";
 "task_assignment.ux.choose_patient_hint" = "Pilih pasien terdaftar atau tambahkan pasien baru untuk melanjutkan.";
 "task_assignment.ux.patient_ready_hint" = "Berikutnya: isi jenis dan ID sediaan.";
@@ -994,3 +994,28 @@
 "examination.upload_retry_scheduled_title" = "Video tersimpan — percobaan terjadwal";
 "examination.upload_retry_at" = "Pemeriksaan pengiriman berikutnya: %@. Tetap buka Oculab dan masuk dengan akun ini.";
 "examination.upload_retained_with_results" = "Ada video yang masih tersimpan di perangkat tanpa konfirmasi penerimaan. Hasil pemeriksaan saat ini ditampilkan di bawah; hasil tersebut bukan konfirmasi bahwa video ini sudah diterima.";
+
+// Patient intake
+"patient.intake.required_hint" = "Lengkapi data wajib pasien. Tambahkan nomor identitas jika tersedia.";
+"patient.intake.identifiers_title" = "Nomor identitas (opsional)";
+"patient.intake.identifiers_hint" = "NIK dan BPJS boleh dikosongkan. Gunakan nomor rekam medis fasilitas jika tersedia; nomor ini berbeda dari NIK dan ID SATUSEHAT.";
+"patient.intake.medical_record_number" = "Nomor rekam medis";
+"patient.intake.medical_record_placeholder" = "Contoh: RM-001234";
+"patient.intake.missing_value" = "Belum dicatat";
+"patient.intake.load_failed" = "Data pasien belum berhasil dimuat. Coba lagi sebelum mengedit.";
+"patient.intake.save_failed" = "Pasien belum berhasil disimpan. Isian Anda tetap tersedia.";
+"patient.intake.retry_load" = "Coba lagi";
+"patient.intake.loading_patient" = "Memuat pasien…";
+"patient.intake.saving_patient" = "Menyimpan pasien…";
+"patient.intake.patient_load_failed" = "Data pasien ini belum berhasil dimuat.";
+"patient.intake.examinations_load_failed" = "Pemeriksaan belum berhasil dimuat. Coba lagi.";
+"patient.intake.patients_load_failed" = "Daftar pasien belum berhasil dimuat. Coba lagi.";
+"patient.intake.demographics_title" = "Data pasien";
+"patient.intake.birth_date_hint" = "Pilih tanggal lahir pasien yang sebenarnya. Tanggal tidak diisi otomatis.";
+"patient.intake.validation.name_required" = "Masukkan nama pasien.";
+"patient.intake.validation.nik_invalid" = "Masukkan 16 digit, atau kosongkan NIK.";
+"patient.intake.validation.bpjs_invalid" = "Masukkan 13 digit, atau kosongkan BPJS.";
+"patient.intake.validation.birth_date_future" = "Tanggal lahir tidak boleh di masa depan.";
+"patient.intake.validation.birth_date_required" = "Pilih tanggal lahir pasien.";
+"patient.intake.validation.sex_required" = "Pilih jenis kelamin pasien.";
+"patient.intake.validation.medical_record_too_long" = "Nomor rekam medis maksimal 64 karakter.";

@@ -60,7 +60,7 @@ final class TaskAssignmentRepository {
             return try await fetchPatient(id: trimmedPreferred)
         }
 
-        guard !patient.NIK.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+        guard PatientIntakeValidation.isReady(patient: patient),
               !patient.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
               !TaskAssignmentIdentifiers.isPatientId(patient.name) else {
             throw TaskAssignmentFlowError.patientDataIncomplete

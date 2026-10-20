@@ -1,0 +1,103 @@
+name: iOS Simulator Tests
+
+on:
+  pull_request:
+    branches: [develop]
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-simulator-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Signed Simulator tests
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Generate Xcode project
+        run: |
+          mkdir -p TestResults
+          xcodebuild -version | tee TestResults/toolchain.log
+          brew install xcodegen
+          xcodegen --version | tee -a TestResults/toolchain.log
+          xcodegen generate
+
+      - name: Resolve Swift packages
+        run: |
+          xcodebuild -resolvePackageDependencies \
+            -project Oculab.xcodeproj \
+            -scheme Oculab \
+            2>&1 | tee TestResults/packages.log
+
+      - name: Select an available iPhone Simulator
+        id: simulator
+        run: |
+          xcrun simctl list devices available --json > TestResults/simulators.json
+          python3 <<'PY'
+          import json
+          import os
+
+          with open("TestResults/simulators.json") as source:
+              runtimes = json.load(source)["devices"]
+          candidates = []
+          for runtime, devices in runtimes.items():
+              if ".iOS-" not in runtime:
+                  continue
+              version = tuple(int(part) for part in runtime.split(".iOS-", 1)[1].split("-"))
+              for device in devices:
+                  if device.get("isAvailable") and device["name"].startswith("iPhone"):
+                      candidates.append((version, device))
+          if not candidates:
+              raise SystemExit("No available iPhone Simulator runtime was found")
+          _, selected = max(candidates, key=lambda item: (item[0], item[1]["name"]))
+          print(f"Selected {selected['name']} ({selected['udid']})")
+          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+              output.write(f"udid={selected['udid']}\nstate={selected['state']}\n")
+          PY
+
+      - name: Boot Simulator
+        env:
+          SIMULATOR_UDID: ${{ steps.simulator.outputs.udid }}
+          SIMULATOR_STATE: ${{ steps.simulator.outputs.state }}
+        run: |
+          if [[ "$SIMULATOR_STATE" != "Booted" ]]; then
+            xcrun simctl boot "$SIMULATOR_UDID"
+          fi
+          xcrun simctl bootstatus "$SIMULATOR_UDID" -b 2>&1 | tee TestResults/simulator-boot.log
+
+      - name: Run signed Simulator tests
+        env:
+          SIMULATOR_UDID: ${{ steps.simulator.outputs.udid }}
+        run: |
+          # Keep Xcode's default Simulator signing: Keychain tests require a signed test host.
+          xcodebuild test \
+            -project Oculab.xcodeproj \
+            -scheme Oculab \
+            -destination "platform=iOS Simulator,id=$SIMULATOR_UDID" \
+            -destination-timeout 120 \
+            -parallel-testing-enabled NO \
+            -disableAutomaticPackageResolution \
+            -resultBundlePath TestResults/Oculab.xcresult \
+            2>&1 | tee TestResults/xcodebuild.log
+
+      - name: Upload test results and logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ios-simulator-results-${{ github.run_id }}-${{ github.run_attempt }}
+          path: TestResults/
+          retention-days: 7
+          if-no-files-found: warn

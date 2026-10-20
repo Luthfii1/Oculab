@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 class PatientInteractor: ObservableObject {
     // MARK: - Dependencies
     private let networkService: NetworkServiceProtocol
@@ -27,65 +28,106 @@ class PatientInteractor: ObservableObject {
     
     // MARK: - Patient Data Operations
     func getAllPatient() async throws -> [Patient] {
-        let userId = try getUserId()
+        let session = try sessionSnapshot()
+        let headers = try AuthSessionManager.authorizationHeaders()
+        let userId = session.ownerUserId
         
-        let response: APIResponse<[Patient]> = try await networkService
-            .get(urlString: APIEndpoints.getAllPatients + userId.lowercased(), headers: nil)
+        let response: APIResponse<[Patient]> = try await ClinicalRequestContext.withSession(session) {
+            try await networkService
+                .get(urlString: APIEndpoints.getAllPatients + userId.lowercased(), headers: headers)
+        }
 
+        try requireCurrentSession(session)
         Logger.info("Successfully fetched all patients", category: .patient)
         return response.data
     }
     
     func getPatientById(patientId: String) async throws -> Patient {
-        let response: APIResponse<Patient> = try await networkService
-            .get(urlString: APIEndpoints.getPatientById + patientId.lowercased(), headers: nil)
+        let session = try sessionSnapshot()
+        let headers = try AuthSessionManager.authorizationHeaders()
+        let response: APIResponse<Patient> = try await ClinicalRequestContext.withSession(session) {
+            try await networkService
+                .get(urlString: APIEndpoints.getPatientById + patientId.lowercased(), headers: headers)
+        }
 
-        Logger.info("Successfully fetched patient with ID: \(patientId)", category: .patient)
+        try requireCurrentSession(session)
+        guard response.data.id.lowercased() == patientId.lowercased() else { throw URLError(.cannotParseResponse) }
+        Logger.info("Successfully fetched patient", category: .patient)
         return response.data
     }
     
     func getAllExamByPatientId(patientId: String) async throws -> [ExaminationResultCardData] {
-        let response: APIResponse<[ExaminationResultCardData]> = try await networkService
-            .get(urlString: APIEndpoints.getAllExamByPatientId + patientId, headers: nil)
-        
-        Logger.info("Successfully fetched examinations for patient: \(patientId)", category: .patient)
+        let session = try sessionSnapshot()
+        let headers = try AuthSessionManager.authorizationHeaders()
+        let response: APIResponse<[ExaminationResultCardData]> = try await ClinicalRequestContext.withSession(session) {
+            try await networkService
+                .get(urlString: APIEndpoints.getAllExamByPatientId + patientId, headers: headers)
+        }
+
+        try requireCurrentSession(session)
+        Logger.info("Successfully fetched examinations for patient", category: .patient)
         return response.data
     }
     
     func addNewPatient(patient: Patient) async throws -> Patient {
-        let adminUserId = try getUserId()
+        let session = try sessionSnapshot()
+        let headers = try AuthSessionManager.authorizationHeaders()
+        let adminUserId = session.ownerUserId
         
-        let response: APIResponse<Patient> = try await networkService.post(
-            urlString: APIEndpoints.createPatient + adminUserId.lowercased(),
-            headers: nil,
-            body: patient
-        )
+        let response: APIResponse<Patient> = try await ClinicalRequestContext.withSession(session) {
+            try await networkService.post(
+                urlString: APIEndpoints.createPatient + adminUserId.lowercased(),
+                headers: headers,
+                body: patient
+            )
+        }
 
-        Logger.info("Successfully created new patient: \(patient.name)", category: .patient)
+        try requireCurrentSession(session)
+        Logger.info("Successfully created new patient", category: .patient)
         return response.data
     }
     
     func updatePatient(patient: Patient, patientId: String) async throws -> Patient {
-        let response: APIResponse<Patient> = try await networkService.update(
-            urlString: APIEndpoints.updatePatient + patientId.lowercased(),
-            headers: nil,
-            body: patient
-        )
+        let session = try sessionSnapshot()
+        let headers = try AuthSessionManager.authorizationHeaders()
+        let response: APIResponse<Patient> = try await ClinicalRequestContext.withSession(session) {
+            try await networkService.update(
+                urlString: APIEndpoints.updatePatient + patientId.lowercased(),
+                headers: headers,
+                body: PatientUpdateBody(patient: patient)
+            )
+        }
 
-        Logger.info("Successfully updated patient: \(patient.name)", category: .patient)
+        try requireCurrentSession(session)
+        guard response.data.id.lowercased() == patientId.lowercased() else { throw URLError(.cannotParseResponse) }
+        Logger.info("Successfully updated patient", category: .patient)
         return response.data
     }
 }
 
 // MARK: - Helper Methods
 extension PatientInteractor {
-    private func getUserId() throws -> String {
-        guard let userId = UserDefaults.standard.string(forKey: UserDefaultType.userId.rawValue) else {
-            Logger.error("User ID not found in UserDefaults", category: .patient)
-            throw NSError(domain: "UserIdNotFound", code: -1, userInfo: [
-                NSLocalizedDescriptionKey: "User ID not found in storage"
-            ])
-        }
-        return userId
+    private func sessionSnapshot() throws -> UploadQueueSession {
+        guard let session = AuthSessionManager.uploadQueueSession else { throw URLError(.userAuthenticationRequired) }
+        try Task.checkCancellation()
+        return session
+    }
+
+    private func requireCurrentSession(_ expected: UploadQueueSession) throws {
+        try Task.checkCancellation()
+        guard expected == AuthSessionManager.uploadQueueSession else { throw CancellationError() }
+    }
+}
+
+/// PATCH-like identifier semantics on the existing PUT endpoint: a deliberate
+/// cleared field is null, rather than silently omitted by encodeIfPresent.
+private struct PatientUpdateBody: Encodable {
+    let patient: Patient
+    private enum Keys: String, CodingKey { case BPJS, medicalRecordNumber }
+    func encode(to encoder: Encoder) throws {
+        try patient.encode(to: encoder)
+        var values = encoder.container(keyedBy: Keys.self)
+        if patient.BPJS == nil { try values.encodeNil(forKey: .BPJS) }
+        if patient.medicalRecordNumber == nil { try values.encodeNil(forKey: .medicalRecordNumber) }
     }
 }
