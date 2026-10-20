@@ -6,9 +6,14 @@
 import SwiftUI
 
 struct HistoryFilterSheet: View {
-    @Binding var filters: HistoryExamFilters
-    var onApply: () -> Void
+    @State private var filters: HistoryExamFilters
+    var onApply: (HistoryExamFilters) -> Void
     @Environment(\.dismiss) private var dismiss
+
+    init(filters: HistoryExamFilters, onApply: @escaping (HistoryExamFilters) -> Void) {
+        _filters = State(initialValue: filters)
+        self.onApply = onApply
+    }
 
     var body: some View {
         NavigationView {
@@ -17,11 +22,13 @@ struct HistoryFilterSheet: View {
                     DatePicker(
                         AppTextHomeHistory.historyFilterFrom,
                         selection: $filters.fromDate,
+                        in: ...filters.toDate,
                         displayedComponents: .date
                     )
                     DatePicker(
                         AppTextHomeHistory.historyFilterTo,
                         selection: $filters.toDate,
+                        in: filters.fromDate...,
                         displayedComponents: .date
                     )
                 }
@@ -52,7 +59,7 @@ struct HistoryFilterSheet: View {
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(AppTextHomeHistory.historyFilterApply) {
-                        onApply()
+                        onApply(filters)
                         dismiss()
                     }
                 }

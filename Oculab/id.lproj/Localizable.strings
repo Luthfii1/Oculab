@@ -574,6 +574,9 @@
 "home_history.history_filter_grading_section" = "Grading";
 "home_history.history_filter_grading" = "Grading akhir";
 "home_history.history_filter_any_grading" = "Semua grading";
+"home_history.refreshing_label" = "Memperbarui pemeriksaan…";
+"home_history.history_filtered_empty" = "Tidak ada pemeriksaan yang sesuai dengan filter ini. Coba rentang tanggal lain atau reset filter.";
+"home_history.history_date_range" = "%1$@ – %2$@";
 "auth.profile.verify_email_title" = "Verifikasi email Anda";
 "auth.profile.verify_email_message" = "Konfirmasi email agar kami dapat menghubungi Anda untuk pemulihan password dan keamanan akun.";
 "auth.profile.verify_email_resend" = "Kirim ulang email verifikasi";

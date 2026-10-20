@@ -565,6 +565,9 @@
 "home_history.history_filter_grading_section" = "Grading";
 "home_history.history_filter_grading" = "Final grading";
 "home_history.history_filter_any_grading" = "Any grading";
+"home_history.refreshing_label" = "Updating examinations…";
+"home_history.history_filtered_empty" = "No examinations match these filters. Try another date range or reset the filters.";
+"home_history.history_date_range" = "%1$@ – %2$@";
 "home_history.task_count_format" = "%d shown";
 "home_history.examination_data" = "your examination data";
 

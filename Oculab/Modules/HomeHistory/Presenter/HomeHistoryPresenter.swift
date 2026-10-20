@@ -13,6 +13,16 @@ class HomeHistoryPresenter: ObservableObject {
     private let interactor: HomeInteractor
     private let cacheService: ExamListCacheService
     private let networkRetryManager: NetworkRetryManager
+    private var listRequestID: UUID?
+    private var historyRequestID: UUID?
+    private var statisticsRequestID: UUID?
+    private var loadedHistoryQuery: HistoryQuery?
+    private var sessionObserver: NSObjectProtocol?
+
+    private enum HistoryQuery: Equatable {
+        case day(String)
+        case filters(HistoryExamFilters)
+    }
 
     init(
         interactor: HomeInteractor = HomeInteractor(),
@@ -22,6 +32,15 @@ class HomeHistoryPresenter: ObservableObject {
         self.interactor = interactor
         self.cacheService = cacheService
         self.networkRetryManager = networkRetryManager
+        sessionObserver = NotificationCenter.default.addObserver(
+            forName: AuthSessionManager.sessionDidChangeNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.resetState() }
+        }
+    }
+
+    deinit {
+        if let sessionObserver { NotificationCenter.default.removeObserver(sessionObserver) }
     }
 
     // MARK: - Published Properties
@@ -41,6 +60,8 @@ class HomeHistoryPresenter: ObservableObject {
 
     @Published var isAllExamsLoading: Bool = false
     @Published var isStatisticLoading: Bool = false
+    @Published private(set) var hasLoadedExaminations = false
+    @Published private(set) var hasLoadedHistory = false
     @Published var loadErrorMessage: String = ""
     @Published var isShowingCachedData: Bool = false
     @Published var cachedAt: Date?
@@ -59,19 +80,34 @@ class HomeHistoryPresenter: ObservableObject {
 // MARK: - Statistics Methods
 extension HomeHistoryPresenter {
     @MainActor
-    func getStatisticData() async {
-        isStatisticLoading = true
-        defer { isStatisticLoading = false }
+    func refreshHome(userRole: RolesType) async {
+        async let statistics: Void = getStatisticData()
+        async let examinations: Void = fetchData(userRole: userRole)
+        _ = await (statistics, examinations)
+    }
 
+    @MainActor
+    func getStatisticData() async {
+        guard let session = AuthSessionManager.uploadQueueSession else { return }
+        let requestID = UUID()
+        statisticsRequestID = requestID
+        isStatisticLoading = true
+        defer {
+            if statisticsRequestID == requestID { isStatisticLoading = false }
+        }
         do {
-            statisticExam = try await interactor.getStatisticExamination()
+            let response = try await interactor.getStatisticExamination()
+            guard !Task.isCancelled, statisticsRequestID == requestID,
+                  session == AuthSessionManager.uploadQueueSession else { return }
+            statisticExam = response
             calculateProgress()
         } catch {
+            guard !Task.isCancelled, statisticsRequestID == requestID,
+                  session == AuthSessionManager.uploadQueueSession else { return }
             Logger.error("Failed to fetch statistics: \(error.localizedDescription)", category: .general)
-            _ = ErrorHandler.shared.handleError(error)
         }
     }
-    
+
     private func calculateProgress() {
         guard let totalFinished = statisticExam.totalFinished,
               let totalNotFinished = statisticExam.totalNotFinished else {
@@ -170,48 +206,46 @@ extension HomeHistoryPresenter {
     func fetchFinishedExaminationsByDate(date: Date) async {
         if usesAdvancedHistoryFilters {
             await fetchFilteredExaminations()
-            return
+        } else {
+            await fetchHistory(query: .day(date.formattedYearMonthDay()))
         }
-
-        let dateString = date.formattedYearMonthDay()
-        
-        isAllExamsLoading = true
-        finishedExaminationsByDate.removeAll()
-        loadErrorMessage = ""
-        
-        defer { isAllExamsLoading = false }
-        
-        do {
-            let response = try await interactor.getFinishedDataCard(date: dateString)
-            
-            handleFinishedExaminationsResponse(response, for: dateString)
-            
-        } catch {
-            finishedExaminationsByDate = []
-            loadErrorMessage = ErrorHandler.shared.handleError(error)
-            Logger.error("Failed to fetch examinations for date \(dateString): \(error.localizedDescription)", category: .general)
-        }
-    }
-    
-    private func handleFinishedExaminationsResponse(_ response: [FinishedExaminationCardData], for dateString: String) {
-        finishedExaminationsByDate = response
-        Logger.info("Loaded \(response.count) examinations", category: .general)
     }
 
     @MainActor
     func fetchFilteredExaminations() async {
-        isAllExamsLoading = true
-        finishedExaminationsByDate.removeAll()
-        loadErrorMessage = ""
-        defer { isAllExamsLoading = false }
+        await fetchHistory(query: .filters(historyFilters))
+    }
 
-        do {
-            let response = try await interactor.getFacilityExaminations(filters: historyFilters)
-            finishedExaminationsByDate = response
-            loadErrorMessage = ""
-            Logger.info("Loaded \(response.count) filtered examinations", category: .general)
-        } catch {
+    @MainActor
+    private func fetchHistory(query: HistoryQuery) async {
+        guard let session = AuthSessionManager.uploadQueueSession else { return }
+        let requestID = UUID()
+        historyRequestID = requestID
+        // Keep rows for a refresh, but never show a different date's results
+        // beneath the newly selected date or filters.
+        if loadedHistoryQuery != query {
             finishedExaminationsByDate = []
+            hasLoadedHistory = false
+        }
+        isAllExamsLoading = true
+        loadErrorMessage = ""
+        defer {
+            if historyRequestID == requestID { isAllExamsLoading = false }
+        }
+        do {
+            let response: [FinishedExaminationCardData]
+            switch query {
+            case .day(let date): response = try await interactor.getFinishedDataCard(date: date)
+            case .filters(let filters): response = try await interactor.getFacilityExaminations(filters: filters)
+            }
+            guard !Task.isCancelled, historyRequestID == requestID,
+                  session == AuthSessionManager.uploadQueueSession else { return }
+            finishedExaminationsByDate = response
+            loadedHistoryQuery = query
+            hasLoadedHistory = true
+        } catch {
+            guard !Task.isCancelled, historyRequestID == requestID,
+                  session == AuthSessionManager.uploadQueueSession else { return }
             loadErrorMessage = ErrorHandler.shared.handleError(error)
         }
     }
@@ -232,30 +266,36 @@ extension HomeHistoryPresenter {
     
     @MainActor
     func fetchData(userRole: RolesType) async {
+        guard let session = AuthSessionManager.uploadQueueSession else { return }
+        let requestID = UUID()
+        listRequestID = requestID
+        if !hasLoadedExaminations, userRole == .ADMIN, selectedLatestActivity == .belumDimulai {
+            selectedLatestActivity = .semua
+        }
         isAllExamsLoading = true
-        defer { isAllExamsLoading = false }
-
+        loadErrorMessage = ""
+        if !hasLoadedExaminations { _ = tryLoadCachedExamList(for: userRole) }
+        defer {
+            if listRequestID == requestID { isAllExamsLoading = false }
+        }
         do {
-            latestExamination = try await getExaminationData(for: userRole)
+            let response = try await getExaminationData(for: userRole)
+            guard !Task.isCancelled, listRequestID == requestID,
+                  session == AuthSessionManager.uploadQueueSession else { return }
+            latestExamination = response
             loadErrorMessage = ""
             isShowingCachedData = false
             cachedAt = nil
-
-            if let userId = currentUserId() {
-                cacheService.save(examinations: latestExamination, userId: userId, role: userRole)
-            }
-
-            await filterLatestActivity(typeActivity: selectedLatestActivity)
+            hasLoadedExaminations = true
+            cacheService.save(examinations: response, userId: session.ownerUserId, role: userRole)
+            applyTaskFilters()
         } catch {
-            if tryLoadCachedExamList(for: userRole) {
-                Logger.info("Showing cached exam list while offline", category: .general)
-            } else {
-                latestExamination = []
-                filteredExamination = []
-                isShowingCachedData = false
-                cachedAt = nil
+            guard !Task.isCancelled, listRequestID == requestID,
+                  session == AuthSessionManager.uploadQueueSession else { return }
+            if !tryLoadCachedExamList(for: userRole) {
+                // A failed background refresh must not erase usable rows or
+                // reset the search/status selection the user is working with.
                 loadErrorMessage = ErrorHandler.shared.handleError(error)
-                Logger.error("Failed to fetch examination data for role \(userRole): \(error.localizedDescription)", category: .general)
             }
         }
     }
@@ -266,10 +306,11 @@ extension HomeHistoryPresenter {
         guard !networkRetryManager.isConnected,
               let userId = currentUserId(),
               let cached = cacheService.load(userId: userId, role: userRole),
-              !cached.examinations.isEmpty
+              cached.userId == userId
         else { return false }
 
         latestExamination = cached.examinations
+        hasLoadedExaminations = true
         isShowingCachedData = true
         cachedAt = cached.cachedAt
         loadErrorMessage = ""
@@ -294,6 +335,15 @@ extension HomeHistoryPresenter {
 extension HomeHistoryPresenter {
     @MainActor
     func resetState() {
+        listRequestID = nil
+        historyRequestID = nil
+        statisticsRequestID = nil
+        loadedHistoryQuery = nil
+        hasLoadedExaminations = false
+        hasLoadedHistory = false
+        loadErrorMessage = ""
+        usesAdvancedHistoryFilters = false
+        historyFilters = .defaultRange()
         latestExamination = []
         filteredExamination = []
         filteredExaminationByDate = []
