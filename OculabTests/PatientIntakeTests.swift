@@ -5,12 +5,10 @@ import XCTest
 
 final class PatientIntakeTests: XCTestCase {
     @MainActor
-    private func withFixture(_ body: (PatientIntakeStub, PatientPresenter) async throws -> Void) async rethrows {
+    private func withFixture(_ body: (PatientIntakeStub, PatientPresenter, Router) async throws -> Void) async rethrows {
         let keys: [KeychainKey] = [.accessToken, .refreshToken, .accessPin]
         let secrets = keys.map { ($0, KeychainHelper.string(for: $0)) }
         let defaults = UserDefaultType.allCases.map { ($0, UserDefaults.standard.object(forKey: $0.rawValue)) }
-        let path = Router.shared.path
-        let route = Router.shared.currentRoute
         defer {
             AuthSessionManager.beginSessionChange()
             for (key, value) in secrets {
@@ -18,13 +16,12 @@ final class PatientIntakeTests: XCTestCase {
             }
             for (key, value) in defaults { UserDefaults.standard.set(value, forKey: key.rawValue) }
             AuthSessionManager.completeSessionChange()
-            Router.shared.path = path
-            Router.shared.currentRoute = route
         }
         setSession("patient-owner-a")
         let interactor = PatientIntakeStub()
-        let presenter = PatientPresenter(interactor: interactor)
-        try await body(interactor, presenter)
+        let router = Router()
+        let presenter = PatientPresenter(interactor: interactor, router: router)
+        try await body(interactor, presenter, router)
         presenter.resetState()
     }
 
@@ -46,7 +43,7 @@ final class PatientIntakeTests: XCTestCase {
 
     @MainActor
     func testNewFormRequiresExplicitBirthDateAndSexWithoutInventingToday() async {
-        await withFixture { stub, presenter in
+        await withFixture { stub, presenter, _ in
             XCTAssertNil(presenter.patient.DoB)
             XCTAssertNil(presenter.selectedDoB)
             presenter.patient.name = "Siti"
@@ -60,7 +57,7 @@ final class PatientIntakeTests: XCTestCase {
 
     @MainActor
     func testReadingReadinessDoesNotPublishValidationErrors() async {
-        await withFixture { _, presenter in
+        await withFixture { _, presenter, _ in
             let initialGlobalErrors = ValidationManager.shared.errors
             for _ in 0..<10 { XCTAssertFalse(presenter.isFormValid) }
             XCTAssertTrue(presenter.fieldErrors.isEmpty)
@@ -71,7 +68,7 @@ final class PatientIntakeTests: XCTestCase {
 
     @MainActor
     func testOptionalIdentifiersSubmitTrimmedWithoutRequiringNationalIdentity() async {
-        await withFixture { stub, presenter in
+        await withFixture { stub, presenter, _ in
             fill(presenter)
             presenter.patient.NIK = "  "
             presenter.patient.medicalRecordNumber = "  RM-00017/A  "
@@ -89,7 +86,7 @@ final class PatientIntakeTests: XCTestCase {
 
     @MainActor
     func testMalformedProvidedIdentifiersRemainVisibleAndAreNotSilentlyStripped() async {
-        await withFixture { stub, presenter in
+        await withFixture { stub, presenter, _ in
             fill(presenter)
             presenter.patient.NIK = "123A"
             presenter.BPJSnumber = "123abc"
@@ -104,7 +101,7 @@ final class PatientIntakeTests: XCTestCase {
 
     @MainActor
     func testFailedEditLoadKeepsEditIdentityAndCannotCreateReplacementPatient() async {
-        await withFixture { stub, presenter in
+        await withFixture { stub, presenter, _ in
             stub.fetch = { _ in throw URLError(.notConnectedToInternet) }
             await presenter.getPatientById(patientId: "patient-intended")
             fill(presenter)
@@ -121,7 +118,7 @@ final class PatientIntakeTests: XCTestCase {
 
     @MainActor
     func testRetryEditLoadsCanonicalPatientAndPreservesMissingDate() async {
-        await withFixture { stub, presenter in
+        await withFixture { stub, presenter, _ in
             stub.fetch = { _ in throw URLError(.timedOut) }
             await presenter.getPatientById(patientId: "patient-a")
             stub.fetch = { id in Patient(id: id, name: "Existing", NIK: "", DoB: nil, sex: .UNKNOWN) }
@@ -139,7 +136,7 @@ final class PatientIntakeTests: XCTestCase {
 
     @MainActor
     func testDuplicateSaveSendsOneSnapshotAndKeepsFormVisible() async {
-        await withFixture { stub, presenter in
+        await withFixture { stub, presenter, _ in
             fill(presenter)
             let started = expectation(description: "Patient POST held")
             let gate = PatientIntakeGate()
@@ -165,7 +162,7 @@ final class PatientIntakeTests: XCTestCase {
 
     @MainActor
     func testListFailureIsNotAnEmptySuccessAndRetrySearchesMedicalRecordNumber() async {
-        await withFixture { stub, presenter in
+        await withFixture { stub, presenter, _ in
             stub.list = { throw URLError(.notConnectedToInternet) }
             await presenter.getAllPatient()
             XCTAssertNotNil(presenter.listErrorMessage)
@@ -186,7 +183,7 @@ final class PatientIntakeTests: XCTestCase {
 
     @MainActor
     func testOldPatientLookupCannotReplaceNewerSelection() async {
-        await withFixture { stub, presenter in
+        await withFixture { stub, presenter, _ in
             let started = expectation(description: "Old patient GET held")
             let gate = PatientIntakeGate()
             stub.fetch = { id in
@@ -204,9 +201,24 @@ final class PatientIntakeTests: XCTestCase {
     }
 
     @MainActor
+    func testCurrentSessionSavePopsOnlyItsOwnInjectedNavigation() async {
+        await withFixture { stub, presenter, router in
+            fill(presenter)
+            router.path.append(Router.Route.patientList)
+            router.path.append(Router.Route.patientForm(patientId: nil))
+            await presenter.handleFormSubmission()
+            XCTAssertEqual(stub.created.count, 1)
+            XCTAssertEqual(presenter.patient.id, "created")
+            XCTAssertEqual(router.path.count, 1, "A successful save must dismiss only its own form")
+            XCTAssertNil(presenter.errorMessage)
+            XCTAssertFalse(presenter.isSavingPatient)
+        }
+    }
+
+    @MainActor
     func testOldSessionListAndSaveCannotPublishPatientOrPopNewNavigation() async {
         for save in [false, true] {
-            await withFixture { stub, presenter in
+            await withFixture { stub, presenter, router in
                 fill(presenter)
                 let started = expectation(description: "Patient operation held")
                 let gate = PatientIntakeGate()
@@ -218,13 +230,15 @@ final class PatientIntakeTests: XCTestCase {
                 }
                 await fulfillment(of: [started], timeout: 2)
                 setSession("patient-owner-b")
-                Router.shared.path.append("New account route")
-                let count = Router.shared.path.count
+                // An isolated router keeps the live test-host NavigationStack
+                // from changing this assertion's navigation state.
+                router.path.append(Router.Route.privacyPolicy)
+                let count = router.path.count
                 await gate.open()
                 await request.value
                 XCTAssertTrue(presenter.patients.isEmpty)
                 XCTAssertTrue(presenter.patient.name.isEmpty)
-                XCTAssertEqual(Router.shared.path.count, count)
+                XCTAssertEqual(router.path.count, count)
                 XCTAssertNil(presenter.errorMessage)
                 XCTAssertFalse(presenter.isSavingPatient)
             }
@@ -233,7 +247,7 @@ final class PatientIntakeTests: XCTestCase {
 
     @MainActor
     func testEditingNameAndRecordNumberPreservesUnchangedLegacyBirthDateWireValue() async throws {
-        try await withFixture { stub, presenter in
+        try await withFixture { stub, presenter, _ in
             let legacyDate = "1990-02-18T17:23:45.123Z"
             let payload = Data("{\"id\":\"patient-legacy\",\"name\":\"Siti\",\"NIK\":\"\",\"DoB\":\"\(legacyDate)\",\"sex\":\"FEMALE\"}".utf8)
             let loaded = try JSONDecoder().decode(Patient.self, from: payload)
@@ -253,7 +267,7 @@ final class PatientIntakeTests: XCTestCase {
 
     @MainActor
     func testPatientIntakeRendersUnselectedDateAndLoadedIdentityAtPhoneWidths() async throws {
-        try await withFixture { stub, presenter in
+        try await withFixture { stub, presenter, _ in
             try await renderIntake(PatientFormField(presenter: presenter).padding(20), width: 375, typeSize: .large, name: "new-patient-empty-date")
             try await renderIntake(PatientFormField(presenter: presenter).padding(20), width: 320, typeSize: .accessibility3, name: "new-patient-accessibility")
             stub.fetch = { id in
@@ -301,7 +315,7 @@ final class PatientIntakeTests: XCTestCase {
 
     @MainActor
     func testExaminationFailureHasIndependentRecoveryState() async {
-        await withFixture { stub, presenter in
+        await withFixture { stub, presenter, _ in
             stub.examinations = { _ in throw URLError(.timedOut) }
             await presenter.getPatientById(patientId: "patient-a")
             await presenter.getExaminationsByPatientId(patientId: "patient-a")
