@@ -180,6 +180,8 @@ struct ProfileView: View {
 }
 
 struct ProfileActionRow: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     let title: String
     let icon: String
     let action: () -> Void
@@ -187,9 +189,12 @@ struct ProfileActionRow: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 12) {
-                Image(systemName: icon)
-                    .frame(width: 24)
-                    .accessibilityHidden(true)
+                if !dynamicTypeSize.isAccessibilitySize {
+                    Image(systemName: icon)
+                        .font(.system(size: 18))
+                        .frame(width: 24)
+                        .accessibilityHidden(true)
+                }
 
                 Text(title)
                     .multilineTextAlignment(.leading)
@@ -198,6 +203,7 @@ struct ProfileActionRow: View {
                 Spacer(minLength: 8)
 
                 Image(systemName: AppIcon.arrowRight)
+                    .font(.system(size: 16))
                     .accessibilityHidden(true)
             }
             .font(AppTypography.s5)
