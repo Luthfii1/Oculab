@@ -40,17 +40,6 @@ struct CameraView: View {
                 }
             }
         }
-        .onAppear {
-            Task {
-                // Ensure camera session is running when view appears
-                if !videoRecordPresenter.session.isRunning {
-                    await videoRecordPresenter.checkPermission()
-                }
-            }
-        }
-        .alert(isPresented: $videoRecordPresenter.alert) {
-            cameraAccessAlert
-        }
         .onChange(of: videoRecordPresenter.zoomFactor) { _, newValue in
             showZoomIndicator()
         }
@@ -109,6 +98,8 @@ struct CameraView: View {
                 }
             }
         }
+        .disabled(!videoRecordPresenter.isRecording && (!videoRecordPresenter.isCameraReady || videoRecordPresenter.isLoading))
+        .opacity(videoRecordPresenter.isRecording || videoRecordPresenter.isCameraReady ? 1 : 0.45)
         .scaleEffect(videoRecordPresenter.isRecording ? 0.9 : 1.0)
         .animation(.easeInOut(duration: 0.2), value: videoRecordPresenter.isRecording)
     }
@@ -125,19 +116,6 @@ struct CameraView: View {
                 .shadow(radius: 4)
         }
         .transition(.scale.combined(with: .opacity))
-    }
-    
-    private var cameraAccessAlert: Alert {
-        Alert(
-            title: Text(AppTextVideoRecordCompCamera.cameraAccessAlertTitle),
-            message: Text(AppTextVideoRecordCompCamera.cameraAccessAlertMessage),
-            primaryButton: .default(Text(AppTextVideoRecordCompCamera.settingsButton)) {
-                if let url = URL(string: UIApplication.openSettingsURLString) {
-                    UIApplication.shared.open(url)
-                }
-            },
-            secondaryButton: .cancel(Text(AppAction.cancel))
-        )
     }
     
     // MARK: - Methods

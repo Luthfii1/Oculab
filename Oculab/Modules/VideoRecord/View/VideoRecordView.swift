@@ -11,6 +11,8 @@ import SwiftUI
 struct VideoRecordView: View {
     @ObservedObject private var videoRecordPresenter = VideoRecordSession.current
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var isCameraScreenVisible = false
     @State private var showGuidelines = false
     @State private var didFinishOnboarding = false
     let slideId: String
@@ -46,13 +48,15 @@ struct VideoRecordView: View {
                 }
                 
                 // Loading overlay
-                if videoRecordPresenter.isLoading {
+                if shouldShowCameraPreparation {
                     Color.black.opacity(0.3)
                         .ignoresSafeArea()
                     
                     ProgressView(AppTextVideoRecordView.settingUpCamera)
+                        .tint(.white)
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .allowsHitTesting(false)
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -93,29 +97,37 @@ struct VideoRecordView: View {
             }
         }
         .navigationBarBackButtonHidden(true)
-        .onAppear {
+        .task(id: videoRecordPresenter.previewURL == nil) {
             videoRecordPresenter.setSpecimenTitle(specimenId: slideId)
+            // Retake clears the preview while this screen stays mounted.
+            guard videoRecordPresenter.previewURL == nil else { return }
+            await videoRecordPresenter.checkPermission()
+        }
+        .onAppear { isCameraScreenVisible = true }
+        .onChange(of: scenePhase) { _, phase in
+            // Granting access in Settings does not remount this screen.
+            guard phase == .active, isCameraScreenVisible,
+                  videoRecordPresenter.previewURL == nil else { return }
             Task {
-                // If we have a preview URL, we're returning from preview mode
-                // Need to reinitialize camera for new recording
-                if videoRecordPresenter.previewURL != nil {
-                    await videoRecordPresenter.resetForNewSession()
-                } else {
-                    await videoRecordPresenter.checkPermission()
-                }
+                guard isCameraScreenVisible else { return }
+                await videoRecordPresenter.checkPermission()
             }
         }
         .onDisappear {
-            Task {
-                await videoRecordPresenter.cleanup()
-            }
+            isCameraScreenVisible = false
+            // Enqueue teardown now; a delayed outer Task could stop an immediately reopened camera.
+            videoRecordPresenter.endSession()
         }
         .alert(isPresented: $videoRecordPresenter.alert) {
             cameraAccessAlert
         }
         .alert("Error", isPresented: .constant(videoRecordPresenter.errorMessage != nil)) {
-            Button("OK") {
+            Button(AppAction.retry) {
+                Task { await videoRecordPresenter.checkPermission() }
+            }
+            Button(AppAction.cancel, role: .cancel) {
                 videoRecordPresenter.errorMessage = nil
+                videoRecordPresenter.navigateBack()
             }
         } message: {
             if let errorMessage = videoRecordPresenter.errorMessage {
@@ -129,6 +141,14 @@ struct VideoRecordView: View {
         }
     }
     
+    private var shouldShowCameraPreparation: Bool {
+        videoRecordPresenter.previewURL == nil
+            && !videoRecordPresenter.isRecording
+            && (!videoRecordPresenter.isCameraReady || videoRecordPresenter.isLoading)
+            && !videoRecordPresenter.alert
+            && videoRecordPresenter.errorMessage == nil
+    }
+
     // MARK: - Subviews
     private var recordingDurationOverlay: some View {
         HStack {

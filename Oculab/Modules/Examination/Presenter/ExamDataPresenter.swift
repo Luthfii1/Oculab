@@ -154,11 +154,13 @@ extension ExamDataPresenter {
 
 // MARK: - Navigation Methods
 extension ExamDataPresenter {
-    func newVideoRecord() {
-        Task { @MainActor in
-            await VideoRecordSession.current.resetForNewSession()
-            Router.shared.navigateTo(.videoRecord(slideId: examDetailData.slideId))
-        }
+    @MainActor
+    func newVideoRecord(capturePresenter: VideoRecordPresenter? = nil) {
+        let slideId = examDetailData.slideId
+        let capturePresenter = capturePresenter ?? VideoRecordSession.current
+        // Navigation must not wait for permission, capture configuration, or hardware startup.
+        capturePresenter.prepareForNewSession()
+        Router.shared.navigateTo(.videoRecord(slideId: slideId))
     }
 
     func navigateToAnalysisResult(examinationId: String) {

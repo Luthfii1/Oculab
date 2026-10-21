@@ -16,9 +16,23 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelegate
 {
     private let interactor: VideoInteractor
+    private let captureController: CameraCaptureControlling
+    private let cameraAuthorization: @MainActor () async -> Bool
+    private var startupTask: Task<Void, Never>?
+    private var lifecycleID = UUID()
+    private var activeRecordingURL: URL?
 
-    init(interactor: VideoInteractor = VideoInteractor()) {
+    init(
+        interactor: VideoInteractor = VideoInteractor(),
+        captureController: CameraCaptureControlling? = nil,
+        cameraAuthorization: (@MainActor () async -> Bool)? = nil
+    ) {
         self.interactor = interactor
+        let controller = captureController ?? CameraCaptureController()
+        self.captureController = controller
+        self.session = controller.session
+        self.output = controller.output
+        self.cameraAuthorization = cameraAuthorization ?? Self.authorizeCamera
         super.init()
     }
 
@@ -26,10 +40,10 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     private var isEnableSaveVideoToPhotos: Bool = false
 
     // MARK: - Published Properties
-    @Published var session = AVCaptureSession()
+    let session: AVCaptureSession
     @Published var videoRecordingTitle: String = AppTextVideoRecordView.specimenTitleDefault
     @Published var alert = false
-    @Published var output = AVCaptureMovieFileOutput()
+    let output: AVCaptureMovieFileOutput
     @Published var preview: AVCaptureVideoPreviewLayer!
     @Published var hasTaken: Bool = false
     @Published var isRecording: Bool = false
@@ -42,214 +56,111 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     @Published var progressImage: UIImage?
     @Published var progressImageChecker: String = AppValue.empty
     @Published var zoomFactor: CGFloat = 1.0
+    @Published private(set) var isCameraReady = false
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     @Published var recordingDuration: TimeInterval = 0.0
     @Published var recordingQuality: AVCaptureSession.Preset = .high
 
     // MARK: - Private Properties
-    private let videoDataOutput = AVCaptureVideoDataOutput()
     private var lastStitchTime: Date?
     private let stitchInterval: TimeInterval = Stitch.clippingDuration
-    private let minZoomFactor: CGFloat = 1.0
-    private let maxZoomFactor: CGFloat = 4.9
     private var recordingTimer: Timer?
     private var recordingStartTime: Date?
-    private let frameProcessingQueue = DispatchQueue(
-        label: "com.oculab.videorecord.frameProcessing",
-        qos: .userInteractive
-    )
-
     // MARK: - Constants
     let preRecordingInstructions: [String] = AppTextVideoRecordInstruction.preRecordingInstructions
     let duringRecordingInstructions: [String] = AppTextVideoRecordInstruction.duringRecordingInstructions
 
-    // MARK: - Permission Management
+    // MARK: - Camera Startup
+    // Navigation never waits for this work. One task owns permission and startup;
+    // the capture controller serializes all blocking AVFoundation operations.
     func checkPermission() async {
-        await requestCameraPermission()
-    }
-    
-    @MainActor
-    private func requestCameraPermission() async {
-        let cameraStatus = AVCaptureDevice.authorizationStatus(for: .video)
-        
-        switch cameraStatus {
-        case .authorized:
-            await setUp()
-        case .notDetermined:
-            let cameraGranted = await AVCaptureDevice.requestAccess(for: .video)
-            
-            if cameraGranted {
-                await setUp()
-            } else {
-                alert = true
-            }
-        case .denied, .restricted:
-            alert = true
-        @unknown default:
-            alert = true
-        }
-    }
-
-    // MARK: - Camera Setup
-    @MainActor
-    private func setUp() async {
-        isLoading = true
-        defer { isLoading = false }
-
-        session.beginConfiguration()
-
-        do {
-            removeExistingInputsAndOutputs()
-            try setupInputs()
-            setupOutputs()
-            session.commitConfiguration()
-        } catch {
-            session.commitConfiguration()
-            Logger.error("Camera setup failed: \(error.localizedDescription)", category: .videoRecord)
-            errorMessage = "Failed to setup camera: \(error.localizedDescription)"
+        guard !Task.isCancelled, !isCameraReady, previewURL == nil else { return }
+        if let startupTask {
+            await startupTask.value
             return
         }
 
-        await startCameraSession()
-    }
-    
-    private func removeExistingInputsAndOutputs() {
-        session.inputs.forEach { session.removeInput($0) }
-        session.outputs.forEach { session.removeOutput($0) }
-    }
-    
-    private func setupInputs() throws {
-        guard let cameraDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
-              let videoInput = try? AVCaptureDeviceInput(device: cameraDevice)
-        else {
-            throw VideoRecordError.deviceNotFound
-        }
-        
-        // Add video input only (audio disabled to reduce file size)
-        if session.canAddInput(videoInput) {
-            session.addInput(videoInput)
-        } else {
-            throw VideoRecordError.cannotAddInput
-        }
-        
-        // Configure camera device
-        try configureCameraDevice(cameraDevice)
-    }
-    
-    private func setupOutputs() {
-        // Setup movie file output
-        if session.canAddOutput(output) {
-            session.addOutput(output)
-            configureMovieOutput()
-        }
-        
-        // Setup video data output for frame processing
-        videoDataOutput.setSampleBufferDelegate(self, queue: frameProcessingQueue)
-        if session.canAddOutput(videoDataOutput) {
-            session.addOutput(videoDataOutput)
-        }
-    }
-    
-    private func configureCameraDevice(_ device: AVCaptureDevice) throws {
-        try device.lockForConfiguration()
-        defer { device.unlockForConfiguration() }
-        
-        // Set video zoom factor
-        device.videoZoomFactor = zoomFactor
-        
-        // Enable smooth autofocus if available
-        if device.isSmoothAutoFocusSupported {
-            device.isSmoothAutoFocusEnabled = true
-        }
-        
-        // Set focus mode
-        if device.isFocusModeSupported(.continuousAutoFocus) {
-            device.focusMode = .continuousAutoFocus
-        }
-        
-        // Set exposure mode
-        if device.isExposureModeSupported(.continuousAutoExposure) {
-            device.exposureMode = .continuousAutoExposure
-        }
-        
-        // Set white balance mode
-        if device.isWhiteBalanceModeSupported(.continuousAutoWhiteBalance) {
-            device.whiteBalanceMode = .continuousAutoWhiteBalance
-        }
-    }
-    
-    private func configureMovieOutput() {
-        output.movieFragmentInterval = .invalid // Disable fragmentation for better compatibility
-        
-        // Set connection properties
-        if let connection = output.connection(with: .video) {
-            if connection.isVideoStabilizationSupported {
-                connection.preferredVideoStabilizationMode = .auto
+        let generation = lifecycleID
+        isLoading = true
+        alert = false
+        errorMessage = nil
+        let task = Task { @MainActor [weak self] in
+            guard let self else { return }
+            let granted = await self.cameraAuthorization()
+            guard self.lifecycleID == generation, !Task.isCancelled else { return }
+            guard granted else {
+                self.alert = true
+                self.isLoading = false
+                self.startupTask = nil
+                return
             }
-        }
-    }
-    
-    @MainActor
-    private func startCameraSession() async {
-        guard !session.isRunning else { 
-            Logger.info("AVCaptureSession already running", category: .videoRecord)
-            return 
-        }
-        
-        return await withCheckedContinuation { continuation in
-            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-                guard let self = self else {
-                    continuation.resume()
-                    return
-                }
-                
-                self.session.startRunning()
-                Logger.info("AVCaptureSession started", category: .videoRecord)
-                continuation.resume()
+            do {
+                try await self.captureController.start(delegate: self)
+                guard self.lifecycleID == generation, !Task.isCancelled else { return }
+                self.isCameraReady = true
+            } catch {
+                guard self.lifecycleID == generation, !Task.isCancelled else { return }
+                Logger.error("Camera setup failed: \(error.localizedDescription)", category: .videoRecord)
+                self.errorMessage = "Failed to setup camera: \(error.localizedDescription)"
             }
+            self.isLoading = false
+            self.startupTask = nil
+        }
+        startupTask = task
+        await task.value
+    }
+
+    private static func authorizeCamera() async -> Bool {
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized:
+            return true
+        case .notDetermined:
+            return await AVCaptureDevice.requestAccess(for: .video)
+        default:
+            return false
         }
     }
 
-    // MARK: - Camera Session Management
+    func cancelCameraStartup() {
+        lifecycleID = UUID()
+        startupTask?.cancel()
+        startupTask = nil
+        isLoading = false
+        isCameraReady = false
+    }
 
-    @MainActor
     func stopCameraSession() async {
-        guard session.isRunning else { 
-            Logger.info("AVCaptureSession already stopped", category: .videoRecord)
-            return 
-        }
-        
-        return await withCheckedContinuation { continuation in
-            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-                guard let self = self else {
-                    continuation.resume()
-                    return
-                }
-                
-                self.session.stopRunning()
-                Logger.info("AVCaptureSession stopped", category: .videoRecord)
-                continuation.resume()
-            }
-        }
+        cancelCameraStartup()
+        captureController.stop()
     }
 
     // MARK: - Recording Management
     @MainActor
     func startRecording() {
-        guard !isRecording else { return }
+        guard isCameraReady, !isRecording, activeRecordingURL == nil else { return }
 
         // Mark recording state before issuing I/O to prevent double-tap races
         isRecording = true
         recordingStartTime = Date()
 
         let tempURL = URL(fileURLWithPath: NSTemporaryDirectory())
-            .appendingPathComponent(AppTextVideoRecordView.videoFileDateAndExtension())
+            .appendingPathComponent("oculab-\(UUID().uuidString).mov")
 
-        configureRecordingQuality()
-
-        output.startRecording(to: tempURL, recordingDelegate: self)
+        activeRecordingURL = tempURL
+        let generation = lifecycleID
         startRecordingTimer()
+        captureController.startRecording(to: tempURL, delegate: self) { [weak self] result in
+            guard let self, self.lifecycleID == generation,
+                  self.activeRecordingURL == tempURL else { return }
+            if case .failure(let error) = result {
+                self.activeRecordingURL = nil
+                self.isRecording = false
+                self.isCameraReady = false
+                self.stopRecordingTimer()
+                self.errorMessage = "Failed to start recording: \(error.localizedDescription)"
+            }
+        }
 
         Logger.info("Recording started", category: .videoRecord)
     }
@@ -259,27 +170,20 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     func stopRecording() {
         guard isRecording else { return }
 
-        output.stopRecording()
+        captureController.stopRecording()
         isRecording = false
+        // Wait for the movie file to finish before allowing another recording.
+        isCameraReady = false
 
         stopRecordingTimer()
 
         Logger.info("Recording stopped", category: .videoRecord)
     }
     
-    private func configureRecordingQuality() {
-        if let connection = output.connection(with: .video) {
-            if connection.isVideoStabilizationSupported {
-                connection.preferredVideoStabilizationMode = .auto
-            }
-        }
-    }
-    
     private func startRecordingTimer() {
         recordingTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
-            guard let self = self, let startTime = self.recordingStartTime else { return }
-            
             Task { @MainActor in
+                guard let self, let startTime = self.recordingStartTime else { return }
                 self.recordingDuration = Date().timeIntervalSince(startTime)
             }
         }
@@ -299,10 +203,19 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
         error: Error?
     ) {
         Task { @MainActor in
+            // A dismissed recording must never replace a newer specimen preview.
+            guard self.activeRecordingURL == outputFileURL else {
+                self.deleteTemporaryFile(at: outputFileURL)
+                return
+            }
+            self.activeRecordingURL = nil
+            self.isRecording = false
+            self.stopRecordingTimer()
             if let error = error {
                 Logger.error("Recording error: \(error.localizedDescription)", category: .videoRecord)
                 self.errorMessage = error.localizedDescription
                 self.previewURL = nil
+                self.isCameraReady = true
                 self.deleteTemporaryFile(at: outputFileURL)
                 return
             }
@@ -368,12 +281,14 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
         }
 
         // Perform stitching on background queue
+        let generation = lifecycleID
         Task {
-            await performImageStitching(newImage: newImage, referenceImage: lastStitchedImage)
+            await performImageStitching(newImage: newImage, referenceImage: lastStitchedImage, generation: generation)
         }
     }
-    
-    private func performImageStitching(newImage: UIImage, referenceImage: UIImage) async {
+
+    private func performImageStitching(newImage: UIImage, referenceImage: UIImage, generation: UUID) async {
+        guard generation == lifecycleID else { return }
         return await withCheckedContinuation { continuation in
             ImageRegistration.shared.register(
                 floatingImage: newImage,
@@ -381,7 +296,8 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
                 registrationMechanism: .translational
             ) { [weak self] compositedImage, _ in
                 Task { @MainActor in
-                    self?.stitchedImage = compositedImage
+                    guard let self, self.lifecycleID == generation else { return }
+                    self.stitchedImage = compositedImage
                 }
                 continuation.resume()
             }
@@ -483,22 +399,29 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     // MARK: - Camera Controls
     @MainActor
     func updateZoom(factor: CGFloat) {
-        guard let videoInput = session.inputs
-            .compactMap({ $0 as? AVCaptureDeviceInput })
-            .first(where: { $0.device.hasMediaType(.video) })
-        else { return }
+        guard isCameraReady else { return }
+        let generation = lifecycleID
+        Task {
+            guard generation == lifecycleID, isCameraReady else { return }
+            do {
+                let actualZoom = try await captureController.setZoom(factor)
+                guard generation == lifecycleID else { return }
+                zoomFactor = actualZoom
+            } catch {
+                guard generation == lifecycleID else { return }
+                errorMessage = "Failed to adjust zoom"
+            }
+        }
+    }
 
-        let cameraDevice = videoInput.device
-        let clampedFactor = min(max(factor, minZoomFactor), maxZoomFactor)
-
+    func focusCamera(at point: CGPoint) async {
+        guard isCameraReady else { return }
+        let generation = lifecycleID
         do {
-            try cameraDevice.lockForConfiguration()
-            cameraDevice.videoZoomFactor = clampedFactor
-            cameraDevice.unlockForConfiguration()
-            zoomFactor = clampedFactor
+            try await captureController.focus(at: point)
         } catch {
-            Logger.error("Error setting zoom: \(error.localizedDescription)", category: .videoRecord)
-            errorMessage = "Failed to adjust zoom"
+            guard generation == lifecycleID else { return }
+            Logger.error("Error focusing camera: \(error.localizedDescription)", category: .videoRecord)
         }
     }
 
@@ -527,46 +450,44 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
     }
     
     // MARK: - Cleanup
-    @MainActor
-    func cleanup() async {
-        // Stop recording cleanly if in progress so the timer is invalidated
-        // and no orphan capture finishes after the view is gone.
-        if isRecording {
-            output.stopRecording()
-        }
+    // Synchronous invalidation and enqueueing are essential: an old disappearance
+    // must not stop or reset a camera that has already been opened again.
+    func endSession() {
+        cancelCameraStartup()
+        activeRecordingURL = nil
+        captureController.stopRecording()
+        captureController.stop()
         stopRecordingTimer()
-        await stopCameraSession()
-
-        // Reset all state
         isRecording = false
         showPlayerView = false
         stitchedImage = nil
         progressImage = nil
+        lastStitchTime = nil
         errorMessage = nil
-        recordingDuration = 0.0
+        recordingStartTime = nil
         zoomFactor = 1.0
-
-        // Clear URLs but don't reset previewURL if it exists
         recordedURLs.removeAll()
         resetSpecimenTitle()
-
-        Logger.info("VideoRecordPresenter cleaned up successfully", category: .videoRecord)
     }
-    
-    @MainActor
-    func resetForNewSession() async {
-        // Complete cleanup first
-        await cleanup()
-        
-        // Reset preview URL for fresh start
+
+    func cleanup() async {
+        endSession()
+        // A replacement presenter must not acquire hardware while the previous
+        // session still owns it. No UI state is changed after this suspension.
+        await captureController.waitForPendingOperations()
+    }
+
+    func prepareForNewSession() {
+        endSession()
         previewURL = nil
         hasTaken = false
         showPreview = false
-        
-        // Reinitialize camera if permissions are granted
+        alert = false
+    }
+
+    func resetForNewSession() async {
+        prepareForNewSession()
         await checkPermission()
-        
-        Logger.info("VideoRecordPresenter reset for new session", category: .videoRecord)
     }
 }
 
