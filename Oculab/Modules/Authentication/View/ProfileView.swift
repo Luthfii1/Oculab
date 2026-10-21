@@ -133,74 +133,34 @@ struct ProfileView: View {
                     }
 
                     if authPresenter.user.role == .ADMIN {
-                        AppButton(
+                        ProfileActionRow(
                             title: AppNav.accountManagement,
-                            leftIcon: AppIcon.personFill,
-                            rightIcon: AppIcon.arrowRight,
-                            colorType: .tertiary,
-                            titleColor: AppColors.slate900
+                            icon: AppIcon.personFill
                         ) {
                             profilePresenter.navigateTo(.accountManagement)
                         }
-                        .padding(.vertical, Decimal.d16)
-                        .background(.white)
-                        .cornerRadius(Decimal.d12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: Decimal.d12)
-                                .stroke(AppColors.slate100)
-                        )
                     }
 
-                    AppButton(
+                    ProfileActionRow(
                         title: AppTextAuthProfile.editPasswordButton,
-                        leftIcon: AppIcon.lock,
-                        rightIcon: AppIcon.arrowRight,
-                        colorType: .tertiary,
-                        titleColor: AppColors.slate900
+                        icon: AppIcon.lock
                     ) {
                         profilePresenter.navigateTo(.editPassword)
                     }
-                    .padding(.vertical, Decimal.d16)
-                    .background(.white)
-                    .cornerRadius(Decimal.d12)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: Decimal.d12)
-                            .stroke(AppColors.slate100)
-                    )
 
-                    AppButton(
+                    ProfileActionRow(
                         title: AppTextAuthProfile.editPinButton,
-                        leftIcon: AppIcon.lockCircleDotted,
-                        rightIcon: AppIcon.arrowRight,
-                        colorType: .tertiary,
-                        titleColor: AppColors.slate900
+                        icon: AppIcon.lockCircleDotted
                     ) {
                         profilePresenter.navigateTo(.userAccessPin(state: .changePIN))
                     }
-                    .padding(.vertical, Decimal.d16)
-                    .background(.white)
-                    .cornerRadius(Decimal.d12)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: Decimal.d12)
-                            .stroke(AppColors.slate100)
-                    )
 
-                    AppButton(
+                    ProfileActionRow(
                         title: AppTextAuthProfile.privacyPolicyButton,
-                        leftIcon: AppIcon.lockShield,
-                        rightIcon: AppIcon.arrowRight,
-                        colorType: .tertiary,
-                        titleColor: AppColors.slate900
+                        icon: AppIcon.lockShield
                     ) {
                         Router.shared.navigateTo(.privacyPolicy)
                     }
-                    .padding(.vertical, Decimal.d16)
-                    .background(.white)
-                    .cornerRadius(Decimal.d12)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: Decimal.d12)
-                            .stroke(AppColors.slate100)
-                    )
 
                     AppButton(title: AppAction.exit, rightIcon: AppIcon.doorRightHandOpen, colorType: .destructive(.secondary)) {
                         Task {
@@ -216,6 +176,56 @@ struct ProfileView: View {
         }
         .task { await authPresenter.refreshEmailVerificationStatus() }
         .refreshable { await authPresenter.refreshEmailVerificationStatus() }
+    }
+}
+
+struct ProfileActionRow: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    let title: String
+    let icon: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                if !dynamicTypeSize.isAccessibilitySize {
+                    Image(systemName: icon)
+                        .font(.system(size: 18))
+                        .frame(width: 24)
+                        .accessibilityHidden(true)
+                }
+
+                Text(title)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Spacer(minLength: 8)
+
+                if !dynamicTypeSize.isAccessibilitySize {
+                    Image(systemName: AppIcon.arrowRight)
+                        .font(.system(size: 16))
+                        .accessibilityHidden(true)
+                }
+            }
+            .font(AppTypography.s5)
+            .foregroundStyle(AppColors.slate900)
+            .padding(16)
+            .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
+            .background(.white, in: RoundedRectangle(cornerRadius: Decimal.d12))
+            .overlay {
+                RoundedRectangle(cornerRadius: Decimal.d12)
+                    .stroke(AppColors.slate100)
+            }
+            .contentShape(RoundedRectangle(cornerRadius: Decimal.d12))
+        }
+        .buttonStyle(ProfileActionButtonStyle())
+    }
+}
+
+private struct ProfileActionButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label.opacity(configuration.isPressed ? 0.8 : 1)
     }
 }
 
