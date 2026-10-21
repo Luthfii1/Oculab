@@ -123,7 +123,10 @@ struct VideoRecordView: View {
         }
         .alert("Error", isPresented: .constant(videoRecordPresenter.errorMessage != nil)) {
             Button(AppAction.retry) {
-                Task { await videoRecordPresenter.checkPermission() }
+                Task {
+                    guard isCameraScreenVisible else { return }
+                    await videoRecordPresenter.retryCameraStartup()
+                }
             }
             Button(AppAction.cancel, role: .cancel) {
                 videoRecordPresenter.errorMessage = nil

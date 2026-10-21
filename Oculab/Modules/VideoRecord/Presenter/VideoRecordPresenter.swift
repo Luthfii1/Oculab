@@ -111,6 +111,13 @@ class VideoRecordPresenter: NSObject, ObservableObject, AVCapturePhotoCaptureDel
         await task.value
     }
 
+    func retryCameraStartup() async {
+        // Recoverable recording/zoom errors can leave capture ready already.
+        // Clear the alert even when no hardware restart is necessary.
+        errorMessage = nil
+        await checkPermission()
+    }
+
     private static func authorizeCamera() async -> Bool {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:

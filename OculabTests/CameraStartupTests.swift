@@ -110,9 +110,15 @@ final class CameraStartupTests: XCTestCase {
         XCTAssertFalse(presenter.isCameraReady)
         XCTAssertFalse(presenter.isLoading)
         capture.onStart = { _ in }
-        await presenter.checkPermission()
+        await presenter.retryCameraStartup()
         XCTAssertNil(presenter.errorMessage)
         XCTAssertTrue(presenter.isCameraReady)
+        let startsBeforeReadyError = capture.starts
+        presenter.errorMessage = "Recoverable recording error"
+        await presenter.retryCameraStartup()
+        XCTAssertNil(presenter.errorMessage)
+        XCTAssertTrue(presenter.isCameraReady)
+        XCTAssertEqual(capture.starts, startsBeforeReadyError)
         presenter.endSession()
     }
 
