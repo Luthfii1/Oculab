@@ -115,3 +115,5 @@ schemes:
       targets:
         - OculabTests
       gatherCoverageData: true
+      environmentVariables:
+        OCULAB_UNIT_TESTING: "1"

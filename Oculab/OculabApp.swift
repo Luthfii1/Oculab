@@ -8,6 +8,18 @@
 import SwiftData
 import SwiftUI
 
+/// The test action starts a signed host for Keychain/UIKit access, without
+/// running the application's live navigation and authentication side effects.
+enum AppLaunchMode {
+    static func usesUnitTestScene(environment: [String: String] = ProcessInfo.processInfo.environment) -> Bool {
+        #if DEBUG
+        return environment["OCULAB_UNIT_TESTING"] == "1"
+        #else
+        return false
+        #endif
+    }
+}
+
 @main
 struct OculabApp: App {
     @UIApplicationDelegateAdaptor(AppNotificationDelegate.self) private var appNotificationDelegate
@@ -31,13 +43,17 @@ struct OculabApp: App {
 
     var body: some Scene {
         WindowGroup {
-            AccountCheckerView()
-                .environmentObject(authPresenter)
-                .environmentObject(routeFinder)
-                .colorScheme(.light)
-                .onOpenURL { url in
-                    handleDeeplink(url)
-                }
+            if AppLaunchMode.usesUnitTestScene() {
+                Color.clear
+            } else {
+                AccountCheckerView()
+                    .environmentObject(authPresenter)
+                    .environmentObject(routeFinder)
+                    .colorScheme(.light)
+                    .onOpenURL { url in
+                        handleDeeplink(url)
+                    }
+            }
         }
         .modelContainer(container)
     }
