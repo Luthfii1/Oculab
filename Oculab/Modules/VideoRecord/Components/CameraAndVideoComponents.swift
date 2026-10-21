@@ -127,37 +127,11 @@ class CameraPreviewCoordinator: NSObject {
     
     @MainActor
     private func focusCamera(at point: CGPoint) {
-        guard let device = parent.videoRecordPresenter.session.inputs.first as? AVCaptureDeviceInput else {
-            return
-        }
-        
-        let cameraDevice = device.device
-        
-        do {
-            try cameraDevice.lockForConfiguration()
-            
-            // Set focus point
-            if cameraDevice.isFocusPointOfInterestSupported &&
-               cameraDevice.isFocusModeSupported(.autoFocus) {
-                cameraDevice.focusPointOfInterest = point
-                cameraDevice.focusMode = .autoFocus
-            }
-            
-            // Set exposure point
-            if cameraDevice.isExposurePointOfInterestSupported &&
-               cameraDevice.isExposureModeSupported(.autoExpose) {
-                cameraDevice.exposurePointOfInterest = point
-                cameraDevice.exposureMode = .autoExpose
-            }
-            
-            cameraDevice.unlockForConfiguration()
-            
-            Logger.info("Camera focused at point: \(point)", category: .videoRecord)
-            
-        } catch {
-            Logger.error("Failed to focus camera: \(error.localizedDescription)", category: .videoRecord)
+        Task { @MainActor in
+            await parent.videoRecordPresenter.focusCamera(at: point)
         }
     }
+
 }
 
 // MARK: - Simple Video Player Component
