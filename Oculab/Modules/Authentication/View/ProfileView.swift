@@ -202,9 +202,11 @@ struct ProfileActionRow: View {
 
                 Spacer(minLength: 8)
 
-                Image(systemName: AppIcon.arrowRight)
-                    .font(.system(size: 16))
-                    .accessibilityHidden(true)
+                if !dynamicTypeSize.isAccessibilitySize {
+                    Image(systemName: AppIcon.arrowRight)
+                        .font(.system(size: 16))
+                        .accessibilityHidden(true)
+                }
             }
             .font(AppTypography.s5)
             .foregroundStyle(AppColors.slate900)
