@@ -117,10 +117,8 @@ struct InputPatientData: View {
                         presenter.markInitialLoadComplete()
                     }
 
-                    if authentication.user.role == .LAB && authentication.user.businessModel == .B2C {
-                        let picId = authentication.user.id
-                        presenter.selectedPIC = picId
-                        await presenter.getUserById(userId: picId)
+                    if let unresolvedOfficerID = presenter.selectDefaultOfficerIfNeeded(user: authentication.user) {
+                        loadOfficer(id: unresolvedOfficerID)
                     }
                     guard !Task.isCancelled, generation == AuthSessionManager.authenticationSessionGeneration else { return }
 
@@ -149,12 +147,7 @@ struct InputPatientData: View {
                 }
             }
             .onChange(of: presenter.selectedPIC) { _, newValue in
-                if !newValue.isEmpty {
-                    picChangeTask?.cancel()
-                    picChangeTask = Task {
-                        await presenter.getUserById(userId: newValue)
-                    }
-                }
+                if !newValue.isEmpty { loadOfficer(id: newValue) }
             }
         }
         .navigationBarBackButtonHidden()
@@ -177,6 +170,14 @@ struct InputPatientData: View {
                 Text(presenter.errorMessage)
             }
         )
+    }
+
+    @MainActor
+    private func loadOfficer(id: String) {
+        picChangeTask?.cancel()
+        picChangeTask = Task {
+            await presenter.getUserById(userId: id)
+        }
     }
 
     private var patientSearchPlaceholder: String {

@@ -7,6 +7,7 @@ import Observation
 @Observable
 class PatientPresenter {
     private let interactor: PatientInteractor
+    private let router: Router
     var formValidation = FormValidationViewModel()
     @ObservationIgnored nonisolated(unsafe) private var sessionObserver: NSObjectProtocol?
     private var listRequestID: UUID?
@@ -40,8 +41,9 @@ class PatientPresenter {
     var patientLoadErrorMessage: String?
     var examinationsErrorMessage: String?
 
-    init(interactor: PatientInteractor? = nil) {
+    init(interactor: PatientInteractor? = nil, router: Router = .shared) {
         self.interactor = interactor ?? PatientInteractor()
+        self.router = router
         sessionObserver = NotificationCenter.default.addObserver(
             forName: AuthSessionManager.sessionDidChangeNotification, object: nil, queue: .main
         ) { [weak self] _ in
@@ -178,7 +180,7 @@ class PatientPresenter {
             if let intendedID, saved.id.lowercased() != intendedID.lowercased() { throw URLError(.badServerResponse) }
             patient = saved
             // Keep navigation within the same checked session; Router.navigateBack dispatches asynchronously.
-            if !Router.shared.path.isEmpty { Router.shared.path.removeLast() }
+            if !router.path.isEmpty { router.path.removeLast() }
         } catch {
             guard isCurrent(session), formID == requestedForm, saveRequestID == requestID, !isCancellation(error) else { return }
             errorMessage = ErrorHandler.shared.handleError(error, context: .patientManagement)
@@ -262,8 +264,8 @@ class PatientPresenter {
                 || $0.bpjs.localizedCaseInsensitiveContains(query) || $0.medicalRecordNumber.localizedCaseInsensitiveContains(query)
         }
     }
-    func navigateTo(_ destination: Router.Route) { Router.shared.navigateTo(destination) }
-    func navigateBack() { Router.shared.navigateBack() }
+    func navigateTo(_ destination: Router.Route) { router.navigateTo(destination) }
+    func navigateBack() { router.navigateBack() }
     func formatDate(_ date: Date?) -> String { date?.formatted(date: .numeric, time: .omitted) ?? AppTextPatientIntake.missingValue }
     func formatDateTime(_ date: Date) -> String { date.formatted(date: .numeric, time: .shortened) }
     private func isEmptyPatientListError(_ error: Error) -> Bool {
