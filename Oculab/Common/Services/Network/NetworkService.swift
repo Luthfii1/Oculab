@@ -29,9 +29,12 @@ class NetworkService: NetworkServiceProtocol {
     
     // MARK: - Initialization
     
-    init(retryManager: NetworkRetryManager = NetworkRetryManager()) {
+    init(
+        retryManager: NetworkRetryManager = NetworkRetryManager(),
+        baseService: AlamofireNetworkService = AlamofireNetworkService()
+    ) {
         self.retryManager = retryManager
-        self.baseService = AlamofireNetworkService()
+        self.baseService = baseService
     }
     
     // MARK: - NetworkServiceProtocol Implementation with Retry Logic
@@ -41,7 +44,10 @@ class NetworkService: NetworkServiceProtocol {
         headers: [String: String]?
     ) async throws -> APIResponse<T> {
         
-        let operationId = "GET_\(urlString.hashValue)"
+        // Reads from different views may overlap legitimately. Each invocation
+        // owns its retries and cancellation; it must not reject another reader
+        // or share a response across authentication/request contexts.
+        let operationId = "GET_\(UUID().uuidString)"
         let maxAttempts = getRetryAttempts(for: urlString)
         
         return try await retryManager.executeWithRetry(
