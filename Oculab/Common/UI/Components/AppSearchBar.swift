@@ -10,10 +10,15 @@ import SwiftUI
 struct AppSearchBar: View {
     @Binding var searchText: String
     var placeholder: String = AppSearch.placeholder
+    var focus: FocusState<Bool>.Binding? = nil
     var onSearch: () -> Void
     
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @FocusState private var isSearchFocused: Bool
+
+    private var searchFocus: FocusState<Bool>.Binding {
+        focus ?? $isSearchFocused
+    }
 
     var body: some View {
         if dynamicTypeSize.isAccessibilitySize {
@@ -47,7 +52,7 @@ struct AppSearchBar: View {
             TextField(placeholder, text: $searchText)
                 .font(AppTypography.p2)
                 .foregroundColor(AppColors.slate900)
-                .focused($isSearchFocused)
+                .focused(searchFocus)
                 .submitLabel(.search)
                 .onSubmit(submitSearch)
                 .accessibilityLabel(placeholder)
@@ -55,7 +60,7 @@ struct AppSearchBar: View {
             if !searchText.isEmpty {
                 Button {
                     searchText = AppValue.empty
-                    isSearchFocused = true
+                    searchFocus.wrappedValue = true
                 } label: {
                     Image(systemName: AppIcon.error)
                         .foregroundColor(AppColors.slate400)
@@ -84,7 +89,7 @@ struct AppSearchBar: View {
     }
 
     private func submitSearch() {
-        isSearchFocused = false
+        searchFocus.wrappedValue = false
         onSearch()
     }
 }

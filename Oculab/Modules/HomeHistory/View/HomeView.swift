@@ -8,42 +8,76 @@
 import SwiftUI
 
 struct HomeView: View {
-    @StateObject private var presenter = HomeHistoryPresenter()
+    @StateObject private var presenter: HomeHistoryPresenter
     @ObservedObject private var uploadQueue = VideoUploadQueueService.shared
     @ObservedObject private var networkStatus = DependencyInjection.shared.networkRetryManager
     @EnvironmentObject private var authentication: AuthenticationPresenter
     @State private var loadTask: Task<Void, Never>?
     @State private var refreshTask: Task<Void, Never>?
     @State private var trackedAnalysisIds: [String] = []
+    @FocusState private var isSearchFocused: Bool
 
     private let tabBarScrollInset: CGFloat = 96
 
+    init(presenter: @autoclosure @escaping () -> HomeHistoryPresenter = HomeHistoryPresenter()) {
+        _presenter = StateObject(wrappedValue: presenter())
+    }
+
+    private var isSearching: Bool {
+        isSearchFocused || !presenter.taskSearchQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
     var body: some View {
         NavigationView {
-            ScrollView(showsIndicators: false) {
-                Spacer().frame(height: Decimal.d16)
+            ScrollViewReader { scrollProxy in
+                ScrollView(showsIndicators: false) {
+                    LazyVStack(alignment: .leading, spacing: 20, pinnedViews: [.sectionHeaders]) {
+                        if !isSearching {
+                            StatisticComponent(isLab: authentication.user.role == .LAB)
+                                .environmentObject(presenter)
+                            taskSectionHeader
+                        }
 
-                LazyVStack(alignment: .leading, spacing: 20) {
-                    StatisticComponent(isLab: authentication.user.role == .LAB)
-                        .environmentObject(presenter)
-
-                    taskListSection
+                        Section {
+                            taskListSection
+                        } header: {
+                            taskSearchBar
+                                .padding(.vertical, 8)
+                                .background(AppColors.slate0)
+                                .id("home-task-search")
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, Decimal.d16)
+                    .padding(.bottom, tabBarScrollInset)
+                    .id("home-task-top")
                 }
-                .padding(.horizontal, 20)
-                .padding(.bottom, tabBarScrollInset)
-            }
-            .scrollDismissesKeyboard(.interactively)
-            .refreshable {
-                refreshTask?.cancel()
-                refreshTask = Task {
-                    await presenter.refreshHome(userRole: authentication.user.role)
+                .scrollDismissesKeyboard(.interactively)
+                .refreshable {
+                    refreshTask?.cancel()
+                    refreshTask = Task {
+                        await presenter.refreshHome(userRole: authentication.user.role)
+                    }
+                    await refreshTask?.value
                 }
-                await refreshTask?.value
+                .task(id: isSearching) {
+                    await Task.yield()
+                    guard !Task.isCancelled else { return }
+                    scrollProxy.scrollTo(isSearching ? "home-task-search" : "home-task-top", anchor: .top)
+                }
             }
             .navigationTitle(AppTextHomeHistory.navigationTitleHome)
+            .navigationBarTitleDisplayMode(isSearching ? .inline : .large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    CompactNetworkStatusView()
+                    if isSearching {
+                        Button(AppCommon.cancel) {
+                            isSearchFocused = false
+                            presenter.updateTaskSearchQuery("")
+                        }
+                    } else {
+                        CompactNetworkStatusView()
+                    }
                 }
             }
         }
@@ -67,6 +101,7 @@ struct HomeView: View {
             }
         }
         .onDisappear {
+            isSearchFocused = false
             loadTask?.cancel()
             refreshTask?.cancel()
         }
@@ -95,37 +130,53 @@ struct HomeView: View {
 
     // MARK: - Task list
 
+    private var taskSectionHeader: some View {
+        HStack(alignment: .center, spacing: 8) {
+            Image(systemName: AppIcon.docOnDocFill)
+                .foregroundStyle(AppColors.purple500)
+
+            Text(AppTextHomeHistory.taskSectionTitle)
+                .foregroundStyle(AppColors.slate900)
+                .font(AppTypography.s4_1)
+
+            Spacer()
+
+            if presenter.isAllExamsLoading && presenter.hasLoadedExaminations {
+                ProgressView().accessibilityLabel(AppTextHomeHistory.refreshingLabel)
+            }
+            if presenter.hasLoadedExaminations && presenter.hasAnyExaminations {
+                Text(
+                    String(
+                        format: AppTextHomeHistory.taskCountFormat,
+                        presenter.filteredExamination.count
+                    )
+                )
+                .font(AppTypography.p5)
+                .foregroundStyle(AppColors.slate400)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+                .background(AppColors.purple50)
+                .clipShape(Capsule())
+            }
+        }
+    }
+
+    private var taskSearchBar: some View {
+        AppSearchBar(
+            searchText: Binding(
+                get: { presenter.taskSearchQuery },
+                set: { presenter.updateTaskSearchQuery($0) }
+            ),
+            placeholder: AppTextHomeHistory.searchPlaceholder,
+            focus: $isSearchFocused,
+            onSearch: {
+                presenter.updateTaskSearchQuery(presenter.taskSearchQuery)
+            }
+        )
+    }
+
     private var taskListSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack(alignment: .center, spacing: 8) {
-                Image(systemName: AppIcon.docOnDocFill)
-                    .foregroundStyle(AppColors.purple500)
-
-                Text(AppTextHomeHistory.taskSectionTitle)
-                    .foregroundStyle(AppColors.slate900)
-                    .font(AppTypography.s4_1)
-
-                Spacer()
-
-                if presenter.isAllExamsLoading && presenter.hasLoadedExaminations {
-                    ProgressView().accessibilityLabel(AppTextHomeHistory.refreshingLabel)
-                }
-                if presenter.hasLoadedExaminations && presenter.hasAnyExaminations {
-                    Text(
-                        String(
-                            format: AppTextHomeHistory.taskCountFormat,
-                            presenter.filteredExamination.count
-                        )
-                    )
-                    .font(AppTypography.p5)
-                    .foregroundStyle(AppColors.slate400)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(AppColors.purple50)
-                    .clipShape(Capsule())
-                }
-            }
-
             filterChips
 
             if uploadQueue.pendingCount > 0 {
@@ -184,18 +235,7 @@ struct HomeView: View {
                 .buttonStyle(.plain)
             }
 
-            AppSearchBar(
-                searchText: Binding(
-                    get: { presenter.taskSearchQuery },
-                    set: { presenter.updateTaskSearchQuery($0) }
-                ),
-                placeholder: AppTextHomeHistory.searchPlaceholder,
-                onSearch: {
-                    presenter.updateTaskSearchQuery(presenter.taskSearchQuery)
-                }
-            )
-
-            if showsNewExaminationButton {
+            if !isSearching && showsNewExaminationButton {
                 AppButton(
                     title: AppTextHomeHistory.newExaminationButton,
                     leftIcon: AppIcon.docBadgePlus,
